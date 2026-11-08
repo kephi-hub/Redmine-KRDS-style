@@ -44,3 +44,6 @@ ko:
   label_auto_watch_on_issue_contributed_to: 내가 참여한 일감
   # 로그인 화면 오른쪽 위 링크·가입 화면 제목
   label_register: 회원가입
+  # 파일 목록 열 이름
+  field_digest: 체크섬
+  label_downloads_abbr: 다운로드
