@@ -73,6 +73,8 @@ cp .env backup/                                         # 암호화 키 포함
 복원: 같은 `.env` 로 실행한 뒤 `pg_restore -U redmine -d redmine --clean` 과 파일 압축 해제.
 
 ## 라이선스 · 출처
+이 저장소의 코드(테마·플러그인·설정 스크립트)는 **GNU GPL v2** 로 배포합니다 — [LICENSE](LICENSE)
+
 - Redmine: GPL v2 — https://www.redmine.org
 - Vault 플러그인: https://github.com/noshutdown-ru/vault — 저장소에 포함하지 않고 빌드 때 받아 씀
 - Pretendard GOV 글꼴: SIL Open Font License 1.1 — https://github.com/orioncactus/pretendard (CDN 으로 불러옴, 저장소에 포함하지 않음)

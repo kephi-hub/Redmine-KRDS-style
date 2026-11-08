@@ -1,5 +1,6 @@
 <%# KRDS 게시판 목록 행 — 원본: Redmine 6.1.6 app/views/documents/_document.html.erb %>
-<% desc = strip_tags(textilizable(document.description.to_s, :object => document)).squish %>
+<%# 요약문: 제목 앵커(¶) 를 빼고 글자만 (headings: false) %>
+<% desc = strip_tags(textilizable(document.description.to_s, :object => document, :headings => false)).squish %>
 <li class="document-item document-<%= document.id %> doc_item">
   <h4 class="title doc_link"><%= link_to document.title, document_path(document) %></h4>
   <% if desc.present? %><p class="doc_desc"><%= truncate(desc, :length => 160) %></p><% end %>
