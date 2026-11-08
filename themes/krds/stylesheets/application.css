@@ -468,6 +468,50 @@ body.controller-news.action-show #content>h3{padding-top:20px;margin-top:28px;bo
 #content>div.contextual>a.icon-del .icon-svg{color:var(--dan_50);}
 #content>div.contextual>a.icon-del:hover{border-color:var(--dan_60);background:var(--dan_5);color:var(--dan_60);}
 
+/* ===== 관리 첫 화면 (KRDS 카드 목록: 아이콘 상자 + 이름 + 설명) — 열 수는 파일 끝 min-width 에서 늘림 ===== */
+#admin-index #admin-menu{padding:0;}
+#admin-index #admin-menu ul{display:grid;grid-template-columns:1fr;gap:12px;padding:0;margin:0;}
+#admin-index #admin-menu li{padding:0;}
+#admin-index #admin-menu a.icon{display:grid;grid-template-columns:44px 1fr;align-items:center;column-gap:14px;row-gap:2px;box-sizing:border-box;height:100%;padding:18px 20px;border:1px solid var(--gray_20);border-radius:var(--radius_m,8px);background:var(--gray_0);font-size:1rem;font-weight:700;line-height:1.5;color:var(--gray_90);transition:border-color .15s,box-shadow .15s;}
+#admin-index #admin-menu a.icon:hover{border-color:var(--pri_50);box-shadow:0 4px 12px rgba(0,0,0,0.08);color:var(--pri_60);text-decoration:none;}
+#admin-index #admin-menu a.icon .icon-svg{grid-row:span 2;box-sizing:border-box;width:44px;height:44px;padding:11px;border-radius:var(--radius_m,8px);background:var(--pri_5);stroke:currentColor;color:var(--pri_50);}
+#admin-index #admin-menu a.icon .icon-label{align-self:end;margin:0;}
+#admin-index #admin-menu a.icon::after{align-self:start;font-size:0.8125rem;font-weight:400;color:var(--gray_60);}
+#admin-index #admin-menu a.projects::after{content:"프로젝트 목록 · 보관 · 삭제";}
+#admin-index #admin-menu a.users::after{content:"계정 추가 · 잠금 · 권한 확인";}
+#admin-index #admin-menu a.groups::after{content:"사용자를 묶어 한 번에 권한 부여";}
+#admin-index #admin-menu a.roles::after{content:"역할별로 할 수 있는 일 지정";}
+#admin-index #admin-menu a.trackers::after{content:"결함 · 새기능 등 일감 종류";}
+#admin-index #admin-menu a.issue-statuses::after{content:"신규 · 진행 · 완료 등 처리 단계";}
+#admin-index #admin-menu a.workflows::after{content:"역할 · 유형별 상태 변경 규칙";}
+#admin-index #admin-menu a.custom-fields::after{content:"일감 · 프로젝트에 입력 항목 추가";}
+#admin-index #admin-menu a.enumerations::after{content:"우선순위 · 문서 범주 · 작업 분류";}
+#admin-index #admin-menu a.settings::after{content:"표시 · 인증 · 메일 등 전체 설정";}
+#admin-index #admin-menu a.ldap-authentication::after{content:"외부 디렉터리 계정 연동";}
+#admin-index #admin-menu a.vault::after{content:"접속정보 암호화 · 권한 설정";}
+#admin-index #admin-menu a.plugins::after{content:"설치된 플러그인 목록";}
+#admin-index #admin-menu a.info::after{content:"버전 · 실행 환경 점검";}
+/* Vault 메뉴는 아이콘 없이 글자만 있어 자물쇠 상자를 붙임 (responsive.css 의 !important 덮어씀) */
+#admin-index #admin-menu a.vault{padding:18px 20px !important;background-image:none;}
+#admin-index #admin-menu a.vault::before{content:"";grid-row:span 2;width:44px;height:44px;border-radius:var(--radius_m,8px);background:var(--pri_5) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23256ef4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2'/%3E%3Cpath d='M8 11V7a4 4 0 0 1 8 0v4'/%3E%3C/svg%3E") center/22px no-repeat;}
+
+/* ===== 관리 화면 왼쪽(사이드바) 메뉴 ===== */
+#sidebar #admin-menu li{padding:0 0 2px;}
+#sidebar #admin-menu a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius_s);font-size:0.875rem;line-height:1.4;color:var(--gray_80);}
+#sidebar #admin-menu a:hover{background:var(--gray_10);color:var(--gray_95);text-decoration:none;}
+#sidebar #admin-menu a .icon-svg{stroke:currentColor;color:var(--gray_60);}
+#sidebar #admin-menu a.selected{font-weight:700;color:var(--pri_60);}
+#sidebar #admin-menu a.vault{padding-left:42px !important;background-position:11px 50%;}
+
+/* ===== 코드값 (KRDS 구역 제목 + 추가 버튼) ===== */
+body.controller-enumerations #content>h3{margin:36px 0 12px;font-size:1.125rem;}
+body.controller-enumerations #content>h2+h3{margin-top:20px;}
+body.controller-enumerations table.enumerations td.name a{font-weight:500;color:var(--gray_90);}
+/* 본문 단독 추가 버튼 (<p><a class="icon icon-add">) — 오른쪽 위 주요 버튼과 같은 모양 */
+#content>p>a.icon-add{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 14px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--pri_50);font-weight:500;color:var(--gray_0);}
+#content>p>a.icon-add:hover{border-color:var(--pri_60);background:var(--pri_60);color:var(--gray_0);text-decoration:none;}
+#content>p>a.icon-add .icon-svg{width:16px;height:16px;stroke:currentColor;color:var(--gray_0);}
+
 /* ===== 모바일 (기본) — Redmine 은 900px 미만에서 responsive.css 로 모바일 화면 전환 =====
  * responsive.css 가 테마보다 뒤에 로드되므로 덮어쓸 규칙은 #wrapper 를 붙여 우선순위를 높임
  * 데스크톱 전용 배치는 파일 끝 @media (min-width:900px) 에 둠 (모바일 퍼스트) */
@@ -551,6 +595,11 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 #issue-form .tabular label:not(.inline):not(.block):not(.floating){margin-bottom:6px;text-align:left;font-weight:500;color:var(--gray_80);}
 #issue-form .jstElements{overflow-x:auto;white-space:nowrap;}
 
+/* ===== 태블릿 (600px 이상) ===== */
+@media (min-width:600px){
+#admin-index #admin-menu ul{grid-template-columns:repeat(2,1fr);}
+}
+
 /* ===== 데스크톱 (900px 이상) ===== */
 @media (min-width:900px){
 #header:not(:has(#main-menu)){padding-bottom:18px;}
@@ -587,4 +636,10 @@ table.list.files tr.file>td{display:table-cell;padding:8px 10px 8px 0;border-top
 table.list.files tr.file>td.filename{font-size:inherit;font-weight:500;}
 table.list.files tr.file>td.digest{display:table-cell;width:30%;font-size:0.75rem;color:var(--gray_50);word-break:break-all;}
 table.list.files tr.file>td.downloads::before{content:none;}
+#admin-index #admin-menu ul{grid-template-columns:repeat(3,1fr);}
+}
+
+/* ===== 넓은 화면 (1200px 이상) ===== */
+@media (min-width:1200px){
+#admin-index #admin-menu ul{grid-template-columns:repeat(4,1fr);}
 }
