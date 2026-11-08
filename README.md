@@ -3,6 +3,24 @@
 Redmine 6.1.6 + Vault(접속정보) 플러그인을 **KRDS(대한민국 정부 디자인 시스템) 스타일**과 한국어 운영 설정으로 묶은 Docker Compose 구성입니다.
 데이터는 포함하지 않으며, 새 서버에서 아래 순서대로 설치하면 같은 화면·설정으로 시작합니다. (데스크톱 화면 기준)
 
+## 화면
+> 아래 화면의 프로젝트·사용자·접속정보는 모두 캡처용 예시 데이터입니다.
+
+| 일감 목록 · 더보기(…) 메뉴 | 일감 상세 |
+|---|---|
+| ![일감 목록](docs/screenshots/02_issues.png) | ![일감 상세](docs/screenshots/03_issue_show.png) |
+| **일감 등록** | **작업내역** |
+| ![일감 등록](docs/screenshots/04_issue_new.png) | ![작업내역](docs/screenshots/09_activity.png) |
+| **문서 목록** | **문서 상세 · 첨부파일** |
+| ![문서 목록](docs/screenshots/05_documents.png) | ![문서 상세](docs/screenshots/06_document_show.png) |
+| **접속정보(Vault) 목록 — 검색 · 선택 삭제** | **접속정보 상세 — 비밀번호 가림 · 복사** |
+| ![접속정보 목록](docs/screenshots/07_keys.png) | ![접속정보 상세](docs/screenshots/08_key_show.png) |
+
+<details><summary>로그인 화면</summary>
+
+![로그인](docs/screenshots/01_login.png)
+</details>
+
 ## 구성
 | 경로 | 내용 |
 |---|---|
