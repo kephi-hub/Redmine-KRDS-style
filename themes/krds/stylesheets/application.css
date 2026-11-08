@@ -1,4 +1,4 @@
-/* KRDS 테마 (Redmine 6.1.x) — 데스크톱 전용
+/* KRDS 테마 (Redmine 6.1.x) — 모바일 퍼스트 (데스크톱 배치는 파일 끝 min-width:900px)
  * 기준: KRDS(krds-uiux 1.1.0) 색상·간격 토큰 + Pretendard GOV
  * 원복: 관리 > 설정 > 표시 > 테마 를 "기본"으로 변경
  * 주의: #top-menu, #main-menu 등은 Redmine 기본 선택자라 이름 변경 불가(클래스 네이밍 규칙 예외)
@@ -29,7 +29,6 @@ code,pre,kbd,tt,samp{font-family:"D2Coding","Consolas","Menlo",monospace,var(--f
 
 /* ===== 헤더 ===== */
 #header{min-height:0;padding:18px 24px 52px;border-bottom:1px solid var(--gray_20);background:var(--gray_0);color:var(--gray_90);}
-#header:not(:has(#main-menu)){padding-bottom:18px;}
 #header a{color:var(--gray_90);}
 #header a:hover{color:var(--pri_60);text-decoration:none;}
 #header h1{font-size:1.5rem;font-weight:700;letter-spacing:-0.03em;}
@@ -37,7 +36,6 @@ code,pre,kbd,tt,samp{font-family:"D2Coding","Consolas","Menlo",monospace,var(--f
 #header h1 .breadcrumbs a{color:var(--gray_60);}
 #quick-search{color:var(--gray_60);}
 #quick-search #q{height:32px;border:1px solid var(--gray_30);border-radius:var(--radius_s);}
-#quick-search #project-jump .drdn-trigger{display:inline-flex;align-items:center;height:32px;padding-top:0;padding-bottom:0;border:1px solid var(--gray_30);border-radius:var(--radius_s);background:var(--gray_0);color:var(--gray_80);}
 
 /* ===== 메인 메뉴 (KRDS GNB 형태: 하단 강조선) ===== */
 #main-menu{left:16px;}
@@ -241,9 +239,9 @@ div.fileover span.add_attachment,p.custom-field-filedroplistner.fileover span.ad
 #query_form_content>fieldset>legend svg{stroke:var(--gray_60);}
 #query_form_content>fieldset>div{clear:both;}
 #filters>div{display:flex;flex-direction:column;align-items:flex-start;gap:12px;}
-#filters-table{display:grid;grid-template-columns:max-content max-content 1fr;row-gap:8px;float:none;width:100%;}
-#filters-table .filter{display:grid;grid-column:1/-1;grid-template-columns:subgrid;align-items:center;gap:0 8px;margin:0;}
-#filters-table .field{display:flex;align-items:center;gap:6px;width:auto;padding-right:16px;}
+#filters-table{display:flex;flex-direction:column;row-gap:12px;float:none;width:100%;}
+#filters-table .filter{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:0;}
+#filters-table .field{display:flex;flex:1 0 100%;align-items:center;gap:6px;width:auto;padding-right:0;}
 #filters-table .field label{font-weight:500;color:var(--gray_80);}
 #filters-table .filter .operator select{width:100%;}
 #filters-table .values{display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
@@ -280,7 +278,6 @@ div.fileover span.add_attachment,p.custom-field-filedroplistner.fileover span.ad
 
 /* ===== 일감 목록 (KRDS 목록: 흰 행 + 구분선, 제목 강조, 상태 점 표시) ===== */
 table.list.issues:not(.odd-even) tbody tr:nth-child(even):not(:hover):not(.context-menu-selection){background-color:var(--gray_0);}
-table.list.issues td{padding-top:12px;padding-bottom:12px;}
 table.list.issues td.id a{color:var(--gray_60);}
 table.list.issues td.subject a{font-weight:500;color:var(--gray_90);}
 table.list.issues td.subject a:hover{color:var(--pri_60);text-decoration:underline;}
@@ -313,7 +310,7 @@ div#activity dt .time,div#activity dt.me .time{flex:none;padding-top:1px;border:
 div#activity dt span.project{flex:none;font-weight:500;color:var(--gray_70);white-space:nowrap;}
 div#activity dt>a{flex:1 1 0%;font-weight:500;color:var(--gray_90);}
 div#activity dt>a:hover{color:var(--pri_60);text-decoration:underline;}
-div#activity dd{padding:0 12px 16px 76px;margin:0;font-size:0.8125rem;}
+div#activity dd{padding:0 4px 16px 36px;margin:0;font-size:0.8125rem;}
 div#activity dd span.description{margin:2px 0 6px;font-style:normal;line-height:1.6;color:var(--gray_60);}
 div#activity dd span.description:empty{display:none;}
 div#activity dd .author a{color:var(--gray_60);}
@@ -357,8 +354,6 @@ div.issue .attributes .attribute .value{min-height:24px;}
 
 /* ===== 일감 등록·편집 폼 (KRDS 입력 폼: 상단 선 + 왼쪽 정렬 라벨 + 구역 제목) ===== */
 #issue-form>.box{padding:12px 0 16px;margin-bottom:20px;border:0;border-top:2px solid var(--gray_90);border-bottom:1px solid var(--gray_20);border-radius:0;background:var(--gray_0);}
-#issue-form .tabular p{padding-top:6px;padding-bottom:6px;padding-left:150px;}
-#issue-form .tabular label:not(.inline):not(.block):not(.floating){width:140px;margin-left:-150px;line-height:36px;text-align:left;font-weight:500;color:var(--gray_80);}
 #issue-form span.required{color:var(--dan_60);}
 #issue-form input[type="text"],#issue-form input[type="date"],#issue-form input[type="number"],#issue-form select:not([multiple]){height:36px;}
 #issue-form p#issue_is_private_wrap{padding-left:0;line-height:36px;}
@@ -444,3 +439,97 @@ body.controller-issues.action-show #content>div.contextual>a.icon-edit .icon-svg
 #content>div.contextual>#revision_selector input,#content>div.contextual>#revision_selector select{height:36px;padding:0 10px;border:1px solid var(--gray_30);border-radius:var(--radius_s);}
 /* 제목 줄 높이를 버튼(36px)에 맞춰 아래 상자와 겹치지 않게 */
 #content>div.contextual+h2{line-height:36px;}
+
+/* ===== 모바일 (기본) — Redmine 은 900px 미만에서 responsive.css 로 모바일 화면 전환 =====
+ * responsive.css 가 테마보다 뒤에 로드되므로 덮어쓸 규칙은 #wrapper 를 붙여 우선순위를 높임
+ * 데스크톱 전용 배치는 파일 끝 @media (min-width:900px) 에 둠 (모바일 퍼스트) */
+
+/* 상단 바: 흰 바탕 + 회색 선, 프로젝트 이름·메뉴 버튼은 진회색 */
+#wrapper #header{border-bottom:1px solid var(--gray_20);background:var(--gray_0);}
+#wrapper #project-jump .drdn-trigger{color:var(--gray_95);}
+#wrapper #header a.mobile-toggle-button{width:56px;border-left:1px solid var(--gray_10);font-size:2rem;color:var(--gray_80);}
+#wrapper #header:not(:has(#project-jump))>h1{display:block !important;padding:0 72px 0 20px;font-size:1.125rem;line-height:64px;}
+
+/* 모바일 메뉴 (오른쪽 패널) */
+#wrapper .flyout-menu{border-left:1px solid var(--gray_20);background:var(--gray_0);color:var(--gray_90);}
+#wrapper .flyout-menu h3{height:auto;padding:18px 20px 6px !important;margin:0;border:0;background:none;font-size:0.75rem;font-weight:700;letter-spacing:0;line-height:1.4;color:var(--gray_50);}
+#wrapper .flyout-menu h4{color:var(--gray_70);}
+#wrapper .flyout-menu a{color:var(--gray_90);}
+#wrapper .flyout-menu .icon svg,#wrapper .flyout-menu .icon-only svg{stroke:var(--gray_60);}
+#wrapper .flyout-menu ul li a{height:44px;padding:0 20px;border-top:1px solid var(--gray_10);font-size:0.9375rem;font-weight:500;line-height:44px;}
+#wrapper .flyout-menu ul li:first-child a{height:44px;border-top:0;line-height:44px;}
+#wrapper .flyout-menu ul li a:hover{background:var(--gray_5);}
+#wrapper .flyout-menu ul li a.selected{background:var(--pri_5);font-weight:700;color:var(--pri_60);}
+#wrapper .flyout-menu__search{height:auto;padding:12px 12px 8px;border-bottom:1px solid var(--gray_10);line-height:normal;}
+#wrapper .search-magnifier--flyout{top:23px;left:24px;}
+#wrapper .flyout-menu__search input[type="text"]{height:40px;padding-left:38px;border:1px solid var(--gray_30);border-radius:var(--radius_s);background:var(--gray_0);}
+#wrapper .flyout-menu__avatar{align-items:center;padding:12px 20px;border-top:0;border-bottom:1px solid var(--gray_10);}
+#wrapper .flyout-menu__avatar a{height:auto;line-height:1.4;color:var(--gray_90);}
+#wrapper .flyout-menu__avatar .user{padding:0 12px;font-weight:700;}
+#wrapper .flyout-menu__sidebar ul.queries li a,#wrapper .flyout-menu #watchers ul li a{border-top:0;}
+
+/* 오른쪽 위 버튼: 보조 버튼은 아이콘만 (글자는 화면 낭독기용으로 남김) */
+#content>div.contextual{margin-bottom:12px;}
+#content>div.contextual>.drdn{padding:0;margin:0;border:0;}
+#content>div.contextual>.drdn>.drdn-content{left:auto;}
+#content>div.contextual>a.icon:not(.icon-add):not(.icon-edit):not(.icon-time-add) .icon-label,body:not(.controller-timelog) #content>div.contextual>a.icon-time-add .icon-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+#content>div.contextual>a.icon:not(.icon-add):not(.icon-edit):not(.icon-time-add),body:not(.controller-timelog) #content>div.contextual>a.icon-time-add{justify-content:center;width:36px;padding:0;}
+
+/* 일감 목록: 카드형 (1줄: 번호·유형·상태·… / 2줄: 제목 / 3줄: 우선순위·담당자·변경일) */
+table.list.issues thead{display:none;}
+table.list.issues,table.list.issues tbody{display:block;}
+table.list.issues tr.issue{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:14px 4px;border-top:1px solid var(--gray_10);}
+table.list.issues tr.issue>td{display:block;order:3;padding:0;border:0;}
+table.list.issues tr.issue>td.checkbox,table.list.issues tr.issue>td.id,table.list.issues tr.issue>td.tracker,table.list.issues tr.issue>td.status,table.list.issues tr.issue>td.buttons{order:1;}
+table.list.issues tr.issue>td.buttons{margin-left:auto;}
+table.list.issues tr.issue>td.subject{flex:1 0 100%;order:2;font-size:0.9375rem;}
+table.list.issues tr.issue>td.priority,table.list.issues tr.issue>td.assigned_to,table.list.issues tr.issue>td.updated_on{font-size:0.8125rem;}
+
+/* 접속정보 목록: 접속 주소·아이디·비밀번호 열은 상세 화면에서 확인 */
+body.controller-keys table.list th:nth-child(n+4):nth-child(-n+6),body.controller-keys table.list tr.key>td:nth-child(n+4):nth-child(-n+6){display:none;}
+.keys_search{width:100%;max-width:none;}
+
+/* 검색조건 버튼: 좁으면 줄바꿈, 버튼 글자는 쪼개지 않음 */
+#query_form_with_buttons>p.buttons{flex-wrap:wrap;}
+#query_form_with_buttons>p.buttons a.icon{flex:none;white-space:nowrap;}
+
+/* 접속정보 유형 글자 한 줄 */
+body.controller-keys table.list tr.key>td:nth-child(2){white-space:nowrap;}
+
+/* 작업내역: 같은 사람이 이어서 한 작업(묶음) 들여쓰기를 좁게 */
+div#activity dt.grouped{padding-left:32px;}
+div#activity dd.grouped{margin-left:32px;}
+
+/* 일감 등록·편집 폼: 항목 이름을 입력칸 위에 */
+#issue-form .tabular p{padding-top:6px;padding-bottom:6px;}
+#issue-form .tabular label:not(.inline):not(.block):not(.floating){margin-bottom:6px;text-align:left;font-weight:500;color:var(--gray_80);}
+#issue-form .jstElements{overflow-x:auto;white-space:nowrap;}
+
+/* ===== 데스크톱 (900px 이상) ===== */
+@media (min-width:900px){
+#header:not(:has(#main-menu)){padding-bottom:18px;}
+#quick-search #project-jump .drdn-trigger{display:inline-flex;align-items:center;height:32px;padding-top:0;padding-bottom:0;border:1px solid var(--gray_30);border-radius:var(--radius_s);background:var(--gray_0);color:var(--gray_80);}
+table.list.issues td{padding-top:12px;padding-bottom:12px;}
+#issue-form .tabular p{padding-top:6px;padding-bottom:6px;padding-left:150px;}
+#issue-form .tabular label:not(.inline):not(.block):not(.floating){width:140px;margin:0 0 0 -150px;line-height:36px;text-align:left;font-weight:500;color:var(--gray_80);}
+#filters-table{display:grid;grid-template-columns:max-content max-content 1fr;row-gap:8px;float:none;width:100%;}
+#filters-table .filter{display:grid;grid-column:1/-1;grid-template-columns:subgrid;align-items:center;gap:0 8px;margin:0;}
+#filters-table .field{flex:initial;padding-right:16px;}
+div#activity dd{padding:0 12px 16px 76px;}
+#wrapper #header:not(:has(#project-jump))>h1{padding:2px 10px 1px 0;font-size:1.5rem;line-height:inherit;}
+#content>div.contextual{margin-bottom:8px;}
+#content>div.contextual>a.icon:not(.icon-add):not(.icon-edit):not(.icon-time-add) .icon-label,body:not(.controller-timelog) #content>div.contextual>a.icon-time-add .icon-label{position:static;width:auto;height:auto;overflow:visible;clip:auto;white-space:normal;}
+#content>div.contextual>a.icon:not(.icon-add):not(.icon-edit):not(.icon-time-add),body:not(.controller-timelog) #content>div.contextual>a.icon-time-add{width:auto;padding:0 14px;}
+table.list.issues{display:table;}
+table.list.issues thead{display:table-header-group;}
+table.list.issues tbody{display:table-row-group;}
+table.list.issues tr.issue{display:table-row;padding:0;border:0;}
+table.list.issues tr.issue>td{display:table-cell;padding:12px 10px 12px 0;border-top:1px solid var(--gray_10);}
+table.list.issues tr.issue>td.checkbox{padding:12px 0;}
+table.list.issues tr.issue>td.subject,table.list.issues tr.issue>td.priority,table.list.issues tr.issue>td.assigned_to,table.list.issues tr.issue>td.updated_on{font-size:inherit;}
+body.controller-keys table.list th:nth-child(n+4):nth-child(-n+6),body.controller-keys table.list tr.key>td:nth-child(n+4):nth-child(-n+6){display:table-cell;}
+.keys_search{max-width:420px;}
+#issue-form .tabular label:not(.inline):not(.block):not(.floating){margin-bottom:0;}
+div#activity dt.grouped{padding-left:5em;}
+div#activity dd.grouped{margin-left:9em;}
+}

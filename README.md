@@ -1,7 +1,7 @@
 # Redmine KRDS Style
 
 Redmine 6.1.6 + Vault(접속정보) 플러그인을 **KRDS(대한민국 정부 디자인 시스템) 스타일**과 한국어 운영 설정으로 묶은 Docker Compose 구성입니다.
-데이터는 포함하지 않으며, 새 서버에서 아래 순서대로 설치하면 같은 화면·설정으로 시작합니다. (데스크톱 화면 기준)
+데이터는 포함하지 않으며, 새 서버에서 아래 순서대로 설치하면 같은 화면·설정으로 시작합니다. 데스크톱과 모바일(반응형) 화면을 모두 지원합니다.
 
 ## 화면
 > 아래 화면의 프로젝트·사용자·접속정보는 모두 캡처용 예시 데이터입니다.
@@ -15,6 +15,12 @@ Redmine 6.1.6 + Vault(접속정보) 플러그인을 **KRDS(대한민국 정부 �
 | ![문서 목록](docs/screenshots/05_documents.png) | ![문서 상세](docs/screenshots/06_document_show.png) |
 | **접속정보(Vault) 목록 — 검색 · 선택 삭제** | **접속정보 상세 — 비밀번호 가림 · 복사** |
 | ![접속정보 목록](docs/screenshots/07_keys.png) | ![접속정보 상세](docs/screenshots/08_key_show.png) |
+
+**모바일 (900px 미만)** — 흰 상단 바, 카드형 일감 목록, 아이콘 버튼, 오른쪽 메뉴 패널
+
+| 일감 목록 | 일감 상세 | 메뉴 |
+|---|---|---|
+| ![모바일 일감 목록](docs/screenshots/m1_issues.png) | ![모바일 일감 상세](docs/screenshots/m2_issue.png) | ![모바일 메뉴](docs/screenshots/m3_menu.png) |
 
 <details><summary>로그인 화면</summary>
 
@@ -79,6 +85,7 @@ docker compose exec redmine sh -c 'bundle exec rails runner setup/apply_settings
 
 - Vault 화면은 이미지 빌드 중 `plugins/vault_ko/build.rb` 가 원본 화면을 고쳐 만듭니다. Vault 버전을 올렸을 때 원본 문구가 바뀌어 맞지 않으면 `[못 찾음]` 을 출력하고 빌드가 멈춥니다.
 - 글꼴(Pretendard GOV)은 공식 배포본을 jsDelivr CDN 으로 불러옵니다. 인터넷이 안 되는 서버에서는 시스템 글꼴(맑은 고딕 등)로 보입니다.
+- 반응형: 모바일 퍼스트 — 기본 규칙은 모바일 기준, 데스크톱 전용 배치는 `application.css` 끝의 `@media (min-width:900px)` 에 둡니다. Redmine 의 `responsive.css` 가 테마보다 뒤에 로드되므로 모바일에서 덮어쓸 규칙에는 `#wrapper` 를 붙여 우선순위를 높입니다.
 - CSS 작성 규칙: 규칙은 한 줄, 클래스명은 언더바(`_`)로 최대 2단어, 속성 순서는 display → position → flex → 크기 → 여백 → 테두리 → 배경 → 글꼴 → 색. Redmine 기본 선택자(`#main-menu` 등)는 예외입니다.
 
 ## 백업
