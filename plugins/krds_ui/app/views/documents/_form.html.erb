@@ -1,0 +1,38 @@
+<%# 원본: Redmine 6.1.6 app/views/documents/_form.html.erb — 편집 때도 첨부 추가·삭제 (저장 처리: init.rb DocumentAttachmentsPatch) %>
+<%= error_messages_for @document %>
+
+<div class="box tabular">
+  <p><%= f.select :category_id, DocumentCategory.active.collect {|c| [c.name, c.id]} %></p>
+  <p><%= f.text_field :title, :required => true, :size => 60 %></p>
+  <p><%= f.text_area :description, :cols => 60, :rows => 15, :class => 'wiki-edit',
+                    :data => {
+                        :auto_complete => true
+                    }.merge(list_autofill_data_attributes)
+                     %></p>
+
+  <% @document.custom_field_values.each do |value| %>
+    <p><%= custom_field_tag_with_label :document, value %></p>
+  <% end %>
+
+  <% existing = @document.persisted? ? @document.attachments.to_a : [] %>
+  <% if existing.any? %>
+    <% deletable = @document.attachments_deletable? %>
+    <% checked = Array(params[:deleted_attachment_ids]).map(&:to_i) %>
+    <p><label><%= l(:label_attachment_plural) %></label>
+      <span id="existing-attachments">
+      <% existing.each do |attachment| %>
+        <span class="existing-attachment">
+          <%= sprite_icon('attachment', size: 12) %>
+          <%= text_field_tag '', attachment.filename, :id => nil, :class => 'icon icon-attachment filename', :disabled => true %>
+          <% if deletable %>
+          <label class="inline"><%= check_box_tag 'deleted_attachment_ids[]', attachment.id, checked.include?(attachment.id), :id => nil, :class => 'deleted_attachment' %> <%= l(:button_delete) %></label>
+          <% end %>
+        </span>
+      <% end %>
+      </span>
+    </p>
+  <% end %>
+  <p><label><%= l(existing.any? ? :label_attachment_new : :label_attachment_plural) %></label><%= render :partial => 'attachments/form', :locals => {:container => @document} %></p>
+</div>
+
+<%= wikitoolbar_for 'document_description' %>

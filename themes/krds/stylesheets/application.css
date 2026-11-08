@@ -200,6 +200,10 @@ div.fileover span.add_attachment,p.custom-field-filedroplistner.fileover span.ad
 .attachments_fields>span>svg,#existing-attachments>span>svg{flex:none;stroke:var(--gray_60);}
 .attachments_fields input.filename,#existing-attachments .filename{flex:1 1 40%;width:auto;font-weight:500;color:var(--gray_90);}
 .attachments_fields input.description,#existing-attachments input.description{flex:1 1 60%;width:auto;margin-left:0;}
+/* 편집 화면의 기존 첨부 목록: 파일 추가 영역과 같은 너비, 긴 파일명은 줄이고 삭제 체크는 항상 보이게 */
+#existing-attachments{display:block;max-width:720px;}
+#existing-attachments .filename{flex:1 1 0;width:0;}
+#content #existing-attachments label.inline{display:inline-flex;align-items:center;flex:none;gap:4px;width:auto;padding:0 8px 0 0;margin:0 0 0 auto !important;font-weight:400;line-height:1.5;color:var(--gray_70);}
 .attachments_fields div.ui-progressbar{flex:none;margin:0;}
 .attachments_fields a.icon-del,#existing-attachments a.icon-del{display:inline-flex;align-items:center;justify-content:center;flex:none;width:28px;height:28px;border-radius:var(--radius_s);}
 .attachments_fields a.icon-del:hover,#existing-attachments a.icon-del:hover{background:var(--dan_5);}
