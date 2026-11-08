@@ -1,0 +1,47 @@
+<%# KRDS 상세 형식 — 원본: Redmine 6.1.6 app/views/documents/show.html.erb (helper·권한 체크·id 는 원본과 동일) %>
+<div class="doc_view">
+  <div class="doc_head">
+    <div class="contextual">
+    <% if User.current.allowed_to?(:edit_documents, @project) %>
+    <%= link_to sprite_icon('edit', l(:button_edit)), edit_document_path(@document), :class => 'icon icon-edit', :accesskey => accesskey(:edit) %>
+    <% end %>
+    <% if User.current.allowed_to?(:delete_documents, @project) %>
+    <%= delete_link document_path(@document) %>
+    <% end %>
+    </div>
+    <h2 class="doc_tit"><%= @document.title %></h2>
+    <ul class="doc_meta">
+      <li><strong><%= l(:field_category) %></strong><%= @document.category.name %></li>
+      <li><strong><%= l(:field_created_on) %></strong><%= format_date @document.created_on %></li>
+      <% render_custom_field_values(@document) do |custom_field, formatted| %>
+      <li><strong><%= custom_field.name %></strong><%= formatted %></li>
+      <% end %>
+    </ul>
+  </div>
+
+  <div class="wiki doc_body">
+  <%= textilizable @document, :description, :attachments => @document.attachments %>
+  </div>
+
+  <div class="doc_file">
+    <h3><%= l(:label_attachment_plural) %> <span class="count"><%= @document.attachments.size %></span></h3>
+    <% if @document.attachments.any? %>
+    <%= link_to_attachments @document, :thumbnails => true %>
+    <% else %>
+    <p class="doc_empty"><%= l(:label_no_data) %></p>
+    <% end %>
+
+    <% if authorize_for('documents', 'add_attachment') %>
+    <p class="doc_add"><%= link_to sprite_icon('add', l(:label_attachment_new)), '#', :onclick => "$('#add_attachment_form').show(); $(this).closest('.doc_add').hide(); return false;",
+                                                 :id => 'attach_files_link', :class => 'icon icon-add' %></p>
+      <%= form_tag({ :controller => 'documents', :action => 'add_attachment', :id => @document }, :multipart => true, :id => "add_attachment_form", :style => "display:none;") do %>
+      <div class="box">
+      <p><%= render :partial => 'attachments/form' %></p>
+      </div>
+      <%= submit_tag l(:button_add) %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<% html_title @document.title -%>

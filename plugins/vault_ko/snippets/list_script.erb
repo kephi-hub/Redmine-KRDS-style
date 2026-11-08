@@ -1,0 +1,67 @@
+<%# vault_ko: 목록 검색 · 체크박스 · 선택 삭제 · 자동 커서 방지 %>
+<script>
+$(function() {
+  var $table = $('#keys_table');
+  if (!$table.length) return;
+  var $rows = function() { return $table.find('tbody tr'); };
+  var $btn = $('#keys_bulk_delete');
+  var defaultProject = <%= raw((defined?(@project) && @project ? @project.identifier : '').to_json) %>;
+
+  // Redmine 기본 자동 커서(defaultFocus)가 화면 밖 복사용 입력칸에 들어간 경우 해제
+  var a = document.activeElement;
+  if (a && a.id && a.id.indexOf('copy_') === 0) a.blur();
+
+  function checked() { return $rows().filter(':visible').find('input[name="ids[]"]:checked'); }
+  function refresh() {
+    var n = checked().length;
+    $btn.prop('disabled', n === 0).find('.count').text(n ? n : '');
+    var $all = $rows().filter(':visible').find('input[name="ids[]"]');
+    $('#check_all').prop('checked', $all.length > 0 && n === $all.length);
+  }
+
+  // 검색: 행에 보이는 글자(유형·이름·주소·아이디·프로젝트) 기준, 숨겨진 행은 선택 해제
+  $('#keys_search').on('input', function() {
+    var q = this.value.toLowerCase().trim();
+    $rows().each(function() {
+      var hit = !q || this.innerText.toLowerCase().indexOf(q) !== -1;
+      $(this).toggle(hit);
+      if (!hit) $(this).find('input[name="ids[]"]').prop('checked', false);
+    });
+    refresh();
+  });
+
+  // 전체 선택 (보이는 행만)
+  $('#check_all').off('click').on('click', function(e) {
+    e.stopImmediatePropagation();
+    $rows().filter(':visible').find('input[name="ids[]"]').prop('checked', this.checked);
+    refresh();
+  });
+  $table.on('change', 'input[name="ids[]"]', refresh);
+
+  // 선택 삭제: 기존 행별 삭제(DELETE /projects/:project/keys/:id)를 차례로 호출
+  $btn.on('click', function() {
+    var items = checked().map(function() {
+      var $tr = $(this).closest('tr');
+      return { id: this.value, project: String($tr.data('project-id') || defaultProject), name: $.trim($tr.find('td:nth-child(' + ($tr.find('td').length > 7 ? 4 : 3) + ')').text()) };
+    }).get().filter(function(x) { return x.project; });
+    if (!items.length) return;
+    if (!confirm('선택한 접속정보 ' + items.length + '개를 삭제할까요?\n삭제하면 되돌릴 수 없습니다.')) return;
+    var token = $('meta[name="csrf-token"]').attr('content');
+    $btn.prop('disabled', true).text('삭제 중...');
+    var fail = [];
+    items.reduce(function(p, it) {
+      return p.then(function() {
+        return fetch('/projects/' + encodeURIComponent(it.project) + '/keys/' + encodeURIComponent(it.id), {
+          method: 'POST', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': token },
+          body: '_method=delete&authenticity_token=' + encodeURIComponent(token)
+        }).then(function(r) { if (!r.ok) fail.push(it.name || it.id); }, function() { fail.push(it.name || it.id); });
+      });
+    }, Promise.resolve()).then(function() {
+      if (fail.length) alert('삭제하지 못한 항목 ' + fail.length + '개: ' + fail.join(', ') + '\n(권한이 없거나 이미 삭제된 항목일 수 있습니다)');
+      location.reload();
+    });
+  });
+  refresh();
+});
+</script>

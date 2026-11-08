@@ -1,0 +1,131 @@
+ko:
+  button_view: '보기'
+  label_vault: '접속정보 (Vault)'
+  label_module: '접속정보'
+  project_module_keys: '접속정보 (Vault)'
+  permission_export_keys: '접속정보 내보내기'
+  permission_keys_all: '전체 프로젝트 접속정보 보기'
+  permission_download_keys: '접속정보 파일 다운로드'
+  permission_view_keys: '접속정보 보기'
+  permission_edit_keys: '접속정보 편집'
+  permission_manage_whitelist_keys: '접근 목록 관리'
+  permission_whitelist_keys: '접근 목록 지정 항목만 보기'
+  settings:
+    title: "접속정보 설정"
+    vault_title_encription_key: "암호화 키"
+    redmine_title_encription_key: "Redmine 암호화 사용"
+    vault_encription_notice: "Vault 자체 암호화 방식에서만 사용"
+    redmine_encryption_notice: "권장. config/configuration.yml 의 database_cipher_key 에 키를 넣어야 합니다. 중요: 이 설정을 바꾼 뒤에는 rake redmine:plugins:vault:convert 를 실행하세요."
+
+  activerecord:
+    models:
+      password: "비밀번호"
+      sftp: "SFTP"
+      key_file: "키 파일"
+
+  backups:
+    title: "접속정보 백업"
+    title_restore: "백업에서 복원"
+    btn:
+      download_backup: "백업 다운로드"
+      upload_backup: "백업에서 복원"
+
+  export:
+    title:
+      pdf: "PDF"
+    pdf:
+      title: "접속정보"
+
+  tag:
+    title:
+      popular: "자주 쓰는 태그"
+
+  key:
+    title:
+      delete: "접속정보 삭제"
+      edit: "접속정보 편집"
+      copy: "접속정보 복사"
+      clone: "접속정보 복제"
+      show: "접속정보 상세"
+      new: "접속정보 추가"
+      list: "접속정보"
+
+    project_not_exist: "ID %{id} 프로젝트가 없습니다"
+    project_deleted: "삭제된 프로젝트"
+    project_id: "ID:"
+
+    btn:
+      new: "접속정보 추가"
+      actions: "작업"
+      clipboard: "클립보드에 복사"
+      find: "찾기"
+      move: "프로젝트 지정"
+      edit_tags: "태그 편집"
+
+    attr:
+      lock: "잠금"
+      owner: "소유자"
+      body: "비밀번호"
+      name: "이름"
+      login: "아이디"
+      url: "접속 주소"
+      type: "유형"
+      project: "프로젝트"
+      tags: "태그"
+      file: "첨부 파일"
+      comment: "메모"
+      whitelist: "접근 목록"
+      created_at: "등록일"
+      updated_at: "수정일"
+
+    whitelist:
+      selected_members: "선택된 구성원"
+      available_members: "선택 가능한 구성원"
+
+    audit_log:
+      title: "변경 이력"
+      action: "작업"
+      user: "사용자"
+      fields: "변경 항목"
+      timestamp: "일시"
+      no_entries: "변경 이력이 없습니다"
+      ago: "전"
+
+  context_menu:
+    copy_key: "비밀번호 복사"
+    copy_url: "접속 주소 복사"
+    copy_login: "아이디 복사"
+    delete: "접속정보 삭제"
+    edit: "접속정보 편집"
+    clone: "접속정보 복제"
+
+  alert:
+    key:
+      not_found: "접속정보를 찾을 수 없습니다"
+
+  confirm:
+    key:
+      delete: "이 접속정보를 삭제할까요?"
+
+  notice:
+    settings:
+      saved: "설정을 저장했습니다"
+      keys_restore: "접속정보를 복원했습니다"
+    key:
+      update:
+        success: "접속정보를 수정했습니다"
+      delete:
+        success: "접속정보를 삭제했습니다"
+      create:
+        success: "접속정보를 등록했습니다"
+
+  error:
+    key:
+      not_set: "설정에 암호화 키가 없습니다"
+      not_whitelisted: "이 접속정보를 볼 권한이 없습니다"
+      length: "암호화 키는 정확히 16자여야 합니다"
+      not_orphaned: "프로젝트가 지정되지 않은 접속정보가 아닙니다"
+    project:
+      required: "프로젝트를 선택하세요"
+    user:
+      not_allowed: "이 접속정보를 볼 권한이 없습니다"

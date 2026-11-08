@@ -1,0 +1,5 @@
+# Redmine 설정 — 비밀값은 .env 에서 받음 (이 파일은 Git 에 올라감)
+# database_cipher_key: DB 에 저장되는 비밀번호류(접속정보·저장소 계정 등) 암호화 키
+#   분실하면 저장된 접속정보를 복호화할 수 없음 → .env 를 안전한 곳에 따로 백업
+production:
+  database_cipher_key: <%= ENV['REDMINE_CIPHER_KEY'] %>

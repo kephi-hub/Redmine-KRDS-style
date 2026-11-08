@@ -1,0 +1,7 @@
+# 이미지 빌드에 필요한 것은 Dockerfile 의 COPY 대상뿐 — 비밀값·백업이 빌드 컨텍스트로 넘어가지 않게 제외
+.env
+.git
+backup/
+*.bak*
+*.dump
+*.tgz

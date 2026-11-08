@@ -1,0 +1,46 @@
+# Redmine 6.1.6 한국어 번역 누락분 보충 (core ko.yml 에 영어로 남아 있는 키)
+ko:
+  button_save_object: "%{object_name} 저장"
+  label_attachment_description: 파일 설명
+  field_any_searchable: 검색 가능한 모든 텍스트
+  label_contains_any_of: 다음 중 하나라도 포함
+  label_has_been: 이었던 적 있음
+  label_has_never_been: 이었던 적 없음
+  label_changed_from: 다음 값에서 변경됨
+  field_estimated_remaining_hours: 남은 추정시간
+  field_passwd_changed_on: 비밀번호 변경일
+  field_twofa_scheme: 2단계 인증 방식
+  label_days_to_html: "%{date}까지 %{days}일간"
+  label_assign_to_me: 나에게 할당
+  # 버튼 · 드롭다운(…) 메뉴
+  button_actions: 더보기
+  button_copy_link: 링크 복사
+  button_edit_object: "%{object_name} 편집"
+  button_delete_object: "%{object_name} 삭제"
+  button_disable: 사용 안 함
+  button_add_subtask: 하위 일감 추가
+  button_fetch_changesets: 커밋 가져오기
+  button_create_and_follow: 생성 후 이동
+  button_apply_issues_filter: 일감 필터 적용
+  label_bulk_edit: 일괄 편집
+  label_subtask: 하위 일감
+  label_download_all_attachments: 전체 파일 다운로드
+  label_import_users: 사용자 가져오기
+  label_message_watchers: 지켜보는 사람
+  label_wiki_page_watchers: 지켜보는 사람
+  label_relations_mapping: 연결 관계 매핑
+  label_default_query: 기본 검색양식
+  label_blank_value: 빈 값
+  label_attribute_of_object: "%{object_name}의 %{name}"
+  label_optional: 선택
+  label_required_lower: 필수
+  label_edited: 수정됨
+  label_time_by_author: "%{author}, %{time}"
+  label_issue_attachment_added: 첨부파일 추가됨
+  label_progressbar: 진행률 막대
+  label_view_previous_annotation: 이 변경 이전의 주석 보기
+  label_auto_watch_on: 자동 지켜보기
+  label_auto_watch_on_issue_created: 내가 만든 일감
+  label_auto_watch_on_issue_contributed_to: 내가 참여한 일감
+  # 로그인 화면 오른쪽 위 링크·가입 화면 제목
+  label_register: 회원가입

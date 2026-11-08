@@ -1,0 +1,155 @@
+# Redmine 기준 설정
+# setup/apply_settings.rb 가 읽어서 DB 에 반영 — 여러 번 실행해도 결과 같음
+# id 대신 이름으로 적음 (서버마다 id 가 다를 수 있음)
+settings:
+  activity_days_default: '10'
+  app_title: 프로젝트 관리 시스템
+  attachment_max_size: '51200'
+  cache_formatted_text: '0'
+  commit_logtime_enabled: '1'
+  default_language: ko
+  default_notification_option: only_assigned
+  feeds_limit: '15'
+  login_required: '1'
+  per_page_options: '25,50,100'
+  plugin_vault:
+    encryption_key: ''
+    encrypt_files: 'on'
+    use_redmine_encryption: 'on'
+  reactions_enabled: '1'
+  search_results_per_page: '10'
+  text_formatting: common_mark
+  ui_theme: krds
+  user_format: lastnamefirstname
+  wiki_compression: ''
+  wiki_tablesort_enabled: '0'
+commit_update_keywords:
+- keywords: fixes,resolves
+  status: 해결
+  done_ratio: '100'
+- keywords: closes
+  status: 완료
+  done_ratio: '100'
+commit_logtime_activity: 개발
+default_projects_trackers:
+- 결함
+- 새기능
+- 지원
+trackers:
+- name: 결함
+  default_status: 신규
+- name: 새기능
+  default_status: 신규
+- name: 지원
+  default_status: 신규
+- name: 오류
+  default_status: 신규
+time_entry_activities:
+- 설계
+- 개발
+- 수정
+document_categories:
+- 사용자 문서
+- 기술 문서
+# 기본 데이터의 역할 중 운영에서 쓰지 않아 지운 것
+remove_roles:
+- 관리자
+- 보고자
+roles:
+- name: Non member
+  builtin: 1
+  permissions:
+  - view_issues
+  - view_news
+  - view_messages
+- name: Anonymous
+  builtin: 2
+  permissions:
+  - view_issues
+  - view_news
+  - view_messages
+- name: 개발자
+  builtin: 0
+  permissions:
+  - add_project
+  - edit_project
+  - close_project
+  - delete_project
+  - select_project_publicity
+  - select_project_modules
+  - manage_members
+  - manage_versions
+  - add_subprojects
+  - manage_public_queries
+  - save_queries
+  - view_messages
+  - add_messages
+  - edit_messages
+  - edit_own_messages
+  - delete_messages
+  - delete_own_messages
+  - view_message_watchers
+  - add_message_watchers
+  - delete_message_watchers
+  - manage_boards
+  - view_calendar
+  - view_documents
+  - add_documents
+  - edit_documents
+  - delete_documents
+  - view_files
+  - manage_files
+  - view_gantt
+  - view_issues
+  - add_issues
+  - edit_issues
+  - edit_own_issues
+  - copy_issues
+  - manage_issue_relations
+  - manage_subtasks
+  - set_issues_private
+  - set_own_issues_private
+  - add_issue_notes
+  - edit_issue_notes
+  - edit_own_issue_notes
+  - view_private_notes
+  - set_notes_private
+  - delete_issues
+  - view_issue_watchers
+  - add_issue_watchers
+  - delete_issue_watchers
+  - import_issues
+  - manage_categories
+  - export_keys
+  - keys_all
+  - download_keys
+  - view_keys
+  - edit_keys
+  - manage_whitelist_keys
+  - view_news
+  - manage_news
+  - comment_news
+  - view_changesets
+  - browse_repository
+  - commit_access
+  - manage_related_issues
+  - manage_repository
+  - view_time_entries
+  - log_time
+  - edit_time_entries
+  - edit_own_time_entries
+  - manage_project_activities
+  - log_time_for_other_users
+  - import_time_entries
+  - view_wiki_pages
+  - view_wiki_edits
+  - export_wiki_pages
+  - edit_wiki_pages
+  - rename_wiki_pages
+  - delete_wiki_pages
+  - delete_wiki_pages_attachments
+  - view_wiki_page_watchers
+  - add_wiki_page_watchers
+  - delete_wiki_page_watchers
+  - protect_wiki_pages
+  - manage_wiki

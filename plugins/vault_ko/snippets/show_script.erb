@@ -1,0 +1,26 @@
+<%# vault_ko: 비밀번호 가리기/보기 · http 에서도 동작하는 복사 %>
+<script>
+(function() {
+  function copyText(text, btn) {
+    var done = function() {
+      var $i = $(btn).find('i'), old = $i.attr('class');
+      $i.attr('class', 'fa fa-check'); setTimeout(function() { $i.attr('class', old); }, 1200);
+    };
+    if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done); return; }
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { alert('복사하지 못했습니다. 직접 선택해 복사해 주세요.'); }
+    document.body.removeChild(ta);
+  }
+  $(document).on('click', '.pwd-copy-btn[data-copy]', function(e) { e.preventDefault(); copyText(this.getAttribute('data-copy'), this); });
+  $(document).on('click', '.pwd-reveal-btn', function(e) {
+    e.preventDefault();
+    var $s = $('#password-body'), on = this.getAttribute('aria-pressed') !== 'true';
+    $s.text(on ? $s.attr('data-secret') : '••••••••');
+    this.setAttribute('aria-pressed', on ? 'true' : 'false');
+    this.title = on ? '숨기기' : '보기';
+    $(this).find('i').attr('class', on ? 'fa fa-eye-slash' : 'fa fa-eye');
+  });
+})();
+</script>

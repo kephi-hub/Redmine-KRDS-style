@@ -1,0 +1,14 @@
+# 비밀값
+.env
+# 백업·임시
+backup/
+*.bak*
+*.dump
+*.sql
+*.tgz
+# 빌드 때 생성되는 Vault 화면 (Dockerfile 참고)
+plugins/vault_ko/app/
+# 기타
+node_modules/
+__pycache__/
+.DS_Store

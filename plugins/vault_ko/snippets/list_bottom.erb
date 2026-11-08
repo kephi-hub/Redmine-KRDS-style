@@ -1,0 +1,6 @@
+<%# vault_ko: 목록 하단 선택 삭제 %>
+<% if (defined?(@project) && @project) ? User.current.allowed_to?(:edit_keys, @project) : User.current.allowed_to?(:edit_keys, nil, :global => true) %>
+<div class="keys_bottom">
+  <button type="button" id="keys_bulk_delete" class="keys_bulk" disabled>선택 삭제 <span class="count"></span></button>
+</div>
+<% end %>

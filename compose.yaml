@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: redmine
+      POSTGRES_USER: redmine
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U redmine -d redmine"]
+      interval: 5s
+      retries: 10
+
+  redmine:
+    build: .
+    image: local/redmine-vault:6.1.6
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${REDMINE_PORT:-3000}:3000"
+    environment:
+      REDMINE_DB_POSTGRES: db
+      REDMINE_DB_DATABASE: redmine
+      REDMINE_DB_USERNAME: redmine
+      REDMINE_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      REDMINE_SECRET_KEY_BASE: ${REDMINE_SECRET_KEY_BASE}
+      REDMINE_CIPHER_KEY: ${REDMINE_CIPHER_KEY:?REDMINE_CIPHER_KEY 를 .env 에 넣으세요}   # config/configuration.yml 이 읽음
+      REDMINE_PLUGINS_MIGRATE: "1"
+      REDMINE_HOST_NAME: ${REDMINE_HOST_NAME:-}        # 메일 링크 등에 쓰는 주소 (예: 서버IP:3000)
+      REDMINE_SYS_API_KEY: ${REDMINE_SYS_API_KEY:-}    # 저장소 커밋 가져오기 API 키 (cron 과 같은 값)
+    volumes:
+      - files:/usr/src/redmine/files     # 첨부파일
+      - keys:/usr/src/redmine/keys       # Vault 키 파일
+      - ./config/configuration.yml:/usr/src/redmine/config/configuration.yml:z   # z: SELinux 라벨 (ro 금지: 엔트리포인트가 config/ 를 chown 함)
+      - ./themes:/usr/src/redmine/themes:z   # 사용자 테마 (krds)
+      - ./plugins/vault_ko:/usr/src/redmine/plugins/vault_ko:z   # Vault 한국어화 (번역+화면 문구)
+      - ./plugins/krds_ui:/usr/src/redmine/plugins/krds_ui:z   # KRDS 화면 마크업 (문서 상세)
+      - ./setup:/usr/src/redmine/setup:z   # 기준 설정 스크립트 (apply_settings.rb)
+
+volumes:
+  db_data:
+  files:
+  keys:
