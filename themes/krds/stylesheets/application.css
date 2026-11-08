@@ -127,6 +127,19 @@ table.progress td.todo{background:var(--gray_10);}
 #content .tabs ul li a:hover{border-bottom-color:var(--gray_30);color:var(--gray_90);}
 #content .tabs ul li a.selected,#content .tabs ul li a.selected:hover{border:0;border-bottom:3px solid var(--pri_50);background:none;font-weight:700;color:var(--pri_60);box-shadow:none;}
 
+/* ===== 설정 화면 탭 (KRDS 박스형 탭: 테두리 버튼 + 선택 탭 짙은 남색 채움) =====
+ * 프로젝트·관리 설정, 사용자·그룹 편집, 업무흐름처럼 #content 바로 아래 탭만 해당. 일감 이력·작업시간 탭은 위 선형 탭 유지
+ * 버튼이 줄바꿈되므로 Redmine 의 좌우 스크롤 버튼(.tabs-buttons)은 숨김 */
+:root{--sec_5:#eef2f7;--sec_10:#d6e0eb;--sec_70:#063a74;}
+#content>div.tabs{overflow:visible;height:auto;margin-bottom:20px;}
+#content>div.tabs ul{display:flex;flex-wrap:wrap;gap:8px;position:static;width:auto;min-width:0;padding:0;border:0;}
+#content>div.tabs ul li{margin:0;}
+#content>div.tabs ul li a{display:flex;align-items:center;height:40px;padding:0 16px;border:1px solid var(--gray_30);border-radius:var(--radius_m);background:var(--gray_0);font-size:0.9375rem;font-weight:700;line-height:1;color:var(--gray_70);transition:background .15s;}
+#content>div.tabs ul li a:hover{border-color:var(--gray_30);background:var(--sec_5);color:var(--gray_90);}
+#content>div.tabs ul li a:active{background:var(--sec_10);}
+#content>div.tabs ul li a.selected,#content>div.tabs ul li a.selected:hover{border-color:var(--sec_70);background:var(--sec_70);color:var(--gray_0);box-shadow:none;}
+#content>div.tabs .tabs-buttons{display:none !important;}
+
 /* ===== 위키 목차 ===== */
 div.wiki ul.toc{border:1px solid var(--gray_20);border-radius:var(--radius_m);background-color:var(--gray_5);}
 
@@ -507,10 +520,10 @@ body.controller-news.action-show #content>h3{padding-top:20px;margin-top:28px;bo
 body.controller-enumerations #content>h3{margin:36px 0 12px;font-size:1.125rem;}
 body.controller-enumerations #content>h2+h3{margin-top:20px;}
 body.controller-enumerations table.enumerations td.name a{font-weight:500;color:var(--gray_90);}
-/* 본문 단독 추가 버튼 (<p><a class="icon icon-add">) — 오른쪽 위 주요 버튼과 같은 모양 */
-#content>p>a.icon-add{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 14px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--pri_50);font-weight:500;color:var(--gray_0);}
-#content>p>a.icon-add:hover{border-color:var(--pri_60);background:var(--pri_60);color:var(--gray_0);text-decoration:none;}
-#content>p>a.icon-add .icon-svg{width:16px;height:16px;stroke:currentColor;color:var(--gray_0);}
+/* 본문·설정 탭 안의 단독 추가 버튼 (<p><a class="icon icon-add">) — 오른쪽 위 주요 버튼과 같은 모양 */
+#content>p>a.icon-add,#content .tab-content p>a.icon-add{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 14px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--pri_50);font-weight:500;color:var(--gray_0);}
+#content>p>a.icon-add:hover,#content .tab-content p>a.icon-add:hover{border-color:var(--pri_60);background:var(--pri_60);color:var(--gray_0);text-decoration:none;}
+#content>p>a.icon-add .icon-svg,#content .tab-content p>a.icon-add .icon-svg{width:16px;height:16px;stroke:currentColor;color:var(--gray_0);}
 
 /* ===== 모바일 (기본) — Redmine 은 900px 미만에서 responsive.css 로 모바일 화면 전환 =====
  * responsive.css 가 테마보다 뒤에 로드되므로 덮어쓸 규칙은 #wrapper 를 붙여 우선순위를 높임
