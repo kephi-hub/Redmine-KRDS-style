@@ -67,7 +67,7 @@ docker compose logs -f redmine          # "Listening on" 이 나오면 Ctrl+C
 docker compose exec redmine sh -c 'bundle exec rake redmine:load_default_data REDMINE_LANG=ko'
 docker compose exec redmine sh -c 'bundle exec rails runner setup/apply_settings.rb'
 ```
-`apply_settings.rb` 는 테마·한국어·이름 표시(성이름)·첨부 50MB·커밋 키워드·역할 권한·안내문 등을 적용합니다. 여러 번 실행해도 결과가 같습니다.
+`apply_settings.rb` 는 테마·한국어·시간대(서울)·이름 표시(성이름)·첨부 50MB·커밋 키워드·역할 권한·안내문 등을 적용합니다. 시간대를 지정하지 않은 계정은 서울로 맞춥니다. 여러 번 실행해도 결과가 같습니다.
 
 ### 4. 커밋 자동 가져오기 (선택)
 `setup/cron.example` 의 `KEY` 를 `.env` 의 `REDMINE_SYS_API_KEY` 로 바꿔 `/etc/cron.d/redmine_fetch` 로 저장하고 `chmod 600`.

@@ -9,6 +9,7 @@ settings:
   commit_logtime_enabled: '1'
   default_language: ko
   default_notification_option: only_assigned
+  default_users_time_zone: Seoul
   feeds_limit: '15'
   login_required: '1'
   per_page_options: '25,50,100'

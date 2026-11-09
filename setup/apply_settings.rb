@@ -50,6 +50,8 @@ ActiveRecord::Base.transaction do
 
   puts '[설정]'
   SEED['settings'].each { |k, v| Setting.send("#{k}=", v) }
+  # 시간대를 지정하지 않은 계정은 기본 시간대로 맞춤 (컨테이너가 UTC 라 비어 있으면 9시간 늦게 표시됨). 직접 고른 시간대는 유지
+  UserPreference.where(time_zone: [nil, '']).update_all(time_zone: Setting.default_users_time_zone) if Setting.default_users_time_zone.present?
   Setting.welcome_text = File.read(File.join(DIR, 'welcome.md'))
   Setting.commit_update_keywords = SEED['commit_update_keywords'].map do |k|
     { 'keywords' => k['keywords'], 'status_id' => status.(k['status']).id.to_s, 'done_ratio' => k['done_ratio'].to_s, 'if_tracker_id' => '' }
