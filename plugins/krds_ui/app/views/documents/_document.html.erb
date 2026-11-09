@@ -2,10 +2,10 @@
 <%# 요약문: 제목 앵커(¶) 를 빼고 글자만 (headings: false) %>
 <% desc = strip_tags(textilizable(document.description.to_s, :object => document, :headings => false)).squish %>
 <li class="document-item document-<%= document.id %> doc_item">
+  <span class="doc_badge"><%= document.category.name %></span>
   <h4 class="title doc_link"><%= link_to document.title, document_path(document) %></h4>
   <% if desc.present? %><p class="doc_desc"><%= truncate(desc, :length => 160) %></p><% end %>
   <ul class="doc_meta">
-    <li><strong><%= l(:field_category) %></strong><%= document.category.name %></li>
     <li><strong><%= l(:field_updated_on) %></strong><%= format_time(document.updated_on) %></li>
     <% if (n = document.attachments.size) > 0 %>
     <li class="doc_attach"><%= sprite_icon('attachment', size: 16) %><%= l(:label_attachment_plural) %> <%= n %></li>

@@ -230,11 +230,15 @@ div.fileover span.add_attachment,p.custom-field-filedroplistner.fileover span.ad
 .doc_file div.attachments>.contextual{position:absolute;top:-30px;right:0;margin:0;}
 
 /* ===== 문서 목록 (KRDS 게시판 목록, 마크업: plugins/krds_ui) ===== */
-.doc_total{margin:0 0 8px;font-size:0.9375rem;color:var(--gray_70);}
+.doc_bar{display:flex;clear:both;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px;}
+.doc_total{margin:0;font-size:0.9375rem;color:var(--gray_70);}
 .doc_total strong{color:var(--pri_50);}
-#document-list .document-group{margin-bottom:32px;}
-#content .document-group h3.group-name{display:flex;align-items:center;gap:6px;padding:0;margin:16px 0 10px;font-size:1.0625rem;color:var(--gray_95);}
-.group-name .count{color:var(--pri_50);}
+.doc_filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0;}
+.doc_filter label{font-size:0.875rem;font-weight:500;color:var(--gray_80);}
+.doc_filter select{height:36px;}
+.doc_filter input[type=submit]{height:36px;margin:0;}
+.doc_clear{font-size:0.875rem;color:var(--gray_60);}
+.doc_badge{display:inline-flex;align-items:center;height:24px;padding:0 8px;margin:0 0 6px;border:1px solid var(--pri_20);border-radius:var(--radius_s);background:var(--pri_5);font-size:0.8125rem;font-weight:700;color:var(--pri_60);}
 .doc_list{padding:0;margin:0;border-top:2px solid var(--gray_90);list-style:none;}
 .doc_list>li.doc_item{padding:20px 16px;border-bottom:1px solid var(--gray_20);}
 .doc_list>li.doc_item:hover{background:var(--gray_5);}

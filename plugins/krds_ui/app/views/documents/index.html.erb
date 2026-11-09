@@ -1,4 +1,4 @@
-<%# KRDS 게시판 목록 형식 — 원본: Redmine 6.1.6 app/views/documents/index.html.erb (새 문서 폼·정렬 사이드바는 원본과 동일) %>
+<%# KRDS 게시판 목록 형식 — 원본: Redmine 6.1.6 app/views/documents/index.html.erb (새 문서 폼은 원본과 동일, 목록·검색조건 데이터: DocumentListPatch) %>
 <div class="contextual">
 <%= link_to sprite_icon('add', l(:label_document_new)), new_project_document_path(@project), :class => 'icon icon-add',
             :onclick => 'showAndScrollTo("add-document", "document_title"); return false;' if User.current.allowed_to?(:add_documents, @project) %>
@@ -18,29 +18,35 @@
 <h2><%=l(:label_document_plural)%></h2>
 
 <div id="document-list" class="doc_board">
-<p class="doc_total">총 <strong><%= @grouped.values.sum(&:size) %></strong>건</p>
-<% if @grouped.empty? %><p class="nodata"><%= l(:label_no_data) %></p><% end %>
-
-<% @grouped.keys.sort.__send__(@sort_by == 'date' ? :reverse_each : :each) do |group| %>
-  <div class="document-group document-group-<%= @sort_by %>">
-    <h3 class="group-name"><%= group %> <span class="count"><%= @grouped[group].size %></span></h3>
-    <ul class="doc_list">
-    <%= render :partial => 'documents/document', :collection => @grouped[group] %>
-    </ul>
-  </div>
+<div class="doc_bar">
+  <p class="doc_total">총 <strong><%= @documents.size %></strong>건</p>
+  <%= form_tag(project_documents_path(@project), :method => :get, :class => 'doc_filter') do %>
+    <%= hidden_field_tag 'sort_by', @sort_by, :id => nil %>
+    <label for="doc_category"><%= l(:field_category) %></label>
+    <%= select_tag 'category_id', options_from_collection_for_select(@categories, :id, :name, @category&.id), :id => 'doc_category', :include_blank => l(:label_all) %>
+    <%= submit_tag l(:button_apply), :name => nil %>
+    <% if @category %><%= link_to l(:button_clear), project_documents_path(@project, :sort_by => @sort_by), :class => 'doc_clear' %><% end %>
+  <% end %>
+</div>
+<% if @documents.empty? %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<ul class="doc_list">
+<%= render :partial => 'documents/document', :collection => @documents %>
+</ul>
 <% end %>
 </div>
 
 <% content_for :sidebar do %>
   <h3><%= l(:label_sort) %></h3>
   <ul>
-    <li><%= link_to(l(:field_category), {:sort_by => 'category'},
+    <li><%= link_to(l(:field_category), {:sort_by => 'category', :category_id => @category&.id},
                     :class => (@sort_by == 'category' ? 'selected' :nil)) %></li>
-    <li><%= link_to(l(:label_date), {:sort_by => 'date'},
+    <li><%= link_to(l(:label_date), {:sort_by => 'date', :category_id => @category&.id},
                     :class => (@sort_by == 'date' ? 'selected' :nil)) %></li>
-    <li><%= link_to(l(:field_title), {:sort_by => 'title'},
+    <li><%= link_to(l(:field_title), {:sort_by => 'title', :category_id => @category&.id},
                     :class => (@sort_by == 'title' ? 'selected' :nil)) %></li>
-    <li><%= link_to(l(:field_author), {:sort_by => 'author'},
+    <li><%= link_to(l(:field_author), {:sort_by => 'author', :category_id => @category&.id},
                     :class => (@sort_by == 'author' ? 'selected' :nil)) %></li>
   </ul>
 <% end %>
