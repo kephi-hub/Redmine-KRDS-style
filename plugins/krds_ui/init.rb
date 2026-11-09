@@ -3,6 +3,7 @@
 # 덮어쓴 화면 (Redmine 업그레이드 시 원본 변경 여부를 비교할 것)
 # - documents/show.html.erb, index.html.erb, _document.html.erb : 문서 상세·목록 (Redmine 6.1.6 원본 기준)
 # - documents/_form.html.erb : 편집 화면에도 첨부 추가·삭제 표시 (저장 처리: DocumentAttachmentsPatch)
+# - activities/_activities.html.erb : 작업내역 시간을 오전/오후 12시간제로 표시
 # config/locales/ko.yml : core 한국어 번역 누락분 보충
 # User#initials : 한글 이름이면 아바타에 이름(firstname) 두 글자 표시 (강윤아 → 윤아)
 
