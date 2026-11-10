@@ -1,0 +1,62 @@
+<%# KRDS 목록 — 원본: Redmine 6.1.6 app/views/files/index.html.erb + 파일명 검색 (목록이 버전별로 나뉘어 화면에서 거름) %>
+<% q = params[:q].to_s.strip.downcase %>
+<% files_of = ->(c) { q.empty? ? c.attachments.to_a : c.attachments.select {|a| a.filename.downcase.include?(q)} } %>
+<div class="contextual">
+<%= link_to(sprite_icon('add', l(:label_attachment_new)), new_project_file_path(@project), :class => 'icon icon-add') if User.current.allowed_to?(:manage_files, @project) %>
+</div>
+
+<h2><%=l(:label_attachment_plural)%></h2>
+
+<div class="list_bar">
+  <p class="list_total">총 <strong><%= @containers.sum {|c| files_of.(c).size} %></strong>건</p>
+  <%= form_tag(project_files_path(@project), :method => :get, :class => 'list_search') do %>
+    <%= hidden_field_tag 'sort', params[:sort], :id => nil if params[:sort].present? %>
+    <%= render :partial => 'krds/title_search', :locals => {:clear_url => (project_files_path(@project, :sort => params[:sort].presence) if q.present?), :placeholder => '파일명으로 검색'} %>
+  <% end %>
+</div>
+
+<% delete_allowed = User.current.allowed_to?(:manage_files, @project) %>
+
+<div class="autoscroll">
+  <table class="list files">
+    <thead><tr>
+      <%= sort_header_tag('filename', :caption => l(:field_filename)) %>
+      <%= sort_header_tag('created_on', :caption => l(:label_date), :default_order => 'desc') %>
+      <%= sort_header_tag('size', :caption => l(:field_filesize), :default_order => 'desc') %>
+      <%= sort_header_tag('downloads', :caption => l(:label_downloads_abbr), :default_order => 'desc') %>
+      <th><%= l(:field_digest) %></th>
+      <th></th>
+    </tr></thead>
+    <tbody>
+  <% @containers.each do |container| %>
+    <% files = files_of.(container) -%>
+    <% next if files.empty? -%>
+    <% if container.is_a?(Version) -%>
+    <tr>
+      <th colspan="6">
+        <%= link_to(sprite_icon('package', container), { :controller => 'versions', :action => 'show', :id => container}, :class => "icon icon-package") %>
+      </th>
+    </tr>
+    <% end -%>
+    <% files.each do |file| %>
+    <tr class="file">
+      <td class="filename"><%= link_to_attachment file, :title => file.description -%></td>
+      <td class="created_on"><%= format_time(file.created_on) %></td>
+      <td class="filesize"><%= number_to_human_size(file.filesize) %></td>
+      <td class="downloads"><%= file.downloads %></td>
+      <td class="digest"><%= file.digest_type %>: <%= file.digest %></td>
+      <td class="buttons">
+      <%= link_to_attachment file, class: 'icon-only icon-download', title: l(:button_download), download: true, icon: 'download' %>
+      <%= link_to(sprite_icon('del', l(:button_delete)), attachment_path(file), :class => 'icon-only icon-del',
+                  :data => {:confirm => l(:text_are_you_sure)}, :method => :delete) if delete_allowed %>
+      </td>
+    </tr>
+    <% end %>
+  <% end %>
+    </tbody>
+  </table>
+</div>
+
+<% if @containers.all? {|c| files_of.(c).empty?} %><p class="nodata"><%= l(:label_no_data) %></p><% end %>
+
+<% html_title(l(:label_attachment_plural)) -%>

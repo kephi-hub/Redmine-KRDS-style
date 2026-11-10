@@ -1,0 +1,7 @@
+<%# 목록 공통 제목 검색칸 — 문서·뉴스·파일. clear_url 이 있으면 지우기 링크 표시 %>
+<% placeholder = local_assigns[:placeholder] || '제목으로 검색' %>
+<span class="list_field">
+<%= search_field_tag 'q', params[:q], :id => 'list_q', :maxlength => 100, :placeholder => placeholder, :'aria-label' => placeholder %>
+<%= submit_tag l(:label_search), :name => nil %>
+</span>
+<% if local_assigns[:clear_url] %><%= link_to l(:button_clear), clear_url, :class => 'list_clear' %><% end %>

@@ -2,6 +2,8 @@
 # app/views/ 의 파일이 Redmine 기본 화면보다 우선 적용됨 (플러그인 view 경로가 앞에 붙음)
 # 덮어쓴 화면 (Redmine 업그레이드 시 원본 변경 여부를 비교할 것)
 # - documents/show.html.erb, index.html.erb, _document.html.erb : 문서 상세·목록 (Redmine 6.1.6 원본 기준, 목록 데이터: DocumentListPatch)
+# - news/index.html.erb, files/index.html.erb : 목록 위 제목(파일명) 검색줄 (뉴스 검색 처리: NewsSearchPatch)
+# - krds/_title_search.html.erb : 문서·뉴스·파일 공통 검색칸 (새 파일, 원본 없음)
 # - documents/_form.html.erb : 편집 화면에도 첨부 추가·삭제 표시 (저장 처리: DocumentAttachmentsPatch)
 # - activities/_activities.html.erb : 작업내역 시간을 오전/오후 12시간제로 표시
 # config/locales/ko.yml : core 한국어 번역 누락분 보충
@@ -23,7 +25,9 @@ module KrdsUi
       documents = @project.documents.includes(:attachments, :category).to_a
       @categories = (DocumentCategory.active.to_a | documents.map(&:category)).sort
       @category = @categories.detect {|c| c.id == params[:category_id].to_i}
+      @q = params[:q].to_s.strip.presence
       documents.select! {|d| d.category == @category} if @category
+      documents.select! {|d| d.title.downcase.include?(@q.downcase)} if @q
       @documents = sort_documents(documents)
       @document = @project.documents.build
       render :layout => false if request.xhr?
@@ -46,6 +50,24 @@ module KrdsUi
     end
   end
 
+  # 뉴스 목록 제목 검색 — 검색어가 없거나 API·Atom 요청이면 원본 그대로
+  module NewsSearchPatch
+    def index
+      @q = params[:q].to_s.strip.presence
+      return super if @q.nil? || params[:format].present?
+
+      scope = (@project ? @project.news.visible : News.visible).
+                where(Redmine::Database.like("#{News.table_name}.title", '?'), "%#{News.sanitize_sql_like(@q)}%")
+      @limit = 10
+      @news_count = scope.count
+      @news_pages = Redmine::Pagination::Paginator.new @news_count, @limit, params['page']
+      @offset = @news_pages.offset
+      @newss = scope.includes([:author, :project]).order("#{News.table_name}.created_on DESC").limit(@limit).offset(@offset).to_a
+      @news = News.new
+      render :layout => false if request.xhr?
+    end
+  end
+
   # 문서 편집 저장 때 첨부 추가·삭제 — 추가는 편집 권한(원본 add_attachment 와 동일), 삭제는 문서 삭제 권한(원본 첨부 삭제와 동일)
   module DocumentAttachmentsPatch
     def update
@@ -65,11 +87,12 @@ end
 User.prepend(KrdsUi::UserInitialsPatch) unless User.ancestors.include?(KrdsUi::UserInitialsPatch)
 DocumentsController.prepend(KrdsUi::DocumentAttachmentsPatch) unless DocumentsController.ancestors.include?(KrdsUi::DocumentAttachmentsPatch)
 DocumentsController.prepend(KrdsUi::DocumentListPatch) unless DocumentsController.ancestors.include?(KrdsUi::DocumentListPatch)
+NewsController.prepend(KrdsUi::NewsSearchPatch) unless NewsController.ancestors.include?(KrdsUi::NewsSearchPatch)
 
 Redmine::Plugin.register :krds_ui do
   name 'KRDS UI'
   author 'kephi-hub'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
-  description 'KRDS 테마용 화면 마크업 (문서 상세·목록), 문서 범주 검색조건, 문서 편집 첨부 추가·삭제, 번역 보충, 한글 아바타 이니셜'
-  version '1.3.0'
+  description 'KRDS 테마용 화면 마크업 (문서 상세·목록), 문서 범주 검색조건, 문서·뉴스·파일 제목 검색, 문서 편집 첨부 추가·삭제, 번역 보충, 한글 아바타 이니셜'
+  version '1.4.0'
 end

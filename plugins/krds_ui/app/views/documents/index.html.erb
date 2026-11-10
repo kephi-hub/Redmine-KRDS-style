@@ -18,14 +18,13 @@
 <h2><%=l(:label_document_plural)%></h2>
 
 <div id="document-list" class="doc_board">
-<div class="doc_bar">
-  <p class="doc_total">총 <strong><%= @documents.size %></strong>건</p>
-  <%= form_tag(project_documents_path(@project), :method => :get, :class => 'doc_filter') do %>
+<div class="list_bar">
+  <p class="list_total">총 <strong><%= @documents.size %></strong>건</p>
+  <%= form_tag(project_documents_path(@project), :method => :get, :class => 'list_search') do %>
     <%= hidden_field_tag 'sort_by', @sort_by, :id => nil %>
     <label for="doc_category"><%= l(:field_category) %></label>
     <%= select_tag 'category_id', options_from_collection_for_select(@categories, :id, :name, @category&.id), :id => 'doc_category', :include_blank => l(:label_all) %>
-    <%= submit_tag l(:button_apply), :name => nil %>
-    <% if @category %><%= link_to l(:button_clear), project_documents_path(@project, :sort_by => @sort_by), :class => 'doc_clear' %><% end %>
+    <%= render :partial => 'krds/title_search', :locals => {:clear_url => (project_documents_path(@project, :sort_by => @sort_by) if @category || @q)} %>
   <% end %>
 </div>
 <% if @documents.empty? %>
@@ -40,13 +39,13 @@
 <% content_for :sidebar do %>
   <h3><%= l(:label_sort) %></h3>
   <ul>
-    <li><%= link_to(l(:field_category), {:sort_by => 'category', :category_id => @category&.id},
+    <li><%= link_to(l(:field_category), {:sort_by => 'category', :category_id => @category&.id, :q => @q},
                     :class => (@sort_by == 'category' ? 'selected' :nil)) %></li>
-    <li><%= link_to(l(:label_date), {:sort_by => 'date', :category_id => @category&.id},
+    <li><%= link_to(l(:label_date), {:sort_by => 'date', :category_id => @category&.id, :q => @q},
                     :class => (@sort_by == 'date' ? 'selected' :nil)) %></li>
-    <li><%= link_to(l(:field_title), {:sort_by => 'title', :category_id => @category&.id},
+    <li><%= link_to(l(:field_title), {:sort_by => 'title', :category_id => @category&.id, :q => @q},
                     :class => (@sort_by == 'title' ? 'selected' :nil)) %></li>
-    <li><%= link_to(l(:field_author), {:sort_by => 'author', :category_id => @category&.id},
+    <li><%= link_to(l(:field_author), {:sort_by => 'author', :category_id => @category&.id, :q => @q},
                     :class => (@sort_by == 'author' ? 'selected' :nil)) %></li>
   </ul>
 <% end %>

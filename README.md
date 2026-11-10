@@ -11,13 +11,13 @@ Redmine 6.1.6 + Vault(접속정보) 플러그인을 **KRDS(대한민국 정부 �
 | ![일감 목록](docs/screenshots/02_issues.png) | ![일감 상세](docs/screenshots/03_issue_show.png) |
 | **일감 등록** | **작업내역** |
 | ![일감 등록](docs/screenshots/04_issue_new.png) | ![작업내역](docs/screenshots/09_activity.png) |
-| **문서 목록 — 범주 검색조건 · 배지** | **문서 상세 · 첨부파일** |
+| **문서 목록 — 범주·제목 검색 · 배지** | **문서 상세 · 첨부파일** |
 | ![문서 목록](docs/screenshots/05_documents.png) | ![문서 상세](docs/screenshots/06_document_show.png) |
 | **접속정보(Vault) 목록 — 검색 · 선택 삭제** | **접속정보 상세 — 비밀번호 가림 · 복사** |
 | ![접속정보 목록](docs/screenshots/07_keys.png) | ![접속정보 상세](docs/screenshots/08_key_show.png) |
-| **프로젝트 설정 — 박스형 탭 · 추가 버튼** | **뉴스 — 게시판 목록** |
+| **프로젝트 설정 — 박스형 탭 · 추가 버튼** | **뉴스 — 게시판 목록 · 제목 검색** |
 | ![프로젝트 설정](docs/screenshots/10_settings.png) | ![뉴스](docs/screenshots/11_news.png) |
-| **파일** | |
+| **파일 — 파일명 검색** | |
 | ![파일](docs/screenshots/12_files.png) | |
 
 **모바일 (900px 미만)** — 흰 상단 바, 카드형 일감 목록, 아이콘 버튼, 오른쪽 메뉴 패널
@@ -37,7 +37,7 @@ Redmine 6.1.6 + Vault(접속정보) 플러그인을 **KRDS(대한민국 정부 �
 | `Dockerfile` | `redmine:6.1.6` 공식 이미지 + Vault 0.10.5 (커밋 고정) |
 | `compose.yaml` | PostgreSQL 17 + Redmine, 데이터는 Docker 볼륨(`db_data`, `files`, `keys`) |
 | `themes/krds/` | KRDS 테마 (색상·간격 토큰, 버튼·드롭다운·목록·상세·폼, 박스형 설정 탭, 관리 카드 메뉴, 검색조건 접기 스크립트) |
-| `plugins/krds_ui/` | 문서 화면 마크업, 문서 범주 검색조건·배지, 문서 편집 시 첨부 추가·삭제, 작업내역 오전·오후 12시간제 표시, 한글 이름 아바타(이름 2자), 누락 번역 보충 |
+| `plugins/krds_ui/` | 문서 화면 마크업, 문서 범주 검색조건·배지, 문서·뉴스·파일 제목 검색, 문서 편집 시 첨부 추가·삭제, 작업내역 오전·오후 12시간제 표시, 한글 이름 아바타(이름 2자), 누락 번역 보충 |
 | `plugins/vault_ko/` | Vault 한국어 번역 + 화면 개선 규칙(`build.rb`). 이미지 빌드 때 원본 화면에 적용 (검색창, 선택 삭제, 비밀번호 가림, http 복사) |
 | `setup/` | 기준 설정(`seed.yml`), 초기화면 안내문(`welcome.md`), 적용 스크립트, cron 예시 |
 | `config/configuration.yml` | 암호화 키를 `.env` 에서 읽음 (파일에 비밀값 없음) |
