@@ -4,7 +4,7 @@
 settings:
   activity_days_default: '10'
   app_title: 프로젝트 관리 시스템 PMS
-  attachment_max_size: '51200'
+  attachment_max_size: '1048576'   # KB = 1GB
   cache_formatted_text: '0'
   commit_logtime_enabled: '1'
   default_language: ko
@@ -144,7 +144,6 @@ roles:
   - view_keys
   - edit_keys
   - manage_whitelist_keys
-  - whitelist_keys
   - view_news
   - manage_news
   - comment_news
