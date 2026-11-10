@@ -1,0 +1,41 @@
+<%# KRDS 게시판 목록 — 원본: Redmine 6.1.6 app/views/boards/index.html.erb (표 → 문서 목록과 같은 형식) %>
+<div class="contextual">
+  <%= link_to_if_authorized sprite_icon('settings', l(:label_settings)),
+                            {:controller => 'projects', :action => 'settings', :id => @project, :tab => 'boards'},
+                            :class => 'icon icon-settings' if User.current.allowed_to?(:manage_boards, @project) %>
+</div>
+
+<h2><%= l(:label_board_plural) %></h2>
+
+<div class="list_bar">
+  <p class="list_total">총 <strong><%= @boards.size %></strong>개</p>
+</div>
+<% if @boards.empty? %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<ul class="doc_list">
+<% Board.board_tree(@boards) do |board, level| %>
+  <li class="doc_item board<%= ' bbs_child' if level > 0 %>">
+    <h3 class="doc_link"><%= link_to board.name, project_board_path(board.project, board) %></h3>
+    <% if board.description.present? %><p class="doc_desc"><%= board.description %></p><% end %>
+    <ul class="doc_meta">
+      <li><strong><%= l(:label_topic_plural) %></strong><%= board.topics_count %></li>
+      <li><strong><%= l(:label_message_plural) %></strong><%= board.messages_count %></li>
+      <% if (last = board.last_message) %>
+      <li class="bbs_last"><strong><%= l(:label_message_last) %></strong><%= link_to_message last %><span class="bbs_by"><%= last.author %> · <%= format_time(last.created_on) %></span></li>
+      <% end %>
+    </ul>
+  </li>
+<% end %>
+</ul>
+<% end %>
+
+<% other_formats_links do |f| %>
+  <%= f.link_to 'Atom', :url => {:controller => 'activities', :action => 'index', :id => @project, :show_messages => 1, :key => User.current.atom_key} %>
+<% end %>
+
+<% content_for :header_tags do %>
+  <%= auto_discovery_link_tag(:atom, {:controller => 'activities', :action => 'index', :id => @project, :format => 'atom', :show_messages => 1, :key => User.current.atom_key}) %>
+<% end %>
+
+<% html_title l(:label_board_plural) %>

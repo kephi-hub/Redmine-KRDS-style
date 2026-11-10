@@ -1,0 +1,19 @@
+<%# KRDS 게시글 수정 — 원본: Redmine 6.1.6 app/views/messages/edit.html.erb + 취소 버튼 %>
+<%= board_breadcrumb(@message) %>
+
+<h2><%= avatar(@topic.author) %><%= @topic.subject %></h2>
+
+<%= form_for @message, {
+               :as => :message,
+               :url => {:action => 'edit'},
+               :html => {:multipart => true,
+                         :id => 'message-form',
+                         :method => :post}
+          } do |f| %>
+  <%= render :partial => 'form',
+             :locals => {:f => f, :replying => !@message.parent.nil?} %>
+  <p class="form_btns">
+    <%= link_to l(:button_cancel), board_message_path(@board, @topic, :r => (@message.id if @message.parent), :anchor => ("message-#{@message.id}" if @message.parent)), :class => 'btn_line' %>
+    <%= submit_tag l(:button_save) %>
+  </p>
+<% end %>

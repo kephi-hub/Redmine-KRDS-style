@@ -1,0 +1,108 @@
+<%# KRDS 게시글 상세 — 원본: Redmine 6.1.6 app/views/messages/show.html.erb (문서 상세와 같은 머리·본문, 답글 머리 간략화, 답글 취소 버튼) %>
+<%= board_breadcrumb(@message) %>
+
+<div class="doc_view" data-controller="quote-reply">
+  <div class="doc_head">
+    <div class="contextual">
+      <%= watcher_link(@topic, User.current) %>
+      <%= quote_reply_button(
+            url: url_for(action: 'quote', id: @topic, format: 'js')
+          ) if !@topic.locked? && authorize_for('messages', 'reply') %>
+      <%= link_to(
+            sprite_icon('edit', l(:button_edit)),
+            { :action => 'edit', :id => @topic },
+            :class => 'icon icon-edit'
+          ) if @message.editable_by?(User.current) %>
+      <%= link_to(
+            sprite_icon('del', l(:button_delete)),
+            { :action => 'destroy', :id => @topic },
+            :method => :post,
+            :data => { :confirm => l(:text_are_you_sure) },
+            :class => 'icon icon-del'
+          ) if @message.destroyable_by?(User.current) %>
+    </div>
+    <% if @topic.sticky? %><span class="bbs_tag"><%= l(:label_board_sticky) %></span><% end %>
+    <h2 class="doc_tit"><%= @topic.subject %></h2>
+    <ul class="doc_meta">
+      <li><%= avatar(@topic.author) %><%= link_to_user @topic.author %></li>
+      <li><strong><%= l(:field_created_on) %></strong><%= format_time(@topic.created_on) %></li>
+      <% if @topic.locked? %><li class="bbs_locked"><%= sprite_icon('lock', size: 16) %><%= l(:label_board_locked) %></li><% end %>
+    </ul>
+  </div>
+
+  <div class="message">
+    <div id="message_topic_wiki" class="wiki doc_body" data-quote-reply-target="content">
+      <%= textilizable(@topic, :content) %>
+    </div>
+    <% if @topic.attachments.any? %><div class="bbs_files"><%= link_to_attachments @topic, :author => false, :thumbnails => true %></div><% end %>
+    <div class="reaction">
+      <%= reaction_button @topic %>
+    </div>
+  </div>
+</div>
+
+<% unless @replies.empty? %>
+  <div id="replies" class="journals">
+    <h3 class="bbs_head"><%= l(:label_reply_plural) %> <span class="count"><%= @reply_count %></span></h3>
+    <% @replies.each do |message| %>
+      <div class="message reply journal" id="<%= "message-#{message.id}" %>" data-controller="quote-reply">
+        <h4 class='reply-header journal-header'>
+          <span class="journal-info">
+            <%= avatar(message.author) %>
+            <%= link_to_user message.author %>
+            <%= link_to format_time(message.created_on), { :controller => 'messages', :action => 'show', :board_id => @board, :id => @topic, :r => message, :anchor => "message-#{message.id}" }, :class => 'bbs_time' %>
+          </span>
+          <span class="journal-meta">
+            <%= reaction_button message %>
+            <%= quote_reply_button(
+                  url: url_for(action: 'quote', id: message, format: 'js'),
+                  icon_only: true
+                ) if !@topic.locked? && authorize_for('messages', 'reply') %>
+            <%= link_to(
+                  sprite_icon('edit', l(:button_edit), icon_only: true),
+                  { :action => 'edit', :id => message },
+                  :title => l(:button_edit),
+                  :class => 'icon icon-edit'
+                ) if message.editable_by?(User.current) %>
+            <%= link_to(
+                  sprite_icon('del', l(:button_delete), icon_only: true),
+                  { :action => 'destroy', :id => message },
+                  :method => :post,
+                  :data => { :confirm => l(:text_are_you_sure) },
+                  :title => l(:button_delete),
+                  :class => 'icon icon-del'
+                ) if message.destroyable_by?(User.current) %>
+          </span>
+        </h4>
+        <div class="wiki journal-content" data-quote-reply-target="content">
+          <%= textilizable message, :content, :attachments => message.attachments %>
+        </div>
+        <%= link_to_attachments message, :author => false, :thumbnails => true %>
+      </div>
+    <% end %>
+  </div>
+  <span class="pagination"><%= pagination_links_full @reply_pages, @reply_count, :per_page_links => false %></span>
+<% end %>
+
+<% if !@topic.locked? && authorize_for('messages', 'reply') %>
+  <p class="bbs_reply"><%= toggle_link l(:button_reply), "reply", :focus => 'message_content' %></p>
+  <div id="reply" style="display:none;">
+    <%= form_for @reply, :as => :reply, :url => { :action => 'reply', :id => @topic }, :html => { :multipart => true, :id => 'message-form' } do |f| %>
+      <%= render :partial => 'form', :locals => { :f => f, :replying => true } %>
+      <p class="form_btns">
+        <%= link_to l(:button_cancel), "#", :onclick => '$("#reply").hide(); return false;', :class => 'btn_line' %>
+        <%= submit_tag l(:button_submit) %>
+      </p>
+    <% end %>
+  </div>
+<% end %>
+
+<% html_title @topic.subject %>
+<% content_for :sidebar do %>
+  <% if User.current.allowed_to?(:add_message_watchers, @project) ||
+        (@topic.watchers.present? && User.current.allowed_to?(:view_message_watchers, @project)) %>
+    <div id="watchers">
+      <%= render :partial => 'watchers/watchers', :locals => { :watched => @topic } %>
+    </div>
+  <% end %>
+<% end %>

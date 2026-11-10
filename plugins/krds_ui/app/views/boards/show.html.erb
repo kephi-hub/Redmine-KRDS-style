@@ -1,0 +1,77 @@
+<%# KRDS 게시판 글 목록 — 원본: Redmine 6.1.6 app/views/boards/show.html.erb (고정·잠금 배지, 작성 정보 간략화, 하단 버튼) %>
+<%= board_breadcrumb(@board) %>
+
+<div class="contextual">
+<%= link_to sprite_icon('add', l(:label_message_new)),
+            new_board_message_path(@board),
+            :class => 'icon icon-add',
+            :onclick => 'showAndScrollTo("add-message", "message_subject"); return false;' if User.current.allowed_to?(:add_messages, @board.project) %>
+<%= watcher_link(@board, User.current) %>
+<%= link_to_if_authorized sprite_icon('settings', l(:label_settings)),
+                          {:controller => 'projects', :action => 'settings', :id => @project, :tab => 'boards'},
+                          :class => 'icon icon-settings' if User.current.allowed_to?(:manage_boards, @project) %>
+
+</div>
+
+<div id="add-message" style="display:none;">
+<% if User.current.allowed_to?(:add_messages, @board.project) %>
+<h2><%= link_to @board.name, project_board_path(@project, @board) %> &#187; <%= l(:label_message_new) %></h2>
+<%= form_for @message, :url => new_board_message_path(@board), :html => {:multipart => true, :id => 'message-form'} do |f| %>
+  <%= render :partial => 'messages/form', :locals => {:f => f} %>
+  <p class="form_btns">
+  <%= link_to l(:button_cancel), "#", :onclick => '$("#add-message").hide(); return false;', :class => 'btn_line' %>
+  <%= submit_tag l(:button_create) %>
+  </p>
+<% end %>
+<% end %>
+</div>
+
+<h2><%= @board.name %></h2>
+<p class="subtitle"><%= @board.description %></p>
+
+<div class="list_bar">
+  <p class="list_total">총 <strong><%= @topic_count %></strong>건</p>
+</div>
+<% if @topics.any? %>
+<table class="list messages">
+  <thead><tr>
+    <th class="subject"><%= l(:field_subject) %></th>
+    <th><%= l(:field_author) %></th>
+    <%= sort_header_tag('created_on', :caption => l(:field_created_on)) %>
+    <%= sort_header_tag('replies', :caption => l(:label_reply_plural)) %>
+    <%= sort_header_tag('updated_on', :caption => l(:label_message_last)) %>
+  </tr></thead>
+  <tbody>
+  <% @topics.each do |topic| %>
+    <tr id="message-<%= topic.id %>" class="message <%= topic.sticky? ? 'sticky' : '' %> <%= topic.locked? ? 'locked' : '' %>">
+      <td class="subject">
+        <% if topic.sticky? %><span class="bbs_tag"><%= l(:label_board_sticky) %></span><% end %>
+        <%= link_to topic.subject, board_message_path(@board, topic) %>
+        <% if topic.replies_count > 0 %><span class="bbs_count">[<%= topic.replies_count %>]</span><% end %>
+        <% if topic.locked? %><span class="bbs_lock" title="<%= l(:label_board_locked) %>"><%= sprite_icon('lock', l(:label_board_locked)) %></span><% end %>
+      </td>
+      <td class="author"><%= topic.author %></td>
+      <td class="created_on"><%= format_time(topic.created_on) %></td>
+      <td class="reply-count"><%= topic.replies_count %></td>
+      <td class="last_message">
+        <% if topic.last_reply %>
+        <%= link_to "#{topic.last_reply.author} · #{format_time(topic.last_reply.created_on)}", board_message_path(@board, topic, :r => topic.last_reply, :anchor => "message-#{topic.last_reply.id}") %>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+<span class="pagination"><%= pagination_links_full @topic_pages, @topic_count %></span>
+<% else %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% end %>
+
+<% other_formats_links do |f| %>
+  <%= f.link_to 'Atom', :url => {:key => User.current.atom_key} %>
+<% end %>
+
+<% html_title @board.name %>
+<% content_for :header_tags do %>
+    <%= auto_discovery_link_tag(:atom, {:format => 'atom', :key => User.current.atom_key}, :title => "#{@project}: #{@board}") %>
+<% end %>

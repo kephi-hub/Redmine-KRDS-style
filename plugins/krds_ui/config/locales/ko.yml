@@ -27,6 +27,7 @@ ko:
   label_download_all_attachments: 전체 파일 다운로드
   label_import_users: 사용자 가져오기
   label_message_watchers: 지켜보는 사람
+  label_board_sticky: 상단 고정
   label_wiki_page_watchers: 지켜보는 사람
   label_relations_mapping: 연결 관계 매핑
   label_default_query: 기본 검색양식

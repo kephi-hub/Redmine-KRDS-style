@@ -3,6 +3,7 @@
 # 덮어쓴 화면 (Redmine 업그레이드 시 원본 변경 여부를 비교할 것)
 # - documents/show.html.erb, index.html.erb, _document.html.erb : 문서 상세·목록 (Redmine 6.1.6 원본 기준, 목록 데이터: DocumentListPatch)
 # - news/index.html.erb, files/index.html.erb : 목록 위 제목(파일명) 검색줄 (뉴스 검색 처리: NewsSearchPatch)
+# - boards/index.html.erb, boards/show.html.erb, messages/show.html.erb, new.html.erb, edit.html.erb : 게시판 목록·글 목록·상세(문서 화면 형식), 등록·수정 취소 버튼
 # - krds/_title_search.html.erb : 문서·뉴스·파일 공통 검색칸 (새 파일, 원본 없음)
 # - documents/_form.html.erb : 편집 화면에도 첨부 추가·삭제 표시 (저장 처리: DocumentAttachmentsPatch)
 # - activities/_activities.html.erb : 작업내역 시간을 오전/오후 12시간제로 표시
@@ -93,6 +94,6 @@ Redmine::Plugin.register :krds_ui do
   name 'KRDS UI'
   author 'kephi-hub'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
-  description 'KRDS 테마용 화면 마크업 (문서 상세·목록), 문서 범주 검색조건, 문서·뉴스·파일 제목 검색, 문서 편집 첨부 추가·삭제, 번역 보충, 한글 아바타 이니셜'
-  version '1.4.0'
+  description 'KRDS 테마용 화면 마크업 (문서·게시판 목록·상세), 문서 범주 검색조건, 문서·뉴스·파일 제목 검색, 문서 편집 첨부 추가·삭제, 번역 보충, 한글 아바타 이니셜'
+  version '1.5.0'
 end

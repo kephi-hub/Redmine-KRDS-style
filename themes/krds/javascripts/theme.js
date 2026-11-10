@@ -18,3 +18,42 @@ $(function() {
   setTimeout(updateCount, 0);
   $('#query_form').on('change', '#filters input[name="f[]"], #add_filter_select', function() { setTimeout(updateCount, 0); });
 });
+
+/* 하단 버튼: 폼 끝의 저장·취소 묶음을 오른쪽 정렬(.form_btns)
+ * - 취소 같은 링크는 파란 테두리 버튼(.btn_line)으로 바꿔 저장 앞에 둠 (Enter 키는 그대로 첫 저장 버튼)
+ * - 두 번째 이후 저장 버튼(저장 후 계속하기 등)도 테두리 버튼
+ * - 검색줄·검색조건·표 안의 폼·접속정보 화면은 제외, 화면에서 직접 .form_btns 를 쓴 폼도 그대로 둠 */
+$(function() {
+  function isBtn(n) { return n.nodeType === 1 && $(n).is('input[type=submit], button[type=submit]'); }
+  function isLink(n) { return n.nodeType === 1 && n.tagName === 'A'; }
+  function isSkip(n) {
+    if (n.nodeType === 3 || n.nodeType === 8) return !n.textContent.replace(/[\s|]/g, '');
+    return n.nodeType === 1 && $(n).is('script, input[type=hidden]');
+  }
+  // parent 끝에서부터 버튼·링크(사이의 공백·구분선 포함)만 이어진 묶음
+  function tailGroup(parent) {
+    var nodes = [];
+    for (var n = parent.lastChild; n; n = n.previousSibling) {
+      if (isSkip(n) || isBtn(n) || isLink(n)) nodes.unshift(n); else break;
+    }
+    while (nodes.length && isSkip(nodes[0])) nodes.shift();
+    return nodes.some(isBtn) ? { nodes: nodes, whole: !n } : null;
+  }
+  function arrange(box) {
+    $(box).contents().filter(function() { return this.nodeType === 3; }).remove();
+    var first = $(box).children('input[type=submit], button[type=submit]').first();
+    $(box).children('a').addClass('btn_line').insertBefore(first);
+    $(box).children('input[type=submit], button[type=submit]').slice(1).addClass('btn_line');
+  }
+  $('#content form').not('.list_search, #query_form').each(function() {
+    if ($(this).find('.form_btns').length || $(this).closest('td, .pwd-form').length) return;
+    var last = $(this).children().not('script, input[type=hidden]').last()[0];
+    var g = last && last.tagName === 'P' ? tailGroup(last) : null;
+    if (g && g.whole) { $(last).addClass('form_btns'); arrange(last); return; }
+    g = tailGroup(this);
+    if (!g) return;
+    var box = $('<div class="form_btns"></div>').insertBefore(g.nodes[0]);
+    box.append($(g.nodes).filter(function() { return isBtn(this) || isLink(this); }));
+    arrange(box[0]);
+  });
+});
