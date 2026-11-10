@@ -122,6 +122,7 @@
     <th><%= l(:label_deploy_started) %></th>
     <th><%= l(:label_deploy_duration) %></th>
     <th class="note"><%= l(:label_deploy_note) %></th>
+    <th class="changes"><%= l(:label_deploy_changes) %></th>
   </tr></thead>
   <tbody>
   <% @history.each do |row| %>
@@ -133,6 +134,7 @@
       <td class="time"><%= row[:time] ? format_time(row[:time]) : '-' %></td>
       <td class="duration"><%= DeployRun::ACTIVE.include?(row[:status]) ? deploy_progress(row) : deploy_duration(row[:duration]) %></td>
       <td class="note"><%= row[:note] %><% (row[:params] || {}).each do |name, value| %> <span class="dep_pv"><%= name %>=<%= value %></span><% end %></td>
+      <td class="changes"><%= deploy_changes(row) %></td>
     </tr>
   <% end %>
   </tbody>

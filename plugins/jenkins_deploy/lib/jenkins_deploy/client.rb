@@ -10,7 +10,8 @@ module JenkinsDeploy
 
   class Client
     BUILD_FIELDS = 'number,result,building,timestamp,duration,estimatedDuration,url,' \
-                   'actions[parameters[name,value],causes[shortDescription,userId,userName]]'
+                   'actions[parameters[name,value],causes[shortDescription,userId,userName]],' \
+                   'changeSets[kind,items[commitId,msg,author[fullName]]],changeSet[kind,items[commitId,msg,author[fullName]]]'
     PARAM_FIELDS = 'property[parameterDefinitions[name,type,description,choices,defaultParameterValue[value]]]'
 
     # Jenkins 응답의 매개변수 정의 → [{name:, type:, description:, default:, choices:}]

@@ -2,6 +2,7 @@
 class DeploysController < ApplicationController
   menu_item :deploys
   helper :deploys
+  helper :repositories # link_to_revision 의 format_revision
 
   before_action :find_project_by_project_id
   before_action :authorize
@@ -109,14 +110,31 @@ class DeploysController < ApplicationController
       { target_id: target&.id, target_name: target&.name || name, production: target&.production?, number: build['number'],
         url: build['url'], status: status, time: time, duration: duration, run: run,
         estimate: (build['estimatedDuration'].to_i / 1000 if build['building'] && build['estimatedDuration'].to_i > 0),
-        by: run&.user || jenkins_cause(build), note: run&.note, params: build_params(build) }
+        by: run&.user || jenkins_cause(build), note: run&.note, params: build_params(build),
+        changes: build_changes(build), baseline: nil }.tap { |r| r[:baseline] = baseline_changeset(time) if r[:changes].empty? }
     else
       time = run.started_at || run.created_at
       duration = run.finished_at ? (run.finished_at - time).to_i : (run.active? ? (Time.current - time).to_i : nil)
       { target_id: run.deploy_target_id, target_name: name || run.target_name, production: run.production?, number: run.build_number,
         url: nil, status: run.status, time: time, duration: duration, run: run, by: run.user, note: run.note || run.error_message, estimate: nil,
-        params: (run.params || {}).except(*DeployTarget::AUTO_PARAMS) }
+        params: (run.params || {}).except(*DeployTarget::AUTO_PARAMS), changes: nil, baseline: nil }
     end
+  end
+
+  # 빌드에 포함된 커밋 (Jenkins changeSets — SVN 은 commitId 가 리비전 번호), 최신 리비전이 먼저
+  def build_changes(build)
+    sets = Array(build['changeSets']) + Array(build['changeSet'] && [build['changeSet']])
+    items = sets.flat_map { |s| Array(s && s['items']) }.filter_map do |i|
+      next if i['commitId'].blank?
+      { rev: i['commitId'].to_s, msg: i['msg'].to_s.strip, author: i.dig('author', 'fullName').to_s }
+    end
+    items.uniq { |i| i[:rev] }.sort_by { |i| i[:rev].match?(/\A\d+\z/) ? -i[:rev].to_i : 0 }
+  end
+
+  # 변경 없는 빌드: 빌드 시점의 Redmine 저장소 최신 리비전 1건
+  def baseline_changeset(time)
+    return nil unless time && (repo = @project.repository)
+    repo.changesets.where('committed_on <= ?', time).reorder(committed_on: :desc, id: :desc).first
   end
 
   def build_params(build)

@@ -71,3 +71,10 @@ ko:
   error_deploy_target_missing: 배포 환경 또는 Jenkins 서버가 삭제되었습니다.
   error_deploy_bad_choice: "%{name} 값이 Jenkins 선택지에 없습니다."
   label_deploy_params_unavailable: Jenkins 매개변수를 불러오지 못해 기본 매개변수로 실행합니다.
+  label_deploy_changes: 변경 내역
+  label_deploy_changes_all: 전체 보기
+  label_deploy_no_changes: 변경 없음
+  label_deploy_baseline: 기준
+  label_deploy_commits:
+    one: "커밋 %{count}건"
+    other: "커밋 %{count}건"

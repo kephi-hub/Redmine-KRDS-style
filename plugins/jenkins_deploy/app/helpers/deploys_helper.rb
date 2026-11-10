@@ -27,6 +27,32 @@ module DeploysHelper
     s < 60 ? "#{s}초" : format('%d분 %02d초', s / 60, s % 60)
   end
 
+  # 변경 내역 칸: 커밋 수 · 최신 리비전 · 최신 메시지 (+ 전체 목록 펼치기), 변경이 없으면 빌드 시점 저장소 최신 리비전
+  def deploy_changes(row)
+    changes = row[:changes]
+    return '-' if changes.nil?
+    repo = @project.repository
+    rev = ->(r, text = "r#{r}") { repo ? link_to_revision(r, repo, text: text) : text }
+    if changes.empty?
+      base = row[:baseline]
+      return content_tag(:span, l(:label_deploy_no_changes), class: 'dep_none') unless base
+      return content_tag(:span, safe_join([content_tag(:span, l(:label_deploy_no_changes), class: 'dep_none'),
+                                           rev.(base.identifier, "#{l(:label_deploy_baseline)} r#{base.identifier}"),
+                                           content_tag(:span, base.comments.to_s.lines.first.to_s.strip.truncate(60), class: 'dep_msg', title: base.comments)], ' '),
+                         class: 'dep_chg')
+    end
+    top = changes.first
+    head = safe_join([content_tag(:span, l(:label_deploy_commits, count: changes.size), class: 'dep_cnt'), rev.(top[:rev]),
+                      content_tag(:span, top[:msg].lines.first.to_s.strip.truncate(60), class: 'dep_msg', title: top[:msg])], ' ')
+    return content_tag(:span, head, class: 'dep_chg') if changes.size == 1
+    list = content_tag(:ul, safe_join(changes.map { |c|
+      content_tag(:li, safe_join([rev.(c[:rev]), content_tag(:span, c[:msg].lines.first.to_s.strip.truncate(80), title: c[:msg]),
+                                  (content_tag(:span, c[:author], class: 'dep_who') if c[:author].present?)].compact, ' '))
+    }))
+    content_tag(:span, head, class: 'dep_chg') +
+      content_tag(:details, content_tag(:summary, l(:label_deploy_changes_all)) + list, class: 'dep_more')
+  end
+
   def deploy_by(by)
     by.is_a?(User) ? link_to_user(by) : (by.presence || '-')
   end

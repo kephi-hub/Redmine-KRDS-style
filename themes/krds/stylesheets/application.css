@@ -363,6 +363,15 @@ table.list.dep_runs tr.dep_row>td{display:block;padding:0;border:0;font-size:0.8
 table.list.dep_runs tr.dep_row>td.target{font-size:0.9375rem;font-weight:500;color:var(--gray_90);}
 table.list.dep_runs tr.dep_row>td.note{flex:1 0 100%;}
 table.list.dep_runs tr.dep_row>td.note:empty{display:none;}
+table.list.dep_runs tr.dep_row>td.changes{flex:1 0 100%;}
+.dep_chg{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px 8px;}
+.dep_cnt{display:inline-block;padding:0 6px;border-radius:var(--radius_s);background:var(--pri_10);font-size:0.75rem;font-weight:700;color:var(--pri_60);white-space:nowrap;}
+.dep_msg{color:var(--gray_80);}
+.dep_more{margin-top:4px;font-size:0.8125rem;}
+.dep_more summary{cursor:pointer;color:var(--pri_60);}
+.dep_more ul{padding:6px 0 0 0;margin:0;list-style:none;}
+.dep_more li{padding:2px 0;color:var(--gray_70);}
+.dep_who{color:var(--gray_50);}
 body.controller-boards #content>p.breadcrumb,body.controller-messages #content>p.breadcrumb{margin:0 0 8px;font-size:0.8125rem;}
 table.list.messages{display:block;border-top:2px solid var(--gray_90);}
 table.list.messages thead{display:none;}
@@ -786,7 +795,9 @@ table.list.dep_runs tbody{display:table-row-group;}
 table.list.dep_runs th.note{text-align:left;}
 table.list.dep_runs tr.dep_row{display:table-row;padding:0;}
 table.list.dep_runs tr.dep_row>td,table.list.dep_runs tr.dep_row>td.note:empty{display:table-cell;padding:12px;border-bottom:1px solid var(--gray_20);font-size:0.875rem;text-align:center;white-space:nowrap;}
-table.list.dep_runs tr.dep_row>td.note{width:100%;text-align:left;white-space:normal;}
+table.list.dep_runs tr.dep_row>td.note{width:25%;text-align:left;white-space:normal;}
+table.list.dep_runs tr.dep_row>td.changes{width:45%;text-align:left;white-space:normal;}
+table.list.dep_runs th.changes{text-align:left;}
 table.list.dep_runs tr.dep_row.on>td.duration{text-align:left;}
 table.list.dep_runs tr.dep_row.on>td.duration .dep_prog{width:120px;}
 table.list.messages{display:table;}

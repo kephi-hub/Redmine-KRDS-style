@@ -71,3 +71,10 @@ en:
   error_deploy_target_missing: The deploy target or Jenkins server was deleted.
   error_deploy_bad_choice: "%{name} is not one of the Jenkins choices."
   label_deploy_params_unavailable: Could not load Jenkins parameters. The default parameters will be used.
+  label_deploy_changes: Changes
+  label_deploy_changes_all: Show all
+  label_deploy_no_changes: No changes
+  label_deploy_baseline: At
+  label_deploy_commits:
+    one: "%{count} commit"
+    other: "%{count} commits"
