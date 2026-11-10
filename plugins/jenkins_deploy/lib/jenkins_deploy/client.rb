@@ -9,7 +9,7 @@ module JenkinsDeploy
   class NotFound < Error; end
 
   class Client
-    BUILD_FIELDS = 'number,result,building,timestamp,duration,url,' \
+    BUILD_FIELDS = 'number,result,building,timestamp,duration,estimatedDuration,url,' \
                    'actions[parameters[name,value],causes[shortDescription,userId,userName]]'
     PARAM_FIELDS = 'property[parameterDefinitions[name,type,description,choices,defaultParameterValue[value]]]'
 

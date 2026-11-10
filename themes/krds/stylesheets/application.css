@@ -322,6 +322,19 @@ td.row_btns a.icon+a.icon{margin-left:6px;}
 .st_running,.st_queued{background:var(--pri_10);color:var(--pri_60);}
 .st_unstable{background:var(--war_10);color:var(--war_60);}
 .st_aborted{background:var(--gray_10);color:var(--gray_70);}
+.dep_spin{display:inline-block;width:10px;height:10px;margin-right:5px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:dep_spin 0.8s linear infinite;}
+@keyframes dep_spin{to{transform:rotate(360deg);}}
+table.list.dep_runs tr.dep_row.on,table.list.dep_runs tr.dep_row.on:hover{background:var(--pri_5);}
+.dep_live{display:flex;flex-direction:column;gap:4px;}
+.dep_est{color:var(--gray_50);}
+.dep_prog{display:block;position:relative;width:100%;max-width:160px;height:6px;overflow:hidden;border-radius:3px;background:var(--pri_10);}
+.dep_prog i{display:block;width:0;height:100%;border-radius:3px;background:var(--pri_50);transition:width 1s linear;}
+.dep_prog.wait i{position:absolute;width:40%;animation:dep_slide 1.4s ease-in-out infinite;}
+@keyframes dep_slide{0%{left:-40%;}100%{left:100%;}}
+@media (prefers-reduced-motion:reduce){
+.dep_spin,.dep_prog.wait i{animation-duration:3s;}
+}
+table.list.dep_runs tr.dep_row.on>td.duration{flex:1 0 100%;}
 #content .dep_sec{padding:0;margin:0 0 8px;font-size:1.0625rem;color:var(--gray_95);}
 .dep_dlg{width:calc(100% - 32px);max-width:480px;padding:24px;border:0;border-radius:var(--radius_l);background:var(--gray_0);box-shadow:0 12px 32px rgba(0,0,0,0.2);}
 .dep_dlg::backdrop{background:rgba(0,0,0,0.4);}
@@ -774,6 +787,8 @@ table.list.dep_runs th.note{text-align:left;}
 table.list.dep_runs tr.dep_row{display:table-row;padding:0;}
 table.list.dep_runs tr.dep_row>td,table.list.dep_runs tr.dep_row>td.note:empty{display:table-cell;padding:12px;border-bottom:1px solid var(--gray_20);font-size:0.875rem;text-align:center;white-space:nowrap;}
 table.list.dep_runs tr.dep_row>td.note{width:100%;text-align:left;white-space:normal;}
+table.list.dep_runs tr.dep_row.on>td.duration{text-align:left;}
+table.list.dep_runs tr.dep_row.on>td.duration .dep_prog{width:120px;}
 table.list.messages{display:table;}
 table.list.messages thead{display:table-header-group;}
 table.list.messages tbody{display:table-row-group;}

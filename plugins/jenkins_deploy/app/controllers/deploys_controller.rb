@@ -108,12 +108,13 @@ class DeploysController < ApplicationController
       duration = build['building'] ? (Time.current - time).to_i : build['duration'].to_i / 1000
       { target_id: target&.id, target_name: target&.name || name, production: target&.production?, number: build['number'],
         url: build['url'], status: status, time: time, duration: duration, run: run,
+        estimate: (build['estimatedDuration'].to_i / 1000 if build['building'] && build['estimatedDuration'].to_i > 0),
         by: run&.user || jenkins_cause(build), note: run&.note, params: build_params(build) }
     else
       time = run.started_at || run.created_at
       duration = run.finished_at ? (run.finished_at - time).to_i : (run.active? ? (Time.current - time).to_i : nil)
       { target_id: run.deploy_target_id, target_name: name || run.target_name, production: run.production?, number: run.build_number,
-        url: nil, status: run.status, time: time, duration: duration, run: run, by: run.user, note: run.note || run.error_message,
+        url: nil, status: run.status, time: time, duration: duration, run: run, by: run.user, note: run.note || run.error_message, estimate: nil,
         params: (run.params || {}).except(*DeployTarget::AUTO_PARAMS) }
     end
   end

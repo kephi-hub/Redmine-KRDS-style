@@ -125,13 +125,13 @@
   </tr></thead>
   <tbody>
   <% @history.each do |row| %>
-    <tr class="dep_row">
+    <tr class="dep_row<%= ' on' if DeployRun::ACTIVE.include?(row[:status]) %>">
       <td class="status"><%= deploy_status_tag(row[:status]) %></td>
       <td class="target"><%= row[:target_name] %><% if row[:production] %> <span class="dep_prod"><%= l(:label_deploy_production) %></span><% end %></td>
       <td class="build"><%= row[:number] ? (row[:url] ? link_to("##{row[:number]}", row[:url], :target => '_blank', :rel => 'noopener') : "##{row[:number]}") : '-' %></td>
       <td class="by"><%= deploy_by(row[:by]) %></td>
       <td class="time"><%= row[:time] ? format_time(row[:time]) : '-' %></td>
-      <td class="duration"><%= deploy_duration(row[:duration]) %></td>
+      <td class="duration"><%= DeployRun::ACTIVE.include?(row[:status]) ? deploy_progress(row) : deploy_duration(row[:duration]) %></td>
       <td class="note"><%= row[:note] %><% (row[:params] || {}).each do |name, value| %> <span class="dep_pv"><%= name %>=<%= value %></span><% end %></td>
     </tr>
   <% end %>
@@ -150,7 +150,21 @@ $(function() {
   $(document).on('input', '.dep_form input[name=confirm]', function() {
     $(this).closest('form').find('input[type=submit]').prop('disabled', $.trim($(this).val()) !== String($(this).data('expect')));
   });
-  <% if @project.deploy_runs.active.exists? %>
+  // 진행 중 행: 경과 시간과 진행바를 1초마다 갱신 (예상 시간 기준, 끝나기 전에는 99% 에서 멈춤)
+  function fmt(s) { return s < 60 ? s + '초' : Math.floor(s / 60) + '분 ' + ('0' + (s % 60)).slice(-2) + '초'; }
+  if ($('.dep_live').length) setInterval(function() {
+    $('.dep_live').each(function() {
+      var start = $(this).data('start'), est = $(this).data('est');
+      if (!start) return;
+      var sec = Math.max(0, Math.floor(Date.now() / 1000) - start);
+      $(this).find('.dep_elapsed').text(fmt(sec));
+      if (est) {
+        var pct = Math.min(99, Math.floor(sec * 100 / est));
+        $(this).find('.dep_prog').attr('aria-valuenow', pct).find('i').css('width', pct + '%');
+      }
+    });
+  }, 1000);
+  <% if @project.deploy_runs.active.exists? || @history.any? { |r| DeployRun::ACTIVE.include?(r[:status]) } %>
   var timer = setInterval(function() {
     $.getJSON('<%= j project_deploys_status_path(@project) %>').done(function(d) {
       if (d.changed || d.active === 0) { clearInterval(timer); location.reload(); }
