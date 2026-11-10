@@ -44,11 +44,41 @@
         <%= hidden_field_tag 'target_id', target.id, :id => nil %>
         <h3 id="dep_dlg_tit_<%= target.id %>"><%= l(:label_deploy_confirm_title, :name => target.name) %></h3>
         <p><%= l(:label_deploy_confirm_text, :job => target.job_path) %></p>
-        <% if (params_hash = target.params_hash).any? %>
-        <dl class="dep_params">
-          <dt><%= l(:label_deploy_params) %></dt>
-          <% params_hash.each do |name, value| %><dd><code><%= name %>=<%= value %></code></dd><% end %>
-        </dl>
+        <% definitions = @definitions[target.id] %>
+        <% if definitions %>
+          <% fields = target.selectable_params(definitions) %>
+          <% if fields.any? %>
+          <fieldset class="dep_fields">
+            <legend><%= l(:label_deploy_params) %></legend>
+            <% fields.each_with_index do |d, i| %>
+              <% fid = "dep_p_#{target.id}_#{i}"; value = target.initial_value(d); fname = "jparams[#{d[:name]}]" %>
+              <div class="dep_field">
+              <% if d[:type].include?('Boolean') %>
+                <%= hidden_field_tag fname, 'false', :id => nil %>
+                <label class="dep_check" for="<%= fid %>"><%= check_box_tag fname, 'true', value.to_s == 'true', :id => fid %> <%= d[:name] %></label>
+              <% elsif d[:choices].any? %>
+                <label for="<%= fid %>"><%= d[:name] %></label>
+                <%= select_tag fname, options_for_select(d[:choices], value.to_s), :id => fid %>
+              <% elsif d[:type].include?('Text') %>
+                <label for="<%= fid %>"><%= d[:name] %></label>
+                <%= text_area_tag fname, value.to_s, :id => fid, :rows => 3 %>
+              <% else %>
+                <label for="<%= fid %>"><%= d[:name] %></label>
+                <%= text_field_tag fname, value.to_s, :id => fid %>
+              <% end %>
+              <% if d[:description].present? %><p class="dep_desc"><%= d[:description] %></p><% end %>
+              </div>
+            <% end %>
+          </fieldset>
+          <% end %>
+        <% else %>
+          <p class="dep_warn"><%= l(:label_deploy_params_unavailable) %></p>
+          <% if (params_hash = target.params_hash).any? %>
+          <dl class="dep_params">
+            <dt><%= l(:label_deploy_params) %></dt>
+            <% params_hash.each do |name, value| %><dd><code><%= name %>=<%= value %></code></dd><% end %>
+          </dl>
+          <% end %>
         <% end %>
         <% if target.production? %>
         <p class="dep_confirm">
@@ -102,7 +132,7 @@
       <td class="by"><%= deploy_by(row[:by]) %></td>
       <td class="time"><%= row[:time] ? format_time(row[:time]) : '-' %></td>
       <td class="duration"><%= deploy_duration(row[:duration]) %></td>
-      <td class="note"><%= row[:note] %></td>
+      <td class="note"><%= row[:note] %><% (row[:params] || {}).each do |name, value| %> <span class="dep_pv"><%= name %>=<%= value %></span><% end %></td>
     </tr>
   <% end %>
   </tbody>

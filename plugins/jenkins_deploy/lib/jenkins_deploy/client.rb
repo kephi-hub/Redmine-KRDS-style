@@ -11,6 +11,16 @@ module JenkinsDeploy
   class Client
     BUILD_FIELDS = 'number,result,building,timestamp,duration,url,' \
                    'actions[parameters[name,value],causes[shortDescription,userId,userName]]'
+    PARAM_FIELDS = 'property[parameterDefinitions[name,type,description,choices,defaultParameterValue[value]]]'
+
+    # Jenkins 응답의 매개변수 정의 → [{name:, type:, description:, default:, choices:}]
+    def self.parse_definitions(data)
+      Array(data['property']).flat_map { |p| Array(p && p['parameterDefinitions']) }.filter_map do |d|
+        next if d['name'].blank?
+        { name: d['name'], type: d['type'].to_s, description: d['description'].to_s,
+          default: d.dig('defaultParameterValue', 'value'), choices: Array(d['choices']).map(&:to_s) }
+      end
+    end
 
     def initialize(server)
       @server = server
@@ -24,16 +34,21 @@ module JenkinsDeploy
       { version: res['X-Jenkins'], name: data['name'], authenticated: data['authenticated'] }
     end
 
-    # 작업에 정의된 매개변수 이름 목록 (없으면 [])
-    def parameter_names(job_path)
-      data = get_json("#{job_url(job_path)}/api/json", tree: 'property[parameterDefinitions[name]]')
-      Array(data['property']).flat_map { |p| Array(p['parameterDefinitions']).map { |d| d['name'] } }.compact
+    # 작업에 정의된 매개변수 (없으면 [])
+    def parameter_definitions(job_path)
+      self.class.parse_definitions(get_json("#{job_url(job_path)}/api/json", tree: PARAM_FIELDS))
+    end
+
+    # 배포 화면용: 최근 빌드와 매개변수 정의를 한 번에
+    def job_info(job_path, limit = 20)
+      data = get_json("#{job_url(job_path)}/api/json", tree: "builds[#{BUILD_FIELDS}]{0,#{limit.to_i}},#{PARAM_FIELDS}")
+      { builds: Array(data['builds']), params: self.class.parse_definitions(data) }
     end
 
     # 배포 실행 → Jenkins 대기열 번호 반환
     # 작업에 매개변수가 있으면 정의된 이름만 골라 buildWithParameters, 없으면 build
-    def trigger(job_path, params)
-      names = parameter_names(job_path)
+    def trigger(job_path, params, definitions = nil)
+      names = (definitions || parameter_definitions(job_path)).map { |d| d[:name] }
       if names.any?
         form = params.select { |k, _| names.include?(k) }
         res = request(:post, "#{job_url(job_path)}/buildWithParameters", form: form)

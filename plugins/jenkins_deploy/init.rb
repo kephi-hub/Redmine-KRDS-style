@@ -3,6 +3,7 @@
 # - 관리 > Jenkins 서버 : 주소·계정·API 토큰(암호화 저장) 등록, 연결 시험 (관리자)
 # - 프로젝트 > 설정 > 배포 : 환경(개발·운영 등)별 Jenkins 작업 지정
 # - 프로젝트 > 배포 : 배포 실행, 진행 상태, 이력 (Jenkins 기본 원격 API 사용, Jenkins 플러그인 불필요)
+# - 1.1.0 : 확인창에서 Jenkins 작업 매개변수 선택 (boolean·choice·string·text, 비밀번호 제외), 이력에 선택 값 표시
 require_relative 'lib/jenkins_deploy/client'
 require_relative 'lib/jenkins_deploy/project_settings_patch'
 
@@ -10,7 +11,7 @@ Redmine::Plugin.register :jenkins_deploy do
   name 'Jenkins 배포'
   author 'kephi-hub'
   description 'Redmine 프로젝트에서 Jenkins 배포 작업 실행과 이력 확인'
-  version '1.0.0'
+  version '1.1.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
 

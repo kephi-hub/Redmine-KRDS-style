@@ -334,6 +334,14 @@ td.row_btns a.icon+a.icon{margin-left:6px;}
 .dep_params dt{margin-bottom:4px;font-weight:700;}
 .dep_params dd{margin:0;word-break:break-all;}
 .dep_confirm label{color:var(--dan_60);}
+.dep_fields{padding:12px 14px;margin:0 0 12px;border:1px solid var(--gray_20);border-radius:var(--radius_s);background:var(--gray_5);}
+.dep_fields legend{padding:0 4px;font-size:0.8125rem;font-weight:700;color:var(--gray_80);}
+.dep_field+.dep_field{margin-top:10px;}
+#content .dep_dlg .dep_check{display:flex;align-items:center;gap:8px;margin:0;font-size:0.9375rem;font-weight:700;color:var(--gray_90);}
+#content .dep_dlg .dep_check input{width:18px;height:18px;margin:0;}
+#content .dep_dlg .dep_field select,#content .dep_dlg .dep_field textarea{width:100%;}
+#content .dep_dlg .dep_desc{margin:4px 0 0;font-size:0.8125rem;color:var(--gray_60);}
+.dep_pv{display:inline-block;padding:0 6px;margin:2px 0;border-radius:var(--radius_s);background:var(--gray_10);font-family:monospace;font-size:0.75rem;color:var(--gray_70);}
 table.list.dep_runs{display:block;border-top:2px solid var(--gray_90);}
 table.list.dep_runs thead{display:none;}
 table.list.dep_runs tbody{display:block;}

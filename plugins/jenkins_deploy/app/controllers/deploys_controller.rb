@@ -30,14 +30,26 @@ class DeploysController < ApplicationController
     run&.refresh!
     return deny(l(:error_deploy_running)) if run&.reload&.active?
 
+    client = target.jenkins_server.client
+    begin
+      definitions = client.parameter_definitions(target.job_path)
+      values = target.run_params(definitions, params[:jparams] || {})
+    rescue ArgumentError => e
+      return deny(l(:error_deploy_failed, message: e.message)) # 잘못된 선택지 — 실행하지 않았으므로 기록 없음
+    rescue JenkinsDeploy::Error => e
+      definitions = nil
+      jenkins_error = e
+    end
+
     run = @project.deploy_runs.create!(
       deploy_target: target, user: User.current, target_name: target.name, job_path: target.job_path,
       production: target.production?, note: params[:note].to_s.strip.truncate(255).presence, status: 'queued'
     )
-    params_sent = target.params_hash.merge('REDMINE_USER' => User.current.login, 'REDMINE_RUN_ID' => run.id.to_s)
-    run.params = params_sent
     begin
-      run.queue_id = target.jenkins_server.client.trigger(target.job_path, params_sent)
+      raise jenkins_error if jenkins_error
+      params_sent = values.merge('REDMINE_USER' => User.current.login, 'REDMINE_RUN_ID' => run.id.to_s)
+      run.params = params_sent
+      run.queue_id = client.trigger(target.job_path, params_sent, definitions)
       run.save!
       flash[:notice] = l(:notice_deploy_started, name: target.name)
     rescue JenkinsDeploy::Error => e
@@ -62,16 +74,20 @@ class DeploysController < ApplicationController
   def load_history
     @errors = {}
     @last = {}
+    @definitions = {}
     rows = []
     runs = @project.deploy_runs.includes(:user).order(id: :desc).limit(200).to_a
-    targets = @filter ? [@filter] : @targets
-    targets.each do |t|
-      builds = begin
-        t.jenkins_server.client.builds(t.job_path, 20)
+    # 환경마다 Jenkins 에 한 번 물어 빌드 목록과 매개변수 정의를 함께 가져옴 (확인창 입력칸용)
+    @targets.each do |t|
+      info = begin
+        t.jenkins_server.client.job_info(t.job_path, 20)
       rescue JenkinsDeploy::Error => e
         @errors[t.id] = e.message
-        []
+        { builds: [], params: nil }
       end
+      @definitions[t.id] = info[:params]
+      next if @filter && @filter != t
+      builds = info[:builds]
       mine = runs.select { |r| r.deploy_target_id == t.id && r.build_number }.index_by(&:build_number)
       builds.each { |b| rows << history_row(t, b, mine[b['number']]) }
     end
@@ -92,13 +108,20 @@ class DeploysController < ApplicationController
       duration = build['building'] ? (Time.current - time).to_i : build['duration'].to_i / 1000
       { target_id: target&.id, target_name: target&.name || name, production: target&.production?, number: build['number'],
         url: build['url'], status: status, time: time, duration: duration, run: run,
-        by: run&.user || jenkins_cause(build), note: run&.note }
+        by: run&.user || jenkins_cause(build), note: run&.note, params: build_params(build) }
     else
       time = run.started_at || run.created_at
       duration = run.finished_at ? (run.finished_at - time).to_i : (run.active? ? (Time.current - time).to_i : nil)
       { target_id: run.deploy_target_id, target_name: name || run.target_name, production: run.production?, number: run.build_number,
-        url: nil, status: run.status, time: time, duration: duration, run: run, by: run.user, note: run.note || run.error_message }
+        url: nil, status: run.status, time: time, duration: duration, run: run, by: run.user, note: run.note || run.error_message,
+        params: (run.params || {}).except(*DeployTarget::AUTO_PARAMS) }
     end
+  end
+
+  def build_params(build)
+    Array(build['actions']).flat_map { |a| Array(a && a['parameters']) }
+                           .reject { |p| DeployTarget::AUTO_PARAMS.include?(p['name']) }
+                           .to_h { |p| [p['name'], p['value'].to_s] }
   end
 
   def jenkins_cause(build)

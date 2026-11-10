@@ -69,3 +69,5 @@ en:
   error_deploy_cancelled: Cancelled in the Jenkins queue.
   error_deploy_lost: The build for this deploy was not found in Jenkins.
   error_deploy_target_missing: The deploy target or Jenkins server was deleted.
+  error_deploy_bad_choice: "%{name} is not one of the Jenkins choices."
+  label_deploy_params_unavailable: Could not load Jenkins parameters. The default parameters will be used.

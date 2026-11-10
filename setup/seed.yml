@@ -3,7 +3,7 @@
 # id 대신 이름으로 적음 (서버마다 id 가 다를 수 있음)
 settings:
   activity_days_default: '10'
-  app_title: 프로젝트 관리 시스템
+  app_title: 프로젝트 관리 시스템 PMS
   attachment_max_size: '51200'
   cache_formatted_text: '0'
   commit_logtime_enabled: '1'
@@ -34,16 +34,29 @@ commit_update_keywords:
 commit_logtime_activity: 개발
 default_projects_trackers:
 - 결함
-- 새기능
+- 기능
 - 지원
+- 오류
+- 회의
+- 데이터 이관
+- 작업
+- 테스트
 trackers:
 - name: 결함
   default_status: 신규
-- name: 새기능
+- name: 기능
   default_status: 신규
 - name: 지원
   default_status: 신규
 - name: 오류
+  default_status: 신규
+- name: 회의
+  default_status: 신규
+- name: 데이터 이관
+  default_status: 신규
+- name: 작업
+  default_status: 신규
+- name: 테스트
   default_status: 신규
 time_entry_activities:
 - 설계
@@ -121,12 +134,17 @@ roles:
   - delete_issue_watchers
   - import_issues
   - manage_categories
+  - view_deploys
+  - run_deploys
+  - run_production_deploys
+  - manage_deploy_targets
   - export_keys
   - keys_all
   - download_keys
   - view_keys
   - edit_keys
   - manage_whitelist_keys
+  - whitelist_keys
   - view_news
   - manage_news
   - comment_news

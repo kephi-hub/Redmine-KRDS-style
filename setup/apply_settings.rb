@@ -57,7 +57,7 @@ ActiveRecord::Base.transaction do
     { 'keywords' => k['keywords'], 'status_id' => status.(k['status']).id.to_s, 'done_ratio' => k['done_ratio'].to_s, 'if_tracker_id' => '' }
   end
   Setting.commit_logtime_activity_id = TimeEntryActivity.find_by!(name: SEED['commit_logtime_activity'], project_id: nil).id.to_s
-  Setting.default_projects_tracker_ids = Tracker.where(name: SEED['default_projects_trackers']).pluck(:id).map(&:to_s)
+  Setting.default_projects_tracker_ids = Tracker.where(name: SEED['default_projects_trackers']).order(:id).pluck(:id).map(&:to_s)
   # 서버마다 다른 값은 .env 에서 받음
   Setting.host_name = ENV['REDMINE_HOST_NAME'] if ENV['REDMINE_HOST_NAME'].present?
   Setting.protocol  = ENV['REDMINE_PROTOCOL'].presence || 'http'

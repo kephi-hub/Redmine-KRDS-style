@@ -69,3 +69,5 @@ ko:
   error_deploy_cancelled: Jenkins 대기열에서 취소되었습니다.
   error_deploy_lost: Jenkins 에서 이 배포의 빌드를 찾을 수 없습니다.
   error_deploy_target_missing: 배포 환경 또는 Jenkins 서버가 삭제되었습니다.
+  error_deploy_bad_choice: "%{name} 값이 Jenkins 선택지에 없습니다."
+  label_deploy_params_unavailable: Jenkins 매개변수를 불러오지 못해 기본 매개변수로 실행합니다.
