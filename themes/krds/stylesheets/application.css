@@ -275,6 +275,27 @@ div.fileover span.add_attachment,p.custom-field-filedroplistner.fileover span.ad
 .journals .bbs_time{margin-left:6px;font-size:0.8125rem;}
 .bbs_reply{display:flex;justify-content:flex-end;margin:16px 0;}
 #content .bbs_reply a{display:inline-flex;align-items:center;height:40px;padding:0 20px;font-size:0.9375rem;font-weight:500;}
+/* 설정 > 게시판 — 행을 카드처럼, 편집(회색)·삭제(빨강) 테두리 버튼, 새 게시판 버튼은 오른쪽 */
+#tab-content-boards>p:first-child{display:flex;justify-content:flex-end;margin:0 0 12px;}
+#tab-content-boards .table-list.boards{display:block;width:100%;border-bottom:0;}
+#tab-content-boards .table-list-header{display:block;}
+#tab-content-boards .table-list-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:14px 8px;border-bottom:1px solid var(--gray_20);}
+#tab-content-boards .table-list-row:hover{background:var(--gray_5);}
+#tab-content-boards .table-list-cell{display:block;padding:0;}
+#tab-content-boards .table-list-header .table-list-cell{padding:0;}
+#tab-content-boards .table-list-cell.name{flex:1 1 100%;width:auto;font-size:1rem;font-weight:700;}
+#tab-content-boards .table-list-cell.name a{color:var(--gray_90);}
+#tab-content-boards .table-list-cell.name a:hover{color:var(--pri_60);}
+#tab-content-boards .table-list-cell.description{flex:1 1 160px;font-size:0.875rem;color:var(--gray_60);}
+#tab-content-boards .table-list-cell.buttons{display:flex;align-items:center;gap:8px;width:auto;margin:0 0 0 auto;}
+#tab-content-boards .buttons a.icon{display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 12px;margin:0;border:1px solid var(--gray_40);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.875rem;font-weight:500;color:var(--gray_80);}
+#tab-content-boards .buttons a.icon:hover{background:var(--gray_10);text-decoration:none;}
+#tab-content-boards .buttons a.icon .icon-svg{width:16px;height:16px;stroke:currentColor;color:inherit;}
+#tab-content-boards .buttons a.icon-del{border-color:var(--dan_50);color:var(--dan_50);}
+#tab-content-boards .buttons a.icon-del:hover{background:var(--dan_5);color:var(--dan_60);}
+#tab-content-boards .sort-handle{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius_s);color:var(--gray_50);}
+#tab-content-boards .sort-handle:hover{background:var(--gray_10);}
+#tab-content-boards .sort-handle .icon-svg{stroke:currentColor;}
 body.controller-boards #content>p.breadcrumb,body.controller-messages #content>p.breadcrumb{margin:0 0 8px;font-size:0.8125rem;}
 table.list.messages{display:block;border-top:2px solid var(--gray_90);}
 table.list.messages thead{display:none;}
@@ -689,6 +710,7 @@ div#activity dd.grouped{margin-left:9em;}
 .list_search{flex:0 1 auto;justify-content:flex-end;}
 .list_field{flex:none;}
 #content .list_field input[type=search]{flex:none;width:240px;}
+#tab-content-boards .table-list-cell.name{flex:0 0 28%;}
 table.list.messages{display:table;}
 table.list.messages thead{display:table-header-group;}
 table.list.messages tbody{display:table-row-group;}
