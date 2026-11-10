@@ -1,0 +1,7 @@
+<h2><%= link_to l(:label_jenkins_server_plural), jenkins_servers_path %> &#187; <%= @server.name %></h2>
+
+<%= labelled_form_for @server, :url => jenkins_server_path(@server), :html => { :method => :patch } do |f| %>
+  <%= render :partial => 'form', :locals => { :f => f } %>
+<% end %>
+
+<% html_title l(:label_jenkins_server_plural) %>

@@ -1,0 +1,16 @@
+<%= error_messages_for @server %>
+<div class="box tabular">
+  <p><%= f.text_field :name, :required => true, :size => 40, :maxlength => 60 %></p>
+  <p><%= f.text_field :url, :required => true, :size => 60, :maxlength => 255, :placeholder => 'http://192.168.10.223:9091' %>
+    <em class="info"><%= l(:text_jenkins_url_info) %></em></p>
+  <p><%= f.text_field :username, :required => true, :size => 40, :maxlength => 120, :autocomplete => 'off' %>
+    <em class="info"><%= l(:text_jenkins_user_info) %></em></p>
+  <p><%= f.password_field :token, :value => '', :required => @server.new_record?, :size => 40, :autocomplete => 'new-password' %>
+    <% if @server.token_set? %><em class="info"><%= l(:label_jenkins_token_saved) %> · <%= l(:label_jenkins_token_keep) %></em><% end %></p>
+  <p><%= f.check_box :verify_ssl %></p>
+  <p><%= f.number_field :timeout, :min => 1, :max => 60, :size => 4 %></p>
+</div>
+<p class="form_btns">
+  <%= link_to l(:button_cancel), jenkins_servers_path, :class => 'btn_line' %>
+  <%= submit_tag l(@server.new_record? ? :button_create : :button_save) %>
+</p>

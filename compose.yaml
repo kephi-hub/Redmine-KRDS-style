@@ -39,6 +39,7 @@ services:
       - ./themes:/usr/src/redmine/themes:z   # 사용자 테마 (krds)
       - ./plugins/vault_ko:/usr/src/redmine/plugins/vault_ko:z   # Vault 한국어화 (번역+화면 문구)
       - ./plugins/krds_ui:/usr/src/redmine/plugins/krds_ui:z   # KRDS 화면 마크업 (문서 상세)
+      - ./plugins/jenkins_deploy:/usr/src/redmine/plugins/jenkins_deploy:z   # Jenkins 배포 연동 (DB 테이블은 시작 때 자동 생성)
       - ./setup:/usr/src/redmine/setup:z   # 기준 설정 스크립트 (apply_settings.rb)
 
 volumes:

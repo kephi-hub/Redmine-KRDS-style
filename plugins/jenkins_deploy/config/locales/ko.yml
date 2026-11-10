@@ -1,0 +1,71 @@
+ko:
+  project_module_jenkins_deploy: 배포
+  permission_view_deploys: 배포 이력 보기
+  permission_run_deploys: 배포 실행
+  permission_run_production_deploys: 운영 배포 실행
+  permission_manage_deploy_targets: 배포 설정 관리
+  label_deploy_plural: 배포
+  label_deploy_history: 배포 이력
+  label_deploy_run: 배포 실행
+  label_deploy_target: 배포 환경
+  label_deploy_target_new: 새 배포 환경
+  label_deploy_production: 운영
+  label_deploy_last: 마지막
+  label_deploy_none: 아직 배포 기록이 없습니다
+  label_deploy_no_targets: 등록된 배포 환경이 없습니다.
+  label_deploy_go_settings: 프로젝트 설정 > 배포 에서 추가
+  label_deploy_need_server: 먼저 관리자가 관리 > Jenkins 서버 에 서버를 등록해야 합니다.
+  label_deploy_confirm_title: "%{name} 배포"
+  label_deploy_confirm_text: "Jenkins 작업 %{job} 을(를) 실행합니다."
+  label_deploy_confirm_prod: "운영 배포입니다. 확인을 위해 프로젝트 식별자 %{identifier} 를 입력하세요."
+  label_deploy_params: 매개변수
+  label_deploy_note: 배포 메모
+  label_deploy_by: 실행자
+  label_deploy_started: 시작
+  label_deploy_duration: 소요
+  label_deploy_build: 빌드
+  label_deploy_running_wait: 진행 중인 배포가 끝난 뒤 실행할 수 있습니다
+  label_deploy_no_permission: 실행 권한이 없습니다
+  label_deploy_all: 전체
+  label_deploy_status_queued: 대기
+  label_deploy_status_running: 진행 중
+  label_deploy_status_success: 성공
+  label_deploy_status_failure: 실패
+  label_deploy_status_unstable: 불안정
+  label_deploy_status_aborted: 중단
+  label_deploy_status_error: 오류
+  label_jenkins_server: Jenkins 서버
+  label_jenkins_server_plural: Jenkins 서버
+  label_jenkins_server_new: 새 Jenkins 서버
+  label_jenkins_test: 연결 시험
+  label_jenkins_token_keep: 바꿀 때만 입력 (비워 두면 기존 토큰 유지)
+  label_jenkins_token_saved: 저장됨
+  field_job_path: Jenkins 작업 경로
+  field_production: 운영 환경
+  field_default_params: 기본 매개변수
+  field_jenkins_server: Jenkins 서버
+  field_token: API 토큰
+  field_username: 계정
+  field_token_encrypted: API 토큰
+  field_verify_ssl: 인증서 검증
+  field_timeout: 응답 대기 시간(초)
+  text_job_path_info: "폴더 안 작업은 / 로 구분 (예: mainbiz/dev-deploy)"
+  text_default_params_info: "한 줄에 하나씩 이름=값 (예: BRANCH=develop). 작업에 정의된 매개변수만 전달됩니다."
+  text_production_info: 켜면 운영 배포 실행 권한이 있어야 하고, 실행할 때 프로젝트 식별자를 입력해야 합니다.
+  text_jenkins_url_info: "예: http://192.168.10.223:9091"
+  text_jenkins_user_info: 배포 작업의 Read·Build 권한만 가진 배포 전용 계정을 권장합니다.
+  notice_jenkins_connected: "연결됨 — Jenkins %{version}, 계정 %{name}"
+  notice_deploy_started: "%{name} 배포를 시작했습니다."
+  error_jenkins_connect: Jenkins 에 연결할 수 없습니다. 주소와 네트워크를 확인하세요.
+  error_jenkins_auth: Jenkins 계정 또는 권한을 확인하세요.
+  error_jenkins_not_found: Jenkins 작업을 찾을 수 없습니다. 작업 경로를 확인하세요.
+  error_jenkins_bad_response: "Jenkins 응답이 올바르지 않습니다 (HTTP %{code})."
+  error_jenkins_no_queue: Jenkins 가 대기열 번호를 돌려주지 않았습니다.
+  error_jenkins_server_in_use: 배포 환경에서 사용 중인 서버는 삭제할 수 없습니다.
+  error_deploy_not_allowed: 이 환경을 배포할 권한이 없습니다.
+  error_deploy_confirm: 프로젝트 식별자가 일치하지 않아 배포하지 않았습니다.
+  error_deploy_running: 진행 중인 배포가 있습니다. 끝난 뒤 다시 실행하세요.
+  error_deploy_failed: "배포를 시작하지 못했습니다: %{message}"
+  error_deploy_cancelled: Jenkins 대기열에서 취소되었습니다.
+  error_deploy_lost: Jenkins 에서 이 배포의 빌드를 찾을 수 없습니다.
+  error_deploy_target_missing: 배포 환경 또는 Jenkins 서버가 삭제되었습니다.

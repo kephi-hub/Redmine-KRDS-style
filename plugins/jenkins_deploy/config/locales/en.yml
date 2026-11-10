@@ -1,0 +1,71 @@
+en:
+  project_module_jenkins_deploy: Deploy
+  permission_view_deploys: View deploys
+  permission_run_deploys: Run deploys
+  permission_run_production_deploys: Run production deploys
+  permission_manage_deploy_targets: Manage deploy targets
+  label_deploy_plural: Deploy
+  label_deploy_history: Deploy history
+  label_deploy_run: Deploy
+  label_deploy_target: Deploy target
+  label_deploy_target_new: New deploy target
+  label_deploy_production: Production
+  label_deploy_last: Last
+  label_deploy_none: No deploys yet
+  label_deploy_no_targets: No deploy targets.
+  label_deploy_go_settings: Add one in Settings > Deploy
+  label_deploy_need_server: An administrator must add a Jenkins server first (Administration > Jenkins servers).
+  label_deploy_confirm_title: "Deploy %{name}"
+  label_deploy_confirm_text: "Runs the Jenkins job %{job}."
+  label_deploy_confirm_prod: "Production deploy. Type the project identifier %{identifier} to confirm."
+  label_deploy_params: Parameters
+  label_deploy_note: Note
+  label_deploy_by: By
+  label_deploy_started: Started
+  label_deploy_duration: Duration
+  label_deploy_build: Build
+  label_deploy_running_wait: Wait until the running deploy finishes
+  label_deploy_no_permission: No permission
+  label_deploy_all: All
+  label_deploy_status_queued: Queued
+  label_deploy_status_running: Running
+  label_deploy_status_success: Success
+  label_deploy_status_failure: Failure
+  label_deploy_status_unstable: Unstable
+  label_deploy_status_aborted: Aborted
+  label_deploy_status_error: Error
+  label_jenkins_server: Jenkins server
+  label_jenkins_server_plural: Jenkins servers
+  label_jenkins_server_new: New Jenkins server
+  label_jenkins_test: Test connection
+  label_jenkins_token_keep: Leave blank to keep the current token
+  label_jenkins_token_saved: Saved
+  field_job_path: Jenkins job path
+  field_production: Production
+  field_default_params: Default parameters
+  field_jenkins_server: Jenkins server
+  field_token: API token
+  field_username: Username
+  field_token_encrypted: API token
+  field_verify_ssl: Verify SSL
+  field_timeout: Timeout (seconds)
+  text_job_path_info: "Separate folders with / (e.g. mainbiz/dev-deploy)"
+  text_default_params_info: "One NAME=value per line. Only parameters defined in the job are sent."
+  text_production_info: Requires the production deploy permission and typing the project identifier.
+  text_jenkins_url_info: "e.g. http://jenkins.example.com:8080"
+  text_jenkins_user_info: Use a dedicated account with Read and Build permission on deploy jobs only.
+  notice_jenkins_connected: "Connected - Jenkins %{version}, user %{name}"
+  notice_deploy_started: "Deploy of %{name} started."
+  error_jenkins_connect: Cannot connect to Jenkins. Check the URL and network.
+  error_jenkins_auth: Check the Jenkins account and permissions.
+  error_jenkins_not_found: Jenkins job not found. Check the job path.
+  error_jenkins_bad_response: "Unexpected Jenkins response (HTTP %{code})."
+  error_jenkins_no_queue: Jenkins did not return a queue item.
+  error_jenkins_server_in_use: This server is used by deploy targets.
+  error_deploy_not_allowed: You are not allowed to deploy this target.
+  error_deploy_confirm: The project identifier did not match. Nothing was deployed.
+  error_deploy_running: A deploy is already running.
+  error_deploy_failed: "Could not start the deploy: %{message}"
+  error_deploy_cancelled: Cancelled in the Jenkins queue.
+  error_deploy_lost: The build for this deploy was not found in Jenkins.
+  error_deploy_target_missing: The deploy target or Jenkins server was deleted.

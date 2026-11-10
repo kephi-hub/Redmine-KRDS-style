@@ -38,6 +38,7 @@ Redmine 6.1.6 + Vault(접속정보) 플러그인을 **KRDS(대한민국 정부 �
 | `compose.yaml` | PostgreSQL 17 + Redmine, 데이터는 Docker 볼륨(`db_data`, `files`, `keys`) |
 | `themes/krds/` | KRDS 테마 (색상·간격 토큰, 버튼·드롭다운·목록·상세·폼, 박스형 설정 탭, 관리 카드 메뉴, 하단 버튼 오른쪽 정렬, 검색조건 접기 스크립트) |
 | `plugins/krds_ui/` | 문서·게시판 화면 마크업, 문서 범주 검색조건·배지, 문서·뉴스·파일 제목 검색, 문서 편집 시 첨부 추가·삭제, 작업내역 오전·오후 12시간제 표시, 한글 이름 아바타(이름 2자), 누락 번역 보충 |
+| `plugins/jenkins_deploy/` | Jenkins 배포 연동 — 프로젝트 "배포" 탭에서 배포 실행·진행 상태·이력 (Jenkins 기본 API, 토큰 암호화 저장) |
 | `plugins/vault_ko/` | Vault 한국어 번역 + 화면 개선 규칙(`build.rb`). 이미지 빌드 때 원본 화면에 적용 (검색창, 선택 삭제, 비밀번호 가림, http 복사) |
 | `setup/` | 기준 설정(`seed.yml`), 초기화면 안내문(`welcome.md`), 적용 스크립트, cron 예시 |
 | `config/configuration.yml` | 암호화 키를 `.env` 에서 읽음 (파일에 비밀값 없음) |
@@ -91,6 +92,17 @@ docker compose exec redmine sh -c 'bundle exec rails runner setup/apply_settings
 - 글꼴(Pretendard GOV)은 공식 배포본을 jsDelivr CDN 으로 불러옵니다. 인터넷이 안 되는 서버에서는 시스템 글꼴(맑은 고딕 등)로 보입니다.
 - 반응형: 모바일 퍼스트 — 기본 규칙은 모바일 기준, 데스크톱 전용 배치는 `application.css` 끝의 `@media (min-width:900px)` 에 둡니다. Redmine 의 `responsive.css` 가 테마보다 뒤에 로드되므로 모바일에서 덮어쓸 규칙에는 `#wrapper` 를 붙여 우선순위를 높입니다.
 - CSS 작성 규칙: 규칙은 한 줄, 클래스명은 언더바(`_`)로 최대 2단어, 속성 순서는 display → position → flex → 크기 → 여백 → 테두리 → 배경 → 글꼴 → 색. Redmine 기본 선택자(`#main-menu` 등)는 예외입니다.
+
+## Jenkins 배포 연동
+Jenkins 쪽은 플러그인 설치 없이 **배포 전용 계정 + API 토큰**만 준비합니다 (배포 작업의 Read·Build 권한만 권장).
+
+1. **관리 → Jenkins 서버**: 주소·계정·API 토큰 등록 후 [연결 시험] (토큰은 `REDMINE_CIPHER_KEY` 로 암호화 저장, 화면에 다시 표시하지 않음)
+2. **관리 → 역할 및 권한**: "배포" 항목의 권한 지정 — 배포 이력 보기 / 배포 실행 / 운영 배포 실행 / 배포 설정 관리
+3. **프로젝트 → 설정 → 모듈**에서 "배포" 켜기 → **설정 → 배포** 탭에서 환경(개발서버·운영서버 등)별 Jenkins 작업 경로·기본 매개변수 지정
+4. **프로젝트 → 배포** 탭에서 [배포 실행] — 운영 환경은 프로젝트 식별자를 입력해야 실행, 진행 중에는 10초마다 상태 갱신
+
+- 작업에 매개변수가 있으면 정의된 이름만 전달하고, `REDMINE_USER`·`REDMINE_RUN_ID` 를 정의해 두면 실행자와 기록 번호도 받습니다.
+- Redmine 서버(Docker 컨테이너)에서 Jenkins 주소로 접속할 수 있어야 합니다. DB 테이블은 컨테이너 시작 때 자동 생성됩니다.
 
 ## 백업
 Git 에는 데이터가 없으므로 아래를 따로 백업합니다.

@@ -1,0 +1,133 @@
+<%# 프로젝트 > 배포 — 환경 카드(배포 실행) + 배포 이력 %>
+<h2><%= l(:label_deploy_plural) %></h2>
+
+<% if @targets.empty? %>
+<p class="nodata"><%= l(:label_deploy_no_targets) %>
+  <% if User.current.allowed_to?(:manage_deploy_targets, @project) %><%= link_to l(:label_deploy_go_settings), settings_project_path(@project, :tab => 'deploys') %><% end %></p>
+<% else %>
+
+<ul class="dep_list">
+<% @targets.each do |target| %>
+  <% last = @last[target.id]; active = target.deploy_runs.active.exists? %>
+  <li class="dep_card">
+    <div class="dep_head">
+      <h3 class="dep_tit"><%= target.name %></h3>
+      <% if target.production? %><span class="dep_prod"><%= l(:label_deploy_production) %></span><% end %>
+    </div>
+    <p class="dep_job"><%= target.jenkins_server %> · <%= target.job_path %></p>
+    <p class="dep_last">
+      <% if last %>
+        <%= deploy_status_tag(last[:status]) %>
+        <% if last[:number] %><span>#<%= last[:number] %></span><% end %>
+        <span><%= format_time(last[:time]) if last[:time] %></span>
+        <% if last[:by] %><span><%= deploy_by(last[:by]) %></span><% end %>
+      <% else %>
+        <span class="dep_none"><%= l(:label_deploy_none) %></span>
+      <% end %>
+    </p>
+    <% if @errors[target.id] %><p class="dep_warn"><%= @errors[target.id] %></p><% end %>
+    <div class="dep_foot">
+      <% if !target.runnable_by?(User.current) %>
+        <span class="dep_hint"><%= l(:label_deploy_no_permission) %></span>
+        <button type="button" class="dep_btn" disabled><%= l(:label_deploy_run) %></button>
+      <% elsif active %>
+        <span class="dep_hint"><%= l(:label_deploy_running_wait) %></span>
+        <button type="button" class="dep_btn" disabled><%= l(:label_deploy_run) %></button>
+      <% else %>
+        <button type="button" class="dep_btn" data-dialog="dep_dlg_<%= target.id %>"><%= l(:label_deploy_run) %></button>
+      <% end %>
+    </div>
+
+    <% if target.runnable_by?(User.current) && !active %>
+    <dialog id="dep_dlg_<%= target.id %>" class="dep_dlg" aria-labelledby="dep_dlg_tit_<%= target.id %>">
+      <%= form_tag project_deploys_path(@project), :method => :post, :class => 'dep_form' do %>
+        <%= hidden_field_tag 'target_id', target.id, :id => nil %>
+        <h3 id="dep_dlg_tit_<%= target.id %>"><%= l(:label_deploy_confirm_title, :name => target.name) %></h3>
+        <p><%= l(:label_deploy_confirm_text, :job => target.job_path) %></p>
+        <% if (params_hash = target.params_hash).any? %>
+        <dl class="dep_params">
+          <dt><%= l(:label_deploy_params) %></dt>
+          <% params_hash.each do |name, value| %><dd><code><%= name %>=<%= value %></code></dd><% end %>
+        </dl>
+        <% end %>
+        <% if target.production? %>
+        <p class="dep_confirm">
+          <label for="dep_confirm_<%= target.id %>"><%= l(:label_deploy_confirm_prod, :identifier => @project.identifier) %></label>
+          <%= text_field_tag 'confirm', '', :id => "dep_confirm_#{target.id}", :autocomplete => 'off', :data => { :expect => @project.identifier } %>
+        </p>
+        <% end %>
+        <p>
+          <label for="dep_note_<%= target.id %>"><%= l(:label_deploy_note) %></label>
+          <%= text_field_tag 'note', '', :id => "dep_note_#{target.id}", :maxlength => 255 %>
+        </p>
+        <p class="form_btns">
+          <button type="button" class="btn_line dep_close"><%= l(:button_cancel) %></button>
+          <%= submit_tag l(:label_deploy_run), :name => nil, :disabled => target.production?, :data => { :disable_with => l(:label_deploy_status_queued) } %>
+        </p>
+      <% end %>
+    </dialog>
+    <% end %>
+  </li>
+<% end %>
+</ul>
+
+<h3 class="dep_sec"><%= l(:label_deploy_history) %></h3>
+<div class="list_bar">
+  <p class="list_total">총 <strong><%= @history.size %></strong>건</p>
+  <%= form_tag project_deploys_path(@project), :method => :get, :class => 'list_search' do %>
+    <label for="dep_filter"><%= l(:label_deploy_target) %></label>
+    <%= select_tag 'target_id', options_from_collection_for_select(@targets, :id, :name, @filter&.id), :id => 'dep_filter', :include_blank => l(:label_deploy_all) %>
+    <%= submit_tag l(:button_apply), :name => nil %>
+  <% end %>
+</div>
+<% if @history.empty? %>
+<p class="nodata"><%= l(:label_deploy_none) %></p>
+<% else %>
+<table class="list dep_runs">
+  <thead><tr>
+    <th><%= l(:field_status) %></th>
+    <th><%= l(:label_deploy_target) %></th>
+    <th><%= l(:label_deploy_build) %></th>
+    <th><%= l(:label_deploy_by) %></th>
+    <th><%= l(:label_deploy_started) %></th>
+    <th><%= l(:label_deploy_duration) %></th>
+    <th class="note"><%= l(:label_deploy_note) %></th>
+  </tr></thead>
+  <tbody>
+  <% @history.each do |row| %>
+    <tr class="dep_row">
+      <td class="status"><%= deploy_status_tag(row[:status]) %></td>
+      <td class="target"><%= row[:target_name] %><% if row[:production] %> <span class="dep_prod"><%= l(:label_deploy_production) %></span><% end %></td>
+      <td class="build"><%= row[:number] ? (row[:url] ? link_to("##{row[:number]}", row[:url], :target => '_blank', :rel => 'noopener') : "##{row[:number]}") : '-' %></td>
+      <td class="by"><%= deploy_by(row[:by]) %></td>
+      <td class="time"><%= row[:time] ? format_time(row[:time]) : '-' %></td>
+      <td class="duration"><%= deploy_duration(row[:duration]) %></td>
+      <td class="note"><%= row[:note] %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+<% end %>
+<% end %>
+
+<%= javascript_tag do %>
+$(function() {
+  $(document).on('click', '.dep_btn[data-dialog]', function() {
+    var d = document.getElementById($(this).data('dialog'));
+    if (d && d.showModal) d.showModal();
+  });
+  $(document).on('click', '.dep_close', function() { this.closest('dialog').close(); });
+  $(document).on('input', '.dep_form input[name=confirm]', function() {
+    $(this).closest('form').find('input[type=submit]').prop('disabled', $.trim($(this).val()) !== String($(this).data('expect')));
+  });
+  <% if @project.deploy_runs.active.exists? %>
+  var timer = setInterval(function() {
+    $.getJSON('<%= j project_deploys_status_path(@project) %>').done(function(d) {
+      if (d.changed || d.active === 0) { clearInterval(timer); location.reload(); }
+    });
+  }, 10000);
+  <% end %>
+});
+<% end %>
+
+<% html_title l(:label_deploy_plural) %>

@@ -1,0 +1,25 @@
+<%# 프로젝트 > 설정 > 배포 탭 %>
+<% if JenkinsServer.none? %>
+<p class="warning"><%= l(:label_deploy_need_server) %></p>
+<% else %>
+<p><%= link_to sprite_icon('add', l(:label_deploy_target_new)), new_project_deploy_target_path(@project), :class => 'icon icon-add' %></p>
+<% end %>
+
+<% targets = @project.deploy_targets.includes(:jenkins_server).sorted.to_a %>
+<% if targets.any? %>
+<div class="table-list dep_targets">
+  <div class="table-list-header"><div class="table-list-cell"><%= l(:label_deploy_target) %></div></div>
+  <% targets.each do |target| %>
+  <div class="table-list-row">
+    <div class="table-list-cell name"><%= target.name %><% if target.production? %> <span class="dep_prod"><%= l(:label_deploy_production) %></span><% end %></div>
+    <div class="table-list-cell description"><%= target.jenkins_server %> · <code><%= target.job_path %></code></div>
+    <div class="table-list-cell buttons">
+      <%= link_to sprite_icon('edit', l(:button_edit)), edit_project_deploy_target_path(@project, target), :class => 'icon icon-edit' %>
+      <%= delete_link project_deploy_target_path(@project, target) %>
+    </div>
+  </div>
+  <% end %>
+</div>
+<% elsif JenkinsServer.any? %>
+<p class="nodata"><%= l(:label_deploy_no_targets) %></p>
+<% end %>

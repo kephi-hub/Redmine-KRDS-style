@@ -1,0 +1,36 @@
+<div class="contextual">
+<%= link_to sprite_icon('add', l(:label_jenkins_server_new)), new_jenkins_server_path, :class => 'icon icon-add' %>
+</div>
+
+<h2><%= l(:label_jenkins_server_plural) %></h2>
+
+<% if @servers.empty? %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<table class="list jk_servers">
+  <thead><tr>
+    <th><%= l(:field_name) %></th>
+    <th><%= l(:field_url) %></th>
+    <th><%= l(:field_username) %></th>
+    <th><%= l(:label_deploy_target) %></th>
+    <th></th>
+  </tr></thead>
+  <tbody>
+  <% @servers.each do |server| %>
+    <tr>
+      <td class="name"><%= link_to server.name, edit_jenkins_server_path(server) %></td>
+      <td class="url"><%= server.url %></td>
+      <td class="username"><%= server.username %></td>
+      <td class="count"><%= server.deploy_targets.count %></td>
+      <td class="row_btns">
+        <%= link_to sprite_icon('reload', l(:label_jenkins_test)), test_jenkins_server_path(server), :method => :post, :class => 'icon icon-reload' %>
+        <%= link_to sprite_icon('edit', l(:button_edit)), edit_jenkins_server_path(server), :class => 'icon icon-edit' %>
+        <%= delete_link jenkins_server_path(server) %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+<% end %>
+
+<% html_title l(:label_jenkins_server_plural) %>

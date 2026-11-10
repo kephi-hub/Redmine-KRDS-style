@@ -279,26 +279,69 @@ div.fileover span.add_attachment,p.custom-field-filedroplistner.fileover span.ad
 .bbs_reply{display:flex;justify-content:flex-end;margin:16px 0;}
 #content .bbs_reply a{display:inline-flex;align-items:center;height:40px;padding:0 20px;font-size:0.9375rem;font-weight:500;}
 /* 설정 > 게시판 — 행을 카드처럼, 편집(회색)·삭제(빨강) 테두리 버튼, 새 게시판 버튼은 오른쪽 */
-#tab-content-boards>p:first-child{display:flex;justify-content:flex-end;margin:0 0 12px;}
-#tab-content-boards .table-list.boards{display:block;width:100%;border-bottom:0;}
-#tab-content-boards .table-list-header{display:block;}
-#tab-content-boards .table-list-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:14px 8px;border-bottom:1px solid var(--gray_20);}
-#tab-content-boards .table-list-row:hover{background:var(--gray_5);}
-#tab-content-boards .table-list-cell{display:block;padding:0;}
-#tab-content-boards .table-list-header .table-list-cell{padding:0;}
-#tab-content-boards .table-list-cell.name{flex:1 1 100%;width:auto;font-size:1rem;font-weight:700;}
-#tab-content-boards .table-list-cell.name a{color:var(--gray_90);}
-#tab-content-boards .table-list-cell.name a:hover{color:var(--pri_60);}
-#tab-content-boards .table-list-cell.description{flex:1 1 160px;font-size:0.875rem;color:var(--gray_60);}
-#tab-content-boards .table-list-cell.buttons{display:flex;align-items:center;gap:8px;width:auto;margin:0 0 0 auto;}
-#tab-content-boards .buttons a.icon{display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 12px;margin:0;border:1px solid var(--gray_40);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.875rem;font-weight:500;color:var(--gray_80);}
-#tab-content-boards .buttons a.icon:hover{background:var(--gray_10);text-decoration:none;}
-#tab-content-boards .buttons a.icon .icon-svg{width:16px;height:16px;stroke:currentColor;color:inherit;}
-#tab-content-boards .buttons a.icon-del{border-color:var(--dan_50);color:var(--dan_50);}
-#tab-content-boards .buttons a.icon-del:hover{background:var(--dan_5);color:var(--dan_60);}
-#tab-content-boards .sort-handle{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius_s);color:var(--gray_50);}
-#tab-content-boards .sort-handle:hover{background:var(--gray_10);}
-#tab-content-boards .sort-handle .icon-svg{stroke:currentColor;}
+:is(#tab-content-boards,#tab-content-deploys)>p:first-child{display:flex;justify-content:flex-end;margin:0 0 12px;}
+:is(#tab-content-boards,#tab-content-deploys) .table-list.boards{display:block;width:100%;border-bottom:0;}
+:is(#tab-content-boards,#tab-content-deploys) .table-list-header{display:block;}
+:is(#tab-content-boards,#tab-content-deploys) .table-list-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:14px 8px;border-bottom:1px solid var(--gray_20);}
+:is(#tab-content-boards,#tab-content-deploys) .table-list-row:hover{background:var(--gray_5);}
+:is(#tab-content-boards,#tab-content-deploys) .table-list-cell{display:block;padding:0;}
+:is(#tab-content-boards,#tab-content-deploys) .table-list-header .table-list-cell{padding:0;}
+:is(#tab-content-boards,#tab-content-deploys) .table-list-cell.name{flex:1 1 100%;width:auto;font-size:1rem;font-weight:700;}
+:is(#tab-content-boards,#tab-content-deploys) .table-list-cell.name a{color:var(--gray_90);}
+:is(#tab-content-boards,#tab-content-deploys) .table-list-cell.name a:hover{color:var(--pri_60);}
+:is(#tab-content-boards,#tab-content-deploys) .table-list-cell.description{flex:1 1 160px;font-size:0.875rem;color:var(--gray_60);}
+:is(#tab-content-boards,#tab-content-deploys) .table-list-cell.buttons{display:flex;align-items:center;gap:8px;width:auto;margin:0 0 0 auto;}
+:is(#tab-content-boards,#tab-content-deploys) .buttons a.icon,td.row_btns a.icon{display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 12px;margin:0;border:1px solid var(--gray_40);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.875rem;font-weight:500;color:var(--gray_80);}
+:is(#tab-content-boards,#tab-content-deploys) .buttons a.icon:hover,td.row_btns a.icon:hover{background:var(--gray_10);text-decoration:none;}
+:is(#tab-content-boards,#tab-content-deploys) .buttons a.icon .icon-svg,td.row_btns a.icon .icon-svg{width:16px;height:16px;stroke:currentColor;color:inherit;}
+:is(#tab-content-boards,#tab-content-deploys) .buttons a.icon-del,td.row_btns a.icon-del{border-color:var(--dan_50);color:var(--dan_50);}
+:is(#tab-content-boards,#tab-content-deploys) .buttons a.icon-del:hover,td.row_btns a.icon-del:hover{background:var(--dan_5);color:var(--dan_60);}
+:is(#tab-content-boards,#tab-content-deploys) .sort-handle{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius_s);color:var(--gray_50);}
+:is(#tab-content-boards,#tab-content-deploys) .sort-handle:hover{background:var(--gray_10);}
+:is(#tab-content-boards,#tab-content-deploys) .sort-handle .icon-svg{stroke:currentColor;}
+td.row_btns{text-align:right;white-space:nowrap;}
+td.row_btns a.icon+a.icon{margin-left:6px;}
+/* 배포 (jenkins_deploy 플러그인) — 환경 카드, 상태 배지, 확인창, 이력 */
+.dep_list{display:grid;grid-template-columns:1fr;gap:12px;padding:0;margin:0 0 32px;list-style:none;}
+.dep_card{display:flex;flex-direction:column;gap:8px;padding:20px;border:1px solid var(--gray_20);border-radius:var(--radius_l);background:var(--gray_0);}
+.dep_head{display:flex;align-items:center;gap:8px;}
+#content .dep_tit{padding:0;margin:0;font-size:1.125rem;color:var(--gray_95);}
+.dep_prod{display:inline-flex;align-items:center;height:22px;padding:0 6px;border:1px solid var(--dan_10);border-radius:var(--radius_s);background:var(--dan_5);font-size:0.75rem;font-weight:700;color:var(--dan_60);vertical-align:middle;white-space:nowrap;}
+.dep_job{margin:0;font-size:0.8125rem;color:var(--gray_60);word-break:break-all;}
+.dep_last{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0;font-size:0.875rem;color:var(--gray_70);}
+.dep_none{color:var(--gray_50);}
+.dep_warn{padding:8px 12px;margin:0;border-radius:var(--radius_s);background:var(--dan_5);font-size:0.8125rem;color:var(--dan_60);}
+.dep_foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px;padding-top:8px;margin-top:auto;}
+.dep_hint{font-size:0.8125rem;color:var(--gray_50);}
+.dep_btn{height:40px;padding:0 20px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--pri_50);font-size:0.9375rem;font-weight:500;color:var(--gray_0);cursor:pointer;}
+.dep_btn:hover{border-color:var(--pri_60);background:var(--pri_60);}
+.dep_btn:disabled{border-color:var(--gray_20);background:var(--gray_10);color:var(--gray_50);cursor:not-allowed;}
+.dep_st{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:11px;font-size:0.75rem;font-weight:700;white-space:nowrap;}
+.st_success{background:var(--suc_10);color:var(--suc_60);}
+.st_failure,.st_error{background:var(--dan_10);color:var(--dan_60);}
+.st_running,.st_queued{background:var(--pri_10);color:var(--pri_60);}
+.st_unstable{background:var(--war_10);color:var(--war_60);}
+.st_aborted{background:var(--gray_10);color:var(--gray_70);}
+#content .dep_sec{padding:0;margin:0 0 8px;font-size:1.0625rem;color:var(--gray_95);}
+.dep_dlg{width:calc(100% - 32px);max-width:480px;padding:24px;border:0;border-radius:var(--radius_l);background:var(--gray_0);box-shadow:0 12px 32px rgba(0,0,0,0.2);}
+.dep_dlg::backdrop{background:rgba(0,0,0,0.4);}
+#content .dep_dlg h3{padding:0;margin:0 0 12px;font-size:1.125rem;}
+.dep_dlg p{margin:0 0 12px;font-size:0.9375rem;color:var(--gray_80);}
+.dep_dlg label{display:block;margin-bottom:6px;font-size:0.875rem;font-weight:500;color:var(--gray_80);}
+#content .dep_dlg input[type=text]{width:100%;height:40px;padding:0 12px;}
+.dep_dlg .form_btns{margin:20px 0 0;}
+.dep_params{padding:12px;margin:0 0 12px;border-radius:var(--radius_s);background:var(--gray_5);font-size:0.8125rem;}
+.dep_params dt{margin-bottom:4px;font-weight:700;}
+.dep_params dd{margin:0;word-break:break-all;}
+.dep_confirm label{color:var(--dan_60);}
+table.list.dep_runs{display:block;border-top:2px solid var(--gray_90);}
+table.list.dep_runs thead{display:none;}
+table.list.dep_runs tbody{display:block;}
+table.list.dep_runs tr.dep_row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;height:auto;padding:12px 4px;border-bottom:1px solid var(--gray_20);}
+table.list.dep_runs tr.dep_row>td{display:block;padding:0;border:0;font-size:0.8125rem;color:var(--gray_60);text-align:left;}
+table.list.dep_runs tr.dep_row>td.target{font-size:0.9375rem;font-weight:500;color:var(--gray_90);}
+table.list.dep_runs tr.dep_row>td.note{flex:1 0 100%;}
+table.list.dep_runs tr.dep_row>td.note:empty{display:none;}
 body.controller-boards #content>p.breadcrumb,body.controller-messages #content>p.breadcrumb{margin:0 0 8px;font-size:0.8125rem;}
 table.list.messages{display:block;border-top:2px solid var(--gray_90);}
 table.list.messages thead{display:none;}
@@ -573,6 +616,7 @@ body.controller-news.action-show #content>h3{padding-top:20px;margin-top:28px;bo
 #admin-index #admin-menu a.vault::after{content:"접속정보 암호화 · 권한 설정";}
 #admin-index #admin-menu a.plugins::after{content:"설치된 플러그인 목록";}
 #admin-index #admin-menu a.info::after{content:"버전 · 실행 환경 점검";}
+#admin-index #admin-menu a.jenkins-servers::after{content:"배포 연동 Jenkins 주소 · 토큰";}
 /* Vault 메뉴는 아이콘 없이 글자만 있어 자물쇠 상자를 붙임 (responsive.css 의 !important 덮어씀) */
 #admin-index #admin-menu a.vault{padding:18px 20px !important;background-image:none;}
 #admin-index #admin-menu a.vault::before{content:"";grid-row:span 2;width:44px;height:44px;border-radius:var(--radius_m,8px);background:var(--pri_5) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23256ef4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2'/%3E%3Cpath d='M8 11V7a4 4 0 0 1 8 0v4'/%3E%3C/svg%3E") center/22px no-repeat;}
@@ -713,7 +757,15 @@ div#activity dd.grouped{margin-left:9em;}
 .list_search{flex:0 1 auto;justify-content:flex-end;}
 .list_field{flex:none;}
 #content .list_field input[type=search]{flex:none;width:240px;}
-#tab-content-boards .table-list-cell.name{flex:0 0 28%;}
+:is(#tab-content-boards,#tab-content-deploys) .table-list-cell.name{flex:0 0 28%;}
+.dep_list{grid-template-columns:repeat(2,1fr);}
+table.list.dep_runs{display:table;}
+table.list.dep_runs thead{display:table-header-group;}
+table.list.dep_runs tbody{display:table-row-group;}
+table.list.dep_runs th.note{text-align:left;}
+table.list.dep_runs tr.dep_row{display:table-row;padding:0;}
+table.list.dep_runs tr.dep_row>td,table.list.dep_runs tr.dep_row>td.note:empty{display:table-cell;padding:12px;border-bottom:1px solid var(--gray_20);font-size:0.875rem;text-align:center;white-space:nowrap;}
+table.list.dep_runs tr.dep_row>td.note{width:100%;text-align:left;white-space:normal;}
 table.list.messages{display:table;}
 table.list.messages thead{display:table-header-group;}
 table.list.messages tbody{display:table-row-group;}
@@ -734,5 +786,6 @@ table.list.files tr.file>td.downloads::before{content:none;}
 
 /* ===== 넓은 화면 (1200px 이상) ===== */
 @media (min-width:1200px){
+.dep_list{grid-template-columns:repeat(3,1fr);}
 #admin-index #admin-menu ul{grid-template-columns:repeat(4,1fr);}
 }
