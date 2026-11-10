@@ -192,7 +192,8 @@ div.thumbnails{margin:8px 0;}
 div.thumbnail{border:1px solid var(--gray_20);border-radius:var(--radius_m);overflow:hidden;}
 
 /* ===== 파일 추가 (KRDS file-upload: 점선 드롭 영역 + 파일 목록) ===== */
-span.attachments_form{display:block;max-width:720px;}
+span.attachments_form{display:block;}
+#content .jstEditor textarea.wiki-edit{width:100%;}
 span.add_attachment{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:24px 16px;border:1px dashed var(--gray_30);border-radius:var(--radius_l);background:var(--gray_5);font-size:0.8125rem;line-height:1.5;color:var(--gray_50);text-align:center;}
 span.add_attachment:has(input.filedrop)::before{content:"첨부할 파일을 여기에 끌어다 놓거나, 파일 선택 버튼을 눌러 주세요.";font-size:0.9375rem;color:var(--gray_80);}
 div.box.fileover{background-color:var(--pri_5);}
@@ -202,7 +203,7 @@ div.fileover span.add_attachment,p.custom-field-filedroplistner.fileover span.ad
 .attachments_fields input.filename,#existing-attachments .filename{flex:1 1 40%;width:auto;font-weight:500;color:var(--gray_90);}
 .attachments_fields input.description,#existing-attachments input.description{flex:1 1 60%;width:auto;margin-left:0;}
 /* 편집 화면의 기존 첨부 목록: 파일 추가 영역과 같은 너비, 긴 파일명은 줄이고 삭제 체크는 항상 보이게 */
-#existing-attachments{display:block;max-width:720px;}
+#existing-attachments{display:block;}
 #existing-attachments .filename{flex:1 1 0;width:0;}
 #content #existing-attachments label.inline{display:inline-flex;align-items:center;flex:none;gap:4px;width:auto;padding:0 8px 0 0;margin:0 0 0 auto !important;font-weight:400;line-height:1.5;color:var(--gray_70);}
 .attachments_fields div.ui-progressbar{flex:none;margin:0;}
@@ -231,6 +232,8 @@ div.fileover span.add_attachment,p.custom-field-filedroplistner.fileover span.ad
 .doc_file div.attachments>.contextual{position:absolute;top:-30px;right:0;margin:0;}
 
 /* ===== 문서 목록 (KRDS 게시판 목록, 마크업: plugins/krds_ui) ===== */
+/* 목록 화면의 인라인 등록 폼(게시판·문서·뉴스) — 오른쪽 위 버튼과 겹치지 않게 아래로 */
+#add-message>form,#add-document>form,#add-news>form{display:block;clear:both;padding-top:12px;}
 /* 하단 버튼 — theme.js 가 폼 끝 버튼 묶음에 .form_btns, 취소 링크·보조 저장 버튼에 .btn_line 을 붙임 */
 .form_btns{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px;padding:0;margin:16px 0 0;}
 #content .form_btns input[type=submit],#content .form_btns .btn_line{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 20px;margin:0;font-size:0.9375rem;font-weight:500;}

@@ -57,3 +57,11 @@ $(function() {
     arrange(box[0]);
   });
 });
+
+/* 목록 화면의 인라인 등록 폼(게시판 새글쓰기·새 문서·새 뉴스)이 열려 있는 동안 오른쪽 위 추가 버튼을 숨김, 취소하면 다시 표시 */
+$(function() {
+  var $add = $('#content>.contextual a.icon-add[onclick*="showAndScrollTo"]');
+  if (!$add.length) return;
+  $add.on('click', function() { $add.hide(); });
+  $('#add-message, #add-document, #add-news').on('click', 'a[onclick*=".hide()"]', function() { $add.show(); });
+});
