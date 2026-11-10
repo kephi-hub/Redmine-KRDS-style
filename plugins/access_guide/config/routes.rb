@@ -1,3 +1,5 @@
 get 'access_overview', to: 'access_overview#index', as: 'access_overview'
 get 'simple_workflows', to: 'simple_workflows#index', as: 'simple_workflows'
 post 'simple_workflows', to: 'simple_workflows#update'
+get 'field_permissions', to: 'field_permissions#index', as: 'field_permissions'
+post 'field_permissions', to: 'field_permissions#update'

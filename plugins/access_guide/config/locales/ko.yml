@@ -1,7 +1,8 @@
 ko:
   label_access_overview: 권한 한눈에 보기
-  label_simple_workflows: 업무흐름 간편 설정
-  text_access_overview: 역할마다 영역별로 할 수 있는 일을 4단계로 요약했습니다. 배지에 마우스를 올리면 실제 권한 목록이 보입니다. 바꾸려면 역할 이름(역할 편집) 또는 업무흐름 간편 설정을 누르세요.
+  label_simple_workflows: 업무흐름 설정
+  label_field_permissions: 항목 편집 권한 설정
+  text_access_overview: 역할마다 영역별로 할 수 있는 일을 4단계로 요약했습니다. 배지에 마우스를 올리면 실제 권한 목록이 보입니다. 바꾸려면 역할 이름(역할 편집) 또는 업무흐름 설정을 누르세요.
   label_access_by_role: 역할별 권한
   label_access_by_user: 사용자별 프로젝트 역할
   label_access_area: 영역
@@ -51,3 +52,21 @@ ko:
   text_sw_confirm: "%{role} 역할의 업무흐름을 선택한 일감 유형에 이 표대로 적용할까요? (작성자·담당자 추가 규칙과 필드 권한은 그대로)"
   notice_simple_workflow_saved: "%{role} 업무흐름을 일감 유형 %{count}개에 적용했습니다 (전환 %{pairs}개)."
   error_simple_workflow_no_tracker: 적용할 일감 유형을 하나 이상 고르세요.
+  text_field_permissions: 역할을 고르고 "상태 × 항목" 표를 정한 뒤 저장하면, 아래에서 고른 일감 유형 모두에 같은 규칙이 적용됩니다. 칸을 누를 때마다 편집 → 읽기 전용 → 필수 순서로 바뀝니다.
+  label_fp_corner: "항목 ↓ / 일감 상태 →"
+  label_fp_none: 편집
+  label_fp_readonly: 읽기 전용
+  label_fp_required: 필수
+  label_fp_mixed: 섞임
+  text_fp_none: 평소 권한대로 수정 가능
+  text_fp_readonly: 이 상태에서는 바꿀 수 없음
+  text_fp_required: 저장할 때 반드시 입력
+  text_fp_mixed: 유형마다 다름 — 건드리지 않으면 그대로 둠
+  button_fp_closed: 닫힌 상태(완료·거절)는 모두 읽기 전용
+  button_fp_assign: 배정 항목 잠금 (담당자·우선순위·목표버전)
+  button_fp_resolved: 해결할 때 완료일 필수
+  text_fp_tip: 한 사람이 여러 역할을 받으면 "읽기 전용" 은 모든 역할에서 읽기 전용일 때만, "필수" 는 한 역할이라도 필수면 적용됩니다. 제목·유형 등 항상 입력하는 항목은 필수를 고를 수 없습니다.
+  label_fp_no_rules: 규칙 없음
+  label_fp_rules: "규칙 %{count}개"
+  text_fp_confirm: "%{role} 역할의 항목 편집 권한을 선택한 일감 유형에 이 표대로 적용할까요? (\"섞임\" 칸은 그대로)"
+  notice_field_permissions_saved: "%{role} 항목 편집 권한을 일감 유형 %{count}개에 적용했습니다 (칸 %{cells}개)."

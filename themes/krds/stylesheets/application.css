@@ -330,6 +330,13 @@ td.row_btns{text-align:right;white-space:nowrap;}
 .sw_trackers legend{padding:0 6px;font-size:0.875rem;font-weight:700;color:var(--gray_90);}
 .sw_tracker{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--gray_20);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.875rem;cursor:pointer;}
 .sw_tracker .ag_warn,.sw_tracker .ag_dim{margin-left:0;}
+.fp_chip,.fp_cell{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 10px;border:1px solid var(--gray_20);border-radius:13px;background:var(--gray_0);font-size:0.75rem;font-weight:700;color:var(--gray_60);white-space:nowrap;}
+.fp_cell{width:100%;max-width:84px;cursor:pointer;font-family:inherit;}
+.fp_cell:hover{border-color:var(--pri_50);}
+.fp_readonly{border-color:var(--gray_40);background:var(--gray_10);color:var(--gray_80);}
+.fp_required{border-color:var(--pri_50);background:var(--pri_50);color:var(--gray_0);}
+.fp_mixed{border:1px dashed var(--war_60);background:var(--war_5);color:var(--war_60);}
+#content table.fp_grid td{padding:6px 8px;}
 /* 첨부 상세 PDF 미리보기 (krds_ui attachments/other) */
 .att_pdf{display:flex;flex-direction:column;gap:12px;margin-top:12px;}
 .att_frame{display:block;width:100%;height:75vh;border:1px solid var(--gray_20);border-radius:var(--radius_m);background:var(--gray_5);}
@@ -706,7 +713,7 @@ body.controller-news.action-show #content>h3{padding-top:20px;margin-top:28px;bo
 #admin-index #admin-menu a.users::after{content:"계정 추가 · 잠금 · 권한 확인";}
 #admin-index #admin-menu a.groups::after{content:"사용자를 묶어 한 번에 권한 부여";}
 #admin-index #admin-menu a.roles::after{content:"역할별로 할 수 있는 일 지정";}
-#admin-index #admin-menu a.trackers::after{content:"결함 · 새기능 등 일감 종류";}
+#admin-index #admin-menu a.trackers::after{content:"결함 · 기능 등 일감 종류";}
 #admin-index #admin-menu a.issue-statuses::after{content:"신규 · 진행 · 완료 등 처리 단계";}
 #admin-index #admin-menu a.workflows::after{content:"역할 · 유형별 상태 변경 규칙";}
 #admin-index #admin-menu a.custom-fields::after{content:"일감 · 프로젝트에 입력 항목 추가";}
@@ -718,6 +725,7 @@ body.controller-news.action-show #content>h3{padding-top:20px;margin-top:28px;bo
 #admin-index #admin-menu a.info::after{content:"버전 · 실행 환경 점검";}
 #admin-index #admin-menu a.access-overview::after{content:"역할별로 할 수 있는 일 한눈에 보기";}
 #admin-index #admin-menu a.simple-workflows::after{content:"역할마다 상태 변경 규칙을 한 번에 설정";}
+#admin-index #admin-menu a.field-permissions::after{content:"상태별 수정 금지 · 필수 항목";}
 #admin-index #admin-menu a.jenkins-servers::after{content:"배포 연동 Jenkins 주소 · 토큰";}
 /* Vault 메뉴는 아이콘 없이 글자만 있어 자물쇠 상자를 붙임 (responsive.css 의 !important 덮어씀) */
 #admin-index #admin-menu a.vault{padding:18px 20px !important;background-image:none;}

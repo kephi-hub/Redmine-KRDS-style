@@ -1,0 +1,111 @@
+<%# 관리 > 항목 편집 권한 설정 — 칸을 누를 때마다 편집 → 읽기 전용 → 필수 순서로 바뀜 %>
+<div class="contextual">
+  <%= link_to sprite_icon('workflows', l(:label_simple_workflows)), simple_workflows_path(:role_id => @role&.id), :class => 'icon icon-workflows' %>
+  <%= link_to sprite_icon('roles', l(:label_access_overview)), access_overview_path, :class => 'icon icon-roles' %>
+</div>
+
+<h2><%= l(:label_field_permissions) %></h2>
+<p class="subtitle"><%= l(:text_field_permissions) %></p>
+
+<div class="tabs">
+  <ul>
+  <% @roles.each do |role| %>
+    <li><%= link_to role.name, field_permissions_path(:role_id => role.id), :class => (role == @role ? 'selected' : nil) %></li>
+  <% end %>
+  </ul>
+</div>
+
+<% if @role.nil? %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<ul class="ag_legend">
+  <li><span class="fp_chip fp_none"><%= l(:label_fp_none) %></span> <%= l(:text_fp_none) %></li>
+  <li><span class="fp_chip fp_readonly"><%= l(:label_fp_readonly) %></span> <%= l(:text_fp_readonly) %></li>
+  <li><span class="fp_chip fp_required"><%= l(:label_fp_required) %></span> <%= l(:text_fp_required) %></li>
+  <li><span class="fp_chip fp_mixed"><%= l(:label_fp_mixed) %></span> <%= l(:text_fp_mixed) %></li>
+</ul>
+
+<%= form_tag field_permissions_path, :id => 'fp_form' do %>
+  <%= hidden_field_tag 'role_id', @role.id %>
+  <div class="sw_quick">
+    <span><%= l(:label_sw_quick) %></span>
+    <button type="button" class="btn_line" data-fp="closed"><%= l(:button_fp_closed) %></button>
+    <button type="button" class="btn_line" data-fp="assign"><%= l(:button_fp_assign) %></button>
+    <% if (resolved = @statuses.find { |s| s.name == '해결' }) %>
+    <button type="button" class="btn_line" data-fp="resolved" data-status="<%= resolved.id %>"><%= l(:button_fp_resolved) %></button>
+    <% end %>
+    <button type="button" class="btn_line" data-fp="none"><%= l(:button_sw_none) %></button>
+  </div>
+
+  <div class="autoscroll">
+  <table class="list ag_tbl fp_grid">
+    <thead><tr>
+      <th class="from"><%= l(:label_fp_corner) %></th>
+      <% @statuses.each do |st| %><th><%= st.name %><% if st.is_closed? %><span class="ag_closed"><%= l(:label_sw_closed) %></span><% end %></th><% end %>
+    </tr></thead>
+    <tbody>
+    <% @fields.each do |key, label, _cf| %>
+      <tr>
+        <th class="from"><%= label %></th>
+        <% @statuses.each do |st| %>
+          <% v = @cells[[st.id, key]]; v = 'none' if v.blank? %>
+          <td>
+            <button type="button" class="fp_cell fp_<%= v %>" data-value="<%= v %>" data-req="<%= always_required?(key) ? 0 : 1 %>"
+                    data-closed="<%= st.is_closed? ? 1 : 0 %>" data-field="<%= key %>" title="<%= st.name %> · <%= label %>"><%= l("label_fp_#{v}") %></button>
+            <input type="hidden" name="p[<%= st.id %>][<%= key %>]" value="<%= v %>">
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  </div>
+  <p class="ag_tip"><%= l(:text_fp_tip) %></p>
+
+  <fieldset class="sw_trackers">
+    <legend><%= l(:label_sw_trackers) %></legend>
+    <% @trackers.each do |tracker| %>
+      <% n = @rule_count[tracker.id].to_i %>
+      <label class="sw_tracker">
+        <%= check_box_tag 'tracker_ids[]', tracker.id, true, :id => nil %>
+        <span class="name"><%= tracker.name %></span>
+        <span class="ag_dim"><%= n.zero? ? l(:label_fp_no_rules) : l(:label_fp_rules, :count => n) %></span>
+      </label>
+    <% end %>
+  </fieldset>
+
+  <p class="form_btns">
+    <%= link_to l(:button_sw_detail), { :controller => 'workflows', :action => 'permissions', :role_id => @role.id }, :class => 'btn_line' %>
+    <%= submit_tag l(:button_save), :name => nil, :data => { :confirm => l(:text_fp_confirm, :role => @role.name) } %>
+  </p>
+<% end %>
+
+<%= javascript_tag do %>
+$(function() {
+  var labels = <%= raw({ 'none' => l(:label_fp_none), 'readonly' => l(:label_fp_readonly), 'required' => l(:label_fp_required), 'mixed' => l(:label_fp_mixed) }.to_json) %>;
+  function setCell($b, v) {
+    if (v === 'required' && $b.data('req') !== 1) v = 'readonly';
+    $b.attr('data-value', v).data('value', v).removeClass('fp_none fp_readonly fp_required fp_mixed').addClass('fp_' + v).text(labels[v]);
+    $b.next('input').val(v);
+  }
+  // 칸을 누를 때마다 편집 → 읽기 전용 → 필수(가능한 항목만) → 편집
+  $('#fp_form').on('click', '.fp_cell', function() {
+    var $b = $(this), v = $b.data('value');
+    var next = v === 'none' ? 'readonly' : (v === 'readonly' && $b.data('req') === 1 ? 'required' : 'none');
+    setCell($b, next);
+  });
+  $('.sw_quick [data-fp]').on('click', function() {
+    var mode = $(this).data('fp'), sid = String($(this).data('status') || '');
+    $('#fp_form .fp_cell').each(function() {
+      var $b = $(this), field = $b.data('field'), name = $b.next('input').attr('name');
+      if (mode === 'none') setCell($b, 'none');
+      else if (mode === 'closed' && $b.data('closed') === 1) setCell($b, 'readonly');
+      else if (mode === 'assign' && ['assigned_to_id', 'priority_id', 'fixed_version_id'].indexOf(field) >= 0) setCell($b, 'readonly');
+      else if (mode === 'resolved' && field === 'due_date' && name.indexOf('p[' + sid + ']') === 0) setCell($b, 'required');
+    });
+  });
+});
+<% end %>
+<% end %>
+
+<% html_title l(:label_field_permissions) %>
