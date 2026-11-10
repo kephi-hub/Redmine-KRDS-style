@@ -1,0 +1,13 @@
+ko:
+  label_vault_type_plural: 접속정보 유형
+  label_vault_type_new: 새 유형
+  label_vault_type_manage: 유형 관리
+  label_vault_type_card: 접속정보 등록 화면의 "유형" 목록을 정합니다. 유형마다 입력 방식(비밀번호·SFTP·키 파일)을 고를 수 있습니다.
+  label_vault_base_password: 비밀번호형
+  label_vault_base_sftp: SFTP (파일 첨부)
+  label_vault_base_key_file: 키 파일 (파일 첨부)
+  label_vault_keys_count: 사용 중
+  field_base_type: 입력 방식
+  field_position: 순서
+  text_vault_base_info: 비밀번호형은 비밀번호 입력칸, SFTP·키 파일은 파일 첨부칸이 나옵니다. 바꾸면 이 유형의 접속정보도 같은 방식으로 바뀝니다.
+  error_vault_type_in_use: 이 유형을 쓰는 접속정보가 있어 삭제할 수 없습니다. 접속정보의 유형을 먼저 바꾸세요.

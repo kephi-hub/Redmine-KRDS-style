@@ -300,6 +300,16 @@ div.fileover span.add_attachment,p.custom-field-filedroplistner.fileover span.ad
 :is(#tab-content-boards,#tab-content-deploys) .sort-handle:hover{background:var(--gray_10);}
 :is(#tab-content-boards,#tab-content-deploys) .sort-handle .icon-svg{stroke:currentColor;}
 td.row_btns{text-align:right;white-space:nowrap;}
+/* 접속정보 유형 (vault_types 플러그인) — 관리 > 접속정보(Vault) 카드, 유형 목록 */
+.vt_card{padding:20px;margin:0 0 30px;border:1px solid var(--gray_20);border-radius:var(--radius_l);background:var(--gray_0);}
+#content .vt_card h3{padding:0;margin:0 0 8px;font-size:1.0625rem;color:var(--gray_95);}
+.vt_card p{margin:0 0 12px;font-size:0.875rem;color:var(--gray_70);}
+.vt_card p:last-child{margin:0;}
+.vt_names{display:flex;flex-wrap:wrap;gap:6px;}
+.vt_name{display:inline-flex;align-items:center;height:26px;padding:0 10px;border:1px solid var(--gray_20);border-radius:13px;background:var(--gray_5);font-size:0.8125rem;color:var(--gray_80);}
+#content a.vt_btn{display:inline-flex;align-items:center;height:36px;padding:0 16px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--pri_50);font-weight:500;color:var(--gray_0);}
+#content a.vt_btn:hover{background:var(--pri_60);text-decoration:none;}
+table.list.vt_list td.name{text-align:left;font-weight:500;}
 td.row_btns a.icon+a.icon{margin-left:6px;}
 /* 배포 (jenkins_deploy 플러그인) — 환경 카드, 상태 배지, 확인창, 이력 */
 .dep_list{display:grid;grid-template-columns:1fr;gap:12px;padding:0;margin:0 0 32px;list-style:none;}

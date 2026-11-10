@@ -1,0 +1,13 @@
+en:
+  label_vault_type_plural: Key types
+  label_vault_type_new: New type
+  label_vault_type_manage: Manage types
+  label_vault_type_card: Defines the "Type" list of the key form. Each type has an input style (password, SFTP, key file).
+  label_vault_base_password: Password
+  label_vault_base_sftp: SFTP (file)
+  label_vault_base_key_file: Key file (file)
+  label_vault_keys_count: In use
+  field_base_type: Input style
+  field_position: Order
+  text_vault_base_info: Password shows a password field, SFTP and key file show a file field. Changing it also changes the keys of this type.
+  error_vault_type_in_use: This type is used by keys. Change their type first.

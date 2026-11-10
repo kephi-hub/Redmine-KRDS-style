@@ -1,0 +1,36 @@
+<div class="contextual">
+<%= link_to sprite_icon('add', l(:label_vault_type_new)), new_vault_key_type_path, :class => 'icon icon-add' %>
+</div>
+
+<h2><%= link_to l(:label_vault), { :controller => 'vault_settings', :action => 'index' } %> &#187; <%= l(:label_vault_type_plural) %></h2>
+<p class="subtitle"><%= l(:label_vault_type_card) %></p>
+
+<% if @types.empty? %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<table class="list vt_list">
+  <thead><tr>
+    <th><%= l(:field_position) %></th>
+    <th><%= l(:field_name) %></th>
+    <th><%= l(:field_base_type) %></th>
+    <th><%= l(:label_vault_keys_count) %></th>
+    <th></th>
+  </tr></thead>
+  <tbody>
+  <% @types.each do |type| %>
+    <tr>
+      <td class="position"><%= type.position %></td>
+      <td class="name"><%= link_to type.name, edit_vault_key_type_path(type) %></td>
+      <td class="base"><%= type.base_label %></td>
+      <td class="count"><%= @counts[type.id] || 0 %></td>
+      <td class="row_btns">
+        <%= link_to sprite_icon('edit', l(:button_edit)), edit_vault_key_type_path(type), :class => 'icon icon-edit' %>
+        <%= delete_link vault_key_type_path(type) %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+<% end %>
+
+<% html_title l(:label_vault_type_plural) %>

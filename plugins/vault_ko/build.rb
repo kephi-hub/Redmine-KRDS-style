@@ -11,6 +11,8 @@ snip = ->(name) { File.read(File.join(HERE, 'snippets', name), encoding: 'UTF-8'
 
 R = {
   "keys/_form.html.erb" => [
+    ["<%= f.select :type, key_types %>",
+     "<%= render 'vault_key_types/select', f: f %>"],
     ["</i> Generate",
      "</i> 생성"],
     ["title: \"Download file\"",
@@ -23,6 +25,8 @@ R = {
      "'새 비밀번호를 생성할까요? 현재 비밀번호가 바뀝니다.'"],
   ],
   "keys/new.html.erb" => [
+    ["<%= f.select :type, key_types, {}, { class: 'pwd-form-select', id: 'vault_key_type' } %>",
+     "<%= render 'vault_key_types/select', f: f %>"],
     ["<div class=\"pwd-container\">",
      "<h2 class=\"keys_tit\"><%= t('key.title.new') %></h2>\n<div class=\"pwd-container\">"],
     ["</i> Generate",
@@ -39,6 +43,8 @@ R = {
      "'새 비밀번호를 생성할까요? 현재 비밀번호가 바뀝니다.'"],
   ],
   "keys/edit.html.erb" => [
+    ["<%= f.select :type, key_types, {}, { class: 'pwd-form-select', id: 'vault_key_type' } %>",
+     "<%= render 'vault_key_types/select', f: f %>"],
     ["<div class=\"pwd-container\">",
      "<h2 class=\"keys_tit\"><%= t('key.title.edit') %></h2>\n<div class=\"pwd-container\">"],
     ["</i> Generate",
@@ -72,15 +78,21 @@ R = {
     ["onclick=\"navigator.clipboard.writeText('<%= @key.body %>')\"",
      "data-copy=\"<%= @key.body %>\""],
     ["<div class=\"pwd-field-value pwd-type-value\"><%= @key.type %></div>",
-     "<div class=\"pwd-field-value pwd-type-value\"><%= t(\"activerecord.models.\#{@key.type.to_s.underscore.split('/').last}\") %></div>"],
+     "<div class=\"pwd-field-value pwd-type-value\"><%= vault_type_label(@key) %></div>"],
     ["<span class=\"pwd-field-value pwd-password\" id=\"password-body\"><%= @key.body %></span>",
      "<span class=\"pwd-field-value pwd-password\" id=\"password-body\" data-secret=\"<%= @key.body %>\">••••••••</span>\n              <button type=\"button\" class=\"pwd-copy-btn pwd-reveal-btn\" title=\"보기\" aria-pressed=\"false\"><i class=\"fa fa-eye\"></i></button>"],
   ],
   "shared/_key_fields.html.erb" => [
+    ["<%= t('activerecord.models.password') %>", "<%= vault_type_label(key) %>"],
+    ["<%= t('activerecord.models.sftp') %>", "<%= vault_type_label(key) %>"],
+    ["<%= t('activerecord.models.key_file') %>", "<%= vault_type_label(key) %>"],
     ["link_to key.name, edit_project_key_path(key.project, key)",
      "link_to key.name, project_key_path(key.project, key)"],
   ],
   "shared/_key_fields_all.html.erb" => [
+    ["<%= t('activerecord.models.password') %>", "<%= vault_type_label(key) %>"],
+    ["<%= t('activerecord.models.sftp') %>", "<%= vault_type_label(key) %>"],
+    ["<%= t('activerecord.models.key_file') %>", "<%= vault_type_label(key) %>"],
     ["link_to key.name, edit_project_key_path(key.project, key)",
      "link_to key.name, project_key_path(key.project, key)"],
   ],
@@ -121,6 +133,8 @@ R = {
      ">색상<"],
   ],
   "vault_settings/index.html.erb" => [
+    ["<!-- Admin Tools -->",
+     "<%= render 'vault_key_types/settings_card' %>\n\n<!-- Admin Tools -->"],
     [">Admin Tools<",
      ">관리 도구<"],
     ["Check which users have access to which keys and understand why. Useful for debugging permissions and planning migration to tag-based permissions.",

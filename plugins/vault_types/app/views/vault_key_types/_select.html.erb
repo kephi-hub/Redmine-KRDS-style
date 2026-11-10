@@ -1,0 +1,21 @@
+<%# 접속정보 등록·수정 화면의 유형 선택칸 (vault_ko/build.rb 가 원본 f.select :type 대신 넣음)
+    - select 는 원본과 같은 id·이름(vault_key_type, vault_key[type])에 값은 입력 방식(Vault 기본 유형), 글자는 관리자가 정한 유형 이름
+      → Vault 원본 스크립트(선택 이름 표시·파일칸 전환·접근 목록 전송)가 그대로 동작
+    - 고른 유형 번호는 숨김칸 vault_key[vault_type_id] 로 보냄 (저장: VaultTypes::KeysControllerPatch) %>
+<% types = VaultKeyType.sorted.to_a %>
+<% if types.empty? %>
+  <%= f.select :type, key_types, {}, { :class => 'pwd-form-select', :id => 'vault_key_type' } %>
+<% else %>
+  <% current = vault_type_current(f.object, types) %>
+  <select name="vault_key[type]" id="vault_key_type" class="pwd-form-select">
+    <% types.each do |type| %>
+      <option value="<%= type.base_type %>" data-type-id="<%= type.id %>"<%= ' selected' if type == current %>><%= type.name %></option>
+    <% end %>
+  </select>
+  <%= hidden_field_tag 'vault_key[vault_type_id]', current.id, :id => 'vault_key_vault_type_id' %>
+  <%= javascript_tag do %>
+    $(document).on('change', '#vault_key_type', function() {
+      $('#vault_key_vault_type_id').val($(this).find('option:selected').data('type-id'));
+    });
+  <% end %>
+<% end %>

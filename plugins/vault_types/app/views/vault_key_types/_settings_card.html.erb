@@ -1,0 +1,7 @@
+<%# 관리 > 접속정보(Vault) 설정 화면의 유형 관리 카드 (vault_ko/build.rb 가 넣음) %>
+<div class="vt_card">
+  <h3><%= l(:label_vault_type_plural) %></h3>
+  <p><%= l(:label_vault_type_card) %></p>
+  <p class="vt_names"><% VaultKeyType.sorted.each do |t| %><span class="vt_name"><%= t.name %></span><% end %></p>
+  <p><%= link_to l(:label_vault_type_manage), vault_key_types_path, :class => 'vt_btn' %></p>
+</div>

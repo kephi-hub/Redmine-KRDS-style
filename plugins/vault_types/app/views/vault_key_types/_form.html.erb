@@ -1,0 +1,11 @@
+<%= error_messages_for @type %>
+<div class="box tabular">
+  <p><%= f.text_field :name, :required => true, :size => 30, :maxlength => 60, :placeholder => 'SSH 서버' %></p>
+  <p><%= f.select :base_type, VaultKeyType::BASES.map { |k, v| [l(v), k] }, { :required => true } %>
+    <em class="info"><%= l(:text_vault_base_info) %></em></p>
+  <p><%= f.number_field :position, :min => 1, :max => 999, :size => 4 %></p>
+</div>
+<p class="form_btns">
+  <%= link_to l(:button_cancel), vault_key_types_path, :class => 'btn_line' %>
+  <%= submit_tag l(@type.new_record? ? :button_create : :button_save) %>
+</p>
