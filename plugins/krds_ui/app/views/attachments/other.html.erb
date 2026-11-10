@@ -1,0 +1,34 @@
+<%# 첨부 상세 (미리보기 없는 형식) — 원본: Redmine 6.1.6 app/views/attachments/other.html.erb
+    + PDF 는 브라우저 내장 PDF 보기로 미리보기 (다운로드 주소가 원래 inline 이라 같은 주소를 iframe 으로 띄움)
+    휴대폰 브라우저는 화면 안 PDF 보기를 지원하지 않을 수 있어 [새 창에서 열기]를 둠 (다운로드는 화면 위 기존 버튼) %>
+<%= render :layout => 'layouts/file' do %>
+  <% if @attachment.is_pdf? %>
+    <% pdf_path = download_named_attachment_path(@attachment, @attachment.filename) %>
+    <div class="att_pdf">
+      <iframe src="<%= pdf_path %>#view=FitH" class="att_frame" title="<%= @attachment.filename %>"></iframe>
+      <p class="att_btns">
+        <%= link_to sprite_icon('link', l(:label_attachment_open_new)), pdf_path, :target => '_blank', :rel => 'noopener', :class => 'icon icon-link' %>
+      </p>
+    </div>
+  <% else %>
+    <% kind = if @attachment.is_video?
+         'video'
+       elsif @attachment.is_audio?
+         'audio'
+       end %>
+
+    <%= render :partial => "common/other",
+               :locals => {
+                 :kind => kind,
+                 :path => download_named_attachment_url(@attachment,
+                                                        @attachment.filename),
+                 :download_link => link_to_attachment(
+                                     @attachment,
+                                     :text => l(:label_no_preview_download),
+                                     :icon => 'download',
+                                     :download => true,
+                                     :class => 'icon icon-download'
+                                   )
+               } %>
+  <% end %>
+<% end %>

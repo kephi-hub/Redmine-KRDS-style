@@ -48,3 +48,4 @@ ko:
   # 파일 목록 열 이름
   field_digest: 체크섬
   label_downloads_abbr: 다운로드
+  label_attachment_open_new: 새 창에서 열기
