@@ -1,30 +1,43 @@
 # Redmine KRDS Style
 
 Redmine 6.1.6 + Vault(접속정보) 플러그인을 **KRDS(대한민국 정부 디자인 시스템) 스타일**과 한국어 운영 설정으로 묶은 Docker Compose 구성입니다.
-데이터는 포함하지 않으며, 새 서버에서 아래 순서대로 설치하면 같은 화면·설정으로 시작합니다. 데스크톱과 모바일(반응형) 화면을 모두 지원합니다.
+Jenkins 배포 연동 플러그인이 함께 들어 있습니다. 데이터는 포함하지 않으며, 새 서버에서 아래 순서대로 설치하면 같은 화면·설정으로 시작합니다. 데스크톱과 모바일(반응형) 화면을 모두 지원합니다.
+
+## 주요 기능
+| 영역 | 내용 |
+|---|---|
+| 디자인 | KRDS 색상·간격 토큰, Pretendard GOV 글꼴, 반응형(모바일 카드형 목록·오른쪽 메뉴 패널), 박스형 설정 탭, 관리 카드 메뉴, 하단 버튼 오른쪽 정렬(취소는 테두리 버튼) |
+| 일감 · 작업내역 | 검색조건 접기·적용 개수 표시, 더보기(…) 메뉴, 작업내역 오전/오후 12시간제, 사용자 시간대 서울 |
+| 문서 | 게시판형 목록, 범주 배지·범주/제목 검색, 상세 화면, 편집할 때 첨부 추가·삭제 |
+| 게시판 · 뉴스 · 파일 | 게시판 목록·글 목록·글 상세(상단 고정·잠금 배지, 답글, 취소 버튼), 뉴스·파일 제목 검색 |
+| 접속정보 (Vault) | 한국어 화면, 검색·선택 삭제, 비밀번호 가림·복사 |
+| Jenkins 배포 | 프로젝트 "배포" 탭에서 실행(Jenkins 매개변수 선택, 운영 배포 식별자 확인), 진행 중 스피너·진행바, 이력 |
+| 운영 설정 | 역할 권한·일감 유형·안내문 등 기준 설정을 `setup/seed.yml` 로 재현 |
 
 ## 화면
-> 아래 화면의 프로젝트·사용자·접속정보는 모두 캡처용 예시 데이터입니다.
+> 아래 화면의 프로젝트·사용자·접속정보·Jenkins 작업은 모두 캡처용 예시 데이터입니다.
 
 | 일감 목록 · 더보기(…) 메뉴 | 일감 상세 |
 |---|---|
 | ![일감 목록](docs/screenshots/02_issues.png) | ![일감 상세](docs/screenshots/03_issue_show.png) |
-| **일감 등록** | **작업내역** |
+| **일감 등록 — 하단 버튼 오른쪽 정렬** | **작업내역 — 오전/오후 12시간제** |
 | ![일감 등록](docs/screenshots/04_issue_new.png) | ![작업내역](docs/screenshots/09_activity.png) |
 | **문서 목록 — 범주·제목 검색 · 배지** | **문서 상세 · 첨부파일** |
 | ![문서 목록](docs/screenshots/05_documents.png) | ![문서 상세](docs/screenshots/06_document_show.png) |
+| **게시판 글 목록 — 상단 고정 · 잠금 배지** | **게시판 글 상세 · 답글** |
+| ![게시판 글 목록](docs/screenshots/13_board.png) | ![게시판 글 상세](docs/screenshots/14_topic.png) |
+| **배포 — 환경 카드 · 진행바 · 이력** | **프로젝트 설정 — 박스형 탭 · 게시판 관리** |
+| ![배포](docs/screenshots/15_deploys.png) | ![프로젝트 설정](docs/screenshots/10_settings.png) |
 | **접속정보(Vault) 목록 — 검색 · 선택 삭제** | **접속정보 상세 — 비밀번호 가림 · 복사** |
 | ![접속정보 목록](docs/screenshots/07_keys.png) | ![접속정보 상세](docs/screenshots/08_key_show.png) |
-| **프로젝트 설정 — 박스형 탭 · 추가 버튼** | **뉴스 — 게시판 목록 · 제목 검색** |
-| ![프로젝트 설정](docs/screenshots/10_settings.png) | ![뉴스](docs/screenshots/11_news.png) |
-| **파일 — 파일명 검색** | |
-| ![파일](docs/screenshots/12_files.png) | |
+| **뉴스 — 게시판형 목록 · 제목 검색** | **파일 — 파일명 검색** |
+| ![뉴스](docs/screenshots/11_news.png) | ![파일](docs/screenshots/12_files.png) |
 
-**모바일 (900px 미만)** — 흰 상단 바, 카드형 일감 목록, 아이콘 버튼, 오른쪽 메뉴 패널
+**모바일 (900px 미만)** — 흰 상단 바, 카드형 목록, 아이콘 버튼, 오른쪽 메뉴 패널
 
-| 일감 목록 | 일감 상세 | 메뉴 | 프로젝트 설정 |
-|---|---|---|---|
-| ![모바일 일감 목록](docs/screenshots/m1_issues.png) | ![모바일 일감 상세](docs/screenshots/m2_issue.png) | ![모바일 메뉴](docs/screenshots/m3_menu.png) | ![모바일 프로젝트 설정](docs/screenshots/m4_settings.png) |
+| 일감 목록 | 일감 상세 | 메뉴 | 프로젝트 설정 | 배포 |
+|---|---|---|---|---|
+| ![모바일 일감 목록](docs/screenshots/m1_issues.png) | ![모바일 일감 상세](docs/screenshots/m2_issue.png) | ![모바일 메뉴](docs/screenshots/m3_menu.png) | ![모바일 프로젝트 설정](docs/screenshots/m4_settings.png) | ![모바일 배포](docs/screenshots/m5_deploys.png) |
 
 <details><summary>로그인 화면</summary>
 
@@ -82,8 +95,11 @@ docker compose exec redmine sh -c 'bundle exec rails runner setup/apply_settings
 | 바꾸는 것 | deploy.sh 가 하는 일 |
 |---|---|
 | 테마 CSS·JS, 플러그인 화면, 번역 | Redmine 재시작 |
+| 플러그인 DB 변경 (`plugins/*/db/migrate`) | 재시작 때 자동 반영 (`REDMINE_PLUGINS_MIGRATE`) |
 | 기준 설정 (`setup/seed.yml` · `welcome.md`) | 재시작 + `apply_settings.rb` 실행 |
 | Redmine / Vault 버전 (`Dockerfile`, `compose.yaml`) | 이미지 다시 빌드 (브랜치에서 먼저 시험 권장) |
+
+> **관리 화면에서 바꾼 기준 설정은 `setup/seed.yml` 에도 반영하세요.** 역할 권한·일감 유형·사이트 제목 등을 화면에서만 바꾸면, 다음에 `seed.yml`·`welcome.md` 가 바뀌는 배포 때 `apply_settings.rb` 가 다시 적용되면서 원래 값으로 돌아갑니다.
 
 서버는 GitHub 저장소의 읽기 전용 Deploy key 로 받아옵니다 (`~/.ssh/config` 의 `Host github-redmine`).
 서버에서 파일을 직접 고치지 마세요 — 다음 배포 때 `git pull` 이 멈춥니다.
@@ -99,7 +115,7 @@ Jenkins 쪽은 플러그인 설치 없이 **배포 전용 계정 + API 토큰**�
 1. **관리 → Jenkins 서버**: 주소·계정·API 토큰 등록 후 [연결 시험] (토큰은 `REDMINE_CIPHER_KEY` 로 암호화 저장, 화면에 다시 표시하지 않음)
 2. **관리 → 역할 및 권한**: "배포" 항목의 권한 지정 — 배포 이력 보기 / 배포 실행 / 운영 배포 실행 / 배포 설정 관리
 3. **프로젝트 → 설정 → 모듈**에서 "배포" 켜기 → **설정 → 배포** 탭에서 환경(개발서버·운영서버 등)별 Jenkins 작업 경로·기본 매개변수(확인창 초기값, 예: `DEPLOY_PROD=true`) 지정
-4. **프로젝트 → 배포** 탭에서 [배포 실행] — 확인창에서 Jenkins 작업의 매개변수를 체크박스·선택 목록·입력칸으로 선택, 운영 환경은 프로젝트 식별자를 입력해야 실행, 진행 중에는 10초마다 상태 갱신
+4. **프로젝트 → 배포** 탭에서 [배포 실행] — 확인창에서 Jenkins 작업의 매개변수를 체크박스·선택 목록·입력칸으로 선택, 운영 환경은 프로젝트 식별자를 입력해야 실행. 진행 중에는 스피너와 진행바(Jenkins 예상 소요 시간 기준)를 보여 주고 끝나면 자동 갱신
 
 - Jenkins 에 정의된 매개변수만 전달하고(비밀번호 매개변수는 표시·전달하지 않음), 선택 목록은 Jenkins 선택지만 허용합니다.
 - `REDMINE_USER`·`REDMINE_RUN_ID` 를 정의해 두면 실행자와 기록 번호를 자동으로 받습니다. 초기화면 안내문에 단계별 연결 가이드가 있습니다.
