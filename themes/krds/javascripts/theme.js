@@ -65,3 +65,18 @@ $(function() {
   $add.on('click', function() { $add.hide(); });
   $('#add-message, #add-document, #add-news').on('click', 'a[onclick*=".hide()"]', function() { $add.show(); });
 });
+
+/* 같은 저장 버튼이 두 개(Redmine 의 데스크톱용 .mobile-hide · 모바일용 .mobile-show)인 폼은 아래쪽 하나만 남김
+ * — 하단 오른쪽 정렬 규칙(.form_btns)에 맞추고, 화면 폭과 관계없이 저장 버튼은 폼 끝에 하나 (예: 일감 유형·사용자 편집) */
+$(function() {
+  $('#content form').each(function() {
+    var $form = $(this);
+    var $bottom = $form.find('input.mobile-show[type=submit], .mobile-show > input[type=submit]');
+    if (!$bottom.length) return;
+    $form.find('input.mobile-hide[type=submit]').remove();
+    $form.find('.mobile-hide').filter(function() {
+      return $(this).find('input[type=submit]').length && !$(this).children().not('input[type=submit]').length;
+    }).remove();
+    $bottom.removeClass('mobile-show').closest('.mobile-show').removeClass('mobile-show');
+  });
+});
