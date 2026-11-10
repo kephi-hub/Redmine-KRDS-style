@@ -1,0 +1,53 @@
+ko:
+  label_access_overview: 권한 한눈에 보기
+  label_simple_workflows: 업무흐름 간편 설정
+  text_access_overview: 역할마다 영역별로 할 수 있는 일을 4단계로 요약했습니다. 배지에 마우스를 올리면 실제 권한 목록이 보입니다. 바꾸려면 역할 이름(역할 편집) 또는 업무흐름 간편 설정을 누르세요.
+  label_access_by_role: 역할별 권한
+  label_access_by_user: 사용자별 프로젝트 역할
+  label_access_area: 영역
+  label_access_level_manage: 관리
+  label_access_level_write: 작성
+  label_access_level_view: 보기
+  label_access_level_none: 없음
+  text_access_level_manage: 삭제·설정·다른 사람 것까지
+  text_access_level_write: 등록·수정
+  text_access_level_view: 보기만
+  text_access_level_none: 메뉴 안 보임
+  label_access_area_project: 프로젝트 설정·구성원
+  label_access_area_issues: 일감
+  label_access_area_time: 소요시간
+  label_access_area_documents: 문서
+  label_access_area_files: 파일
+  label_access_area_boards: 게시판
+  label_access_area_news: 뉴스
+  label_access_area_wiki: 위키
+  label_access_area_repository: 저장소
+  label_access_area_keys: 접속정보
+  label_access_area_deploys: 배포
+  label_access_area_calendar: 달력·간트
+  label_access_area_workflow: 일감 상태 변경
+  label_access_wf_manage: 완료·거절까지
+  label_access_wf_write: 진행 처리
+  label_access_wf_none: 바꿀 수 없음
+  label_access_wf_missing: "유형 %{count}개 비어 있음"
+  label_access_whitelist_only: 허용 목록만
+  label_access_perm_count: 체크된 권한
+  label_access_perm_count_value: "%{count}개"
+  label_access_admin_all: 관리자(전체)
+  text_access_tip: 한 사람이 여러 역할을 받으면 권한이 모두 합쳐집니다. 관리자 계정은 역할과 관계없이 모든 프로젝트에서 모든 일을 할 수 있습니다.
+  text_access_user_tip: 프로젝트가 비공개라 구성원으로 들어 있는 프로젝트만 보입니다. 프로젝트 이름을 누르면 구성원 설정으로 이동합니다.
+  text_simple_workflows: 역할을 고르고 상태 전환표를 정한 뒤 저장하면, 아래에서 고른 일감 유형 모두에 같은 규칙이 적용됩니다. 체크된 칸은 "왼쪽 상태 → 위쪽 상태" 로 바꿀 수 있다는 뜻입니다.
+  label_sw_quick: 빠른 선택
+  button_sw_worker: 작업자용 (완료·거절 제외)
+  button_sw_all: 전체 허용
+  button_sw_none: 모두 해제
+  label_sw_corner: "현재 상태 ↓ / 바꿀 상태 →"
+  label_sw_closed: 닫힘
+  text_sw_partial: "일부 유형에만 있는 전환은 \"n/%{count}\" 으로 표시합니다. 저장하면 아래에서 고른 유형 모두 이 표와 똑같아집니다."
+  label_sw_trackers: 적용할 일감 유형
+  label_sw_none_yet: 업무흐름 없음
+  label_sw_pairs: "전환 %{count}개"
+  button_sw_detail: 유형별 상세 편집
+  text_sw_confirm: "%{role} 역할의 업무흐름을 선택한 일감 유형에 이 표대로 적용할까요? (작성자·담당자 추가 규칙과 필드 권한은 그대로)"
+  notice_simple_workflow_saved: "%{role} 업무흐름을 일감 유형 %{count}개에 적용했습니다 (전환 %{pairs}개)."
+  error_simple_workflow_no_tracker: 적용할 일감 유형을 하나 이상 고르세요.

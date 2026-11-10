@@ -9,6 +9,7 @@ settings:
   commit_logtime_enabled: '1'
   default_language: ko
   default_notification_option: only_assigned
+  default_projects_public: '0'   # 새 프로젝트는 비공개 (구성원만 보임)
   default_users_time_zone: Seoul
   feeds_limit: '15'
   login_required: '1'
@@ -32,6 +33,8 @@ commit_update_keywords:
   status: 완료
   done_ratio: '100'
 commit_logtime_activity: 개발
+# 새 프로젝트를 만든 사용자에게 줄 역할 (프로젝트 생성은 관리자만)
+new_project_user_role: PM/PL
 default_projects_trackers:
 - 결함
 - 기능
@@ -58,6 +61,10 @@ trackers:
   default_status: 신규
 - name: 테스트
   default_status: 신규
+- name: 시안 수정
+  default_status: 신규
+- name: 퍼블리싱
+  default_status: 신규
 time_entry_activities:
 - 설계
 - 개발
@@ -82,92 +89,238 @@ roles:
   - view_issues
   - view_news
   - view_messages
-- name: 개발자
+# 권한 등급: 관리자(계정 표시) > PM/PL > 개발자 = 디자이너(업무흐름·접속정보만 다름) > 조회자
+# 프로젝트 생성·삭제·공개 전환은 관리자만 (어느 역할에도 주지 않음)
+- name: PM/PL
+  rename_from: PL
   builtin: 0
+  assignable: true
+  issues_visibility: all
+  time_entries_visibility: all
   permissions:
-  - add_project
-  - edit_project
-  - close_project
-  - delete_project
-  - select_project_publicity
-  - select_project_modules
-  - manage_members
-  - manage_versions
-  - add_subprojects
-  - manage_public_queries
-  - save_queries
-  - view_messages
-  - add_messages
-  - edit_messages
-  - edit_own_messages
-  - delete_messages
-  - delete_own_messages
-  - view_message_watchers
-  - add_message_watchers
-  - delete_message_watchers
-  - manage_boards
-  - view_calendar
-  - view_documents
-  - add_documents
-  - edit_documents
-  - delete_documents
-  - view_files
-  - manage_files
-  - view_gantt
   - view_issues
+  - view_issue_watchers
+  - save_queries
+  - view_time_entries
+  - view_news
+  - view_documents
+  - view_files
+  - view_wiki_pages
+  - view_wiki_edits
+  - export_wiki_pages
+  - view_messages
+  - view_message_watchers
+  - view_calendar
+  - view_gantt
+  - view_deploys
   - add_issues
   - edit_issues
   - edit_own_issues
   - copy_issues
   - manage_issue_relations
   - manage_subtasks
-  - set_issues_private
   - set_own_issues_private
   - add_issue_notes
-  - edit_issue_notes
   - edit_own_issue_notes
+  - add_issue_watchers
+  - log_time
+  - edit_own_time_entries
+  - comment_news
+  - add_documents
+  - edit_documents
+  - manage_files
+  - edit_wiki_pages
+  - view_wiki_page_watchers
+  - add_wiki_page_watchers
+  - add_messages
+  - edit_own_messages
+  - delete_own_messages
+  - add_message_watchers
+  - view_changesets
+  - browse_repository
+  - manage_related_issues
+  - view_keys
+  - download_keys
+  - keys_all
+  - commit_access
+  - edit_keys
+  - run_deploys
+  - edit_project
+  - close_project
+  - select_project_modules
+  - manage_members
+  - manage_versions
+  - add_subprojects
+  - manage_public_queries
+  - set_issues_private
+  - edit_issue_notes
   - view_private_notes
   - set_notes_private
   - delete_issues
-  - view_issue_watchers
-  - add_issue_watchers
   - delete_issue_watchers
   - import_issues
   - manage_categories
-  - view_deploys
-  - run_deploys
-  - run_production_deploys
-  - manage_deploy_targets
-  - export_keys
-  - keys_all
-  - download_keys
-  - view_keys
-  - edit_keys
-  - manage_whitelist_keys
-  - view_news
-  - manage_news
-  - comment_news
-  - view_changesets
-  - browse_repository
-  - commit_access
-  - manage_related_issues
-  - manage_repository
-  - view_time_entries
-  - log_time
   - edit_time_entries
-  - edit_own_time_entries
   - manage_project_activities
   - log_time_for_other_users
   - import_time_entries
-  - view_wiki_pages
-  - view_wiki_edits
-  - export_wiki_pages
-  - edit_wiki_pages
+  - manage_news
+  - delete_documents
   - rename_wiki_pages
   - delete_wiki_pages
   - delete_wiki_pages_attachments
-  - view_wiki_page_watchers
-  - add_wiki_page_watchers
   - delete_wiki_page_watchers
   - protect_wiki_pages
   - manage_wiki
+  - manage_repository
+  - edit_messages
+  - delete_messages
+  - delete_message_watchers
+  - manage_boards
+  - run_production_deploys
+  - manage_deploy_targets
+  - export_keys
+  - manage_whitelist_keys
+- name: 개발자
+  builtin: 0
+  assignable: true
+  issues_visibility: default
+  time_entries_visibility: all
+  permissions:
+  - view_issues
+  - view_issue_watchers
+  - save_queries
+  - view_time_entries
+  - view_news
+  - view_documents
+  - view_files
+  - view_wiki_pages
+  - view_wiki_edits
+  - export_wiki_pages
+  - view_messages
+  - view_message_watchers
+  - view_calendar
+  - view_gantt
+  - view_deploys
+  - add_issues
+  - edit_issues
+  - edit_own_issues
+  - copy_issues
+  - manage_issue_relations
+  - manage_subtasks
+  - set_own_issues_private
+  - add_issue_notes
+  - edit_own_issue_notes
+  - add_issue_watchers
+  - log_time
+  - edit_own_time_entries
+  - comment_news
+  - add_documents
+  - edit_documents
+  - manage_files
+  - edit_wiki_pages
+  - view_wiki_page_watchers
+  - add_wiki_page_watchers
+  - add_messages
+  - edit_own_messages
+  - delete_own_messages
+  - add_message_watchers
+  - view_changesets
+  - browse_repository
+  - manage_related_issues
+  - view_keys
+  - download_keys
+  - keys_all
+  - commit_access
+  - edit_keys
+  - run_deploys
+- name: 디자이너
+  builtin: 0
+  assignable: true
+  issues_visibility: default
+  time_entries_visibility: all
+  permissions:
+  - view_issues
+  - view_issue_watchers
+  - save_queries
+  - view_time_entries
+  - view_news
+  - view_documents
+  - view_files
+  - view_wiki_pages
+  - view_wiki_edits
+  - export_wiki_pages
+  - view_messages
+  - view_message_watchers
+  - view_calendar
+  - view_gantt
+  - view_deploys
+  - add_issues
+  - edit_issues
+  - edit_own_issues
+  - copy_issues
+  - manage_issue_relations
+  - manage_subtasks
+  - set_own_issues_private
+  - add_issue_notes
+  - edit_own_issue_notes
+  - add_issue_watchers
+  - log_time
+  - edit_own_time_entries
+  - comment_news
+  - add_documents
+  - edit_documents
+  - manage_files
+  - edit_wiki_pages
+  - view_wiki_page_watchers
+  - add_wiki_page_watchers
+  - add_messages
+  - edit_own_messages
+  - delete_own_messages
+  - add_message_watchers
+  - view_changesets
+  - browse_repository
+  - manage_related_issues
+  - view_keys
+  - download_keys
+  - keys_all
+  - whitelist_keys
+- name: 조회자
+  builtin: 0
+  assignable: false
+  issues_visibility: default
+  time_entries_visibility: all
+  permissions:
+  - view_issues
+  - view_issue_watchers
+  - save_queries
+  - view_time_entries
+  - view_news
+  - view_documents
+  - view_files
+  - view_wiki_pages
+  - view_wiki_edits
+  - export_wiki_pages
+  - view_messages
+  - view_message_watchers
+  - view_calendar
+  - view_gantt
+  - view_deploys
+
+# 일감 상태 — 보류는 개발자·디자이너가 쓰는 "잠시 멈춤" 이라 열린 상태
+issue_statuses:
+- name: 보류
+  is_closed: false
+
+# 업무흐름 기본값 (모든 일감 유형 공통). 상태 이름 또는 all
+# 역할 × 일감 유형 조합에 업무흐름이 하나도 없을 때만 채움 — 관리 화면에서 바꾼 업무흐름은 덮어쓰지 않음
+workflows:
+  PM/PL:
+    from: all
+    to: all
+  개발자:
+    from: [신규, 진행, 해결, 의견, 보류]
+    to: [진행, 해결, 의견, 보류]
+  디자이너:
+    from: [신규, 진행, 해결, 의견, 보류]
+    to: [진행, 해결, 의견, 보류]

@@ -1,0 +1,90 @@
+<%# 관리 > 업무흐름 간편 설정 — 역할 하나의 상태 전환표를 선택한 일감 유형 모두에 적용 %>
+<div class="contextual">
+  <%= link_to sprite_icon('roles', l(:label_access_overview)), access_overview_path, :class => 'icon icon-roles' %>
+</div>
+
+<h2><%= l(:label_simple_workflows) %></h2>
+<p class="subtitle"><%= l(:text_simple_workflows) %></p>
+
+<div class="tabs">
+  <ul>
+  <% @roles.each do |role| %>
+    <li><%= link_to role.name, simple_workflows_path(:role_id => role.id), :class => (role == @role ? 'selected' : nil) %></li>
+  <% end %>
+  </ul>
+</div>
+
+<% if @role.nil? %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<%= form_tag simple_workflows_path, :id => 'sw_form' do %>
+  <%= hidden_field_tag 'role_id', @role.id %>
+  <div class="sw_quick">
+    <span><%= l(:label_sw_quick) %></span>
+    <button type="button" class="btn_line" data-sw="worker"><%= l(:button_sw_worker) %></button>
+    <button type="button" class="btn_line" data-sw="all"><%= l(:button_sw_all) %></button>
+    <button type="button" class="btn_line" data-sw="none"><%= l(:button_sw_none) %></button>
+  </div>
+
+  <div class="autoscroll">
+  <table class="list ag_tbl sw_grid">
+    <thead><tr>
+      <th class="from"><%= l(:label_sw_corner) %></th>
+      <% @statuses.each do |to| %><th><%= to.name %><% if to.is_closed? %><span class="ag_closed"><%= l(:label_sw_closed) %></span><% end %></th><% end %>
+    </tr></thead>
+    <tbody>
+    <% @statuses.each do |from| %>
+      <tr>
+        <th class="from"><%= from.name %><% if from.is_closed? %><span class="ag_closed"><%= l(:label_sw_closed) %></span><% end %></th>
+        <% @statuses.each do |to| %>
+          <td>
+          <% if from == to %>
+            <span class="ag_dim">—</span>
+          <% else %>
+            <% c = @count[[from.id, to.id]] %>
+            <label class="sw_cell" title="<%= from.name %> → <%= to.name %>">
+              <%= check_box_tag "t[#{from.id}][]", to.id, c > 0, :id => nil, :data => { :from_closed => from.is_closed?, :to_closed => to.is_closed? }, :'aria-label' => "#{from.name} → #{to.name}" %>
+              <% if c > 0 && c < @trackers.size %><span class="sw_part"><%= c %>/<%= @trackers.size %></span><% end %>
+            </label>
+          <% end %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  </div>
+  <p class="ag_tip"><%= l(:text_sw_partial, :count => @trackers.size) %></p>
+
+  <fieldset class="sw_trackers">
+    <legend><%= l(:label_sw_trackers) %></legend>
+    <% @trackers.each do |tracker| %>
+      <% n = (@per_tracker[tracker.id] || []).size %>
+      <label class="sw_tracker">
+        <%= check_box_tag 'tracker_ids[]', tracker.id, true, :id => nil %>
+        <span class="name"><%= tracker.name %></span>
+        <% if n.zero? %><span class="ag_warn"><%= l(:label_sw_none_yet) %></span><% else %><span class="ag_dim"><%= l(:label_sw_pairs, :count => n) %></span><% end %>
+      </label>
+    <% end %>
+  </fieldset>
+
+  <p class="form_btns">
+    <%= link_to l(:button_sw_detail), { :controller => 'workflows', :action => 'edit', :role_id => @role.id }, :class => 'btn_line' %>
+    <%= submit_tag l(:button_save), :name => nil, :data => { :confirm => l(:text_sw_confirm, :role => @role.name) } %>
+  </p>
+<% end %>
+
+<%= javascript_tag do %>
+$(function() {
+  $('.sw_quick [data-sw]').on('click', function() {
+    var mode = $(this).data('sw');
+    $('#sw_form .sw_grid input[type=checkbox]').each(function() {
+      var toClosed = $(this).data('to-closed') === true, fromClosed = $(this).data('from-closed') === true;
+      this.checked = mode === 'all' || (mode === 'worker' && !toClosed && !fromClosed);
+    });
+  });
+});
+<% end %>
+<% end %>
+
+<% html_title l(:label_simple_workflows) %>

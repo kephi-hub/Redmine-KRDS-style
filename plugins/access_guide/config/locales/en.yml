@@ -1,0 +1,53 @@
+en:
+  label_access_overview: Access overview
+  label_simple_workflows: Simple workflows
+  text_access_overview: What each role can do per area, in four levels. Hover a badge for the permission list.
+  label_access_by_role: By role
+  label_access_by_user: Project roles by user
+  label_access_area: Area
+  label_access_level_manage: Manage
+  label_access_level_write: Write
+  label_access_level_view: View
+  label_access_level_none: None
+  text_access_level_manage: delete, settings, others' items
+  text_access_level_write: add and edit
+  text_access_level_view: read only
+  text_access_level_none: menu hidden
+  label_access_area_project: Project settings and members
+  label_access_area_issues: Issues
+  label_access_area_time: Spent time
+  label_access_area_documents: Documents
+  label_access_area_files: Files
+  label_access_area_boards: Forums
+  label_access_area_news: News
+  label_access_area_wiki: Wiki
+  label_access_area_repository: Repository
+  label_access_area_keys: Keys
+  label_access_area_deploys: Deploy
+  label_access_area_calendar: Calendar and Gantt
+  label_access_area_workflow: Issue status change
+  label_access_wf_manage: Can close
+  label_access_wf_write: Can progress
+  label_access_wf_none: Cannot change
+  label_access_wf_missing: "%{count} trackers empty"
+  label_access_whitelist_only: Whitelist only
+  label_access_perm_count: Permissions
+  label_access_perm_count_value: "%{count}"
+  label_access_admin_all: Admin (all)
+  text_access_tip: Permissions of multiple roles are combined. Administrators can do everything.
+  text_access_user_tip: Projects are private; users see only projects they are members of.
+  text_simple_workflows: Pick a role, set one transition table and save to apply it to the selected trackers.
+  label_sw_quick: Quick
+  button_sw_worker: Worker (no close/reject)
+  button_sw_all: Allow all
+  button_sw_none: Clear
+  label_sw_corner: "Current ↓ / New →"
+  label_sw_closed: closed
+  text_sw_partial: "Transitions present in some trackers only are marked n/%{count}. Saving makes all selected trackers identical."
+  label_sw_trackers: Trackers to apply
+  label_sw_none_yet: No workflow
+  label_sw_pairs: "%{count} transitions"
+  button_sw_detail: Detailed editor
+  text_sw_confirm: "Apply this table to the selected trackers for %{role}?"
+  notice_simple_workflow_saved: "Applied %{role} workflow to %{count} trackers (%{pairs} transitions)."
+  error_simple_workflow_no_tracker: Select at least one tracker.

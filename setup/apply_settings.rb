@@ -19,14 +19,30 @@ ActiveRecord::Base.transaction do
       role.destroy!; log "#{name}: 삭제"
     end
   end
-  SEED['roles'].each do |r|
-    role = r['builtin'].to_i > 0 ? Role.find_by(builtin: r['builtin']) : Role.find_or_initialize_by(name: r['name'], builtin: 0)
+  SEED['roles'].each_with_index do |r, i|
+    role = if r['builtin'].to_i > 0
+             Role.find_by(builtin: r['builtin'])
+           else
+             # rename_from: 예전 이름의 역할이 있으면 이름만 바꿔 그대로 씀 (구성원 유지)
+             Role.find_by(name: r['name'], builtin: 0) || (r['rename_from'] && Role.find_by(name: r['rename_from'], builtin: 0)) || Role.new(builtin: 0)
+           end
+    role.name = r['name'] if r['builtin'].to_i.zero?
     role.permissions = r['permissions'].map(&:to_sym)
+    %w(assignable issues_visibility time_entries_visibility users_visibility).each { |k| role.send("#{k}=", r[k]) if r.key?(k) }
     role.save!; log "#{role.name}: 권한 #{role.permissions.size}개"
+  end
+  # 역할 목록 순서도 seed 순서대로
+  SEED['roles'].reject { |r| r['builtin'].to_i > 0 }.each_with_index do |r, i|
+    Role.where(name: r['name'], builtin: 0).update_all(position: i + 1)
   end
 
   puts '[일감 상태·유형]'
   status = ->(name) { IssueStatus.find_by!(name: name) }
+  (SEED['issue_statuses'] || []).each do |s|
+    st = IssueStatus.find_or_initialize_by(name: s['name'])
+    st.is_closed = s['is_closed'] ? true : false
+    st.save!; log "상태 #{st.name}: #{st.is_closed ? '닫힘' : '열림'}"
+  end
   base = Tracker.order(:position).first
   SEED['trackers'].each do |t|
     tracker = Tracker.find_or_initialize_by(name: t['name'])
@@ -37,6 +53,19 @@ ActiveRecord::Base.transaction do
       tracker.copy_workflow_rules(base)
     end
     log "#{tracker.name}#{' (새로 만듦, 업무흐름 복사)' if created}"
+  end
+
+  puts '[업무흐름]'
+  # 역할 × 일감 유형 조합에 업무흐름이 하나도 없을 때만 기본값을 채움 (관리 화면에서 바꾼 업무흐름은 그대로)
+  statuses = IssueStatus.all.index_by(&:name)
+  pick = ->(v) { v == 'all' ? statuses.values : Array(v).map { |n| statuses.fetch(n) } }
+  (SEED['workflows'] || {}).each do |role_name, rule|
+    role = Role.find_by!(name: role_name)
+    pairs = pick.(rule['from']).product(pick.(rule['to'])).reject { |a, b| a == b }
+    filled = Tracker.all.reject { |t| WorkflowTransition.exists?(role_id: role.id, tracker_id: t.id) }.each do |t|
+      WorkflowTransition.insert_all(pairs.map { |a, b| { type: 'WorkflowTransition', role_id: role.id, tracker_id: t.id, old_status_id: a.id, new_status_id: b.id, author: false, assignee: false } })
+    end
+    log "#{role.name}: #{filled.empty? ? '기존 업무흐름 유지' : "#{filled.map(&:name).join(', ')} 에 기본 흐름 #{pairs.size}개 전환"}"
   end
 
   puts '[작업분류·문서 범주]'
@@ -58,6 +87,7 @@ ActiveRecord::Base.transaction do
   end
   Setting.commit_logtime_activity_id = TimeEntryActivity.find_by!(name: SEED['commit_logtime_activity'], project_id: nil).id.to_s
   Setting.default_projects_tracker_ids = Tracker.where(name: SEED['default_projects_trackers']).order(:id).pluck(:id).map(&:to_s)
+  Setting.new_project_user_role_id = Role.find_by!(name: SEED['new_project_user_role']).id.to_s if SEED['new_project_user_role']
   # 서버마다 다른 값은 .env 에서 받음
   Setting.host_name = ENV['REDMINE_HOST_NAME'] if ENV['REDMINE_HOST_NAME'].present?
   Setting.protocol  = ENV['REDMINE_PROTOCOL'].presence || 'http'
