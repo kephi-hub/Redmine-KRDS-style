@@ -66,10 +66,10 @@ ko:
   field_db_key: 키
   field_db_comment: 설명
   text_db_server_info: 프로젝트에서 쓸 DB 서버 접속정보입니다. 비밀번호는 암호화해 저장하며, 접속할 때는 읽기 전용으로 테이블·컬럼 정보만 읽습니다. SELECT 권한만 있는 조회 전용 계정을 권장합니다.
-  text_db_adapter_info: MS SQL Server·Oracle 은 준비 중입니다.
-  text_db_database_info: MariaDB·MySQL 은 조회할 데이터베이스(스키마) 이름, PostgreSQL 은 접속할 데이터베이스 이름
+  text_db_adapter_info: "Oracle 은 DB 이름 칸에 서비스 이름(예: ORCLPDB1)을 적습니다."
+  text_db_database_info: MariaDB·MySQL 은 조회할 데이터베이스(스키마) 이름, PostgreSQL·SQL Server 는 접속할 데이터베이스 이름
   text_db_user_info: 조회 전용 계정 권장 (information_schema 를 읽을 수 있어야 함)
-  text_db_schema_info: 비워 두면 PostgreSQL 은 public, MariaDB·MySQL 은 서버의 DB 이름
+  text_db_schema_info: 비워 두면 PostgreSQL 은 public, SQL Server 는 dbo, Oracle 은 접속 계정(대문자), MariaDB·MySQL 은 서버의 DB 이름
   text_db_production_info: 운영 DB 는 탭에 '운영' 표시, 비교 화면에서 기본 비교 대상(B)
   text_db_project: 프로젝트 DB 의 테이블·뷰·함수·프로시저·트리거·DB 잡 등을 종류별로 봅니다(DB 종류마다 탭이 다름). 테이블 정의서(엑셀), 개발/운영 비교, 용어사전 점검도 할 수 있습니다.
   text_db_compare: 두 DB 의 테이블과 컬럼(타입·NULL·기본값·설명·키) 차이를 보여 줍니다.
@@ -250,6 +250,18 @@ ko:
   label_db_query_ms: 시간(ms)
   label_db_history_prev: 이전 저장본
   label_db_history_this: 이 저장본
+  label_db_kind_synonym: 시노님
+  label_db_kind_package: 패키지
+  label_db_target: 대상
+  text_db_hint_mssql_event: "SQL Server 에이전트 작업은 msdb 데이터베이스의 SQLAgentReaderRole 권한이 있어야 보입니다: USE msdb; ALTER ROLE SQLAgentReaderRole ADD MEMBER 계정;"
+  text_db_hint_mssql_function: "함수·프로시저 정의는 VIEW DEFINITION 권한이 있어야 보입니다: GRANT VIEW DEFINITION TO 계정;"
+  text_db_hint_mssql_procedure: "함수·프로시저 정의는 VIEW DEFINITION 권한이 있어야 보입니다: GRANT VIEW DEFINITION TO 계정;"
+  text_db_hint_mssql_trigger: "트리거 정의는 VIEW DEFINITION 권한이 있어야 보입니다: GRANT VIEW DEFINITION TO 계정;"
+  text_db_hint_oracle_function: 다른 스키마의 함수·프로시저 소스는 그 객체의 EXECUTE 권한(또는 SELECT_CATALOG_ROLE)이 있어야 보입니다.
+  text_db_hint_oracle_procedure: 다른 스키마의 함수·프로시저 소스는 그 객체의 EXECUTE 권한(또는 SELECT_CATALOG_ROLE)이 있어야 보입니다.
+  text_db_hint_oracle_package: 다른 스키마의 패키지는 EXECUTE 권한(또는 SELECT_CATALOG_ROLE)이 있어야 보입니다.
+  text_db_hint_oracle_event: 다른 스키마의 스케줄러 작업은 보이지 않을 수 있습니다 (SELECT_CATALOG_ROLE 필요).
+  text_db_hint_oracle_trigger: 다른 스키마의 트리거는 그 테이블 권한이 있어야 보입니다.
   activerecord:
     attributes:
       db_server:

@@ -114,6 +114,17 @@
           </tr>
         <% end %>
         </tbody>
+      <% when 'synonym', 'package' %>
+        <thead><tr><th class="name"><%= l(:field_name) %></th><th class="comment"><%= l(kind == 'synonym' ? :label_db_target : :field_db_comment) %></th><th><%= l(:field_status) %></th></tr></thead>
+        <tbody>
+        <% items.each do |o| %>
+          <tr class="db_row" data-filter="<%= "#{o[:name]} #{o[:target]}".downcase %>">
+            <td class="name"><%= link_to o[:name], db_object_path(@link, kind, o[:key]) %></td>
+            <td class="comment"><% if kind == 'synonym' %><code><%= o[:target] %></code><% else %><%= o[:comment] %><% end %></td>
+            <td class="status"><%= db_status_tag(o[:status]) %></td>
+          </tr>
+        <% end %>
+        </tbody>
       <% when 'sequence' %>
         <thead><tr><th class="name"><%= l(:field_name) %></th><th><%= l(:field_db_type) %></th><th><%= l(:label_db_seq_start) %></th><th><%= l(:label_db_seq_inc) %></th><th><%= l(:label_db_seq_max) %></th><th><%= l(:label_db_seq_cycle) %></th><th class="comment"><%= l(:label_db_seq_owned) %></th></tr></thead>
         <tbody>

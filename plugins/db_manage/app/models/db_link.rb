@@ -8,10 +8,10 @@ class DbLink < ApplicationRecord
 
   scope :sorted, -> { order(:position, :id) }
 
-  # PostgreSQL 은 스키마(기본 public), MariaDB 는 데이터베이스 이름이 스키마
+  # 비워 두면 DB 종류별 기본: PostgreSQL public · SQL Server dbo · Oracle 접속 계정 · MariaDB 는 데이터베이스 이름
   def schema
     return schema_name if schema_name.present?
-    db_server.adapter == 'postgresql' ? 'public' : db_server.database_name
+    DbManage::Connector.default_schema(db_server)
   end
 
   # 운영 여부는 DB 서버의 개발/운영 구분을 따름 (db_links.production 칸은 005 에서 삭제)

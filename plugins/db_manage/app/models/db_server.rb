@@ -4,8 +4,8 @@ class DbServer < ApplicationRecord
   ADAPTERS = {
     'mariadb' => ['MariaDB · MySQL', 3306, true],
     'postgresql' => ['PostgreSQL', 5432, true],
-    'mssql' => ['MS SQL Server', 1433, false],
-    'oracle' => ['Oracle', 1521, false]
+    'mssql' => ['MS SQL Server', 1433, true],
+    'oracle' => ['Oracle', 1521, true]
   }.freeze
 
   has_many :db_links, dependent: :restrict_with_error

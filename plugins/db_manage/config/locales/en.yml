@@ -66,7 +66,7 @@ en:
   field_db_key: Key
   field_db_comment: Comment
   text_db_server_info: DB servers used by projects. Passwords are stored encrypted; connections are read-only and read only table and column metadata. A read-only account is recommended.
-  text_db_adapter_info: MS SQL Server and Oracle are coming soon.
+  text_db_adapter_info: "For Oracle, enter the service name (e.g. ORCLPDB1) as database."
   text_db_database_info: Schema name for MariaDB/MySQL, database name for PostgreSQL
   text_db_user_info: Read-only account recommended (must be able to read information_schema)
   text_db_schema_info: Blank means public for PostgreSQL, the server database for MariaDB/MySQL
@@ -250,6 +250,18 @@ en:
   label_db_query_ms: Time (ms)
   label_db_history_prev: Previous
   label_db_history_this: This version
+  label_db_kind_synonym: Synonyms
+  label_db_kind_package: Packages
+  label_db_target: Target
+  text_db_hint_mssql_event: "SQL Server Agent jobs need SQLAgentReaderRole in msdb."
+  text_db_hint_mssql_function: "Definitions need VIEW DEFINITION: GRANT VIEW DEFINITION TO user;"
+  text_db_hint_mssql_procedure: "Definitions need VIEW DEFINITION: GRANT VIEW DEFINITION TO user;"
+  text_db_hint_mssql_trigger: "Definitions need VIEW DEFINITION: GRANT VIEW DEFINITION TO user;"
+  text_db_hint_oracle_function: Source of other schemas' routines needs EXECUTE (or SELECT_CATALOG_ROLE).
+  text_db_hint_oracle_procedure: Source of other schemas' routines needs EXECUTE (or SELECT_CATALOG_ROLE).
+  text_db_hint_oracle_package: Other schemas' packages need EXECUTE (or SELECT_CATALOG_ROLE).
+  text_db_hint_oracle_event: Other schemas' scheduler jobs may need SELECT_CATALOG_ROLE.
+  text_db_hint_oracle_trigger: Other schemas' triggers need privileges on the table.
   activerecord:
     attributes:
       db_server:

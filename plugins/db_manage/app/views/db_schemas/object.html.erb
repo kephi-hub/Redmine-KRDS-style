@@ -6,6 +6,7 @@
   <% o = @object %>
   <% if o[:comment] %><p class="subtitle"><%= o[:comment] %></p><% end %>
   <% props = [
+       [l(:label_db_target), (content_tag(:code, o[:target]) if o[:target])],
        [l(:label_db_args), (o[:args].nil? ? nil : content_tag(:code, o[:args].presence || '()'))],
        [l(:label_db_returns), o[:returns]],
        [l(:field_db_table), (link_to(o[:table], project_db_table_path(@project, @link, o[:table])) if o[:table])],
@@ -27,7 +28,7 @@
   <dl class="db_props">
     <% props.each do |k, v| %><div><dt><%= k %></dt><dd><%= v %></dd></div><% end %>
   </dl>
-  <% unless params[:kind] == 'sequence' %>
+  <% unless %w(sequence synonym).include?(params[:kind]) %>
   <h3 class="ag_sec"><%= l(:label_db_definition) %></h3>
   <% if o[:definition] %>
     <pre class="db_sql"><code><%= o[:definition] %></code></pre>

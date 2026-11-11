@@ -18,7 +18,7 @@ module DbSchemasHelper
 
   def db_link_info(link)
     s = link.db_server
-    "#{s.adapter_label} · #{s.host}:#{s.port}/#{s.database_name}#{" · #{l(:field_db_schema)} #{link.schema}" if s.adapter == 'postgresql'}"
+    "#{s.adapter_label} · #{s.host}:#{s.port}/#{s.database_name}#{" · #{l(:field_db_schema)} #{link.schema}" unless s.adapter == 'mariadb'}"
   end
 
   def db_number(n)

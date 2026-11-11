@@ -10,10 +10,14 @@
 #           위키·일감 본문의 ```mermaid 블록을 그림으로
 # - 1.5.0 : DB 종류별 처리 분리(Dialect), 인덱스 정보, 화면 캐시(10분·새로 고침), 다단계 SSH(최대 3대), 용어 점검(설명 누락·불일치), ERD draw.io
 # - 1.6.0 : 구조 변경 이력(저장본 비교, rake 자동 저장), SQL 조회(조회 문장만·읽기 전용·시간/건수 제한·실행 기록, 운영 DB 별도 권한)
+# - 1.7.0 : MS SQL Server (tiny_tds) — 테이블·뷰·함수·프로시저·트리거·시퀀스·시노님·에이전트 작업
+# - 1.8.0 : Oracle (ruby-oci8, Instant Client) — 테이블·뷰·구체화 뷰·함수·프로시저·패키지·트리거·시퀀스·시노님·스케줄러 작업
 # 원격 DB 에는 읽기 전용 세션으로 접속해 메타데이터만 읽음 (데이터 조회·변경 SQL 없음)
 require_relative 'lib/db_manage/dialect_base'
 require_relative 'lib/db_manage/dialect_mysql'
 require_relative 'lib/db_manage/dialect_postgresql'
+require_relative 'lib/db_manage/dialect_mssql'
+require_relative 'lib/db_manage/dialect_oracle'
 require_relative 'lib/db_manage/connector'
 require_relative 'lib/db_manage/sql_guard'
 require_relative 'lib/db_manage/tunnel'
@@ -25,7 +29,7 @@ Redmine::Plugin.register :db_manage do
   name 'DB 관리'
   author 'kephi-hub'
   description 'DB 서버 접속정보 관리, 프로젝트 DB 스키마 조회·테이블 정의서·개발/운영 비교·용어 점검'
-  version '1.6.0'
+  version '1.8.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
 
