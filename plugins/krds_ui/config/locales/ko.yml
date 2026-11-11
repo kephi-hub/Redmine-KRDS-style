@@ -58,3 +58,41 @@ ko:
   label_nav_collab: 협업
   label_nav_etc: 기타
   label_nav_section: 구역
+  label_nav_close: 메뉴 닫기
+  label_nav_desc_overview: 프로젝트 현황과 최근 활동
+  label_nav_desc_work: 할 일 · 일정 · 투입 시간
+  label_nav_desc_design: 요구사항부터 화면 · 권한 · 용어까지
+  label_nav_desc_dev: 소스 · DB · 테스트 · 배포
+  label_nav_desc_ops: 서버 · 배치 · 장애 · 연계 · 접속정보
+  label_nav_desc_docs: 산출물 · 회의록 · 이슈와 위험
+  label_nav_desc_collab: 위키 · 게시판 · 소식
+  label_nav_desc_etc: 그 밖의 메뉴
+  label_nav_desc_activity: 프로젝트에서 일어난 일 모아 보기
+  label_nav_desc_issues: 일감 목록 · 검색 · 일괄 처리
+  label_nav_desc_new_issue: 새 일감 등록
+  label_nav_desc_gantt: 일정 막대 그래프
+  label_nav_desc_calendar: 달력으로 보는 일감
+  label_nav_desc_roadmap: 버전별 진행 상황
+  label_nav_desc_time_entries: 작업 시간 기록과 집계
+  label_nav_desc_qa_requirements: 요구사항 · 변경요청 · 추적표
+  label_nav_desc_menu_items: 화면 메뉴 트리 · 시스템 권한
+  label_nav_desc_glossary: 표준 용어 · 약어
+  label_nav_desc_repository: 커밋 이력 · 소스 보기 · 다운로드
+  label_nav_desc_programs: 프로그램 ID · 소스 · 개발 진척
+  label_nav_desc_db_schemas: 테이블 · ERD · 이력 · 공통코드
+  label_nav_desc_qa_tests: 테스트 케이스 · 회차 · 결함
+  label_nav_desc_deploys: Jenkins 배포 실행 · 이력
+  label_nav_desc_ops_assets: 서버 · 도메인 · 인증서 · 만료일
+  label_nav_desc_ops_schedules: 배치 일정 · 타임라인
+  label_nav_desc_ops_incidents: 장애 · 정기점검 · 월간 보고서
+  label_nav_desc_ops_interfaces: 연계 정의 · 구성도
+  label_nav_desc_keys: 서버 · 계정 접속정보 (Vault)
+  label_nav_desc_deliverables: 단계별 산출물 · 일괄 다운로드
+  label_nav_desc_meetings: 회의록 · 결정 사항 · 후속 조치
+  label_nav_desc_risks: 이슈 · 위험 관리대장
+  label_nav_desc_documents: 문서 보관함
+  label_nav_desc_files: 배포 파일 · 첨부
+  label_nav_desc_wiki: 함께 쓰는 문서
+  label_nav_desc_boards: 게시판 · 토론
+  label_nav_desc_news: 공지 · 소식
+

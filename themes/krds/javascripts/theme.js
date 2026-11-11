@@ -86,3 +86,31 @@ $(function() {
   var $sub = $('#main-menu > .nav_sub');
   if ($sub.length) $sub.insertAfter('#header');
 });
+
+/* 프로젝트 메뉴 대분류 펼침 패널 (KRDS 메인 메뉴형): 데스크톱에서 대분류를 누르면 머리글 아래 전체 너비 패널,
+ * 다시 누르기·닫기 버튼·Esc·바깥 누르기로 닫힘, aria-expanded 로 상태 표시. 모바일은 오른쪽 메뉴 패널 그대로 */
+$(function() {
+  var $panels = $('.gnb_panel');
+  if (!$panels.length) return;
+  var $layer = $('<div class="gnb_layer"></div>').insertAfter('#header');
+  $panels.appendTo($layer);
+  function desktop() { return window.matchMedia('(min-width:900px)').matches; }
+  function close(focus) {
+    var $t = $('#main-menu a.nav_grp[aria-expanded="true"]');
+    $t.attr('aria-expanded', 'false');
+    $layer.find('.gnb_panel').prop('hidden', true);
+    if (focus && $t.length) $t.trigger('focus');
+  }
+  $('#main-menu').on('click', 'a.nav_grp[aria-controls]', function(e) {
+    if (!desktop()) return;
+    e.preventDefault();
+    var $t = $(this), open = $t.attr('aria-expanded') === 'true';
+    close(false);
+    if (open) return;
+    $t.attr('aria-expanded', 'true');
+    $('#' + $t.attr('aria-controls')).prop('hidden', false);
+  });
+  $layer.on('click', '.gnb_close', function() { close(true); });
+  $(document).on('keydown', function(e) { if (e.key === 'Escape') close(true); });
+  $(document).on('click', function(e) { if (!$(e.target).closest('#main-menu, .gnb_layer').length) close(false); });
+});

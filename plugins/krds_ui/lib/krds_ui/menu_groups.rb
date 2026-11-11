@@ -18,7 +18,26 @@ module KrdsUi
     FIXED = %i(new_object settings).freeze
   end
 
+  # KRDS 메인 메뉴형 펼침 패널 (데스크톱): 왼쪽 대분류 제목·설명, 오른쪽 하위 메뉴(이름 + 한 줄 설명)
+  module GnbPanel
+    private
+
+    def krds_gnb_panel(pid, key, label, entries)
+      links = entries.map do |n, caption, url, sel|
+        desc = l("label_nav_desc_#{n.name}", default: '')
+        content_tag(:li, link_to(safe_join([content_tag(:strong, caption), (content_tag(:span, desc) if desc.present?)].compact), url,
+                                 class: (sel ? 'on' : nil), 'aria-current': (sel ? 'page' : nil)))
+      end
+      head = content_tag(:div, content_tag(:strong, label, class: 'gnb_tit') + content_tag(:p, l("label_nav_desc_#{key}", default: '')), class: 'gnb_head')
+      close = content_tag(:button, content_tag(:span, l(:label_nav_close), class: 'gnb_sr'), type: 'button', class: 'gnb_close')
+      content_tag(:div, content_tag(:div, head + content_tag(:ul, safe_join(links), class: 'gnb_list') + close, class: 'gnb_inner'),
+                  id: pid, class: 'gnb_panel', hidden: true, role: 'region', 'aria-label': label)
+    end
+  end
+
   module MenuHelperPatch
+    include GnbPanel
+
     def render_main_menu(project)
       return super unless project && !project.new_record? && controller.current_menu(project) == :project_menu
       krds_grouped_menu(project) || super
@@ -55,7 +74,10 @@ module KrdsUi
           lis << content_tag(:li, link_to(label, first[2], class: "nav_grp #{'selected' if active}".strip, title: first[1]))
         else
           items = safe_join(entries.map { |n, caption, url, sel| content_tag(:li, render_single_menu_node(n, caption, url, sel)) })
-          lis << content_tag(:li, link_to(label, first[2], class: "nav_grp #{'selected' if active}".strip) + content_tag(:ul, items, class: 'menu-children'), class: 'nav_parent')
+          pid = "gnb_p_#{key}"
+          trigger = link_to(safe_join([label, content_tag(:span, '', class: 'gnb_arrow', 'aria-hidden': 'true')]), first[2],
+                            class: "nav_grp #{'selected' if active}".strip, 'aria-expanded': 'false', 'aria-controls': pid)
+          lis << content_tag(:li, trigger + content_tag(:ul, items, class: 'menu-children') + krds_gnb_panel(pid, key, label, entries), class: 'nav_parent')
           sub = items if active
         end
       end
