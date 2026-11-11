@@ -1,0 +1,5 @@
+<%= error_messages_for @template %>
+<div class="box tabular">
+  <p><%= f.text_field :name, :required => true, :size => 40, :maxlength => 100, :label => :label_oa_tpl_name %></p>
+  <p><%= f.text_area :items, :rows => 14, :cols => 70, :label => :label_oa_tpl_items %><em class="info"><%= l(:text_oa_tpl_items) %></em></p>
+</div>

@@ -1,0 +1,10 @@
+<%# 스케줄러 공통 머리 (locals: current) %>
+<% can_edit = User.current.allowed_to?(:manage_ops_schedules, @project) %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('add', l(:label_oa_sched_new)), new_project_ops_schedule_path(@project), :class => 'icon icon-add' %>
+    <%= link_to sprite_icon('import', l(:label_oa_import)), project_ops_schedules_import_path(@project), :class => 'icon icon-import' %><% end %>
+  <%= link_to sprite_icon('download', l(:label_oa_sched_export)), project_ops_schedules_export_path(@project), :class => 'icon icon-download' %>
+</div>
+<h2><%= l(:label_oa_schedules) %></h2>
+<p class="subtitle"><%= l(:text_oa_schedules) %></p>
+<%= oa_schedule_tabs(current) %>

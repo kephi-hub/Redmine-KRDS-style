@@ -1,0 +1,24 @@
+<% can_edit = User.current.allowed_to?(:manage_ops_interfaces, @project) %>
+<% i = @interface %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_ops_interface_path(@project, i), :class => 'icon icon-edit' %>
+    <%= link_to sprite_icon('del', l(:button_delete)), project_ops_interface_path(@project, i), :method => :delete, :data => { :confirm => l(:text_are_you_sure) }, :class => 'icon icon-del' %><% end %>
+</div>
+<h2><%= link_to l(:label_oa_interfaces), project_ops_interfaces_path(@project) %> &#187; <%= i.code %></h2>
+<div class="qa_box">
+  <h3 class="qa_tit"><%= i.name %></h3>
+  <p class="qa_meta"><%= oa_badge(oa_label('direction', i.direction), i.direction) %> <strong><%= i.partner %></strong> <span class="db_dim"><%= oa_label('protocol', i.protocol) %> · <%= oa_label('cycle', i.cycle) %> · <%= oa_label('istatus', i.status) %></span></p>
+  <dl class="db_props">
+    <% [[:label_oa_schedule, i.ops_schedule ? link_to("#{i.ops_schedule.name} (#{i.ops_schedule.describe})", project_ops_schedule_path(@project, i.ops_schedule)) : nil],
+        [:label_oa_dev_url, i.dev_url], [:label_oa_prod_url, i.prod_url], [:label_oa_our_owner, i.our_owner], [:label_oa_partner_owner, i.partner_owner],
+        [:label_oa_partner_contact, i.partner_contact], [:label_oa_auth_note, i.auth_note]].each do |k, v| %>
+      <% if v.present? %><div><dt><%= l(k) %></dt><dd><%= v %></dd></div><% end %>
+    <% end %>
+  </dl>
+  <dl class="qa_steps">
+    <% { :label_oa_data_desc => i.data_desc, :label_oa_tables => i.tables, :label_oa_note => i.note }.each do |k, v| %>
+      <% if v.present? %><dt><%= l(k) %></dt><dd><%= simple_format(h(v)) %></dd><% end %>
+    <% end %>
+  </dl>
+</div>
+<% html_title "#{i.code} #{i.name}" %>

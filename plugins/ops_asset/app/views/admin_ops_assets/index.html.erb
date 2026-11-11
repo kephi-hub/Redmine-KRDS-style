@@ -1,0 +1,20 @@
+<%# 관리 > 자산 대장 %>
+<div class="contextual">
+  <%= link_to sprite_icon('add', l(:label_oa_shared_new)), new_admin_ops_asset_path, :class => 'icon icon-add' %>
+  <%= link_to sprite_icon('download', l(:label_oa_export)), admin_ops_assets_path(:download => 'xlsx'), :class => 'icon icon-download' %>
+</div>
+<h2><%= l(:label_oa_admin_assets) %></h2>
+<p class="subtitle"><%= l(:text_oa_admin_assets) %></p>
+<%= render :partial => 'ops_assets/kpi', :locals => { :path => ->(a) { admin_ops_assets_path(a.merge(:scope => @scope)) } } %>
+<div class="tabs"><ul>
+  <li><%= link_to l(:label_oa_scope_all), admin_ops_assets_path(:state => @state), :class => (@scope ? nil : 'selected') %></li>
+  <li><%= link_to l(:label_oa_shared), admin_ops_assets_path(:scope => 'shared', :state => @state), :class => (@scope == 'shared' ? 'selected' : nil) %></li>
+  <li><%= link_to l(:label_oa_scope_project), admin_ops_assets_path(:scope => 'project', :state => @state), :class => (@scope == 'project' ? 'selected' : nil) %></li>
+</ul></div>
+<p class="db_info"><%= ActionMailer::Base.perform_deliveries ? l(:text_oa_notify_on, :count => @due.size) : l(:text_oa_notify_off, :count => @due.size) %></p>
+<% if @assets.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<%= render :partial => 'ops_assets/table', :locals => { :assets => @assets, :admin => true, :can_edit => true } %>
+<% end %>
+<% html_title l(:label_oa_admin_assets) %>

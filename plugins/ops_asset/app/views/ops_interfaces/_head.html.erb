@@ -1,0 +1,8 @@
+<% can_edit = User.current.allowed_to?(:manage_ops_interfaces, @project) %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('add', l(:label_oa_if_new)), new_project_ops_interface_path(@project), :class => 'icon icon-add' %><% end %>
+  <%= link_to sprite_icon('download', l(:label_oa_if_export)), project_ops_interfaces_export_path(@project), :class => 'icon icon-download' %>
+</div>
+<h2><%= l(:label_oa_interfaces) %></h2>
+<p class="subtitle"><%= l(:text_oa_interfaces) %></p>
+<%= oa_interface_tabs(current) %>

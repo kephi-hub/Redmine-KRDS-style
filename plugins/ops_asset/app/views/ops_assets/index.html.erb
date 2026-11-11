@@ -1,0 +1,29 @@
+<%# 프로젝트 > 자산 %>
+<% can_edit = User.current.allowed_to?(:manage_ops_assets, @project) %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('add', l(:label_oa_asset_new)), new_project_ops_asset_path(@project), :class => 'icon icon-add' %><% end %>
+  <%= link_to sprite_icon('download', l(:label_oa_export)), project_ops_assets_export_path(@project), :class => 'icon icon-download' %>
+</div>
+<h2><%= l(:label_oa_assets) %></h2>
+<p class="subtitle"><%= l(:text_oa_assets) %></p>
+<%= render :partial => 'ops_assets/kpi', :locals => { :path => ->(a) { project_ops_assets_path(@project, a) } } %>
+<%= form_tag(project_ops_assets_path(@project), :method => :get, :class => 'qa_filter') do %>
+  <%= hidden_field_tag 'state', @state if @state %>
+  <%= select_tag 'kind', options_for_select([[l(:label_oa_kind_all), '']] + oa_options('kind', OpsAsset::KINDS), @kind), :'aria-label' => l(:label_oa_kind) %>
+  <%= search_field_tag 'q', @q, :placeholder => l(:label_oa_search), :'aria-label' => l(:label_oa_search) %>
+  <%= submit_tag l(:label_oa_filter), :name => nil %>
+  <% if @kind || @state || @q.present? %><%= link_to l(:label_oa_clear), project_ops_assets_path(@project), :class => 'qa_clear' %><% end %>
+<% end %>
+<% if @assets.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<%= render :partial => 'ops_assets/table', :locals => { :assets => @assets, :admin => false, :can_edit => can_edit } %>
+<% end %>
+<% if can_edit && @linkable.any? %>
+  <h3><%= l(:label_oa_link_shared) %></h3>
+  <%= form_tag(project_ops_assets_link_path(@project), :class => 'st_bar') do %>
+    <%= select_tag 'asset_id', options_for_select(@linkable.map { |a| ["#{oa_label('kind', a.kind)} · #{a.name}#{" (#{a.address})" if a.address.present?}", a.id] }), :'aria-label' => l(:label_oa_link_shared) %>
+    <%= submit_tag l(:label_oa_link) %>
+  <% end %>
+<% end %>
+<% html_title l(:label_oa_assets) %>

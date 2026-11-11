@@ -1,0 +1,30 @@
+<%# 자산 등록·수정 (프로젝트·관리자 공용) — locals: f %>
+<%= error_messages_for @asset %>
+<div class="box tabular">
+  <p><%= f.select :kind, oa_options('kind', OpsAsset::KINDS), { :label => :label_oa_kind } %></p>
+  <p><%= f.text_field :name, :required => true, :size => 50, :maxlength => 120, :label => :label_oa_name %></p>
+  <p><%= f.select :env, oa_options('env', OpsAsset::ENVS), { :label => :label_oa_env } %></p>
+  <p><%= f.text_field :address, :size => 50, :maxlength => 255, :placeholder => '10.0.0.10 / www.example.go.kr', :label => :label_oa_address %></p>
+  <p><%= f.text_area :spec, :rows => 3, :cols => 60, :placeholder => 'Rocky Linux 9 · 4 vCPU · 16GB', :label => :label_oa_spec %></p>
+  <p><%= f.text_field :vendor, :size => 40, :maxlength => 120, :label => :label_oa_vendor %></p>
+  <p><%= f.text_field :owner, :size => 30, :maxlength => 120, :label => :label_oa_owner %></p>
+  <p><%= f.date_field :expires_on, :label => :label_oa_expires %><%= calendar_for('ops_asset_expires_on') %>
+    <em class="info"><%= l(:text_oa_expires) %></em></p>
+  <p><%= f.text_field :renew_cycle, :size => 20, :maxlength => 60, :placeholder => '1년', :label => :label_oa_renew %></p>
+  <% if defined?(DbServer) && (servers = DbServer.order(:name).to_a).any? %>
+    <p><%= f.select :db_server_id, servers.map { |s| [s.name, s.id] }, { :include_blank => true, :label => :label_oa_db_server } %></p>
+  <% end %>
+  <% if defined?(JenkinsServer) && (jk = JenkinsServer.order(:name).to_a).any? %>
+    <p><%= f.select :jenkins_server_id, jk.map { |s| [s.name, s.id] }, { :include_blank => true, :label => :label_oa_jenkins } %></p>
+  <% end %>
+  <p><%= f.text_area :note, :rows => 3, :cols => 60, :label => :label_oa_note %>
+    <em class="info"><%= l(:text_oa_secret) %></em></p>
+  <p><%= f.check_box :active, :label => :field_active %></p>
+  <% if local_assigns[:admin] && @asset.shared? %>
+    <p><label><%= l(:label_oa_linked_projects) %></label>
+      <%= hidden_field_tag 'links_sent', '1', :id => nil %>
+      <span class="oa_projects">
+        <% Project.active.sorted.each do |p| %><label class="inline"><%= check_box_tag 'project_ids[]', p.id, @asset.linked_project_ids.include?(p.id), :id => nil %> <%= p.name %></label><% end %>
+      </span></p>
+  <% end %>
+</div>

@@ -1,0 +1,28 @@
+<%# 인터페이스 > 구성도 (Mermaid) %>
+<%= render :partial => 'ops_interfaces/head', :locals => { :current => :diagram } %>
+<% if @count.zero? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+  <p class="db_btns">
+    <a href="#" class="btn_line" id="oa_svg"><%= sprite_icon('download', 'SVG') %></a>
+    <a href="#" class="btn_line" id="oa_png"><%= sprite_icon('download', 'PNG') %></a>
+    <%= link_to sprite_icon('download', '.md'), project_ops_interfaces_diagram_path(@project, :download => 'md'), :class => 'btn_line' %>
+    <%= link_to sprite_icon('download', '.mmd'), project_ops_interfaces_diagram_path(@project, :download => 'mmd'), :class => 'btn_line' %>
+    <%= link_to sprite_icon('download', 'draw.io'), project_ops_interfaces_diagram_path(@project, :download => 'drawio'), :class => 'btn_line' %>
+  </p>
+  <p class="db_info"><%= l(:text_oa_diagram) %></p>
+  <div class="erd_view" id="oa_view"><p class="erd_loading"><%= l(:label_oa_drawing) %></p></div>
+  <pre id="oa_src" hidden><%= @mermaid %></pre>
+  <details class="erd_text"><summary><%= l(:label_oa_mermaid_src) %></summary><pre class="db_sql"><code><%= @mermaid %></code></pre></details>
+  <%= javascript_tag do %>
+  $(function() {
+    var base = <%= raw "연계구성도_#{@project.identifier}_#{User.current.today.strftime('%Y%m%d')}".to_json %>, svgEl = null, $v = $('#oa_view');
+    window.krdsMermaid().then(function(mm) { return mm.render('oa_svg_out', $('#oa_src').text()); })
+      .then(function(r) { $v.html(r.svg); svgEl = $v.find('svg')[0]; })
+      .catch(function(e) { $v.html('<p class="db_hintbox"></p>').find('p').text(<%= raw l(:text_oa_draw_error).to_json %> + ' ' + (e && e.message ? e.message : '')); });
+    $('#oa_svg').on('click', function(e) { e.preventDefault(); if (svgEl) window.krdsSaveSvg(svgEl, base); });
+    $('#oa_png').on('click', function(e) { e.preventDefault(); if (svgEl) window.krdsSavePng(svgEl, base); });
+  });
+  <% end %>
+<% end %>
+<% html_title l(:label_oa_if_diagram) %>

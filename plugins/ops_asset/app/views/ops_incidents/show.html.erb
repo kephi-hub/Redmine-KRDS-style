@@ -1,0 +1,26 @@
+<% can_edit = User.current.allowed_to?(:manage_ops_logs, @project) %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_ops_incident_path(@project, @incident), :class => 'icon icon-edit' %>
+    <%= link_to sprite_icon('del', l(:button_delete)), project_ops_incident_path(@project, @incident), :method => :delete, :data => { :confirm => l(:text_are_you_sure) }, :class => 'icon icon-del' %><% end %>
+  <% if !@incident.issue && User.current.allowed_to?(:add_issues, @project) %>
+    <%= link_to sprite_icon('add', l(:label_oa_make_issue)), new_project_issue_path(@project, :issue => { :subject => "[장애] #{@incident.title}", :description => "장애 발생: #{oa_time(@incident.occurred_at)}\n\n■ 영향\n#{@incident.impact}\n\n■ 원인\n#{@incident.cause}" }), :class => 'icon icon-add' %>
+  <% end %>
+</div>
+<h2><%= link_to l(:label_oa_incidents), project_ops_incidents_path(@project) %> &#187; <%= @incident.title %></h2>
+<div class="qa_box">
+  <p class="qa_meta"><%= oa_badge(l(:label_oa_grade_n, :n => @incident.grade), "g#{@incident.grade}") %> <span class="mt_yn <%= 'on' if @incident.status == 'closed' %>"><%= oa_label('status', @incident.status) %></span>
+    <% if @incident.issue %><%= link_to "##{@incident.issue_id} #{@incident.issue.subject}", issue_path(@incident.issue) %><% end %></p>
+  <dl class="db_props">
+    <div><dt><%= l(:label_oa_occurred) %></dt><dd><%= oa_time(@incident.occurred_at) %></dd></div>
+    <div><dt><%= l(:label_oa_detected) %></dt><dd><%= oa_time(@incident.detected_at) || '-' %><% if @incident.detect_min %> <span class="db_dim">(+<%= oa_minutes(@incident.detect_min) %>)</span><% end %></dd></div>
+    <div><dt><%= l(:label_oa_recovered) %></dt><dd><%= oa_time(@incident.recovered_at) || l(:label_oa_not_recovered) %></dd></div>
+    <div><dt><%= l(:label_oa_downtime) %></dt><dd><strong><%= oa_minutes(@incident.downtime_min) %></strong></dd></div>
+    <div><dt><%= l(:label_oa_target) %></dt><dd><%= [@incident.ops_asset&.name, @incident.target].compact.join(' · ').presence || '-' %></dd></div>
+  </dl>
+  <dl class="qa_steps">
+    <% { :label_oa_impact => @incident.impact, :label_oa_cause => @incident.cause, :label_oa_action => @incident.action, :label_oa_prevention => @incident.prevention }.each do |k, v| %>
+      <dt><%= l(k) %></dt><dd><%= v.present? ? simple_format(h(v)) : '-' %></dd>
+    <% end %>
+  </dl>
+</div>
+<% html_title @incident.title %>

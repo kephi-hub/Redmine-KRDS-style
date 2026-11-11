@@ -1,0 +1,34 @@
+<%= error_messages_for @schedule %>
+<div class="box tabular">
+  <p><%= f.text_field :name, :required => true, :size => 50, :maxlength => 150, :label => :label_oa_sched_name %></p>
+  <p><%= f.select :kind, oa_options('skind', OpsSchedule::KINDS), { :label => :label_oa_kind }, :id => 'oa_kind' %></p>
+  <p><%= f.select :ops_asset_id, oa_asset_options(@project), { :include_blank => true, :label => :label_oa_server } %>
+    <em class="info"><%= l(:text_oa_server_hint) %></em></p>
+  <p><%= f.text_field :expression, :size => 40, :maxlength => 255, :placeholder => '0 2 * * *', :label => :label_oa_expr, :id => 'oa_expr' %>
+    <span class="oa_preview" id="oa_preview" data-url="<%= project_ops_schedules_preview_path(@project) %>" role="status" aria-live="polite"></span>
+    <em class="info"><%= l(:text_oa_expr) %></em></p>
+  <p><%= f.text_area :command, :rows => 3, :cols => 60, :placeholder => '/opt/batch/daily_stat.sh >> /var/log/daily.log 2>&1', :label => :label_oa_command %></p>
+  <p><%= f.text_field :run_as, :size => 20, :maxlength => 60, :label => :label_oa_run_as %></p>
+  <p><%= f.number_field :duration_min, :min => 0, :max => 99999, :label => :label_oa_duration_min %></p>
+  <p><%= f.text_area :depends_on, :rows => 2, :cols => 60, :label => :label_oa_depends %></p>
+  <p><%= f.text_area :on_failure, :rows => 3, :cols => 60, :placeholder => l(:text_oa_on_failure_ph), :label => :label_oa_on_failure %></p>
+  <p><%= f.text_field :owner, :size => 30, :maxlength => 120, :label => :label_oa_owner %></p>
+  <p><%= f.text_area :related, :rows => 2, :cols => 60, :placeholder => l(:text_oa_related_ph), :label => :label_oa_related %></p>
+  <p><%= f.text_area :note, :rows => 2, :cols => 60, :label => :label_oa_note %></p>
+  <p><%= f.check_box :active, :label => :field_active %></p>
+</div>
+<%= javascript_tag do %>
+$(function() {
+  var $e = $('#oa_expr'), $k = $('#oa_kind'), $p = $('#oa_preview'), timer;
+  function go() {
+    clearTimeout(timer);
+    timer = setTimeout(function() {
+      if (!$e.val()) { $p.text('').removeClass('db_fail on'); return; }
+      $.getJSON($p.data('url'), { expression: $e.val(), kind: $k.val() }).done(function(r) {
+        $p.toggleClass('on', !!r.ok).toggleClass('db_fail', !r.ok).text(r.text + (r.next && r.next.length ? ' · ' + <%= raw l(:label_oa_next).to_json %> + ' ' + r.next.slice(0, 3).join(', ') : ''));
+      });
+    }, 300);
+  }
+  $e.on('input', go); $k.on('change', go); go();
+});
+<% end %>

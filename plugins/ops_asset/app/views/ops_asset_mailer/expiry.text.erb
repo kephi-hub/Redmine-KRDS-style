@@ -1,0 +1,4 @@
+만료가 다가왔거나 지난 자산입니다.
+<% @assets.each do |a| %>
+- <%= OpsKit::Sheet::LABEL['kind'][a.kind] %> <%= a.name %><%= " (#{a.address})" if a.address.present? %> : <%= a.expires_on %> <%= (d = a.days_left(@today)).negative? ? "만료됨 (#{-d}일 지남)" : (d.zero? ? '오늘 만료' : "#{d}일 남음") %><%= " / #{a.shared? ? '공용' : a.project.name}" %>
+<% end %>

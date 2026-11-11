@@ -1,0 +1,37 @@
+<%# 프로젝트 > 스케줄러 — 24시간 타임라인 %>
+<%= render :partial => 'ops_schedules/head', :locals => { :current => :timeline } %>
+<%= form_tag(project_ops_schedules_timeline_path(@project), :method => :get, :class => 'qa_filter') do %>
+  <%= date_field_tag 'date', @date, :'aria-label' => l(:label_date) %>
+  <%= submit_tag l(:label_oa_filter), :name => nil %>
+  <%= link_to l(:label_oa_prev_day), project_ops_schedules_timeline_path(@project, :date => @date - 1), :class => 'qa_clear' %>
+  <%= link_to l(:label_oa_next_day), project_ops_schedules_timeline_path(@project, :date => @date + 1), :class => 'qa_clear' %>
+<% end %>
+<p class="db_info"><%= l(:text_oa_timeline, :date => format_date(@date), :count => @hours.sum) %></p>
+<% if @rows.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="oa_tl">
+  <thead><tr><th class="name"><%= l(:label_oa_sched_name) %></th><% 24.times do |h| %><th><%= format('%02d', h) %></th><% end %><th><%= l(:label_oa_runs) %></th></tr></thead>
+  <tbody>
+    <tr class="oa_sum"><th class="name"><%= l(:label_oa_tl_total) %></th>
+      <% @hours.each do |n| %><td data-k="<%= n.zero? ? 0 : (n == @peak && n > 1 ? 'peak' : 'on') %>"><%= n.positive? ? n : '' %></td><% end %><td><%= @hours.sum %></td></tr>
+    <% @rows.each do |s, runs| %>
+      <% per = Array.new(24, 0); runs&.each { |t| per[t.hour] += 1 } %>
+      <tr><th class="name"><%= link_to s.name, project_ops_schedule_path(@project, s) %><span class="db_dim db_pvsub"><%= s.ops_asset&.name %> · <%= s.describe %></span></th>
+        <% if runs.nil? %><td colspan="24" class="oa_na"><%= l(:text_oa_tl_na) %></td><td>-</td>
+        <% else %><% per.each_with_index do |n, h| %><td data-k="<%= n.zero? ? 0 : 'on' %>" title="<%= runs.select { |t| t.hour == h }.first(12).map { |t| t.strftime('%H:%M') }.join(' ') %>"><%= n > 1 ? n : (n == 1 ? runs.find { |t| t.hour == h }.strftime(':%M') : '') %></td><% end %><td><%= runs.size %></td><% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+<h3><%= l(:label_oa_overlaps) %> <span class="db_dim"><%= @overlaps.size %></span></h3>
+<% if @overlaps.empty? %>
+  <p class="db_allsame"><%= l(:text_oa_no_overlaps) %></p>
+<% else %>
+  <ul class="mt_nolist"><% @overlaps.each do |a, b, from, to| %><li><strong><%= a.ops_asset&.name %></strong> — <%= link_to a.name, project_ops_schedule_path(@project, a) %> ↔ <%= link_to b.name, project_ops_schedule_path(@project, b) %> <span class="db_dim"><%= from.strftime('%H:%M') %>~<%= to.strftime('%H:%M') %></span></li><% end %></ul>
+<% end %>
+<p class="mt_help"><%= l(:text_oa_overlaps) %></p>
+<% end %>
+<% html_title l(:label_oa_timeline) %>

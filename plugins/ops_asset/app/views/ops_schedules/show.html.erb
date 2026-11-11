@@ -1,0 +1,31 @@
+<% can_edit = User.current.allowed_to?(:manage_ops_schedules, @project) %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_ops_schedule_path(@project, @schedule), :class => 'icon icon-edit' %>
+    <%= link_to sprite_icon('del', l(:button_delete)), project_ops_schedule_path(@project, @schedule), :method => :delete, :data => { :confirm => l(:text_are_you_sure) }, :class => 'icon icon-del' %><% end %>
+</div>
+<h2><%= link_to l(:label_oa_schedules), project_ops_schedules_path(@project) %> &#187; <%= @schedule.name %></h2>
+<div class="qa_box">
+  <p class="qa_meta"><%= oa_badge(oa_label('skind', @schedule.kind), 'kind') %> <span class="mt_yn <%= 'on' if @schedule.active? %>"><%= @schedule.active? ? l(:general_text_Yes) : l(:general_text_No) %></span>
+    <% if @schedule.source != 'manual' %><span class="db_dim"><%= l("label_oa_src_#{@schedule.source}") %></span><% end %></p>
+  <dl class="db_props">
+    <div><dt><%= l(:label_oa_expr) %></dt><dd><strong><%= @schedule.describe %></strong><% if @schedule.expression.present? %> <code><%= @schedule.expression %></code><% end %></dd></div>
+    <div><dt><%= l(:label_oa_server) %></dt><dd><%= @schedule.ops_asset ? "#{@schedule.ops_asset.name} #{@schedule.ops_asset.address}" : '-' %></dd></div>
+    <div><dt><%= l(:label_oa_run_as) %></dt><dd><%= @schedule.run_as.presence || '-' %></dd></div>
+    <div><dt><%= l(:label_oa_duration) %></dt><dd><%= oa_minutes(@schedule.duration_min) %></dd></div>
+    <div><dt><%= l(:label_oa_owner) %></dt><dd><%= @schedule.owner.presence || '-' %></dd></div>
+  </dl>
+  <dl class="qa_steps">
+    <dt><%= l(:label_oa_command) %></dt><dd><% if @schedule.command.present? %><pre class="db_sql"><code><%= @schedule.command %></code></pre><% else %>-<% end %></dd>
+    <% { :label_oa_depends => @schedule.depends_on, :label_oa_on_failure => @schedule.on_failure, :label_oa_related => @schedule.related, :label_oa_note => @schedule.note }.each do |k, v| %>
+      <% if v.present? %><dt><%= l(k) %></dt><dd><%= simple_format(h(v)) %></dd><% end %>
+    <% end %>
+  </dl>
+</div>
+<h3><%= l(:label_oa_next_runs) %></h3>
+<% if @next.any? %><ul class="mt_nolist"><% @next.each do |t| %><li><%= oa_time(t) %> <span class="db_dim">(<%= %w(일 월 화 수 목 금 토)[t.wday] %>)</span></li><% end %></ul>
+<% else %><p class="nodata"><%= l(:text_oa_no_next) %></p><% end %>
+<% if (ifs = @schedule.ops_interfaces.to_a).any? %>
+  <h3><%= l(:label_oa_interfaces) %></h3>
+  <ul class="mt_nolist"><% ifs.each do |i| %><li><%= link_to "#{i.code} #{i.name}", project_ops_interface_path(@project, i) %></li><% end %></ul>
+<% end %>
+<% html_title @schedule.name %>

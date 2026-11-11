@@ -35,6 +35,10 @@ en:
   label_access_area_sysroles: System roles
   label_access_area_requirements: Requirements
   label_access_area_tests: Tests
+  label_access_area_assets: Assets
+  label_access_area_schedules: Schedules
+  label_access_area_opslogs: Checks & incidents
+  label_access_area_interfaces: Interfaces
   label_access_area_project: "Project settings and members"
   label_access_area_issues: "Issues"
   label_access_area_time: "Spent time"

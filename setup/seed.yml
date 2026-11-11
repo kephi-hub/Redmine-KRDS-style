@@ -121,6 +121,14 @@ roles:
   - view_qa_requirements
   - manage_qa_requirements
   - view_qa_tests
+  - view_ops_assets
+  - manage_ops_assets
+  - view_ops_schedules
+  - manage_ops_schedules
+  - view_ops_logs
+  - manage_ops_logs
+  - view_ops_interfaces
+  - manage_ops_interfaces
   - run_qa_tests
   - manage_qa_tests
   - view_db_schema
@@ -223,6 +231,13 @@ roles:
   - manage_sys_roles
   - view_qa_requirements
   - view_qa_tests
+  - view_ops_assets
+  - view_ops_schedules
+  - manage_ops_schedules
+  - view_ops_logs
+  - manage_ops_logs
+  - view_ops_interfaces
+  - manage_ops_interfaces
   - run_qa_tests
   - manage_qa_tests
   - view_db_schema
@@ -287,6 +302,10 @@ roles:
   - manage_menu_tree
   - view_qa_requirements
   - view_qa_tests
+  - view_ops_assets
+  - view_ops_schedules
+  - view_ops_logs
+  - view_ops_interfaces
   - run_qa_tests
   - add_issues
   - edit_issues
@@ -344,6 +363,10 @@ roles:
   - view_sys_roles
   - view_qa_requirements
   - view_qa_tests
+  - view_ops_assets
+  - view_ops_schedules
+  - view_ops_logs
+  - view_ops_interfaces
 
 # 일감 상태 — 보류는 개발자·디자이너가 쓰는 "잠시 멈춤" 이라 열린 상태
 issue_statuses:

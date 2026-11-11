@@ -1,0 +1,19 @@
+<% can_edit = User.current.allowed_to?(:manage_ops_logs, @project) %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_ops_check_path(@project, @check), :class => 'icon icon-edit' %>
+    <%= link_to sprite_icon('del', l(:button_delete)), project_ops_check_path(@project, @check), :method => :delete, :data => { :confirm => l(:text_are_you_sure) }, :class => 'icon icon-del' %><% end %>
+</div>
+<h2><%= link_to l(:label_oa_checks), project_ops_checks_path(@project) %> &#187; <%= @check.name %></h2>
+<p class="subtitle"><%= format_date(@check.checked_on) %> · <%= @check.user %></p>
+<div class="autoscroll">
+<table class="list oa_list">
+  <thead><tr><th>No</th><th class="name"><%= l(:label_oa_item) %></th><th><%= l(:label_oa_result) %></th><th class="name"><%= l(:label_oa_check_action) %></th></tr></thead>
+  <tbody>
+  <% @check.result_list.each_with_index do |r, i| %>
+    <tr><td><%= i + 1 %></td><td class="name"><%= r['item'] %></td><td><%= oa_badge(oa_label('check', r['result']), "c#{r['result']}") %></td><td class="name"><%= r['action'] %></td></tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<% if @check.note.present? %><div class="qa_box"><%= simple_format(h(@check.note)) %></div><% end %>
+<% html_title @check.name %>

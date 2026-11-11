@@ -1,0 +1,9 @@
+<%# 점검·장애 공통 머리 (locals: current) %>
+<% can_edit = User.current.allowed_to?(:manage_ops_logs, @project) %>
+<div class="contextual">
+  <% if can_edit && current == :incidents %><%= link_to sprite_icon('add', l(:label_oa_incident_new)), new_project_ops_incident_path(@project), :class => 'icon icon-add' %><% end %>
+  <% if can_edit && current == :checks %><%= link_to sprite_icon('add', l(:label_oa_tpl_new)), new_project_ops_check_template_path(@project), :class => 'icon icon-add' %><% end %>
+</div>
+<h2><%= l(:label_oa_logs) %></h2>
+<p class="subtitle"><%= l(:text_oa_logs) %></p>
+<%= oa_log_tabs(current) %>

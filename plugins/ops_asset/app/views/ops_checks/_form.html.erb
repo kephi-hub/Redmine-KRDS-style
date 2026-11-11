@@ -1,0 +1,21 @@
+<%= error_messages_for @check %>
+<%= hidden_field_tag 'ops_check[ops_check_template_id]', @check.ops_check_template_id, :id => nil %>
+<div class="box tabular">
+  <p><%= f.text_field :name, :required => true, :size => 50, :maxlength => 120, :label => :label_oa_check_name %></p>
+  <p><%= f.date_field :checked_on, :required => true, :label => :label_oa_checked_on %><%= calendar_for('ops_check_checked_on') %></p>
+</div>
+<div class="autoscroll">
+<table class="list oa_list oa_items" id="oa_items">
+  <thead><tr><th class="name"><%= l(:label_oa_item) %></th><th><%= l(:label_oa_result) %></th><th class="name"><%= l(:label_oa_check_action) %></th></tr></thead>
+  <tbody>
+  <% (@check.result_list + [{ 'item' => '', 'result' => 'ok' }] * 2).each_with_index do |r, i| %>
+    <tr>
+      <td class="name"><%= text_field_tag "items[#{i}][item]", r['item'], :id => nil, :class => 'oa_wide', :'aria-label' => l(:label_oa_item), :placeholder => (r['item'].blank? ? l(:label_oa_item_add) : nil) %></td>
+      <td><%= select_tag "items[#{i}][result]", options_for_select(OpsCheck::RESULTS.map { |k| [oa_label('check', k), k] }, r['result']), :id => nil, :'aria-label' => l(:label_oa_result) %></td>
+      <td class="name"><%= text_field_tag "items[#{i}][action]", r['action'], :id => nil, :class => 'oa_wide', :'aria-label' => l(:label_oa_check_action) %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<div class="box tabular"><p><%= f.text_area :note, :rows => 3, :cols => 60, :label => :label_oa_note %></p></div>

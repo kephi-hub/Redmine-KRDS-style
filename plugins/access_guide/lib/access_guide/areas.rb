@@ -26,6 +26,10 @@ module AccessGuide
     { key: 'sysroles', view: %i[view_sys_roles], write: %i[], manage: %i[manage_sys_roles] },
     { key: 'requirements', view: %i[view_qa_requirements], write: %i[manage_qa_requirements], manage: %i[] },
     { key: 'tests', view: %i[view_qa_tests], write: %i[run_qa_tests], manage: %i[manage_qa_tests] },
+    { key: 'assets', view: %i[view_ops_assets], write: %i[], manage: %i[manage_ops_assets] },
+    { key: 'schedules', view: %i[view_ops_schedules], write: %i[manage_ops_schedules], manage: %i[] },
+    { key: 'opslogs', view: %i[view_ops_logs], write: %i[manage_ops_logs], manage: %i[] },
+    { key: 'interfaces', view: %i[view_ops_interfaces], write: %i[manage_ops_interfaces], manage: %i[] },
     { key: 'calendar', view: %i[view_calendar view_gantt], write: %i[], manage: %i[] },
   ].freeze
 

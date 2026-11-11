@@ -5,3 +5,7 @@
 # DB 관리: 프로젝트 DB 구조를 매일 새벽 3시에 저장 (바뀐 경우만, 변경 이력 화면에서 비교)
 # 설치: /etc/cron.d/redmine_db_snapshot 로 저장 (경로는 서버의 Redmine 폴더로)
 0 3 * * * root cd /root/redmine && docker compose exec -T -u redmine redmine sh -c 'SECRET_KEY_BASE=$REDMINE_SECRET_KEY_BASE bundle exec rake redmine:db_manage:snapshot' >> /var/log/redmine_db_snapshot.log 2>&1
+
+# 자산 만료 알림 메일 (만료 30·7·1일 전·당일·다음 날) — 관리 > 메일 서버에서 메일 발송을 켜야 보냄
+# 설치: /etc/cron.d/redmine_asset_notify 로 저장
+10 8 * * * root cd /root/redmine && docker compose exec -T -u redmine redmine sh -c 'SECRET_KEY_BASE=$REDMINE_SECRET_KEY_BASE bundle exec rake redmine:ops_asset:notify' >> /var/log/redmine_asset_notify.log 2>&1

@@ -1,0 +1,264 @@
+ko:
+  project_module_ops_assets: 자산
+  project_module_ops_schedules: 스케줄러
+  project_module_ops_logs: 점검·장애
+  project_module_ops_interfaces: 인터페이스
+  permission_view_ops_assets: 자산 보기
+  permission_manage_ops_assets: 자산 편집
+  permission_view_ops_schedules: 스케줄러 보기
+  permission_manage_ops_schedules: 스케줄러 편집
+  permission_view_ops_logs: 점검·장애 보기
+  permission_manage_ops_logs: 점검·장애 기록
+  permission_view_ops_interfaces: 인터페이스 보기
+  permission_manage_ops_interfaces: 인터페이스 편집
+  label_oa_assets: 자산
+  label_oa_schedules: 스케줄러
+  label_oa_logs: 점검·장애
+  label_oa_interfaces: 인터페이스
+  label_oa_admin_assets: 자산 대장
+  label_oa_filter: 찾기
+  label_oa_clear: 초기화
+  label_oa_export: 엑셀 내보내기
+  label_oa_note: 비고
+  label_oa_owner: 담당
+  label_oa_kind: 종류
+  label_oa_kind_all: 모든 종류
+  label_oa_pick_all: 모두 고르기
+  label_oa_save_continue: 저장 후 계속 등록
+  label_oa_m: "%{m}분"
+  label_oa_hm: "%{h}시간 %{m}분"
+  # 자산
+  text_oa_assets: 이 프로젝트의 서버·도메인·SSL 인증서·라이선스·클라우드·장비입니다. 프로젝트 자산과, 관리자가 등록한 공용 자산 중 연결한 것이 보입니다.
+  text_oa_admin_assets: 모든 프로젝트의 자산과 공용 자산입니다. 공용 자산은 여러 프로젝트에 연결할 수 있습니다.
+  label_oa_asset_new: 새 자산
+  label_oa_shared_new: 새 공용 자산
+  label_oa_name: 이름
+  label_oa_env: 구분
+  label_oa_address: 주소 (IP·도메인)
+  label_oa_spec: OS · 사양
+  label_oa_vendor: 공급사 · 계약처
+  label_oa_expires: 만료일
+  text_oa_expires: 인증서·도메인·라이선스 만료일. 30일·7일·1일 전과 당일에 화면 표시, 메일 발송이 켜져 있으면 알림 메일(매일 cron)
+  label_oa_renew: 갱신 주기
+  label_oa_db_server: DB 서버
+  label_oa_jenkins: Jenkins 서버
+  text_oa_secret: 계정·비밀번호는 여기에 적지 말고 접속정보(Vault)에 등록하세요.
+  label_oa_linked_projects: 연결 프로젝트
+  label_oa_k_all: 전체 자산
+  label_oa_k_expired: 만료됨
+  label_oa_k_soon7: 7일 이내 만료
+  label_oa_k_soon30: 30일 이내 만료
+  label_oa_k_server: 서버
+  label_oa_k_cert: 도메인 · 인증서
+  label_oa_search: 이름 · 주소 · 담당으로 찾기
+  label_oa_scope: 소속
+  label_oa_belongs: 소속 · 연결
+  label_oa_shared: 공용
+  label_oa_project_own: 프로젝트
+  label_oa_scope_all: 전체
+  label_oa_scope_project: 프로젝트 자산
+  label_oa_link_shared: 공용 자산 연결
+  label_oa_link: 연결
+  label_oa_unlink: 연결 해제
+  text_oa_unlink: 이 공용 자산을 프로젝트에서 연결 해제합니다(자산은 남음). 계속할까요?
+  text_oa_asset_delete: 이 자산을 지웁니다. 이 자산을 쓰는 스케줄의 실행 서버는 비워집니다. 계속할까요?
+  label_oa_today: 오늘 만료
+  label_oa_days_left: "%{count}일 남음"
+  label_oa_expired_days: "만료 %{count}일 지남"
+  notice_ops_asset_linked: "%{name} 을(를) 연결했습니다."
+  notice_ops_asset_unlinked: 연결을 해제했습니다.
+  text_oa_notify_on: "메일 알림 켜짐 — 오늘 알림 대상 %{count}건 (매일 cron 으로 rake redmine:ops_asset:notify)"
+  text_oa_notify_off: "메일 발송이 꺼져 있어 화면으로만 알립니다 (관리 > 메일 서버). 오늘 알림 대상 %{count}건"
+  label_oa_asset: 대상 자산
+  # 스케줄러
+  text_oa_schedules: 서버의 cron, 애플리케이션의 Spring·Quartz 스케줄, Windows 작업, Jenkins 주기 빌드, DB 잡을 한곳에 정리합니다.
+  label_oa_sched_list: 목록
+  label_oa_timeline: 24시간 타임라인
+  label_oa_sched_new: 새 스케줄
+  label_oa_sched_export: 배치 정의서
+  label_oa_import: 가져오기
+  label_oa_sk_all: 전체 작업
+  label_oa_sk_active: 사용 중
+  label_oa_sk_servers: 실행 서버
+  label_oa_sk_today: 오늘 실행 횟수
+  label_oa_sk_unparsed: 일정 해석 불가
+  label_oa_server: 실행 서버
+  label_oa_server_all: 모든 서버
+  label_oa_sched_search: 작업명 · 명령 · 담당으로 찾기
+  label_oa_include_off: 사용 안 하는 작업도
+  text_oa_sched_empty: "[가져오기] 에서 crontab -l 결과를 붙여 넣거나, DB 잡 · Jenkins 주기 빌드를 불러올 수 있습니다."
+  label_oa_sched_name: 작업명
+  label_oa_expr: 일정
+  label_oa_next: 다음 실행
+  label_oa_next_runs: 다음 실행 (10회)
+  text_oa_no_next: 계산할 수 없는 일정입니다 (사용 안 함, 형식 오류, 또는 글로 적은 일정).
+  label_oa_command: 실행 명령 · 클래스
+  label_oa_run_as: 실행 계정
+  label_oa_duration: 예상 소요
+  label_oa_duration_min: 예상 소요(분)
+  label_oa_depends: 선행 · 후행 작업
+  label_oa_on_failure: 실패 시 영향 · 재처리
+  text_oa_on_failure_ph: "예: 통계 화면 전일 자료 미표시 → 수동 재실행 /opt/batch/daily_stat.sh 2026-11-10"
+  label_oa_related: 관련 테이블 · 메뉴
+  text_oa_related_ph: "예: TB_STAT_DAILY, 관리자 > 통계"
+  text_oa_server_hint: 자산 메뉴에 등록한 서버 중에서 고릅니다.
+  text_oa_expr: "cron 5칸(분 시 일 월 요일) · Spring·Quartz 6칸(초 포함) · @daily 등. Windows·DB 잡은 글로 적어도 됩니다."
+  text_oa_no_cron: 이 종류는 일정을 글로만 보여 줍니다.
+  label_oa_src: 출처
+  label_oa_src_manual: 직접 등록
+  label_oa_src_crontab: crontab 가져옴
+  label_oa_src_db_job: DB 잡 가져옴
+  label_oa_src_jenkins: Jenkins 가져옴
+  label_oa_prev_day: ← 전날
+  label_oa_next_day: 다음날 →
+  text_oa_timeline: "%{date} 실행 예정 %{count}회 — 칸의 숫자는 그 시간의 실행 횟수(1회면 실행 분), 가장 몰린 시간은 진하게 표시합니다."
+  label_oa_runs: 횟수
+  label_oa_tl_total: 시간대 합계
+  text_oa_tl_na: 일정을 계산할 수 없음
+  label_oa_overlaps: 같은 서버에서 겹치는 작업
+  text_oa_no_overlaps: 겹치는 작업이 없습니다.
+  text_oa_overlaps: 같은 실행 서버에서 실행 시작부터 예상 소요 시간까지 겹치는 작업입니다. 예상 소요(분)를 적지 않은 작업은 1분으로 봅니다.
+  text_oa_import: "같은 서버 · 같은 일정 · 같은 명령은 한 번만 등록되고, 다시 가져오면 값만 갱신됩니다."
+  label_oa_imp_crontab: crontab 붙여넣기
+  label_oa_imp_db: DB 잡
+  label_oa_imp_jenkins: Jenkins 주기 빌드
+  text_oa_imp_server: 이 crontab 이 있는 서버
+  label_oa_imp_system: 시스템 crontab
+  text_oa_imp_system: /etc/crontab · /etc/cron.d 형식(시각 다음에 실행 계정)이면 켜세요.
+  text_oa_imp_crontab: "주석(#)·환경변수 줄은 건너뛰고, 작업명은 스크립트 파일 이름으로 정합니다. 해석하지 못한 줄은 알려 드립니다."
+  text_oa_imp_db: 이 프로젝트에 연결된 DB 에서 이벤트 · pg_cron · Oracle 스케줄러 · SQL Server 에이전트 작업을 읽었습니다. 가져올 작업을 고르세요.
+  text_oa_imp_jenkins: 배포 대상 Jenkins 작업의 "빌드 주기"·"SCM 폴링" 설정을 읽었습니다. Jenkins 의 H 는 0 으로 보고 계산합니다.
+  label_oa_import_selected: 고른 작업 가져오기
+  label_oa_imported_before: 가져온 적 있음
+  notice_oa_imported: "가져오기를 마쳤습니다. 새로 등록 %{created}개, 값 갱신 %{updated}개"
+  warning_oa_import_skipped: "건너뛴 항목: %{lines}"
+  label_oa_schedule: 연결 스케줄
+  # 점검·장애
+  text_oa_logs: 장애를 기록하고(중단 시간 자동 계산), 점검표 양식으로 정기점검을 남기며, 달마다 운영 보고서를 엑셀로 받습니다.
+  label_oa_incidents: 장애
+  label_oa_checks: 정기점검
+  label_oa_report: 월간 보고서
+  label_oa_incident_new: 장애 기록
+  label_oa_ik_all: 전체 장애
+  label_oa_ik_open: 처리 중
+  label_oa_ik_year: 올해 장애
+  label_oa_ik_downtime: 중단 시간 합계
+  label_oa_ik_grade1: 올해 1등급
+  label_oa_grade: 등급
+  label_oa_grade_n: "%{n}등급"
+  label_oa_grade_desc_1: 1등급 — 전체 서비스 중단
+  label_oa_grade_desc_2: 2등급 — 주요 기능 중단
+  label_oa_grade_desc_3: 3등급 — 일부 기능 장애
+  label_oa_grade_desc_4: 4등급 — 경미 · 우회 가능
+  label_oa_inc_title: 장애 제목
+  label_oa_occurred: 발생 시각
+  label_oa_detected: 인지 시각
+  label_oa_recovered: 복구 시각
+  text_oa_times: 서울 시간 기준. 중단 시간 = 복구 − 발생
+  label_oa_downtime: 중단 시간
+  label_oa_not_recovered: 복구 전
+  label_oa_target: 대상 (서비스 · 메뉴)
+  text_oa_target_ph: "예: 회원 로그인, 결제"
+  label_oa_impact: 영향
+  label_oa_cause: 원인
+  label_oa_action: 조치
+  label_oa_prevention: 재발 방지 대책
+  label_oa_issue: 일감
+  label_oa_make_issue: 일감으로 만들기
+  label_oa_templates: 점검표 양식
+  text_oa_no_templates: 점검표 양식이 없습니다. [새 점검표 양식] 으로 점검 항목을 정해 두면 회차마다 같은 항목으로 점검합니다.
+  label_oa_tpl_new: 새 점검표 양식
+  label_oa_tpl_name: 양식 이름
+  label_oa_tpl_items: 점검 항목
+  text_oa_tpl_items: 한 줄에 하나씩
+  label_oa_tpl_default_name: 월간 정기점검
+  text_oa_tpl_default_items: "서버 CPU · 메모리 · 디스크 사용률\n웹 · WAS 프로세스 상태\nDB 접속 · 용량 · 백업 결과\n로그 오류 확인\nSSL 인증서 · 도메인 만료일\n보안 패치 · 계정 점검\n배치 작업 실패 여부"
+  text_oa_tpl_delete: 이 양식을 지웁니다. 이미 한 점검 기록은 남습니다. 계속할까요?
+  label_oa_items_n: "항목 %{count}개"
+  label_oa_check_start: 이 양식으로 점검
+  label_oa_check_new: 정기점검 기록
+  label_oa_check_name: 점검 이름
+  label_oa_checked_on: 점검일
+  label_oa_checker: 점검자
+  label_oa_item: 점검 항목
+  label_oa_item_add: 항목 추가
+  label_oa_result: 결과
+  label_oa_check_action: 조치 · 메모
+  label_oa_res_ok: 정상
+  label_oa_res_issue: 이상
+  label_oa_res_na: 해당 없음
+  label_oa_month: 달
+  label_oa_report_xlsx: 월간 보고서 엑셀
+  text_oa_report: 엑셀에는 요약 · 장애 · 정기점검(항목별) · 일감 처리 · 배포 이력 · DB 구조 변경 · 만료 예정 자산 시트가 들어갑니다.
+  label_oa_rk_issues: 일감 등록 / 완료
+  label_oa_rk_deploys: 배포
+  label_oa_rk_snapshots: DB 구조 변경
+  label_oa_rk_expiring: 만료 예정 자산 (다음 달까지)
+  text_oa_no_incidents: 이 달에는 장애가 없습니다.
+  text_oa_no_expiring: 만료 예정 자산이 없습니다.
+  label_oa_created: 등록
+  label_oa_closed: 완료
+  label_oa_open_at_end: "월말 미완료 일감 %{count}건"
+  label_oa_snap_sum: "추가 %{add} · 삭제 %{del} · 변경 %{chg} · 객체 %{obj}"
+  label_oa_snap_first: 첫 저장본
+  # 인터페이스
+  text_oa_interfaces: 다른 시스템 · 기관과 주고받는 연계를 정리합니다. 인증정보는 접속정보(Vault)에 두고 여기에는 위치만 적으세요.
+  label_oa_if_list: 목록
+  label_oa_if_diagram: 구성도
+  label_oa_if_new: 새 인터페이스
+  label_oa_if_export: 인터페이스 정의서
+  label_oa_fk_all: 전체 연계
+  label_oa_fk_partners: 상대 시스템
+  label_oa_fk_send: 송신
+  label_oa_fk_recv: 수신
+  label_oa_fk_realtime: 실시간
+  label_oa_partner: 상대 시스템 · 기관
+  label_oa_partner_all: 모든 상대
+  label_oa_if_search: ID · 이름 · 데이터로 찾기
+  label_oa_if_code: 인터페이스 ID
+  text_oa_if_code: 비워 두면 IF-001 처럼 자동
+  label_oa_if_name: 인터페이스명
+  label_oa_direction: 방향
+  label_oa_protocol: 방식
+  label_oa_cycle: 주기
+  label_oa_data_desc: 주고받는 데이터
+  label_oa_tables: 관련 테이블
+  label_oa_dev_url: 개발 주소
+  label_oa_prod_url: 운영 주소
+  label_oa_our_owner: 우리 쪽 담당
+  label_oa_partner_owner: 상대 쪽 담당
+  label_oa_partner_contact: 상대 연락처
+  label_oa_auth_note: 인증 방식 · 위치
+  text_oa_auth_ph: "예: API 키 — 접속정보(Vault) '나이스 API'"
+  text_oa_diagram: 우리 시스템을 가운데 두고 상대 시스템별 연계를 화살표로 그립니다 (중지된 연계 제외). 선 글자는 인터페이스 ID · 방식입니다.
+  label_oa_drawing: 그리는 중…
+  label_oa_mermaid_src: Mermaid 원문
+  text_oa_draw_error: 구성도를 그리지 못했습니다.
+  activerecord:
+    attributes:
+      ops_asset:
+        name: 이름
+        kind: 종류
+        env: 구분
+        address: 주소
+      ops_schedule:
+        name: 작업명
+        kind: 종류
+        ops_asset_id: 실행 서버
+        expression: 일정
+        duration_min: 예상 소요
+      ops_incident:
+        title: 장애 제목
+        occurred_at: 발생 시각
+        detected_at: 인지 시각
+        recovered_at: 복구 시각
+      ops_check:
+        name: 점검 이름
+        checked_on: 점검일
+      ops_check_template:
+        name: 양식 이름
+      ops_interface:
+        code: 인터페이스 ID
+        name: 인터페이스명
+        partner: 상대 시스템
+        ops_schedule_id: 연결 스케줄

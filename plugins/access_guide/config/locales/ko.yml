@@ -37,6 +37,10 @@ ko:
   label_access_area_sysroles: 시스템 권한
   label_access_area_requirements: 요구사항
   label_access_area_tests: 테스트
+  label_access_area_assets: 자산
+  label_access_area_schedules: 스케줄러
+  label_access_area_opslogs: 점검·장애
+  label_access_area_interfaces: 인터페이스
   label_access_area_project: 프로젝트 설정·구성원
   label_access_area_issues: 일감
   label_access_area_time: 소요시간

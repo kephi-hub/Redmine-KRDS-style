@@ -1,0 +1,48 @@
+<%# 스케줄 가져오기 — crontab 붙여넣기 / DB 잡 / Jenkins 주기 빌드 %>
+<h2><%= link_to l(:label_oa_schedules), project_ops_schedules_path(@project) %> &#187; <%= l(:label_oa_import) %></h2>
+<p class="subtitle"><%= l(:text_oa_import) %></p>
+<div class="tabs"><ul>
+  <li><%= link_to l(:label_oa_imp_crontab), project_ops_schedules_import_path(@project), :class => (@from.nil? || @from == 'crontab' ? 'selected' : nil) %></li>
+  <% if @project.module_enabled?(:db_manage) %><li><%= link_to l(:label_oa_imp_db), project_ops_schedules_import_path(@project, :from => 'db'), :class => (@from == 'db' ? 'selected' : nil) %></li><% end %>
+  <% if @project.module_enabled?(:jenkins_deploy) %><li><%= link_to l(:label_oa_imp_jenkins), project_ops_schedules_import_path(@project, :from => 'jenkins'), :class => (@from == 'jenkins' ? 'selected' : nil) %></li><% end %>
+</ul></div>
+<% if @from == 'db' || @from == 'jenkins' %>
+  <% jobs = @from == 'db' ? @db_jobs : @jk_jobs %>
+  <% errs = @from == 'db' ? @db_errors : @jk_errors %>
+  <p class="db_info"><%= l(@from == 'db' ? :text_oa_imp_db : :text_oa_imp_jenkins) %></p>
+  <% errs.each do |e| %><p class="db_hintbox"><%= e %></p><% end %>
+  <% if jobs.empty? %><p class="nodata"><%= l(:label_no_data) %></p><% else %>
+  <%= form_tag(project_ops_schedules_import_path(@project)) do %>
+    <%= hidden_field_tag 'from', @from, :id => nil %>
+    <div class="autoscroll"><table class="list oa_list">
+      <thead><tr><th class="pick"><input type="checkbox" id="oa_all" checked aria-label="<%= l(:label_oa_pick_all) %>"></th><th class="name"><%= l(:label_oa_sched_name) %></th><th class="name"><%= l(:label_oa_expr) %></th><th><%= l(:label_oa_src) %></th></tr></thead>
+      <tbody>
+      <% jobs.each do |j| %>
+        <% key = @from == 'db' ? OpsKit::Importer.key_for('db', j[:link].id, j[:key]) : OpsKit::Importer.key_for('jenkins', j[:target].id, j[:label], j[:schedule]) %>
+        <% exists = OpsSchedule.exists?(project_id: @project.id, source_key: key) %>
+        <tr><td class="pick"><%= check_box_tag 'keys[]', key, true, :id => nil, :class => 'oa_pick' %></td>
+          <td class="name"><%= @from == 'db' ? j[:name] : "#{j[:target].name} (#{j[:label]})" %><% if exists %> <%= oa_badge(l(:label_oa_imported_before), 'shared') %><% end %></td>
+          <td class="name"><% s = OpsSchedule.new(kind: @from == 'db' ? 'db_job' : 'jenkins', expression: j[:schedule]) %><%= s.describe %><span class="db_dim db_pvsub"><code><%= j[:schedule] %></code></span></td>
+          <td><%= @from == 'db' ? "#{j[:link].name} · #{j[:status]}" : j[:job] %></td></tr>
+      <% end %>
+      </tbody>
+    </table></div>
+    <p class="form_btns"><%= submit_tag l(:label_oa_import_selected) %></p>
+  <% end %>
+  <% end %>
+<% else %>
+  <%= form_tag(project_ops_schedules_import_path(@project)) do %>
+    <%= hidden_field_tag 'from', 'crontab', :id => nil %>
+    <div class="box tabular">
+      <p><label for="oa_imp_asset"><%= l(:label_oa_server) %></label><%= select_tag 'asset_id', options_for_select([['', '']] + oa_asset_options(@project, %w(server cloud device))), :id => 'oa_imp_asset' %>
+        <em class="info"><%= l(:text_oa_imp_server) %></em></p>
+      <p><label for="oa_crontab"><%= l(:label_oa_imp_crontab) %></label><%= text_area_tag 'crontab', nil, :id => 'oa_crontab', :rows => 12, :cols => 80, :class => 'oa_mono', :placeholder => "# crontab -l 결과를 붙여 넣으세요\n0 2 * * * /opt/batch/daily_stat.sh >> /var/log/daily.log 2>&1\n*/10 * * * * /opt/batch/sync_users.sh" %></p>
+      <p><label for="oa_system"><%= l(:label_oa_imp_system) %></label><%= check_box_tag 'system', '1', false, :id => 'oa_system' %>
+        <em class="info"><%= l(:text_oa_imp_system) %></em></p>
+    </div>
+    <p class="mt_help"><%= l(:text_oa_imp_crontab) %></p>
+    <p class="form_btns"><%= link_to l(:button_cancel), project_ops_schedules_path(@project), :class => 'btn_line' %><%= submit_tag l(:label_oa_import) %></p>
+  <% end %>
+<% end %>
+<%= javascript_tag do %>$(function() { $('#oa_all').on('change', function() { $('.oa_pick').prop('checked', this.checked); }); });<% end %>
+<% html_title l(:label_oa_import) %>

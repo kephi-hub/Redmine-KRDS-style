@@ -1,0 +1,10 @@
+en:
+  project_module_ops_assets: Assets
+  project_module_ops_schedules: Schedules
+  project_module_ops_logs: Checks & incidents
+  project_module_ops_interfaces: Interfaces
+  label_oa_assets: Assets
+  label_oa_schedules: Schedules
+  label_oa_logs: Checks & incidents
+  label_oa_interfaces: Interfaces
+  label_oa_admin_assets: Asset register

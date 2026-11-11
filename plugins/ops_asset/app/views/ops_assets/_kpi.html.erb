@@ -1,0 +1,9 @@
+<%# 자산 KPI (locals: path — 필터 주소 만드는 람다) %>
+<ul class="db_stats mt_kpi">
+  <li class="<%= 'on' unless @state %>"><%= link_to path.call({}) do %><span><%= l(:label_oa_k_all) %></span><strong><%= @kpi[:all] %></strong><% end %></li>
+  <li class="<%= 'on' if @state == 'expired' %>"><%= link_to path.call(:state => 'expired') do %><span><%= l(:label_oa_k_expired) %></span><strong class="<%= 'qa_fail' if @kpi[:expired].positive? %>"><%= @kpi[:expired] %></strong><% end %></li>
+  <li class="<%= 'on' if @state == 'soon7' %>"><%= link_to path.call(:state => 'soon7') do %><span><%= l(:label_oa_k_soon7) %></span><strong class="<%= 'qa_fail' if @kpi[:soon7].positive? %>"><%= @kpi[:soon7] %></strong><% end %></li>
+  <li class="<%= 'on' if @state == 'soon30' %>"><%= link_to path.call(:state => 'soon30') do %><span><%= l(:label_oa_k_soon30) %></span><strong><%= @kpi[:soon30] %></strong><% end %></li>
+  <li><span><%= l(:label_oa_k_server) %></span><strong><%= @kpi[:server] %></strong></li>
+  <li><span><%= l(:label_oa_k_cert) %></span><strong><%= @kpi[:cert] %></strong></li>
+</ul>

@@ -1,0 +1,6 @@
+<h2><%= link_to l(:label_oa_schedules), project_ops_schedules_path(@project) %> &#187; <%= link_to @schedule.name, project_ops_schedule_path(@project, @schedule) %> &#187; <%= l(:button_edit) %></h2>
+<%= labelled_form_for @schedule, :url => project_ops_schedule_path(@project, @schedule), :method => :patch do |f| %>
+  <%= render :partial => 'ops_schedules/form', :locals => { :f => f } %>
+  <p class="form_btns"><%= link_to l(:button_cancel), project_ops_schedule_path(@project, @schedule), :class => 'btn_line' %><%= submit_tag l(:button_save) %></p>
+<% end %>
+<% html_title @schedule.name %>

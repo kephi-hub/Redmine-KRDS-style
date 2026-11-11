@@ -1,0 +1,44 @@
+<%# 점검·장애 > 월간 보고서 %>
+<% r = @report %>
+<%= render :partial => 'ops_incidents/head', :locals => { :current => :report } %>
+<%= form_tag(project_ops_report_path(@project), :method => :get, :class => 'qa_filter') do %>
+  <%= month_field_tag 'month', @month.strftime('%Y-%m'), :'aria-label' => l(:label_oa_month) %>
+  <%= submit_tag l(:label_oa_filter), :name => nil %>
+  <%= link_to sprite_icon('download', l(:label_oa_report_xlsx)), project_ops_report_path(@project, :month => @month.strftime('%Y-%m'), :download => 'xlsx'), :class => 'btn_line oa_btn' %>
+<% end %>
+<ul class="db_stats mt_kpi">
+  <li><span><%= l(:label_oa_incidents) %></span><strong class="<%= 'qa_fail' if r[:incidents].any? %>"><%= r[:incidents].size %></strong></li>
+  <li><span><%= l(:label_oa_ik_downtime) %></span><strong><%= oa_minutes(r[:downtime]) %></strong></li>
+  <li><span><%= l(:label_oa_checks) %></span><strong><%= r[:checks].size %></strong></li>
+  <li><span><%= l(:label_oa_rk_issues) %></span><strong><%= r[:issue_rows].sum { |x| x[1] } %> / <%= r[:issue_rows].sum { |x| x[2] } %></strong></li>
+  <li><span><%= l(:label_oa_rk_deploys) %></span><strong><%= r[:deploys].size %></strong></li>
+  <li><span><%= l(:label_oa_rk_snapshots) %></span><strong><%= r[:snapshots].count(&:changed?) %></strong></li>
+</ul>
+<p class="db_info"><%= l(:text_oa_report) %></p>
+<h3><%= l(:label_oa_incidents) %></h3>
+<% if r[:incidents].empty? %><p class="db_allsame"><%= l(:text_oa_no_incidents) %></p><% else %>
+<ul class="mt_nolist"><% r[:incidents].each do |i| %><li><%= oa_badge(l(:label_oa_grade_n, :n => i.grade), "g#{i.grade}") %> <%= link_to i.title, project_ops_incident_path(@project, i) %> <span class="db_dim"><%= oa_time(i.occurred_at) %> · <%= oa_minutes(i.downtime_min) %></span></li><% end %></ul>
+<% end %>
+<h3><%= l(:label_oa_checks) %></h3>
+<% if r[:checks].empty? %><p class="nodata"><%= l(:label_no_data) %></p><% else %>
+<ul class="mt_nolist"><% r[:checks].each do |c| %><li><%= link_to c.name, project_ops_check_path(@project, c) %> <span class="db_dim"><%= format_date(c.checked_on) %> · <%= l(:label_oa_res_issue) %> <%= c.issue_count %></span></li><% end %></ul>
+<% end %>
+<h3><%= l(:label_oa_rk_issues) %></h3>
+<% if r[:issue_rows].empty? %><p class="nodata"><%= l(:label_no_data) %></p><% else %>
+<div class="autoscroll"><table class="list oa_list"><thead><tr><th class="name"><%= l(:field_tracker) %></th><th><%= l(:label_oa_created) %></th><th><%= l(:label_oa_closed) %></th></tr></thead>
+<tbody><% r[:issue_rows].each do |t, c, d| %><tr><td class="name"><%= t %></td><td><%= c %></td><td><%= d %></td></tr><% end %></tbody></table></div>
+<p class="db_dim"><%= l(:label_oa_open_at_end, :count => r[:issue_open]) %></p>
+<% end %>
+<% if r[:deploys].any? %>
+<h3><%= l(:label_oa_rk_deploys) %></h3>
+<ul class="mt_nolist"><% r[:deploys].first(30).each do |d| %><li><%= oa_time(d.created_at) %> · <%= d.target_name %> #<%= d.build_number %> <span class="db_dim"><%= d.status %> · <%= d.user %></span></li><% end %></ul>
+<% end %>
+<% if r[:snapshots].any? %>
+<h3><%= l(:label_oa_rk_snapshots) %></h3>
+<ul class="mt_nolist"><% r[:snapshots].each do |s| %><% h = s.summary_hash %><li><%= oa_time(s.created_at) %> · <%= s.db_link.name %> <span class="db_dim"><%= h ? l(:label_oa_snap_sum, :add => h[:only_b], :del => h[:only_a], :chg => h[:changed], :obj => h[:objects]) : l(:label_oa_snap_first) %></span></li><% end %></ul>
+<% end %>
+<h3><%= l(:label_oa_rk_expiring) %></h3>
+<% if r[:expiring].empty? %><p class="db_allsame"><%= l(:text_oa_no_expiring) %></p><% else %>
+<ul class="mt_nolist"><% r[:expiring].each do |a| %><li><%= oa_label('kind', a.kind) %> <strong><%= a.name %></strong> <%= oa_expiry(a) %></li><% end %></ul>
+<% end %>
+<% html_title l(:label_oa_report) %>

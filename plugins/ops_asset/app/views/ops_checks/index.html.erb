@@ -1,0 +1,39 @@
+<% can_edit = User.current.allowed_to?(:manage_ops_logs, @project) %>
+<%= render :partial => 'ops_incidents/head', :locals => { :current => :checks } %>
+<h3><%= l(:label_oa_templates) %></h3>
+<% if @templates.empty? %>
+  <p class="db_hintbox"><%= l(:text_oa_no_templates) %></p>
+<% else %>
+  <ul class="oa_tpls">
+    <% @templates.each do |t| %>
+      <li><strong><%= t.name %></strong> <span class="db_dim"><%= l(:label_oa_items_n, :count => t.item_list.size) %></span>
+        <% if can_edit %><%= link_to l(:label_oa_check_start), new_project_ops_check_path(@project, :template_id => t.id), :class => 'btn_line' %>
+          <%= link_to sprite_icon('edit', l(:button_edit)), edit_project_ops_check_template_path(@project, t), :class => 'icon icon-edit' %><% end %></li>
+    <% end %>
+  </ul>
+<% end %>
+<h3><%= l(:label_oa_checks) %></h3>
+<% if @checks.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list oa_list">
+  <thead><tr><th><%= l(:label_oa_checked_on) %></th><th class="name"><%= l(:label_oa_check_name) %></th><th><%= l(:label_oa_checker) %></th><th><%= l(:label_oa_res_ok) %></th><th><%= l(:label_oa_res_issue) %></th><th><%= l(:label_oa_res_na) %></th><th></th></tr></thead>
+  <tbody>
+  <% @checks.each do |c| %>
+    <% n = c.counts %>
+    <tr>
+      <td class="next"><%= format_date(c.checked_on) %></td>
+      <td class="name"><%= link_to c.name, project_ops_check_path(@project, c) %></td>
+      <td><%= c.user %></td>
+      <td><%= n['ok'].to_i %></td>
+      <td class="<%= 'qa_fail' if n['issue'].to_i.positive? %>"><%= n['issue'].to_i %></td>
+      <td><%= n['na'].to_i %></td>
+      <td class="buttons"><% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_ops_check_path(@project, c), :class => 'icon icon-edit' %><% end %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<% end %>
+<% html_title l(:label_oa_checks) %>

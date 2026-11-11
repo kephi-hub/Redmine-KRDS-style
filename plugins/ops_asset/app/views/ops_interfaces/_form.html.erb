@@ -1,0 +1,23 @@
+<%= error_messages_for @interface %>
+<% scheds = OpsSchedule.where(project_id: @project.id).sorted.to_a %>
+<div class="box tabular">
+  <p><%= f.text_field :code, :size => 14, :maxlength => 30, :placeholder => 'IF-001', :label => :label_oa_if_code %><em class="info"><%= l(:text_oa_if_code) %></em></p>
+  <p><%= f.text_field :name, :required => true, :size => 50, :maxlength => 150, :label => :label_oa_if_name %></p>
+  <p><%= f.select :direction, oa_options('direction', OpsInterface::DIRECTIONS), { :label => :label_oa_direction } %></p>
+  <p><%= f.text_field :partner, :required => true, :size => 40, :maxlength => 120, :placeholder => '행정안전부 GPKI / 나이스평가정보', :label => :label_oa_partner,
+                      :list => 'oa_partners' %>
+    <datalist id="oa_partners"><% OpsInterface.where(project_id: @project.id).distinct.pluck(:partner).sort.each do |p| %><option value="<%= p %>"><% end %></datalist></p>
+  <p><%= f.select :protocol, oa_options('protocol', OpsInterface::PROTOCOLS), { :label => :label_oa_protocol } %></p>
+  <p><%= f.select :cycle, oa_options('cycle', OpsInterface::CYCLES), { :label => :label_oa_cycle } %></p>
+  <% if scheds.any? %><p><%= f.select :ops_schedule_id, scheds.map { |s| ["#{s.name} · #{s.describe}", s.id] }, { :include_blank => true, :label => :label_oa_schedule } %></p><% end %>
+  <p><%= f.text_area :data_desc, :rows => 3, :cols => 60, :label => :label_oa_data_desc %></p>
+  <p><%= f.text_area :tables, :rows => 2, :cols => 60, :placeholder => 'TB_MEMBER, TB_ORDER', :label => :label_oa_tables %></p>
+  <p><%= f.text_field :dev_url, :size => 60, :maxlength => 255, :label => :label_oa_dev_url %></p>
+  <p><%= f.text_field :prod_url, :size => 60, :maxlength => 255, :label => :label_oa_prod_url %></p>
+  <p><%= f.text_field :our_owner, :size => 30, :maxlength => 120, :label => :label_oa_our_owner %></p>
+  <p><%= f.text_field :partner_owner, :size => 30, :maxlength => 120, :label => :label_oa_partner_owner %></p>
+  <p><%= f.text_field :partner_contact, :size => 40, :maxlength => 255, :label => :label_oa_partner_contact %></p>
+  <p><%= f.text_field :auth_note, :size => 50, :maxlength => 255, :placeholder => l(:text_oa_auth_ph), :label => :label_oa_auth_note %></p>
+  <p><%= f.select :status, oa_options('istatus', OpsInterface::STATUSES), { :label => :field_status } %></p>
+  <p><%= f.text_area :note, :rows => 2, :cols => 60, :label => :label_oa_note %></p>
+</div>

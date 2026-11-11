@@ -1243,6 +1243,36 @@ table.list.st_list td{text-align:center;}
 table.list.st_list td.name{text-align:left;word-break:keep-all;}
 table.list tr.st_unmapped td:first-child{font-weight:700;color:var(--war_60);}
 
+/* 운영 관리 (ops_asset) — 자산·스케줄러·점검·장애·인터페이스, 배지 색은 data-k */
+.oa_badge{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:10px;background:var(--gray_10);font-size:0.6875rem;font-weight:700;white-space:nowrap;color:var(--gray_70);}
+.oa_badge[data-k=server],.oa_badge[data-k=cloud],.oa_badge[data-k=send],.oa_badge[data-k=kind]{background:var(--pri_10);color:var(--pri_70);}
+.oa_badge[data-k=domain],.oa_badge[data-k=cert],.oa_badge[data-k=recv]{background:var(--suc_10);color:var(--suc_60);}
+.oa_badge[data-k=license],.oa_badge[data-k=both]{background:var(--war_5);color:var(--war_60);}
+.oa_badge[data-k=expired],.oa_badge[data-k=soon7],.oa_badge[data-k=g1],.oa_badge[data-k=cissue]{background:var(--dan_5);color:var(--dan_60);}
+.oa_badge[data-k=soon30],.oa_badge[data-k=g2]{background:var(--war_5);color:var(--war_60);}
+.oa_badge[data-k=ok],.oa_badge[data-k=cok]{background:var(--suc_10);color:var(--suc_60);}
+.oa_badge[data-k=shared]{border:1px solid var(--pri_20);background:var(--gray_0);color:var(--pri_60);}
+.oa_date{font-size:0.8125rem;}
+table.list.oa_list td{text-align:left;vertical-align:top;word-break:keep-all;}
+table.list.oa_list td.next,table.list.oa_list td.exp,table.list.oa_list td.code{white-space:nowrap;}
+.oa_projects{display:flex;flex-wrap:wrap;gap:4px 16px;}
+.oa_preview{display:block;margin:6px 0 0;font-size:0.8125rem;color:var(--gray_60);}
+.oa_preview.on{color:var(--suc_60);}
+.oa_preview.db_fail{color:var(--dan_60);}
+.oa_mono,.oa_wide{width:100%;}
+.oa_mono{font-family:monospace;font-size:0.8125rem;}
+.oa_tpls{padding:0;margin:0 0 20px;list-style:none;}
+.oa_tpls li{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--gray_10);}
+#content .oa_tpls .btn_line,#content .oa_btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.8125rem;font-weight:500;color:var(--pri_60);}
+.oa_tl{width:100%;border-collapse:collapse;font-size:0.75rem;}
+.oa_tl th,.oa_tl td{padding:4px 2px;border:1px solid var(--gray_10);text-align:center;}
+.oa_tl thead th{background:var(--gray_5);font-weight:700;color:var(--gray_70);}
+.oa_tl th.name{padding:6px 8px;text-align:left;font-weight:500;white-space:nowrap;}
+.oa_tl td[data-k=on]{background:var(--pri_10);color:var(--pri_70);}
+.oa_tl td[data-k=peak]{background:var(--pri_50);font-weight:700;color:var(--gray_0);}
+.oa_tl tr.oa_sum th,.oa_tl tr.oa_sum td{border-bottom:2px solid var(--gray_30);font-weight:700;}
+.oa_tl td.oa_na{color:var(--gray_50);}
+
 /* 이전·다음 버튼: Redmine 은 600px 미만에서 너비 32% 로 고정해 글자가 잘림 → 글자 너비대로 */
 #wrapper .pagination ul.pages li.current,#wrapper .pagination ul.pages li.previous,#wrapper .pagination ul.pages li.next{width:auto;overflow:visible;}
 

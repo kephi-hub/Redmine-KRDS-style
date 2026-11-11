@@ -1,0 +1,18 @@
+<%= error_messages_for @incident %>
+<% dt = ->(t) { t && t.in_time_zone(OpsKit::Cron.zone).strftime('%Y-%m-%dT%H:%M') } %>
+<div class="box tabular">
+  <p><%= f.text_field :title, :required => true, :size => 60, :maxlength => 200, :label => :label_oa_inc_title %></p>
+  <p><%= f.select :grade, OpsIncident::GRADES.map { |g| [l("label_oa_grade_desc_#{g}"), g] }, { :label => :label_oa_grade } %></p>
+  <p><%= f.select :status, OpsIncident::STATUSES.map { |s| [oa_label('status', s), s] }, { :label => :field_status } %></p>
+  <p><label for="oi_occ"><%= l(:label_oa_occurred) %> <span class="required">*</span></label><%= datetime_local_field_tag 'ops_incident[occurred_at]', dt.(@incident.occurred_at), :id => 'oi_occ' %></p>
+  <p><label for="oi_det"><%= l(:label_oa_detected) %></label><%= datetime_local_field_tag 'ops_incident[detected_at]', dt.(@incident.detected_at), :id => 'oi_det' %></p>
+  <p><label for="oi_rec"><%= l(:label_oa_recovered) %></label><%= datetime_local_field_tag 'ops_incident[recovered_at]', dt.(@incident.recovered_at), :id => 'oi_rec' %>
+    <em class="info"><%= l(:text_oa_times) %></em></p>
+  <% if (opts = oa_asset_options(@project)).any? %><p><%= f.select :ops_asset_id, opts, { :include_blank => true, :label => :label_oa_asset } %></p><% end %>
+  <p><%= f.text_field :target, :size => 50, :maxlength => 200, :placeholder => l(:text_oa_target_ph), :label => :label_oa_target %></p>
+  <p><%= f.text_area :impact, :rows => 3, :cols => 60, :label => :label_oa_impact %></p>
+  <p><%= f.text_area :cause, :rows => 3, :cols => 60, :label => :label_oa_cause %></p>
+  <p><%= f.text_area :action, :rows => 3, :cols => 60, :label => :label_oa_action %></p>
+  <p><%= f.text_area :prevention, :rows => 3, :cols => 60, :label => :label_oa_prevention %></p>
+  <p><%= f.text_field :issue_id, :size => 10, :placeholder => '#123', :label => :label_oa_issue %></p>
+</div>

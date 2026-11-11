@@ -1,0 +1,33 @@
+<% can_edit = User.current.allowed_to?(:manage_ops_logs, @project) %>
+<%= render :partial => 'ops_incidents/head', :locals => { :current => :incidents } %>
+<ul class="db_stats mt_kpi">
+  <li class="<%= 'on' unless @status %>"><%= link_to project_ops_incidents_path(@project) do %><span><%= l(:label_oa_ik_all) %></span><strong><%= @kpi[:all] %></strong><% end %></li>
+  <li class="<%= 'on' if @status == 'open' %>"><%= link_to project_ops_incidents_path(@project, :status => 'open') do %><span><%= l(:label_oa_ik_open) %></span><strong class="<%= 'qa_fail' if @kpi[:open].positive? %>"><%= @kpi[:open] %></strong><% end %></li>
+  <li><span><%= l(:label_oa_ik_year) %></span><strong><%= @kpi[:year] %></strong></li>
+  <li><span><%= l(:label_oa_ik_downtime) %></span><strong><%= oa_minutes(@kpi[:downtime]) %></strong></li>
+  <li><span><%= l(:label_oa_ik_grade1) %></span><strong><%= @kpi[:grade1] %></strong></li>
+</ul>
+<% if @incidents.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list oa_list">
+  <thead><tr><th><%= l(:label_oa_grade) %></th><th class="name"><%= l(:label_oa_inc_title) %></th><th><%= l(:label_oa_occurred) %></th><th><%= l(:label_oa_downtime) %></th><th><%= l(:label_oa_target) %></th><th><%= l(:field_status) %></th><th><%= l(:label_oa_issue) %></th><th></th></tr></thead>
+  <tbody>
+  <% @incidents.each do |i| %>
+    <tr>
+      <td><%= oa_badge(l(:label_oa_grade_n, :n => i.grade), "g#{i.grade}") %></td>
+      <td class="name"><%= link_to i.title, project_ops_incident_path(@project, i) %></td>
+      <td class="next"><%= oa_time(i.occurred_at) %></td>
+      <td><%= i.recovered_at ? oa_minutes(i.downtime_min) : oa_badge(l(:label_oa_not_recovered), 'g1') %></td>
+      <td><%= i.ops_asset&.name || i.target %></td>
+      <td><span class="mt_yn <%= 'on' if i.status == 'closed' %>"><%= oa_label('status', i.status) %></span></td>
+      <td><% if i.issue %><%= link_to "##{i.issue_id}", issue_path(i.issue) %><% end %></td>
+      <td class="buttons"><% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_ops_incident_path(@project, i), :class => 'icon icon-edit' %><% end %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<% end %>
+<% html_title l(:label_oa_incidents) %>
