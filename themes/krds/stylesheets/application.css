@@ -1349,7 +1349,8 @@ table.list.pm_list tr.pm_late td.next{font-weight:700;color:var(--dan_60);}
 .pm_ol{padding:0 0 0 20px;margin:0;}
 .pm_rows .pm_row{margin:0 0 6px;}
 .pm_path{display:block;margin:0 0 4px;word-break:break-all;}
-.pm_decide{padding:16px;margin:0 0 16px;border:1px solid var(--gray_20);border-radius:var(--radius_m);}
+.pm_decide{display:block;padding:16px;margin:0 0 16px;border:1px solid var(--gray_20);border-radius:var(--radius_m);}
+.pm_decide label{display:block;margin:0 0 6px;font-weight:700;}
 .pm_flow{display:flex;flex-wrap:wrap;gap:6px;padding:0;margin:0 0 12px;list-style:none;}
 .pm_flow li{display:inline-flex;align-items:center;height:32px;padding:0 14px;border-radius:16px;background:var(--gray_5);font-size:0.8125rem;font-weight:500;color:var(--gray_60);}
 .pm_flow li.done{background:var(--suc_10);color:var(--suc_60);}
