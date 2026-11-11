@@ -1,0 +1,69 @@
+<%# 프로젝트 > DB > 비교 — 두 DB 의 테이블·컬럼 차이 %>
+<h2><%= l(:label_db_manage) %></h2>
+<p class="subtitle"><%= l(:text_db_compare) %></p>
+<% if @links.size < 2 %>
+<p class="nodata"><%= l(:label_db_compare_need) %></p>
+<% else %>
+<%= db_tabs(:compare) %>
+<%= form_tag project_db_compare_path(@project), :method => :get, :class => 'db_pick' do %>
+  <label for="db_a">A</label><%= select_tag 'a', options_for_select(@links.map { |l| [l.name, l.id] }, @a&.id), :id => 'db_a' %>
+  <span class="db_vs">↔</span>
+  <label for="db_b">B</label><%= select_tag 'b', options_for_select(@links.map { |l| [l.name, l.id] }, @b&.id), :id => 'db_b' %>
+  <%= submit_tag l(:label_db_compare_run), :name => nil %>
+<% end %>
+<%= render :partial => 'error' %>
+<% if @a == @b %><p class="nodata"><%= l(:label_db_compare_same_link) %></p><% end %>
+<% if @result %>
+  <ul class="db_stats">
+    <li><span><%= l(:label_db_only_in, :name => @a.name) %></span><strong><%= @result[:only_a].size %></strong></li>
+    <li><span><%= l(:label_db_only_in, :name => @b.name) %></span><strong><%= @result[:only_b].size %></strong></li>
+    <li class="<%= 'on' if @result[:changed].any? %>"><span><%= l(:label_db_changed) %></span><strong><%= @result[:changed].size %></strong></li>
+    <li><span><%= l(:label_db_same) %></span><strong><%= @result[:same] %></strong></li>
+  </ul>
+  <% if @result[:only_a].empty? && @result[:only_b].empty? && @result[:changed].empty? %>
+  <p class="db_allsame"><%= l(:label_db_all_same) %></p>
+  <% end %>
+  <% [[@result[:only_a], @a], [@result[:only_b], @b]].each do |tables, link| %>
+    <% next if tables.empty? %>
+    <h3 class="ag_sec"><%= l(:label_db_only_in, :name => link.name) %></h3>
+    <ul class="db_tags"><% tables.each do |t| %><li><code><%= t[:name] %></code><% if t[:comment] %> <span><%= t[:comment] %></span><% end %></li><% end %></ul>
+  <% end %>
+  <% if @result[:changed].any? %>
+    <h3 class="ag_sec"><%= l(:label_db_changed) %></h3>
+    <% @result[:changed].each do |ch| %>
+    <div class="db_diff">
+      <h4><code><%= ch[:table] %></code><% if ch[:comment_a] != ch[:comment_b] %> <span class="db_dim"><%= l(:label_db_comment_diff) %>: <%= ch[:comment_a].presence || '-' %> ↔ <%= ch[:comment_b].presence || '-' %></span><% end %></h4>
+      <% if ch[:diffs].any? %>
+      <div class="autoscroll">
+      <table class="list db_difftbl">
+        <thead><tr><th class="name"><%= l(:field_db_column) %></th><th><%= l(:label_db_diff_kind) %></th><th><%= @a.name %></th><th><%= @b.name %></th></tr></thead>
+        <tbody>
+        <% ch[:diffs].each do |d| %>
+          <% if d[:kind] == :changed %>
+            <% d[:fields].each_with_index do |f, i| %>
+            <tr>
+              <td class="name"><% if i.zero? %><code><%= d[:column] %></code><% end %></td>
+              <td class="kind"><%= l("label_db_field_#{f}") %></td>
+              <td class="a"><%= db_diff_value(d[:a], f) %></td>
+              <td class="b"><%= db_diff_value(d[:b], f) %></td>
+            </tr>
+            <% end %>
+          <% else %>
+            <tr class="db_missing_row">
+              <td class="name"><code><%= d[:column] %></code></td>
+              <td class="kind"><%= l(:label_db_column_only, :name => (d[:kind] == :only_a ? @a.name : @b.name)) %></td>
+              <td class="a"><%= d[:a] ? d[:a][:type] : '—' %></td>
+              <td class="b"><%= d[:b] ? d[:b][:type] : '—' %></td>
+            </tr>
+          <% end %>
+        <% end %>
+        </tbody>
+      </table>
+      </div>
+      <% end %>
+    </div>
+    <% end %>
+  <% end %>
+<% end %>
+<% end %>
+<% html_title "#{l(:label_db_compare)} - #{l(:label_db_manage)}" %>

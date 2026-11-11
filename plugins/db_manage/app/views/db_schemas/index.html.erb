@@ -1,0 +1,66 @@
+<%# 프로젝트 > DB — DB 별 탭, 테이블 목록 %>
+<h2><%= l(:label_db_manage) %></h2>
+<p class="subtitle"><%= l(:text_db_project) %></p>
+
+<% if @links.empty? %>
+<%= render :partial => 'none' %>
+<% else %>
+<%= db_tabs(@link) %>
+<div class="db_head">
+  <p class="db_info"><%= db_link_info(@link) %></p>
+  <p class="db_btns">
+    <% if @terms %><%= link_to sprite_icon('checked', l(:label_db_check)), project_db_check_path(@project, @link), :class => 'btn_line' %><% end %>
+    <%= link_to sprite_icon('download', l(:label_db_export)), project_db_export_path(@project, @link), :class => 'btn_line' %>
+  </p>
+</div>
+<%= render :partial => 'error' %>
+<% if @snapshot %>
+  <% tables = @snapshot[:tables]; cols = @snapshot[:columns] %>
+  <div class="list_bar">
+    <p class="list_total"><%= l(:label_db_summary, :tables => tables.count { |t| !t[:view] }, :views => tables.count { |t| t[:view] }, :columns => cols.values.sum(&:size)) %></p>
+    <p class="list_search"><span class="list_field"><input type="search" id="db_filter" placeholder="<%= l(:label_db_filter) %>" aria-label="<%= l(:label_db_filter) %>"></span></p>
+  </div>
+  <% if tables.empty? %>
+  <p class="nodata"><%= l(:label_db_no_tables) %></p>
+  <% else %>
+  <div class="autoscroll">
+  <table class="list db_list" id="db_tables">
+    <thead><tr>
+      <th class="name"><%= l(:field_db_table) %></th>
+      <th class="comment"><%= l(:field_db_comment) %></th>
+      <th><%= l(:label_db_columns) %></th>
+      <th><%= l(:label_db_rows) %></th>
+      <% if @terms %><th><%= l(:label_db_term_match) %></th><% end %>
+    </tr></thead>
+    <tbody>
+    <% tables.each do |t| %>
+      <% tc = cols[t[:name]] || [] %>
+      <tr class="db_row" data-filter="<%= "#{t[:name]} #{t[:comment]}".downcase %>">
+        <td class="name"><%= link_to t[:name], project_db_table_path(@project, @link, t[:name]) %><% if t[:view] %> <span class="db_view"><%= l(:label_db_view) %></span><% end %></td>
+        <td class="comment"><%= t[:comment] %></td>
+        <td class="count"><%= tc.size %></td>
+        <td class="rows"><%= t[:view] ? '-' : db_number(t[:rows]) %></td>
+        <% if @terms %>
+          <% ok = tc.count { |c| DbManage::Analysis.term_status(c, @terms).first == :ok } %>
+          <td class="match"><span class="db_ratio<%= ' on' if tc.any? && ok == tc.size %>"><%= ok %> / <%= tc.size %></span></td>
+        <% end %>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  </div>
+  <p class="nodata db_nomatch" style="display:none;"><%= l(:label_no_data) %></p>
+  <%= javascript_tag do %>
+  $(function() {
+    $('#db_filter').on('input', function() {
+      var q = $(this).val().toLowerCase().trim(), shown = 0;
+      $('#db_tables tr.db_row').each(function() { var on = !q || $(this).data('filter').indexOf(q) >= 0; $(this).toggle(on); if (on) shown++; });
+      $('.db_nomatch').toggle(shown === 0);
+    });
+  });
+  <% end %>
+  <% end %>
+<% end %>
+<% end %>
+
+<% html_title l(:label_db_manage) %>

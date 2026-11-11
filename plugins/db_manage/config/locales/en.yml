@@ -1,0 +1,95 @@
+en:
+  project_module_db_manage: DB management
+  permission_view_db_schema: View DB schema
+  permission_manage_db_links: Manage DB links
+  label_db_manage: DB
+  label_db_server: DB server
+  label_db_server_plural: DB servers
+  label_db_server_new: New DB server
+  label_db_test: Test connection
+  label_db_used_by: Used by
+  label_db_password_keep: Saved · leave blank to keep
+  label_db_need_server: An administrator must first add a server in Administration > DB servers.
+  label_db_link: DB
+  label_db_link_new: Add DB
+  label_db_no_links: No DB linked.
+  label_db_go_settings: Add one in Project settings > DB
+  label_db_production: Production
+  label_db_check: Glossary check
+  label_db_export: Table specification
+  label_db_summary: "%{tables} tables · %{views} views · %{columns} columns"
+  label_db_filter: Filter by table name or comment
+  label_db_no_tables: No tables.
+  label_db_columns: Columns
+  label_db_rows: Rows (est.)
+  label_db_term_match: Glossary match
+  label_db_view: View
+  label_db_no_comment: No table comment
+  label_glossary_short: Glossary
+  label_db_back: Back to tables
+  label_db_compare: Compare
+  label_db_compare_need: Link at least two DBs to compare.
+  label_db_compare_run: Compare
+  label_db_compare_same_link: Choose two different DBs.
+  label_db_only_in: "Tables only in %{name}"
+  label_db_changed: Tables with differences
+  label_db_same: Identical tables
+  label_db_all_same: Both DBs have the same structure.
+  label_db_comment_diff: Comment
+  label_db_diff_kind: Item
+  label_db_field_type: Data type
+  label_db_field_nullable: Nullable
+  label_db_field_default: Default
+  label_db_field_comment: Comment
+  label_db_field_keys: Keys
+  label_db_column_only: "Only in %{name}"
+  label_db_term_ok: Match
+  label_db_term_type: "Type differs (term: %{expected})"
+  label_db_term_type_short: Type differs
+  label_db_term_missing: Not registered
+  label_db_check_csv: Download unregistered columns
+  label_db_used_tables: Tables
+  label_db_no_glossary: Glossary plugin is not installed.
+  field_db_adapter: DB type
+  field_db_address: Address
+  field_db_host: Host
+  field_db_port: Port
+  field_db_database: Database
+  field_db_username: Account
+  field_db_timeout: Timeout (s)
+  field_db_note: Note
+  field_db_schema: Schema
+  field_db_table: Table
+  field_db_column: Column
+  field_db_type: Data type
+  field_db_default: Default
+  field_db_key: Key
+  field_db_comment: Comment
+  text_db_server_info: DB servers used by projects. Passwords are stored encrypted; connections are read-only and read only table and column metadata. A read-only account is recommended.
+  text_db_adapter_info: MS SQL Server and Oracle are coming soon.
+  text_db_database_info: Schema name for MariaDB/MySQL, database name for PostgreSQL
+  text_db_user_info: Read-only account recommended (must be able to read information_schema)
+  text_db_schema_info: Blank means public for PostgreSQL, the server database for MariaDB/MySQL
+  text_db_production_info: Marked as production and used as default compare target (B)
+  text_db_project: Browse tables and columns of the project databases, download the table specification, compare DBs and check against the glossary.
+  text_db_compare: Shows table and column differences (type, null, default, comment, keys).
+  text_db_check: Matches every column name against glossary abbreviations.
+  text_db_check_csv: Download unregistered columns in glossary import format.
+  notice_db_connected: "%{name} connected — %{version}"
+  error_db_server_in_use: This DB server is used by a project.
+  activerecord:
+    attributes:
+      db_server:
+        name: Name
+        adapter: DB type
+        host: Host
+        port: Port
+        database_name: Database
+        username: Account
+        password_encrypted: Password
+        timeout: Timeout
+        note: Note
+      db_link:
+        name: Name
+        db_server: DB server
+        schema_name: Schema

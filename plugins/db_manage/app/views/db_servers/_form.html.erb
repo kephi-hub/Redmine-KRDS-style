@@ -1,0 +1,30 @@
+<%= error_messages_for @server %>
+<div class="box tabular">
+  <p><%= f.text_field :name, :required => true, :size => 40, :maxlength => 60, :placeholder => '메인비즈 개발DB', :label => :field_name %></p>
+  <p><%= f.select :adapter, DbServer.adapter_options, { :required => true, :label => :field_db_adapter }, { :id => 'db_adapter' } %>
+    <em class="info"><%= l(:text_db_adapter_info) %></em></p>
+  <p><%= f.text_field :host, :required => true, :size => 40, :maxlength => 255, :placeholder => '192.168.10.10', :label => :field_db_host %></p>
+  <p><%= f.number_field :port, :required => true, :min => 1, :max => 65535, :id => 'db_port', :label => :field_db_port %></p>
+  <p><%= f.text_field :database_name, :required => true, :size => 40, :maxlength => 128, :label => :field_db_database %>
+    <em class="info"><%= l(:text_db_database_info) %></em></p>
+  <p><%= f.text_field :username, :required => true, :size => 30, :maxlength => 120, :autocomplete => 'off', :label => :field_db_username %>
+    <em class="info"><%= l(:text_db_user_info) %></em></p>
+  <p><%= f.password_field :password, :value => '', :required => @server.new_record?, :size => 30, :autocomplete => 'new-password', :label => :field_password %>
+    <% if @server.password_set? %><em class="info"><%= l(:label_db_password_keep) %></em><% end %></p>
+  <p><%= f.number_field :timeout, :min => 1, :max => 60, :label => :field_db_timeout %></p>
+  <p><%= f.text_field :note, :size => 60, :maxlength => 255, :label => :field_db_note %></p>
+</div>
+<p class="form_btns">
+  <%= link_to l(:button_cancel), db_servers_path, :class => 'btn_line' %>
+  <%= submit_tag l(@server.new_record? ? :button_create : :button_save) %>
+</p>
+<%= javascript_tag do %>
+// DB 종류를 바꾸면 포트가 비었거나 다른 종류의 기본 포트일 때 새 기본 포트로
+$(function() {
+  var defaults = $('#db_adapter option').map(function() { return String($(this).data('port')); }).get();
+  $('#db_adapter').on('change', function() {
+    var $p = $('#db_port'), v = $p.val();
+    if (!v || defaults.indexOf(v) >= 0) $p.val($(this).find('option:selected').data('port'));
+  });
+});
+<% end %>

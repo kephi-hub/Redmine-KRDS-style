@@ -1,0 +1,4 @@
+<p class="nodata"><%= l(:label_db_no_links) %></p>
+<% if User.current.allowed_to?(:manage_db_links, @project) %>
+<p class="db_hint"><%= link_to l(:label_db_go_settings), settings_project_path(@project, :tab => 'db_links') %></p>
+<% end %>

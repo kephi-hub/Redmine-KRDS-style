@@ -1,0 +1,36 @@
+<%# 프로젝트 > DB > 테이블 — 컬럼·키·용어사전 대조 %>
+<h2><%= link_to l(:label_db_manage), project_db_schemas_path(@project, :link => @link.id) %> &#187; <%= @link.name %> &#187; <%= params[:table] %></h2>
+<%= render :partial => 'error' %>
+<% if @table %>
+<p class="subtitle"><%= @table[:comment].presence || l(:label_db_no_comment) %><% if @table[:view] %> · <%= l(:label_db_view) %><% end %><% unless @table[:view] %> · <%= l(:label_db_rows) %> <%= db_number(@table[:rows]) %><% end %></p>
+<div class="autoscroll">
+<table class="list db_cols">
+  <thead><tr>
+    <th>No</th>
+    <th class="name"><%= l(:field_db_column) %></th>
+    <th><%= l(:field_db_type) %></th>
+    <th>Null</th>
+    <th><%= l(:field_db_default) %></th>
+    <th><%= l(:field_db_key) %></th>
+    <th class="comment"><%= l(:field_db_comment) %></th>
+    <% if @terms %><th><%= l(:label_glossary_short) %></th><% end %>
+  </tr></thead>
+  <tbody>
+  <% @columns.each do |c| %>
+    <tr class="db_col">
+      <td class="pos"><%= c[:position] %></td>
+      <td class="name"><code><%= c[:name] %></code></td>
+      <td class="type"><%= c[:type] %></td>
+      <td class="null"><%= c[:nullable] ? 'Y' : 'N' %></td>
+      <td class="default"><%= c[:default] %></td>
+      <td class="keys"><%= db_key_tags(c) %><% if c[:ref] %> <span class="db_ref">→ <%= c[:ref] %></span><% end %></td>
+      <td class="comment"><%= c[:comment] %></td>
+      <% if @terms %><td class="term"><%= db_term_tag(*DbManage::Analysis.term_status(c, @terms)) %></td><% end %>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<% end %>
+<p class="form_btns"><%= link_to l(:label_db_back), project_db_schemas_path(@project, :link => @link.id), :class => 'btn_line' %></p>
+<% html_title "#{params[:table]} - #{l(:label_db_manage)}" %>

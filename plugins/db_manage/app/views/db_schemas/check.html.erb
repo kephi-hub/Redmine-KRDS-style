@@ -1,0 +1,51 @@
+<%# 프로젝트 > DB > 용어 점검 — 컬럼명을 용어사전 약어와 대조 %>
+<h2><%= link_to l(:label_db_manage), project_db_schemas_path(@project, :link => @link.id) %> &#187; <%= @link.name %> &#187; <%= l(:label_db_check) %></h2>
+<p class="subtitle"><%= l(:text_db_check) %></p>
+<% if @terms.nil? %>
+<p class="nodata"><%= l(:label_db_no_glossary) %></p>
+<% else %>
+<%= render :partial => 'error' %>
+<% if @rows %>
+  <ul class="db_stats">
+    <% [[nil, l(:label_all), @rows.size], [:ok, l(:label_db_term_ok), @counts[:ok].to_i], [:type, l(:label_db_term_type_short), @counts[:type].to_i], [:missing, l(:label_db_term_missing), @counts[:missing].to_i]].each do |st, label, n| %>
+    <li class="<%= 'on' if @status == st %>"><%= link_to project_db_check_path(@project, @link, :status => st) do %><span><%= label %></span><strong><%= n %></strong><% end %></li>
+    <% end %>
+  </ul>
+  <div class="db_head">
+    <p class="db_info"><%= l(:text_db_check_csv) %></p>
+    <p class="db_btns">
+      <%= link_to sprite_icon('download', l(:label_db_check_csv)), project_db_check_path(@project, @link, :format => 'csv'), :class => 'btn_line' %>
+      <% if @project.module_enabled?(:glossary) && User.current.allowed_to?(:manage_glossary, @project) %>
+        <%= link_to sprite_icon('import', l(:label_glossary_import)), import_project_glossary_terms_path(@project), :class => 'btn_line' %>
+      <% end %>
+    </p>
+  </div>
+  <% if @shown.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+  <% else %>
+  <div class="autoscroll">
+  <table class="list db_cols db_check">
+    <thead><tr>
+      <th class="name"><%= l(:field_db_column) %></th>
+      <th><%= l(:field_db_type) %></th>
+      <th class="comment"><%= l(:field_db_comment) %></th>
+      <th class="tables"><%= l(:label_db_used_tables) %></th>
+      <th><%= l(:label_glossary_short) %></th>
+    </tr></thead>
+    <tbody>
+    <% @shown.each do |r| %>
+      <tr class="db_col">
+        <td class="name"><code><%= r[:name] %></code></td>
+        <td class="type"><%= r[:types].join(', ') %></td>
+        <td class="comment"><%= r[:comments].join(', ') %></td>
+        <td class="tables" title="<%= r[:tables].join(', ') %>"><%= r[:tables].first(3).join(', ') %><% if r[:tables].size > 3 %> <span class="db_dim">+<%= r[:tables].size - 3 %></span><% end %></td>
+        <td class="term"><%= db_term_tag(r[:status], r[:term]) %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  </div>
+  <% end %>
+<% end %>
+<% end %>
+<% html_title "#{l(:label_db_check)} - #{l(:label_db_manage)}" %>

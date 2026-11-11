@@ -114,6 +114,7 @@ roles:
   - view_gantt
   - view_deploys
   - view_glossary
+  - view_db_schema
   - add_issues
   - edit_issues
   - edit_own_issues
@@ -147,6 +148,7 @@ roles:
   - edit_keys
   - run_deploys
   - manage_glossary
+  - manage_db_links
   - edit_project
   - close_project
   - select_project_modules
@@ -205,6 +207,7 @@ roles:
   - view_gantt
   - view_deploys
   - view_glossary
+  - view_db_schema
   - add_issues
   - edit_issues
   - edit_own_issues

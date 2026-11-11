@@ -1,0 +1,25 @@
+<%# 프로젝트 > 설정 > DB 탭 %>
+<% if DbServer.none? %>
+<p class="warning"><%= l(:label_db_need_server) %></p>
+<% else %>
+<p><%= link_to sprite_icon('add', l(:label_db_link_new)), new_project_db_link_path(@project), :class => 'icon icon-add' %></p>
+<% end %>
+
+<% links = @project.db_links.includes(:db_server).sorted.to_a %>
+<% if links.any? %>
+<div class="table-list dep_targets">
+  <div class="table-list-header"><div class="table-list-cell"><%= l(:label_db_link) %></div></div>
+  <% links.each do |link| %>
+  <div class="table-list-row">
+    <div class="table-list-cell name"><%= link.name %><% if link.production? %> <span class="dep_prod"><%= l(:label_db_production) %></span><% end %></div>
+    <div class="table-list-cell description"><%= link.db_server %> · <code><%= link.db_server.adapter_label %> <%= link.schema %></code></div>
+    <div class="table-list-cell buttons">
+      <%= link_to sprite_icon('edit', l(:button_edit)), edit_project_db_link_path(@project, link), :class => 'icon icon-edit' %>
+      <%= delete_link project_db_link_path(@project, link) %>
+    </div>
+  </div>
+  <% end %>
+</div>
+<% elsif DbServer.any? %>
+<p class="nodata"><%= l(:label_db_no_links) %></p>
+<% end %>

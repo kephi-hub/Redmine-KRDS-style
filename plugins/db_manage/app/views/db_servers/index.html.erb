@@ -1,0 +1,40 @@
+<%# 관리 > DB 서버 %>
+<div class="contextual">
+<%= link_to sprite_icon('add', l(:label_db_server_new)), new_db_server_path, :class => 'icon icon-add' %>
+</div>
+
+<h2><%= l(:label_db_server_plural) %></h2>
+<p class="subtitle"><%= l(:text_db_server_info) %></p>
+
+<% if @servers.empty? %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<table class="list db_servers">
+  <thead><tr>
+    <th><%= l(:field_name) %></th>
+    <th><%= l(:field_db_adapter) %></th>
+    <th><%= l(:field_db_address) %></th>
+    <th><%= l(:field_db_username) %></th>
+    <th><%= l(:label_db_used_by) %></th>
+    <th></th>
+  </tr></thead>
+  <tbody>
+  <% @servers.each do |server| %>
+    <tr>
+      <td class="name"><%= link_to server.name, edit_db_server_path(server) %><% if server.note.present? %><span class="db_note"><%= server.note %></span><% end %></td>
+      <td class="adapter"><span class="db_adapter db_<%= server.adapter %>"><%= server.adapter_label %></span></td>
+      <td class="address"><code><%= server.address %></code></td>
+      <td class="username"><%= server.username %></td>
+      <td class="links"><%= server.db_links.map { |l| "#{l.project.name} · #{l.name}" }.join(', ').presence || '-' %></td>
+      <td class="row_btns">
+        <%= link_to sprite_icon('reload', l(:label_db_test)), test_db_server_path(server), :method => :post, :class => 'icon icon-reload' %>
+        <%= link_to sprite_icon('edit', l(:button_edit)), edit_db_server_path(server), :class => 'icon icon-edit' %>
+        <%= delete_link db_server_path(server) %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+<% end %>
+
+<% html_title l(:label_db_server_plural) %>

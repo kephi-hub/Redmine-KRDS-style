@@ -1,0 +1,2 @@
+# MariaDB·MySQL 접속용 — Redmine 공식 이미지에 이미 설치되어 있어 이미지 재빌드 없이 사용 (PostgreSQL 은 Redmine 기본 pg 사용)
+gem 'mysql2', '~> 0.5.0'

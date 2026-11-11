@@ -1,0 +1,95 @@
+ko:
+  project_module_db_manage: DB 관리
+  permission_view_db_schema: DB 스키마 보기
+  permission_manage_db_links: DB 연결 관리
+  label_db_manage: DB
+  label_db_server: DB 서버
+  label_db_server_plural: DB 서버
+  label_db_server_new: 새 DB 서버
+  label_db_test: 연결 시험
+  label_db_used_by: 사용 프로젝트
+  label_db_password_keep: 저장되어 있음 · 비워 두면 기존 비밀번호 유지
+  label_db_need_server: 먼저 관리자가 관리 > DB 서버 에 서버를 등록해야 합니다.
+  label_db_link: DB
+  label_db_link_new: DB 추가
+  label_db_no_links: 연결된 DB 가 없습니다.
+  label_db_go_settings: 프로젝트 설정 > DB 에서 추가
+  label_db_production: 운영
+  label_db_check: 용어 점검
+  label_db_export: 테이블 정의서
+  label_db_summary: "테이블 %{tables} · 뷰 %{views} · 컬럼 %{columns}"
+  label_db_filter: 테이블명·설명으로 찾기
+  label_db_no_tables: 테이블이 없습니다.
+  label_db_columns: 컬럼 수
+  label_db_rows: 행 수(추정)
+  label_db_term_match: 용어 일치
+  label_db_view: 뷰
+  label_db_no_comment: 테이블 설명 없음
+  label_glossary_short: 용어사전
+  label_db_back: 테이블 목록으로
+  label_db_compare: 비교
+  label_db_compare_need: 비교하려면 DB 가 2개 이상 연결되어 있어야 합니다.
+  label_db_compare_run: 비교
+  label_db_compare_same_link: 서로 다른 DB 를 고르세요.
+  label_db_only_in: "%{name}에만 있는 테이블"
+  label_db_changed: 차이가 있는 테이블
+  label_db_same: 같은 테이블
+  label_db_all_same: 두 DB 의 테이블·컬럼 구조가 같습니다.
+  label_db_comment_diff: 설명
+  label_db_diff_kind: 항목
+  label_db_field_type: 데이터 타입
+  label_db_field_nullable: NULL 허용
+  label_db_field_default: 기본값
+  label_db_field_comment: 설명
+  label_db_field_keys: 키
+  label_db_column_only: "%{name}에만 있음"
+  label_db_term_ok: 일치
+  label_db_term_type: "타입 다름 (용어: %{expected})"
+  label_db_term_type_short: 타입 다름
+  label_db_term_missing: 미등록
+  label_db_check_csv: 미등록 컬럼 내려받기
+  label_db_used_tables: 사용 테이블
+  label_db_no_glossary: 용어사전 플러그인이 없어 점검할 수 없습니다.
+  field_db_adapter: DB 종류
+  field_db_address: 주소
+  field_db_host: 호스트
+  field_db_port: 포트
+  field_db_database: DB 이름
+  field_db_username: 계정
+  field_db_timeout: 응답 대기(초)
+  field_db_note: 메모
+  field_db_schema: 스키마
+  field_db_table: 테이블
+  field_db_column: 컬럼
+  field_db_type: 데이터 타입
+  field_db_default: 기본값
+  field_db_key: 키
+  field_db_comment: 설명
+  text_db_server_info: 프로젝트에서 쓸 DB 서버 접속정보입니다. 비밀번호는 암호화해 저장하며, 접속할 때는 읽기 전용으로 테이블·컬럼 정보만 읽습니다. SELECT 권한만 있는 조회 전용 계정을 권장합니다.
+  text_db_adapter_info: MS SQL Server·Oracle 은 준비 중입니다.
+  text_db_database_info: MariaDB·MySQL 은 조회할 데이터베이스(스키마) 이름, PostgreSQL 은 접속할 데이터베이스 이름
+  text_db_user_info: 조회 전용 계정 권장 (information_schema 를 읽을 수 있어야 함)
+  text_db_schema_info: 비워 두면 PostgreSQL 은 public, MariaDB·MySQL 은 서버의 DB 이름
+  text_db_production_info: 운영 DB 는 탭에 '운영' 표시, 비교 화면에서 기본 비교 대상(B)
+  text_db_project: 프로젝트 DB 의 테이블·컬럼 구조를 봅니다. 테이블 정의서(엑셀) 내려받기, 개발/운영 비교, 용어사전 점검을 할 수 있습니다.
+  text_db_compare: 두 DB 의 테이블과 컬럼(타입·NULL·기본값·설명·키) 차이를 보여 줍니다.
+  text_db_check: 모든 컬럼명을 용어사전의 약어와 대조합니다. 같은 이름의 컬럼은 하나로 묶어 보여 줍니다.
+  text_db_check_csv: 미등록 컬럼을 용어사전 가져오기 양식(CSV)으로 받아 정리한 뒤 용어사전에 올릴 수 있습니다.
+  notice_db_connected: "%{name} 연결 성공 — %{version}"
+  error_db_server_in_use: 프로젝트에서 사용 중인 DB 서버는 삭제할 수 없습니다. 프로젝트 설정 > DB 에서 먼저 연결을 지우세요.
+  activerecord:
+    attributes:
+      db_server:
+        name: 이름
+        adapter: DB 종류
+        host: 호스트
+        port: 포트
+        database_name: DB 이름
+        username: 계정
+        password_encrypted: 비밀번호
+        timeout: 응답 대기(초)
+        note: 메모
+      db_link:
+        name: 이름
+        db_server: DB 서버
+        schema_name: 스키마

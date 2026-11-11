@@ -727,6 +727,7 @@ body.controller-news.action-show #content>h3{padding-top:20px;margin-top:28px;bo
 #admin-index #admin-menu a.simple-workflows::after{content:"역할마다 상태 변경 규칙을 한 번에 설정";}
 #admin-index #admin-menu a.field-permissions::after{content:"상태별 수정 금지 · 필수 항목";}
 #admin-index #admin-menu a.jenkins-servers::after{content:"배포 연동 Jenkins 주소 · 토큰";}
+#admin-index #admin-menu a.db-servers::after{content:"프로젝트 DB 접속정보 · 연결 시험";}
 #admin-index #admin-menu a.glossary-common::after{content:"모든 프로젝트가 함께 쓰는 용어 · 약어";}
 /* Vault 메뉴는 아이콘 없이 글자만 있어 자물쇠 상자를 붙임 (responsive.css 의 !important 덮어씀) */
 #admin-index #admin-menu a.vault{padding:18px 20px !important;background-image:none;}
@@ -834,6 +835,70 @@ a.gl_term{border-bottom:1px dashed var(--pri_50);text-decoration:none;}
 a.gl_term:hover{border-bottom-style:solid;text-decoration:none;}
 .gl_missing{border-bottom:1px dashed var(--dan_50);color:var(--dan_60);}
 
+/* DB 관리 (db_manage 플러그인) — 서버 목록, 프로젝트 DB 탭·테이블·컬럼·비교·용어 점검. 모바일은 카드형 */
+.db_note{display:block;margin:2px 0 0;font-size:0.8125rem;font-weight:400;color:var(--gray_50);}
+.db_adapter{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:12px;background:var(--gray_10);font-size:0.75rem;font-weight:500;color:var(--gray_80);white-space:nowrap;}
+.db_adapter.db_mariadb{background:var(--suc_10);color:var(--suc_60);}
+.db_adapter.db_postgresql{background:var(--pri_10);color:var(--pri_60);}
+.db_head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin:0 0 16px;}
+.db_head p{margin:0;}
+.db_info{font-size:0.875rem;color:var(--gray_60);}
+.db_btns{display:flex;flex-wrap:wrap;gap:8px;}
+#content .db_btns a.btn_line{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.875rem;font-weight:500;color:var(--pri_60);}
+#content .db_btns a.btn_line:hover{background:var(--pri_5);text-decoration:none;}
+#content .db_btns a.btn_line .icon-svg{width:16px;height:16px;}
+.db_hint{text-align:center;}
+.db_error{margin:0 0 20px;word-break:break-all;}
+table.list.db_list,table.list.db_cols{display:block;}
+table.list.db_list>thead,table.list.db_cols>thead{display:none;}
+table.list.db_list>tbody,table.list.db_cols>tbody{display:block;}
+table.list.db_list tr.db_row,table.list.db_cols tr.db_col{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;padding:12px 4px;border-bottom:1px solid var(--gray_20);}
+table.list.db_list tr.db_row>td,table.list.db_cols tr.db_col>td{display:block;padding:0;border:0;font-size:0.875rem;text-align:left;color:var(--gray_70);}
+table.list.db_list tr.db_row>td:empty,table.list.db_cols tr.db_col>td:empty{display:none;}
+table.list.db_list tr.db_row>td.name,table.list.db_cols tr.db_col>td.name{flex:1 0 100%;font-size:1rem;font-weight:500;color:var(--gray_95);}
+table.list.db_list tr.db_row>td.comment,table.list.db_cols tr.db_col>td.comment{flex:1 0 100%;}
+table.list.db_list tr.db_row>td.count::before{content:"컬럼 ";color:var(--gray_50);}
+table.list.db_list tr.db_row>td.rows::before{content:"행 ";color:var(--gray_50);}
+table.list.db_list tr.db_row>td.match::before{content:"용어 ";font-size:0.8125rem;color:var(--gray_50);}
+table.list.db_cols tr.db_col>td.pos{display:none;}
+table.list.db_cols tr.db_col>td.null::before{content:"Null ";color:var(--gray_50);}
+table.list.db_cols tr.db_col>td.default::before{content:"기본값 ";color:var(--gray_50);}
+table.list.db_cols td.name code{font-size:0.9375rem;color:var(--gray_95);}
+.db_view{display:inline-flex;align-items:center;height:20px;padding:0 6px;border:1px solid var(--gray_30);border-radius:var(--radius_s);font-size:0.75rem;font-weight:400;color:var(--gray_60);vertical-align:middle;}
+.db_ratio{font-size:0.8125rem;color:var(--gray_60);}
+.db_ratio.on{font-weight:500;color:var(--suc_60);}
+.db_key{display:inline-flex;align-items:center;height:20px;padding:0 6px;border-radius:var(--radius_s);font-size:0.6875rem;font-weight:700;}
+.db_key.db_pk{background:var(--war_10);color:var(--war_60);}
+.db_key.db_uk{background:var(--pri_10);color:var(--pri_60);}
+.db_key.db_fk{background:var(--suc_10);color:var(--suc_60);}
+.db_ref{font-size:0.8125rem;color:var(--gray_50);}
+.db_term{display:inline-flex;align-items:center;min-height:24px;padding:0 8px;border-radius:12px;font-size:0.75rem;font-weight:500;}
+.db_term.db_ok{background:var(--suc_5);color:var(--suc_60);}
+.db_term.db_type{background:var(--war_5);color:var(--war_60);}
+.db_term.db_missing{background:var(--gray_5);color:var(--gray_60);}
+.db_pick{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 20px;}
+.db_pick label{font-weight:700;color:var(--gray_70);}
+.db_vs{color:var(--gray_50);}
+.db_stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:0;margin:0 0 20px;list-style:none;}
+.db_stats li{display:flex;flex-direction:column;gap:4px;padding:12px 16px;border:1px solid var(--gray_20);border-radius:var(--radius_m);background:var(--gray_0);font-size:0.8125rem;color:var(--gray_60);}
+.db_stats li a{display:flex;flex-direction:column;gap:4px;color:inherit;text-decoration:none;}
+.db_stats li strong{font-size:1.375rem;color:var(--gray_95);}
+.db_stats li.on{border-color:var(--pri_50);background:var(--pri_5);}
+.db_stats li.on strong{color:var(--pri_60);}
+.db_allsame{padding:16px;margin:0 0 20px;border-radius:var(--radius_m);background:var(--suc_5);color:var(--suc_60);}
+.db_tags{display:flex;flex-wrap:wrap;gap:6px;padding:0;margin:0 0 24px;list-style:none;}
+.db_tags li{padding:4px 10px;border:1px solid var(--gray_20);border-radius:var(--radius_s);background:var(--gray_5);font-size:0.8125rem;}
+.db_tags li span{color:var(--gray_50);}
+.db_diff{margin:0 0 20px;}
+#content .db_diff h4{margin:0 0 8px;font-size:0.9375rem;}
+.db_dim{font-size:0.8125rem;font-weight:400;color:var(--gray_50);}
+table.list.db_difftbl{table-layout:fixed;}
+table.list.db_difftbl th{text-align:left;}
+table.list.db_difftbl th:nth-child(1){width:24%;}
+table.list.db_difftbl th:nth-child(2){width:16%;}
+table.list.db_difftbl td{text-align:left;font-size:0.875rem;word-break:break-all;}
+table.list.db_difftbl tr.db_missing_row td{background:var(--war_5);}
+
 /* 이전·다음 버튼: Redmine 은 600px 미만에서 너비 32% 로 고정해 글자가 잘림 → 글자 너비대로 */
 #wrapper .pagination ul.pages li.current,#wrapper .pagination ul.pages li.previous,#wrapper .pagination ul.pages li.next{width:auto;overflow:visible;}
 
@@ -930,6 +995,15 @@ table.list.gl_list tr.gl_row>td,table.list.gl_list tr.gl_row>td.name,table.list.
 table.list.gl_list tr.gl_row>td:empty{display:table-cell;}
 table.list.gl_list tr.gl_row>td.name{white-space:nowrap;}
 table.list.gl_list tr.gl_row>td.definition{width:40%;}
+table.list.db_list,table.list.db_cols{display:table;}
+table.list.db_list>thead,table.list.db_cols>thead{display:table-header-group;}
+table.list.db_list>tbody,table.list.db_cols>tbody{display:table-row-group;}
+table.list.db_list>thead th,table.list.db_cols>thead th{text-align:left;}
+table.list.db_list tr.db_row,table.list.db_cols tr.db_col{display:table-row;padding:0;border:0;}
+table.list.db_list tr.db_row>td,table.list.db_cols tr.db_col>td,table.list.db_list tr.db_row>td:empty,table.list.db_cols tr.db_col>td:empty,table.list.db_list tr.db_row>td.name,table.list.db_cols tr.db_col>td.name,table.list.db_list tr.db_row>td.comment,table.list.db_cols tr.db_col>td.comment,table.list.db_cols tr.db_col>td.pos{display:table-cell;padding:9px 10px 9px 4px;border-top:1px solid var(--gray_10);font-size:0.875rem;vertical-align:middle;}
+table.list.db_list tr.db_row>td.count::before,table.list.db_list tr.db_row>td.rows::before,table.list.db_list tr.db_row>td.match::before,table.list.db_cols tr.db_col>td.null::before,table.list.db_cols tr.db_col>td.default::before{content:none;}
+table.list.db_list tr.db_row>td.name,table.list.db_cols tr.db_col>td.name{white-space:nowrap;}
+.db_stats{grid-template-columns:repeat(4,1fr);}
 #admin-index #admin-menu ul{grid-template-columns:repeat(3,1fr);}
 }
 
