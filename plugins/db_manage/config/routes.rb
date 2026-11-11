@@ -13,6 +13,8 @@ resources :projects, only: [] do
   match 'db/:link_id/query', to: 'db_schemas#query', via: [:get, :post], as: 'db_query'
   get 'db/:link_id/query/log', to: 'db_schemas#query_log', as: 'db_query_log'
   get 'db/:link_id/check', to: 'db_schemas#check', as: 'db_check'
+  get 'db/:link_id/privacy', to: 'db_schemas#privacy', as: 'db_privacy'
+  post 'db/:link_id/privacy', to: 'db_schemas#save_privacy'
   get 'db/:link_id/erd', to: 'db_schemas#erd', as: 'db_erd', format: false
   get 'db/:link_id/export', to: 'db_schemas#export', as: 'db_export'
   get 'db/:link_id/objects/:kind/:key', to: 'db_schemas#object', as: 'db_object', constraints: { key: %r{[^/]+} }, format: false

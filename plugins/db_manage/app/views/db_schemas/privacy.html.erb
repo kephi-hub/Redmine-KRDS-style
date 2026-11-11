@@ -1,0 +1,108 @@
+<%# 프로젝트 > DB > 개인정보 — 확정 목록 · 자동 후보 · 경고, 분류·암호화 여부 저장 %>
+<div class="contextual">
+  <%= link_to sprite_icon('download', l(:label_db_export)), project_db_privacy_path(@project, @link, :download => 'xlsx'), :class => 'icon icon-download' %>
+</div>
+<h2><%= link_to l(:label_db_manage), project_db_schemas_path(@project, :link => @link.id) %> &#187; <%= @link.name %> &#187; <%= l(:label_db_privacy) %></h2>
+<p class="subtitle"><%= l(:text_db_privacy) %></p>
+<%= render :partial => 'error' %>
+<% tab_path = ->(t) { project_db_privacy_path(@project, @link, :tab => t) } %>
+<ul class="db_stats mt_kpi">
+  <li class="<%= 'on' if @tab == 'list' %>"><%= link_to tab_path.('list') do %><span><%= l(:label_db_pv_k_personal) %></span><strong><%= @kpi[:personal] %></strong><% end %></li>
+  <li><%= link_to tab_path.('list') do %><span><%= l(:label_db_pv_k_required) %></span><strong><%= @kpi[:required] %></strong><% end %></li>
+  <li class="<%= 'on' if @tab == 'warn' %>"><%= link_to tab_path.('warn') do %><span><%= l(:label_db_pv_k_warn) %></span><strong class="<%= 'qa_fail' if @kpi[:warn].positive? %>"><%= @kpi[:warn] %></strong><% end %></li>
+  <li><%= link_to tab_path.('warn') do %><span><%= l(:label_db_pv_k_check) %></span><strong><%= @kpi[:check] %></strong><% end %></li>
+  <li class="<%= 'on' if @tab == 'candidates' %>"><%= link_to tab_path.('candidates') do %><span><%= l(:label_db_pv_k_candidates) %></span><strong><%= @kpi[:candidates] %></strong><% end %></li>
+  <li><%= link_to tab_path.('warn') do %><span><%= l(:label_db_pv_k_gone) %></span><strong class="<%= 'qa_fail' if @kpi[:gone].positive? %>"><%= @kpi[:gone] %></strong><% end %></li>
+</ul>
+<div class="tabs">
+  <ul>
+    <li><%= link_to l(:label_db_pv_tab_list, :count => @kpi[:personal]), tab_path.('list'), :class => (@tab == 'list' ? 'selected' : nil) %></li>
+    <li><%= link_to l(:label_db_pv_tab_candidates, :count => @kpi[:candidates]), tab_path.('candidates'), :class => (@tab == 'candidates' ? 'selected' : nil) %></li>
+    <li><%= link_to l(:label_db_pv_tab_warn, :count => @kpi[:warn] + @kpi[:check] + @kpi[:gone]), tab_path.('warn'), :class => (@tab == 'warn' ? 'selected' : nil) %></li>
+    <% if @none_count.positive? %><li><%= link_to l(:label_db_pv_tab_none, :count => @none_count), tab_path.('none'), :class => (@tab == 'none' ? 'selected' : nil) %></li><% end %>
+  </ul>
+</div>
+<p class="db_info"><%= l("text_db_pv_tab_#{@tab}") %></p>
+<% cand = @tab == 'candidates' %>
+<% list = cand ? @candidates.first(500) : @shown %>
+<% if list.empty? %>
+  <p class="<%= @tab == 'warn' ? 'db_allsame' : 'nodata' %>"><%= l(@tab == 'warn' ? :label_db_pv_no_warn : (cand ? :label_db_pv_no_candidates : :label_no_data)) %></p>
+<% else %>
+<%= form_tag(project_db_privacy_path(@project, @link), :id => 'db_pv_form') do %>
+  <%= hidden_field_tag 'tab', @tab, :id => nil %>
+  <div class="autoscroll">
+  <table class="list db_cols db_pvtbl">
+    <thead><tr>
+      <% if cand && @can_edit %><th class="pick"><input type="checkbox" id="db_pv_all" aria-label="<%= l(:label_db_pv_pick_all) %>"></th><% end %>
+      <th class="name"><%= l(:field_db_table) %></th>
+      <th><%= l(:field_db_column) %></th>
+      <th class="comment"><%= l(:field_db_comment) %></th>
+      <th><%= l(:label_db_pv_category) %></th>
+      <th><%= l(:label_db_pv_encryption) %></th>
+      <th><%= cand ? l(:label_db_pv_reason) : l(:label_db_pv_judge) %></th>
+      <% unless cand %><th class="comment"><%= l(:label_db_pv_note) %></th><th><%= l(:label_db_pv_by) %></th><% end %>
+    </tr></thead>
+    <tbody>
+    <% list.each_with_index do |x, i| %>
+      <% rec = x[:rec]; col = x[:col] || {} %>
+      <% cat = rec ? rec.category : x[:category] %>
+      <% enc = rec ? rec.encryption : 'unknown' %>
+      <tr class="db_col db_pvrow <%= 'db_gone' if x[:gone] %>" data-j="<%= x[:gone] ? 'gone' : x[:judge] %>">
+        <% if cand && @can_edit %><td class="pick"><%= check_box_tag "rows[#{i}][on]", '1', false, :class => 'db_pvon', :id => nil, :'aria-label' => "#{x[:table]}.#{x[:column]}" %></td><% end %>
+        <td class="name"><% if @can_edit %><%= hidden_field_tag "rows[#{i}][t]", x[:table], :id => nil %><%= hidden_field_tag "rows[#{i}][c]", x[:column], :id => nil %><% if cand %><%= hidden_field_tag "rows[#{i}][cand]", '1', :id => nil %><% end %><% end %><%= link_to x[:table], project_db_table_path(@project, @link, x[:table]) %><% if x[:table_comment].present? %><span class="db_dim db_pvsub"><%= x[:table_comment] %></span><% end %></td>
+        <td class="col"><code><%= x[:column] %></code><% if col[:type] %><span class="db_dim db_pvsub"><%= col[:type] %></span><% end %></td>
+        <td class="comment"><%= col[:comment] %></td>
+        <% if @can_edit %>
+          <td class="cat"><%= select_tag "rows[#{i}][category]", options_for_select(db_pv_options(cand ? nil : l(:label_db_pv_unmark)), cat), :class => 'db_pvsel', :id => nil, :data => { :orig => (cand ? '' : cat) }, :'aria-label' => l(:label_db_pv_category) %></td>
+          <td class="enc"><%= select_tag "rows[#{i}][encryption]", options_for_select(db_pv_enc_options, enc), :class => 'db_pvsel', :id => nil, :data => { :orig => (cand ? '' : enc) }, :'aria-label' => l(:label_db_pv_encryption) %></td>
+        <% else %>
+          <td class="cat"><%= db_pv_badge(cat) %></td>
+          <td class="enc"><%= l("label_db_pv_enc_#{enc}") %></td>
+        <% end %>
+        <% if cand %>
+          <td class="reason"><span class="db_dim"><%= l("label_db_pv_reason_#{x[:reason]}") %></span></td>
+        <% else %>
+          <td class="judge"><%= db_pv_judge(x[:judge], x[:gone]) %></td>
+          <td class="note"><% if @can_edit %><%= text_field_tag "rows[#{i}][note]", rec.note, :class => 'db_pvnote', :id => nil, :data => { :orig => rec.note.to_s }, :'aria-label' => l(:label_db_pv_note) %><% else %><%= rec.note %><% end %></td>
+          <td class="by"><% if rec.user %><%= rec.user %><span class="db_dim db_pvsub"><%= format_date(rec.updated_at) %></span><% end %></td>
+        <% end %>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  </div>
+  <% if cand && @candidates.size > 500 %><p class="db_dim"><%= l(:label_db_more, :count => @candidates.size - 500) %></p><% end %>
+  <% if @can_edit %>
+  <p class="form_btns qa_savebar">
+    <span class="qa_changed" hidden></span>
+    <%= submit_tag l(cand ? :label_db_pv_confirm : :button_save) %>
+  </p>
+  <% end %>
+<% end %>
+<% if @can_edit %>
+<%= javascript_tag do %>
+$(function() {
+  var $f = $('#db_pv_form'), $msg = $f.find('.qa_changed'), tpl = <%= raw l(:label_db_pv_changed, :count => '__N__').to_json %>, dirty = false, cand = <%= cand ? 'true' : 'false' %>;
+  function refresh() {
+    var n = 0;
+    $f.find('tr.db_pvrow').each(function() {
+      var $tr = $(this), ch;
+      if (cand) { ch = $tr.find('.db_pvon').prop('checked'); }
+      else { ch = false; $tr.find('.db_pvsel, .db_pvnote').each(function() { if ($(this).val() !== String($(this).data('orig'))) ch = true; }); }
+      $tr.toggleClass('on', !!ch); if (ch) n++;
+    });
+    dirty = n > 0;
+    $msg.prop('hidden', !dirty).text(tpl.replace('__N__', n));
+  }
+  $f.on('change input', '.db_pvsel, .db_pvnote, .db_pvon', function() {
+    if (cand && $(this).hasClass('db_pvsel')) $(this).closest('tr').find('.db_pvon').prop('checked', true);
+    refresh();
+  });
+  $('#db_pv_all').on('change', function() { $f.find('.db_pvon').prop('checked', this.checked); refresh(); });
+  $f.on('submit', function() { dirty = false; });
+  $(window).on('beforeunload', function() { if (dirty) return true; });
+});
+<% end %>
+<% end %>
+<% end %>
+<% html_title "#{l(:label_db_privacy)} - #{l(:label_db_manage)}" %>

@@ -12,6 +12,28 @@ module DbSchemasHelper
     end
   end
 
+  # 개인정보 분류 배지 (data-k 로 색)
+  def db_pv_badge(category, encryption = nil)
+    title = encryption ? "#{l(:label_db_pv_encryption)}: #{l("label_db_pv_enc_#{encryption}")}" : nil
+    content_tag(:span, l("label_db_pv_cat_#{category}"), class: 'db_pv', data: { k: category }, title: title)
+  end
+
+  # 판정 배지: 정상·경고·확인 필요·DB 에 없음
+  def db_pv_judge(judge, gone = false)
+    return content_tag(:span, l(:label_db_pv_gone), class: 'db_pvj', data: { k: 'gone' }) if gone
+    return ''.html_safe if judge == :na
+    content_tag(:span, l("label_db_pv_judge_#{judge}"), class: 'db_pvj', data: { k: judge })
+  end
+
+  def db_pv_options(blank_label = nil)
+    opts = DbPrivacyColumn::CATEGORIES.map { |k| [l("label_db_pv_cat_#{k}"), k] }
+    blank_label ? [[blank_label, '']] + opts : opts
+  end
+
+  def db_pv_enc_options
+    DbPrivacyColumn::ENCRYPTIONS.map { |k| [l("label_db_pv_enc_#{k}"), k] }
+  end
+
   def db_link_label(link)
     safe_join([link.name, (content_tag(:span, l(:label_db_production), class: 'dep_prod') if link.production?)].compact, ' ')
   end

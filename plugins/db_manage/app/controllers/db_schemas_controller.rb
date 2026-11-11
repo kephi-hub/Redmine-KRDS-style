@@ -8,7 +8,7 @@ class DbSchemasController < ApplicationController
   before_action :find_project_by_project_id
   before_action :authorize
   before_action :load_links
-  before_action :find_link, only: [:table, :object, :export, :check, :erd, :history, :save_history, :history_diff, :query, :query_log]
+  before_action :find_link, only: [:table, :object, :export, :check, :erd, :history, :save_history, :history_diff, :query, :query_log, :privacy, :save_privacy]
 
   def index
     @link = @links.find { |l| l.id.to_s == params[:link].to_s } || @links.first
@@ -28,6 +28,7 @@ class DbSchemasController < ApplicationController
     # 뷰·구체화 뷰는 정의(SQL)도, 테이블은 걸린 트리거도 보여 줌
     @view = (@snapshot.dig(:objects, 'view').to_a + @snapshot.dig(:objects, 'matview').to_a).find { |v| v[:name] == @table[:name] } if @table[:view]
     @triggers = @snapshot.dig(:objects, 'trigger').to_a.select { |t| t[:table] == @table[:name] }
+    @privacy = DbPrivacyColumn.where(db_link_id: @link.id, table_name: @table[:name]).index_by(&:column_name)
   end
 
   # 함수·프로시저·트리거·DB 잡·시퀀스 상세 (정의 SQL 포함)
@@ -243,7 +244,99 @@ class DbSchemasController < ApplicationController
     end
   end
 
+  # 개인정보 컬럼: 확정 목록 · 자동 후보 · 경고, 엑셀(download=xlsx)
+  def privacy
+    snap = snapshot(@link)
+    @terms = DbManage::Analysis.term_map(@project)
+    records = DbPrivacyColumn.where(db_link_id: @link.id).includes(:user).to_a
+    cols = {}
+    snap&.dig(:tables)&.reject { |t| t[:view] }&.each do |t|
+      (snap[:columns][t[:name]] || []).each { |c| cols["#{t[:name]}.#{c[:name]}"] = [t, c] }
+    end
+    order = DbPrivacyColumn::CATEGORIES
+    @rows = records.map do |r|
+      t, c = cols[r.key]
+      { rec: r, table: r.table_name, column: r.column_name, col: c, table_comment: t&.dig(:comment), gone: snap && c.nil?, judge: r.judge }
+    end.sort_by { |x| [order.index(x[:rec].category), x[:table], x[:column]] }
+    @candidates = snap ? DbManage::Privacy.candidates(snap, @terms, records.map(&:key).to_set) : []
+    @candidates.sort_by! { |x| [order.index(x[:category]), x[:table], x[:column]] }
+    personal = @rows.select { |x| x[:rec].personal? }
+    @kpi = { personal: personal.size, required: personal.count { |x| DbPrivacyColumn::REQUIRED.include?(x[:rec].category) },
+             warn: personal.count { |x| x[:judge] == :warn }, check: personal.count { |x| x[:judge] == :check },
+             candidates: @candidates.size, gone: @rows.count { |x| x[:gone] } }
+    return privacy_xlsx(personal) if params[:download] == 'xlsx'
+    tabs = %w(list candidates warn none)
+    @tab = tabs.include?(params[:tab]) ? params[:tab] : (records.empty? && @candidates.any? ? 'candidates' : 'list')
+    @none_count = @rows.count { |x| !x[:rec].personal? }
+    @shown = case @tab
+             when 'list' then personal
+             when 'warn' then @rows.select { |x| x[:gone] || %i(warn check).include?(x[:judge]) }
+             when 'none' then @rows.reject { |x| x[:rec].personal? }
+             else []
+             end
+    @can_edit = User.current.allowed_to?({ controller: 'db_schemas', action: 'save_privacy' }, @project)
+  end
+
+  # 개인정보 컬럼 저장: rows[n][t|c|category|encryption|note|cand|on] — 후보 줄은 고른 것(on)만, 분류를 비우면 삭제
+  def save_privacy
+    input = params[:rows].respond_to?(:to_unsafe_h) ? params[:rows].to_unsafe_h.values : []
+    existing = DbPrivacyColumn.where(db_link_id: @link.id).index_by(&:key)
+    # 지금 DB 에 있는 컬럼(또는 이미 저장된 컬럼)만 저장
+    snap = snapshot(@link)
+    allowed = existing.keys.to_set
+    snap&.dig(:tables)&.reject { |t| t[:view] }&.each { |t| (snap[:columns][t[:name]] || []).each { |c| allowed << "#{t[:name]}.#{c[:name]}" } }
+    changed = 0
+    DbPrivacyColumn.transaction do
+      input.each do |row|
+        next unless row.respond_to?(:[])
+        t = row['t'].to_s; c = row['c'].to_s
+        next if t.blank? || c.blank?
+        next if row['cand'] == '1' && row['on'] != '1'
+        next unless allowed.include?("#{t}.#{c}")
+        rec = existing["#{t}.#{c}"]
+        cat = row['category'].to_s.presence_in(DbPrivacyColumn::CATEGORIES)
+        if cat.nil?
+          if rec
+            rec.destroy
+            changed += 1
+          end
+          next
+        end
+        rec ||= DbPrivacyColumn.new(db_link_id: @link.id, table_name: t.truncate(128, omission: ''), column_name: c.truncate(128, omission: ''))
+        rec.assign_attributes(category: cat, encryption: row['encryption'].to_s.presence_in(DbPrivacyColumn::ENCRYPTIONS) || 'unknown',
+                              note: row['note'].to_s.strip.truncate(255).presence)
+        next unless rec.changed?
+        rec.user_id = User.current.id
+        rec.save!
+        changed += 1
+      end
+    end
+    flash[:notice] = l(:notice_db_privacy_saved, count: changed)
+    redirect_to project_db_privacy_path(@project, @link, tab: params[:tab].presence)
+  end
+
   private
+
+  def privacy_xlsx(personal)
+    lb = ->(k, v) { l("label_db_pv_#{k}_#{v}") }
+    rows = personal.map do |x|
+      r = x[:rec]; c = x[:col] || {}
+      judge = x[:gone] ? l(:label_db_pv_gone) : l("label_db_pv_judge_#{x[:judge]}")
+      [r.table_name, x[:table_comment], r.column_name, c[:type], c[:comment], lb.('cat', r.category), lb.('enc', r.encryption), judge, r.note, r.user&.name,
+       r.updated_at && format_time(r.updated_at)]
+    end
+    summary = DbPrivacyColumn::CATEGORIES.reject { |k| k == 'none' }.map do |k|
+      list = personal.select { |x| x[:rec].category == k }
+      [lb.('cat', k), list.size, list.count { |x| x[:judge] == :warn }, list.count { |x| x[:judge] == :check }]
+    end
+    data = KrdsUi::Xlsx.build([
+      { name: '개인정보 컬럼', header: %w(테이블명 테이블\ 설명 컬럼명 데이터\ 타입 컬럼\ 설명 분류 암호화 판정 비고 확인자 확인일시), rows: rows,
+        widths: [26, 24, 24, 18, 30, 16, 12, 14, 30, 12, 18] },
+      { name: '분류별 요약', header: %w(분류 컬럼\ 수 경고 확인\ 필요), rows: summary, widths: [18, 10, 10, 10] }
+    ])
+    send_data data, filename: "개인정보컬럼_#{@project.identifier}_#{@link.name}_#{User.current.today.strftime('%Y%m%d')}.xlsx",
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  end
 
   def log_query(status, rows: nil, ms: nil, message: nil)
     DbQueryLog.create!(db_link_id: @link.id, user_id: User.current.id, sql: @sql.to_s.truncate(20_000), status: status,

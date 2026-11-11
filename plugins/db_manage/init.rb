@@ -12,6 +12,7 @@
 # - 1.6.0 : 구조 변경 이력(저장본 비교, rake 자동 저장), SQL 조회(조회 문장만·읽기 전용·시간/건수 제한·실행 기록, 운영 DB 별도 권한)
 # - 1.7.0 : MS SQL Server (tiny_tds) — 테이블·뷰·함수·프로시저·트리거·시퀀스·시노님·에이전트 작업
 # - 1.8.0 : Oracle (ruby-oci8, Instant Client) — 테이블·뷰·구체화 뷰·함수·프로시저·패키지·트리거·시퀀스·시노님·스케줄러 작업
+# - 1.9.0 : 개인정보 컬럼(분류·암호화 여부, 이름·설명·용어로 자동 후보, 암호화 누락·DB 에서 사라짐 경고, 엑셀)
 # 원격 DB 에는 읽기 전용 세션으로 접속해 메타데이터만 읽음 (데이터 조회·변경 SQL 없음)
 require_relative 'lib/db_manage/dialect_base'
 require_relative 'lib/db_manage/dialect_mysql'
@@ -22,6 +23,7 @@ require_relative 'lib/db_manage/connector'
 require_relative 'lib/db_manage/sql_guard'
 require_relative 'lib/db_manage/tunnel'
 require_relative 'lib/db_manage/analysis'
+require_relative 'lib/db_manage/privacy'
 require_relative 'lib/db_manage/erd'
 require_relative 'lib/db_manage/project_settings_patch'
 
@@ -29,13 +31,13 @@ Redmine::Plugin.register :db_manage do
   name 'DB 관리'
   author 'kephi-hub'
   description 'DB 서버 접속정보 관리, 프로젝트 DB 스키마 조회·테이블 정의서·개발/운영 비교·용어 점검'
-  version '1.8.0'
+  version '1.9.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
 
   project_module :db_manage do
-    permission :view_db_schema, { db_schemas: [:index, :table, :object, :export, :compare, :check, :erd, :history, :history_diff] }, read: true
-    permission :manage_db_links, { projects: :settings, db_links: [:new, :create, :edit, :update, :destroy], db_schemas: [:save_history, :query_log] }, require: :member
+    permission :view_db_schema, { db_schemas: [:index, :table, :object, :export, :compare, :check, :erd, :history, :history_diff, :privacy] }, read: true
+    permission :manage_db_links, { projects: :settings, db_links: [:new, :create, :edit, :update, :destroy], db_schemas: [:save_history, :query_log, :save_privacy] }, require: :member
     # SQL 조회: 개발 DB 와 운영 DB 권한을 따로 (운영은 기본으로 아무 역할에도 주지 않음)
     permission :run_db_query, { db_schemas: [:query] }, require: :member
     permission :run_db_query_production, { db_schemas: [:query] }, require: :member
@@ -57,6 +59,8 @@ Project.has_many :db_links, dependent: :destroy unless Project.reflect_on_associ
 DbLink.has_many :db_snapshots, dependent: :delete_all unless DbLink.reflect_on_association(:db_snapshots)
 # 연결을 지우면 SQL 조회 실행 기록도 함께 지움
 DbLink.has_many :db_query_logs, dependent: :delete_all unless DbLink.reflect_on_association(:db_query_logs)
+# 연결을 지우면 개인정보 컬럼 표시도 함께 지움
+DbLink.has_many :db_privacy_columns, dependent: :delete_all unless DbLink.reflect_on_association(:db_privacy_columns)
 
 # 비밀번호가 로그에 남지 않게
 Rails.application.config.filter_parameters += [:password, :ssh_password, :ssh_private_key, :ssh_passphrase]

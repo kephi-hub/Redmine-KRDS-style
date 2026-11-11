@@ -19,7 +19,7 @@
   <% @columns.each do |c| %>
     <tr class="db_col">
       <td class="pos"><%= c[:position] %></td>
-      <td class="name"><code><%= c[:name] %></code></td>
+      <td class="name"><code><%= c[:name] %></code><% if (pv = @privacy[c[:name]]) && pv.personal? %> <%= db_pv_badge(pv.category, pv.encryption) %><% end %></td>
       <td class="type"><%= c[:type] %></td>
       <td class="null"><%= c[:nullable] ? 'Y' : 'N' %></td>
       <td class="default"><%= c[:default] %></td>
