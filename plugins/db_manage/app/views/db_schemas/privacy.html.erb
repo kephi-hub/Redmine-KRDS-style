@@ -1,6 +1,6 @@
 <%# 프로젝트 > DB > 개인정보 — 확정 목록 · 자동 후보 · 경고, 분류·암호화 여부 저장 %>
 <div class="contextual">
-  <%= link_to sprite_icon('download', l(:label_db_export)), project_db_privacy_path(@project, @link, :download => 'xlsx'), :class => 'icon icon-download' %>
+  <%= link_to sprite_icon('download', l(:label_db_pv_export)), project_db_privacy_path(@project, @link, :download => 'xlsx'), :class => 'icon icon-download' %>
 </div>
 <h2><%= link_to l(:label_db_manage), project_db_schemas_path(@project, :link => @link.id) %> &#187; <%= @link.name %> &#187; <%= l(:label_db_privacy) %></h2>
 <p class="subtitle"><%= l(:text_db_privacy) %></p>

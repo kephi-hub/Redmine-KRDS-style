@@ -251,6 +251,7 @@ ko:
   label_db_pv_reason_comment: 설명 · 용어
   notice_db_privacy_saved: "개인정보 컬럼 %{count}건을 저장했습니다."
   label_db_pv_changed: "%{count}줄 바뀜 — 저장해야 반영됩니다"
+  label_db_pv_export: 엑셀 내보내기
   text_db_history: DB 구조(테이블·컬럼·인덱스·뷰·함수 등 정의)를 저장해 두고, 저장본끼리 또는 지금 DB 와 비교합니다. 구조가 바뀌었을 때만 저장됩니다.
   button_db_snapshot: 지금 구조 저장
   label_db_snapshotting: 저장하는 중…
