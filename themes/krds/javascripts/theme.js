@@ -80,3 +80,9 @@ $(function() {
     $bottom.removeClass('mobile-show').closest('.mobile-show').removeClass('mobile-show');
   });
 });
+
+/* 프로젝트 메뉴 대분류: 지금 대분류의 메뉴 줄(.nav_sub)을 머리글 바로 아래로 (krds_ui MenuGroups) */
+$(function() {
+  var $sub = $('#main-menu > .nav_sub');
+  if ($sub.length) $sub.insertAfter('#header');
+});

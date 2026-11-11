@@ -49,3 +49,12 @@ ko:
   field_digest: 체크섬
   label_downloads_abbr: 다운로드
   label_attachment_open_new: 새 창에서 열기
+  label_nav_overview: 개요
+  label_nav_work: 일감
+  label_nav_design: 설계
+  label_nav_dev: 개발
+  label_nav_ops: 운영
+  label_nav_docs: 산출물
+  label_nav_collab: 협업
+  label_nav_etc: 기타
+  label_nav_section: 구역

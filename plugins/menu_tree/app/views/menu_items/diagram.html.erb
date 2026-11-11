@@ -1,4 +1,5 @@
 <%# 프로젝트 > 메뉴 구조도 > 구조도 — Mermaid flowchart (완료·진행·일감 없음·미사용 색 구분), .md/.mmd/SVG/PNG %>
+<%= render :partial => 'menu_items/section', :locals => { :current => :menu } %>
 <h2><%= l(:label_menu_tree) %></h2>
 <%= menu_view_tabs(:diagram) %>
 <% if @ordered.empty? %>

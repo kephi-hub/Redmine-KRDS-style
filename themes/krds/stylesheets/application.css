@@ -1273,6 +1273,23 @@ table.list.oa_list td.next,table.list.oa_list td.exp,table.list.oa_list td.code{
 .oa_tl tr.oa_sum th,.oa_tl tr.oa_sum td{border-bottom:2px solid var(--gray_30);font-weight:700;}
 .oa_tl td.oa_na{color:var(--gray_50);}
 
+/* 프로젝트 메뉴 대분류 (krds_ui MenuGroups) — 위쪽 대분류, 펼침 목록, 아래 메뉴 줄, 모바일 패널, 합친 메뉴 구역 탭 */
+#main-menu li.nav_parent{position:relative;}
+#main-menu li.nav_parent>.menu-children{min-width:180px;}
+.nav_sub{display:block;overflow-x:auto;padding:0 16px;border-bottom:1px solid var(--gray_20);background:var(--gray_5);}
+.nav_sub ul{display:flex;gap:4px;padding:0;margin:0;list-style:none;white-space:nowrap;}
+.nav_sub li a{display:block;padding:10px 12px;border-bottom:2px solid transparent;font-size:0.875rem;font-weight:500;color:var(--gray_70);text-decoration:none;}
+.nav_sub li a:hover{color:var(--gray_95);text-decoration:none;}
+.nav_sub li a.selected{border-bottom-color:var(--pri_50);font-weight:700;color:var(--pri_60);}
+.nav_sub li a .icon-svg{display:none;}
+#wrapper .flyout-menu li.nav_parent>a.nav_grp{height:auto;padding:16px 20px 4px;border-top:1px solid var(--gray_10);font-size:0.75rem;font-weight:700;line-height:1.4;color:var(--gray_50);}
+#wrapper .flyout-menu li.nav_parent>.menu-children{display:block;position:static;width:auto;padding:0;border:0;box-shadow:none;}
+#wrapper .flyout-menu li.nav_parent>.menu-children li a{padding:0 20px 0 32px;border-top:0;}
+.nav_sec{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px;}
+.nav_sec a{display:inline-flex;align-items:center;height:32px;padding:0 14px;border:1px solid var(--gray_30);border-radius:16px;background:var(--gray_0);font-size:0.8125rem;font-weight:500;color:var(--gray_70);text-decoration:none;}
+.nav_sec a:hover{border-color:var(--pri_50);color:var(--pri_60);text-decoration:none;}
+.nav_sec a.on{border-color:var(--pri_50);background:var(--pri_50);color:var(--gray_0);}
+
 /* 이전·다음 버튼: Redmine 은 600px 미만에서 너비 32% 로 고정해 글자가 잘림 → 글자 너비대로 */
 #wrapper .pagination ul.pages li.current,#wrapper .pagination ul.pages li.previous,#wrapper .pagination ul.pages li.next{width:auto;overflow:visible;}
 
@@ -1302,6 +1319,7 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 
 /* ===== 데스크톱 (900px 이상) ===== */
 @media (min-width:900px){
+.nav_sub{padding:0 26px;}
 table.list.qa_run{display:table;}
 table.list.qa_run>thead{display:table-header-group;}
 table.list.qa_run>tbody{display:table-row-group;}
