@@ -8,7 +8,7 @@ class DbSchemasController < ApplicationController
   before_action :find_project_by_project_id
   before_action :authorize
   before_action :load_links
-  before_action :find_link, only: [:table, :object, :export, :check]
+  before_action :find_link, only: [:table, :object, :export, :check, :erd]
 
   def index
     @link = @links.find { |l| l.id.to_s == params[:link].to_s } || @links.first
@@ -76,6 +76,27 @@ class DbSchemasController < ApplicationController
     name = "테이블정의서_#{@project.identifier}_#{@link.name}_#{User.current.today.strftime('%Y%m%d')}.xlsx"
     send_data DbManage::Xlsx.build(sheets), filename: name,
               type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  end
+
+  # ERD (Mermaid) — 화면 보기, download=md|mmd 내려받기 (SVG·PNG 는 화면에서 그림을 그대로 저장)
+  def erd
+    @snapshot = snapshot(@link)
+    return unless @snapshot
+    all = @snapshot[:tables].map { |t| t[:name] }
+    picked = Array(params[:t]).map(&:to_s) & all
+    @picked = picked.any? ? picked : nil
+    @columns = %w(all keys none).include?(params[:cols]) ? params[:cols] : 'all'
+    @inferred = params.key?(:applied) ? params[:inferred] == '1' : true
+    @erd = DbManage::Erd.build(@snapshot, tables: @picked, columns: @columns, inferred: @inferred)
+    base = "ERD_#{@project.identifier}_#{@link.name}_#{User.current.today.strftime('%Y%m%d')}"
+    case params[:download]
+    when 'mmd'
+      send_data @erd[:mermaid], filename: "#{base}.mmd", type: 'text/plain; charset=utf-8'
+    when 'md'
+      info = "- DB: #{helpers.db_link_info(@link)}
+- 생성: #{format_time(Time.now)} · 테이블 #{@erd[:tables].size} · 관계 #{@erd[:relations].size}"
+      send_data DbManage::Erd.markdown("#{@project.name} · #{@link.name} ERD", info, @erd), filename: "#{base}.md", type: 'text/markdown; charset=utf-8'
+    end
   end
 
   # 두 DB(기본: 운영 아님 ↔ 운영) 의 테이블·컬럼 차이

@@ -158,6 +158,26 @@ en:
   text_db_hint_mysql_event: MySQL 8 shows events only with the EVENT privilege, which also allows changing events.
   text_db_hint_mysql_trigger: MySQL 8 shows triggers only with the TRIGGER privilege, which also allows creating and dropping triggers.
   text_db_hint_postgresql_event: pg_cron jobs are visible only to the account that created them.
+  label_db_erd: ERD
+  text_db_erd: Draws tables and relations as a Mermaid ERD. The .md file renders on GitHub, VS Code and the Redmine wiki; SVG/PNG can be pasted into documents.
+  label_db_erd_cols: Columns
+  label_db_erd_cols_all: All
+  label_db_erd_cols_keys: Keys only
+  label_db_erd_cols_none: Table names only
+  label_db_erd_inferred: Show inferred relations
+  label_db_erd_tables: Tables
+  label_db_erd_sum: "%{tables} tables · %{fk} FK relations · %{inferred} inferred"
+  label_db_erd_zoom_in: Zoom in
+  label_db_erd_zoom_out: Zoom out
+  label_db_erd_fit: Fit
+  label_db_erd_fk: FK constraint
+  label_db_erd_guess: Inferred (column named like another table's PK)
+  label_db_erd_loading: Drawing ERD…
+  label_db_erd_text: Show Mermaid source
+  text_db_erd_many: "%{count} tables may make a large, slow diagram. Pick the tables you need."
+  text_db_erd_error: Could not draw the ERD.
+  text_db_erd_md: Markdown document (```mermaid block + table list)
+  text_db_erd_mmd: Mermaid source
   activerecord:
     attributes:
       db_server:

@@ -9,6 +9,7 @@
 <div class="db_head">
   <p class="db_info"><%= db_link_info(@link) %><% if @link.db_server.ssh_enabled? %> · <%= l(:label_db_ssh_via, :route => @link.db_server.ssh_host) %><% end %></p>
   <p class="db_btns">
+    <%= link_to sprite_icon('workflows', l(:label_db_erd)), project_db_erd_path(@project, @link), :class => 'btn_line' %>
     <% if @terms %><%= link_to sprite_icon('checked', l(:label_db_check)), project_db_check_path(@project, @link), :class => 'btn_line' %><% end %>
     <%= link_to sprite_icon('download', l(:label_db_export)), project_db_export_path(@project, @link), :class => 'btn_line' %>
   </p>

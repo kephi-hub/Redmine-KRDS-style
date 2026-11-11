@@ -1,0 +1,105 @@
+<%# 프로젝트 > DB > ERD — Mermaid erDiagram (DbManage::Erd), 테이블 선택·컬럼 표시·추정 관계, 확대·축소, .md/.mmd/SVG/PNG %>
+<h2><%= link_to l(:label_db_manage), project_db_schemas_path(@project, :link => @link.id) %> &#187; <%= @link.name %> &#187; ERD</h2>
+<p class="subtitle"><%= l(:text_db_erd) %></p>
+<%= render :partial => 'error' %>
+<% if @erd %>
+  <% all = @snapshot[:tables].reject { |t| t[:view] }; chosen = @erd[:tables].map { |t| t[:name] } %>
+  <%= form_tag project_db_erd_path(@project, @link), :method => :get, :id => 'erd_form', :class => 'erd_form' do %>
+    <%= hidden_field_tag 'applied', '1', :id => nil %>
+    <div class="erd_opts">
+      <span class="ag_flabel"><%= l(:label_db_erd_cols) %></span>
+      <% [['all', :label_db_erd_cols_all], ['keys', :label_db_erd_cols_keys], ['none', :label_db_erd_cols_none]].each do |v, label| %>
+        <label class="ag_chip"><%= radio_button_tag 'cols', v, @columns == v, :id => nil %><span><%= l(label) %></span></label>
+      <% end %>
+      <label class="ag_chip"><%= check_box_tag 'inferred', '1', @inferred, :id => nil %><span><%= l(:label_db_erd_inferred) %></span></label>
+    </div>
+    <details class="erd_pick"<%= raw(' open') if all.size > 60 && @picked.nil? %>>
+      <summary><%= l(:label_db_erd_tables) %> <b id="erd_cnt"><%= chosen.size %></b> / <%= all.size %></summary>
+      <div class="erd_pick_bar">
+        <span class="list_field"><input type="search" id="erd_q" placeholder="<%= l(:label_db_filter) %>" aria-label="<%= l(:label_db_filter) %>"></span>
+        <button type="button" class="btn_line" id="erd_all"><%= l(:button_check_all) %></button>
+        <button type="button" class="btn_line" id="erd_none"><%= l(:button_uncheck_all) %></button>
+      </div>
+      <ul class="erd_tables">
+        <% all.each do |t| %>
+          <li data-name="<%= "#{t[:name]} #{t[:comment]}".downcase %>"><label><%= check_box_tag 't[]', t[:name], chosen.include?(t[:name]), :id => nil %> <code><%= t[:name] %></code><% if t[:comment] %> <span><%= t[:comment] %></span><% end %></label></li>
+        <% end %>
+      </ul>
+    </details>
+    <p class="erd_apply"><%= submit_tag l(:button_apply), :name => nil %></p>
+  <% end %>
+
+  <% if all.size > 60 && @picked.nil? %><p class="db_hintbox"><%= l(:text_db_erd_many, :count => all.size) %></p><% end %>
+
+  <div class="erd_bar">
+    <p class="erd_sum"><%= l(:label_db_erd_sum, :tables => @erd[:tables].size, :fk => @erd[:relations].count { |r| !r[:inferred] }, :inferred => @erd[:relations].count { |r| r[:inferred] }) %></p>
+    <p class="erd_zoom">
+      <button type="button" class="btn_line" data-zoom="-1" aria-label="<%= l(:label_db_erd_zoom_out) %>">−</button>
+      <span id="erd_pct">100%</span>
+      <button type="button" class="btn_line" data-zoom="1" aria-label="<%= l(:label_db_erd_zoom_in) %>">+</button>
+      <button type="button" class="btn_line" data-zoom="0"><%= l(:label_db_erd_fit) %></button>
+    </p>
+    <p class="db_btns">
+      <% q = request.query_parameters.except('download') %>
+      <%= link_to sprite_icon('download', '.md'), project_db_erd_path(@project, @link, q.merge(:download => 'md')), :class => 'btn_line', :title => l(:text_db_erd_md) %>
+      <%= link_to sprite_icon('download', '.mmd'), project_db_erd_path(@project, @link, q.merge(:download => 'mmd')), :class => 'btn_line', :title => l(:text_db_erd_mmd) %>
+      <a href="#" class="btn_line" id="erd_svg"><%= sprite_icon('download', 'SVG') %></a>
+      <a href="#" class="btn_line" id="erd_png"><%= sprite_icon('download', 'PNG') %></a>
+    </p>
+  </div>
+  <p class="erd_legend"><span class="erd_solid"></span><%= l(:label_db_erd_fk) %> <span class="erd_dash"></span><%= l(:label_db_erd_guess) %></p>
+
+  <div class="erd_view" id="erd_view" tabindex="0" aria-label="ERD"><p class="erd_loading"><%= l(:label_db_erd_loading) %></p></div>
+  <pre class="erd_src" id="erd_src" hidden><%= @erd[:mermaid] %></pre>
+  <details class="erd_text"><summary><%= l(:label_db_erd_text) %></summary><pre class="db_sql"><code><%= @erd[:mermaid] %></code></pre></details>
+
+  <%= javascript_tag do %>
+  $(function() {
+    var base = <%= raw "ERD_#{@project.identifier}_#{@link.name}_#{User.current.today.strftime('%Y%m%d')}".to_json %>;
+    var $view = $('#erd_view'), scale = 1, svgEl = null;
+    function apply() { if (!svgEl) return; svgEl.style.width = (svgEl.viewBox.baseVal.width * scale) + 'px'; svgEl.style.height = (svgEl.viewBox.baseVal.height * scale) + 'px'; $('#erd_pct').text(Math.round(scale * 100) + '%'); }
+    function fit() { if (!svgEl) return; var w = svgEl.viewBox.baseVal.width; scale = Math.min(1, ($view.width() - 24) / w); apply(); }
+    window.dbMermaid().then(function(mm) {
+      return mm.render('erd_svg_out', $('#erd_src').text());
+    }).then(function(r) {
+      $view.html(r.svg); svgEl = $view.find('svg')[0]; svgEl.removeAttribute('style'); svgEl.style.maxWidth = 'none'; fit();
+    }).catch(function(e) {
+      $view.html('<p class="db_hintbox"></p>').find('p').text(<%= raw l(:text_db_erd_error).to_json %> + ' ' + (e && e.message ? e.message : ''));
+    });
+    $('[data-zoom]').on('click', function() { var z = +$(this).data('zoom'); if (z === 0) return fit(); scale = Math.max(0.2, Math.min(3, scale + z * 0.2)); apply(); });
+    // 드래그로 이동
+    var drag = null;
+    $view.on('mousedown', function(e) { drag = { x: e.pageX, y: e.pageY, l: this.scrollLeft, t: this.scrollTop }; $view.addClass('on'); });
+    $(document).on('mousemove', function(e) { if (!drag) return; $view[0].scrollLeft = drag.l - (e.pageX - drag.x); $view[0].scrollTop = drag.t - (e.pageY - drag.y); })
+               .on('mouseup', function() { drag = null; $view.removeClass('on'); });
+    function svgText() {
+      var c = svgEl.cloneNode(true), w = svgEl.viewBox.baseVal.width, h = svgEl.viewBox.baseVal.height;
+      c.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); c.setAttribute('width', w); c.setAttribute('height', h); c.removeAttribute('style');
+      var bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      bg.setAttribute('x', svgEl.viewBox.baseVal.x); bg.setAttribute('y', svgEl.viewBox.baseVal.y); bg.setAttribute('width', w); bg.setAttribute('height', h); bg.setAttribute('fill', '#ffffff');
+      c.insertBefore(bg, c.firstChild);
+      return { text: '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(c), w: w, h: h };
+    }
+    function save(blob, name) { var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function() { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+    $('#erd_svg').on('click', function(e) { e.preventDefault(); if (!svgEl) return; save(new Blob([svgText().text], { type: 'image/svg+xml' }), base + '.svg'); });
+    $('#erd_png').on('click', function(e) {
+      e.preventDefault(); if (!svgEl) return;
+      var s = svgText(), img = new Image(), k = 2;
+      img.onload = function() {
+        var cv = document.createElement('canvas'); cv.width = s.w * k; cv.height = s.h * k;
+        var g = cv.getContext('2d'); g.fillStyle = '#ffffff'; g.fillRect(0, 0, cv.width, cv.height); g.drawImage(img, 0, 0, cv.width, cv.height);
+        cv.toBlob(function(b) { save(b, base + '.png'); }, 'image/png');
+      };
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s.text);
+    });
+    // 테이블 선택
+    function count() { $('#erd_cnt').text($('.erd_tables input:checked').length); }
+    $('#erd_q').on('input', function() { var q = $(this).val().toLowerCase().trim(); $('.erd_tables li').each(function() { $(this).toggle(!q || String($(this).data('name')).indexOf(q) >= 0); }); });
+    $('#erd_all').on('click', function() { $('.erd_tables li:visible input').prop('checked', true); count(); });
+    $('#erd_none').on('click', function() { $('.erd_tables li:visible input').prop('checked', false); count(); });
+    $('.erd_tables').on('change', 'input', count);
+  });
+  <% end %>
+<% end %>
+<p class="form_btns"><%= link_to l(:label_db_back), project_db_schemas_path(@project, :link => @link.id), :class => 'btn_line' %></p>
+<% html_title "ERD - #{@link.name}" %>

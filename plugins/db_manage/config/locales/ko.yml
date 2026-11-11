@@ -158,6 +158,26 @@ ko:
   text_db_hint_mysql_event: MySQL 8 은 EVENT 권한이 있어야 이벤트(DB 잡)가 보입니다. 이벤트를 만들고 지울 수도 있는 권한이라 조회 전용 계정에는 권장하지 않습니다.
   text_db_hint_mysql_trigger: MySQL 8 은 TRIGGER 권한이 있어야 트리거가 보입니다. 이 권한은 트리거를 만들고 지울 수도 있어 조회 전용 계정에는 권장하지 않습니다.
   text_db_hint_postgresql_event: pg_cron 작업은 작업을 만든 계정으로 접속해야 보입니다.
+  label_db_erd: ERD
+  text_db_erd: 테이블과 관계(FK)를 Mermaid ERD 로 그립니다. .md 파일은 깃허브·VS Code·Redmine 위키에서 그림으로 보이고, SVG·PNG 는 문서에 바로 붙일 수 있습니다.
+  label_db_erd_cols: 컬럼 표시
+  label_db_erd_cols_all: 전체
+  label_db_erd_cols_keys: 키 컬럼만
+  label_db_erd_cols_none: 테이블명만
+  label_db_erd_inferred: 추정 관계 표시
+  label_db_erd_tables: 테이블 선택
+  label_db_erd_sum: "테이블 %{tables} · FK 관계 %{fk} · 추정 관계 %{inferred}"
+  label_db_erd_zoom_in: 확대
+  label_db_erd_zoom_out: 축소
+  label_db_erd_fit: 화면 맞춤
+  label_db_erd_fk: FK 제약
+  label_db_erd_guess: 추정 관계 (다른 테이블의 PK 와 이름이 같은 컬럼)
+  label_db_erd_loading: ERD 를 그리는 중…
+  label_db_erd_text: Mermaid 원문 보기
+  text_db_erd_many: "테이블이 %{count}개라 그림이 크고 느릴 수 있습니다. 테이블 선택에서 필요한 테이블만 골라 보세요."
+  text_db_erd_error: ERD 를 그리지 못했습니다.
+  text_db_erd_md: 마크다운 문서 (```mermaid 블록 + 테이블 목록)
+  text_db_erd_mmd: Mermaid 원문
   activerecord:
     attributes:
       db_server:
