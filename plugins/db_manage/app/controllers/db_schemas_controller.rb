@@ -74,7 +74,7 @@ class DbSchemasController < ApplicationController
                   widths: [12, 28, 30, 22, 10, 30, 60] }
     end
     name = "테이블정의서_#{@project.identifier}_#{@link.name}_#{User.current.today.strftime('%Y%m%d')}.xlsx"
-    send_data DbManage::Xlsx.build(sheets), filename: name,
+    send_data KrdsUi::Xlsx.build(sheets), filename: name,
               type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   end
 

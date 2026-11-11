@@ -1,0 +1,91 @@
+<%# 프로젝트 > 시스템 권한 > 메뉴 권한 매트릭스 — 칸을 누를 때마다 없음 → 조회(R) → 편집(CRU) → 전체(CRUD) %>
+<% can_edit = User.current.allowed_to?(:manage_sys_roles, @project) %>
+<div class="contextual">
+  <%= link_to sprite_icon('download', l(:label_sys_export)), project_sys_roles_export_path(@project), :class => 'icon icon-download' %>
+</div>
+<h2><%= l(:label_sys_roles) %></h2>
+<p class="subtitle"><%= l(:text_sys_matrix) %></p>
+<%= render :partial => 'sys_roles/tabs', :locals => { :current => :matrix } %>
+<% if !@project.module_enabled?(:menu_tree) %>
+  <p class="db_hintbox"><%= l(:text_sys_need_menu) %></p>
+<% elsif @roles.empty? || @ordered.empty? %>
+  <p class="nodata"><%= @roles.empty? ? l(:label_sys_no_roles) : l(:label_menu_g_no_rows) %></p>
+<% else %>
+<ul class="ag_legend">
+  <li><span class="sr_cell sr_none">—</span> <%= l(:label_sys_access_none) %></li>
+  <li><span class="sr_cell sr_read">R</span> <%= l(:label_sys_access_read) %></li>
+  <li><span class="sr_cell sr_write">CRU</span> <%= l(:label_sys_access_write) %></li>
+  <li><span class="sr_cell sr_full">CRUD</span> <%= l(:label_sys_access_full) %></li>
+</ul>
+<%= form_tag project_sys_roles_matrix_path(@project), :id => 'sr_form' do %>
+  <% if can_edit %><p class="sr_tip mt_dim"><%= l(:text_sys_matrix_tip) %></p><% end %>
+  <div class="autoscroll">
+  <table class="list ag_tbl sr_matrix">
+    <thead><tr>
+      <th class="area"><%= l(:label_menu_tree) %></th>
+      <% @roles.each do |r| %>
+        <th class="role"><span class="sr_level"><%= r.level %></span> <%= r.name %><% if r.code %><br><code><%= r.code %></code><% end %>
+          <% if can_edit %><br><button type="button" class="ag_coltog sr_col" data-role="<%= r.id %>"><%= l(:label_sys_col_read) %></button><% end %></th>
+      <% end %>
+    </tr></thead>
+    <tbody>
+    <% @ordered.each do |m, d| %>
+      <tr class="sr_row" data-id="<%= m.id %>" data-depth="<%= d %>">
+        <th class="area" style="padding-left:<%= 12 + d * 18 %>px">
+          <span class="<%= 'mt_off' unless m.active? %>"><%= m.name %></span><% if m.screen_id %> <code><%= m.screen_id %></code><% end %>
+          <% if can_edit && @ordered.any? { |x, _| x.parent_id == m.id } %><button type="button" class="sr_down" title="<%= l(:text_sys_apply_down) %>">↓</button><% end %>
+        </th>
+        <% @roles.each do |r| %>
+          <% v = @cells[[m.id, r.id]].to_s %>
+          <td>
+            <button type="button" class="sr_cell sr_<%= v.presence || 'none' %>" data-role="<%= r.id %>" data-value="<%= v %>" data-orig="<%= v %>"<%= raw(' disabled') unless can_edit %> title="<%= m.name %> · <%= r.name %>"><%= MenuRoleAccess::CODES[v] || '—' %></button>
+            <input type="hidden" name="a[<%= m.id %>][<%= r.id %>]" value="<%= v %>">
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  </div>
+  <% if can_edit %>
+  <div class="ag_savebar">
+    <span class="ag_chg" id="sr_chg"></span>
+    <%= submit_tag l(:button_save), :name => nil, :id => 'sr_save' %>
+  </div>
+  <% end %>
+<% end %>
+<% if can_edit %>
+<%= javascript_tag do %>
+$(function() {
+  var order = ['', 'read', 'write', 'full'], code = { '': '—', read: 'R', write: 'CRU', full: 'CRUD' }, n = 0;
+  var chgText = <%= raw l(:label_sys_changed, :count => '__N__').to_json %>;
+  function set($b, v) {
+    $b.attr('data-value', v).data('value', v).removeClass('sr_none sr_read sr_write sr_full').addClass('sr_' + (v || 'none')).text(code[v]);
+    var $in = $b.next('input'); $in.val(v);
+    // 숨김칸은 값을 바꾸면 기본값도 같이 바뀌므로 처음 값(data-orig)과 비교
+    var changed = $('#sr_form .sr_cell').filter(function() { return String($(this).attr('data-orig') || '') !== String($(this).attr('data-value') || ''); }).length;
+    $('#sr_chg').text(changed ? chgText.replace('__N__', changed) : '').toggleClass('on', changed > 0);
+  }
+  $('#sr_form').on('click', '.sr_cell', function() { var v = String($(this).data('value') || ''); set($(this), order[(order.indexOf(v) + 1) % order.length]); });
+  // 열: 모두 조회(R) ↔ 모두 없음
+  $('#sr_form').on('click', '.sr_col', function() {
+    var rid = $(this).data('role'), $cells = $('#sr_form .sr_cell[data-role="' + rid + '"]');
+    var allRead = $cells.filter(function() { return !$(this).data('value'); }).length === 0;
+    $cells.each(function() { set($(this), allRead ? '' : ($(this).data('value') || 'read')); });
+  });
+  // 행: 이 메뉴의 값을 하위 메뉴 전체에 적용
+  $('#sr_form').on('click', '.sr_down', function() {
+    var $tr = $(this).closest('tr'), depth = +$tr.data('depth'), vals = {};
+    $tr.find('.sr_cell').each(function() { vals[$(this).data('role')] = String($(this).data('value') || ''); });
+    $tr.nextAll('tr').each(function() {
+      if (+$(this).data('depth') <= depth) return false;
+      $(this).find('.sr_cell').each(function() { set($(this), vals[$(this).data('role')]); });
+    });
+  });
+  $(window).on('beforeunload', function() { if ($('#sr_chg').hasClass('on')) return true; });
+  $('#sr_form').on('submit', function() { $(window).off('beforeunload'); });
+});
+<% end %>
+<% end %>
+<% end %>
+<% html_title l(:label_sys_matrix) %>

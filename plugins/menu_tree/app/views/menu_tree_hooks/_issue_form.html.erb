@@ -1,0 +1,42 @@
+<%# 일감 등록·편집: 메뉴 선택 (여러 개) — 메뉴 구조도 모듈이 켜져 있고 메뉴가 있을 때 %>
+<% project = issue.project %>
+<% if MenuTree.enabled_for?(project) && (ordered = MenuItem.ordered(project)).any? %>
+  <% index = ordered.to_h { |m, _| [m.id, m] } %>
+  <% chosen = params[:menu_items_sent] == '1' ? Array(params[:menu_item_ids]).map(&:to_i) : (issue.new_record? ? Array(params[:menu_item_ids] || params[:menu_item_id]).map(&:to_i) : issue.menu_item_ids) %>
+  <div class="mt_pick" id="mt_pick">
+    <p>
+      <label><%= l(:label_menu_item) %></label>
+      <%= hidden_field_tag 'menu_items_sent', '1', :id => nil %>
+      <span class="mt_chips">
+        <% chosen.each do |mid| %><% if (m = index[mid]) %><span class="mt_chip" data-id="<%= m.id %>"><%= m.path(index) %><button type="button" aria-label="<%= l(:button_delete) %>">×</button><input type="hidden" name="menu_item_ids[]" value="<%= m.id %>"></span><% end %><% end %>
+      </span>
+      <span class="mt_finder">
+        <input type="search" class="mt_q" placeholder="<%= l(:label_menu_pick) %>" aria-label="<%= l(:label_menu_pick) %>" autocomplete="off">
+        <span class="mt_drop" hidden>
+          <% ordered.each do |m, d| %>
+            <a href="#" data-id="<%= m.id %>" data-path="<%= m.path(index) %>" data-q="<%= "#{m.path(index)} #{m.screen_id}".downcase %>" style="padding-left:<%= 10 + d * 14 %>px"><%= m.name %><% if m.screen_id %> <code><%= m.screen_id %></code><% end %></a>
+          <% end %>
+        </span>
+      </span>
+    </p>
+  </div>
+  <%= javascript_tag do %>
+  $(function() {
+    var $p = $('#mt_pick');
+    if ($p.data('ready')) return; $p.data('ready', 1);
+    var $q = $p.find('.mt_q'), $d = $p.find('.mt_drop'), $chips = $p.find('.mt_chips');
+    function filter() { var q = $q.val().toLowerCase().trim(); $d.find('a').each(function() { $(this).toggle(!q || String($(this).data('q')).indexOf(q) >= 0); }); }
+    $q.on('focus input', function() { filter(); $d.prop('hidden', false); });
+    $(document).on('mousedown', function(e) { if (!$(e.target).closest('.mt_finder').length) $d.prop('hidden', true); });
+    $d.on('mousedown', 'a', function(e) {
+      e.preventDefault();
+      var id = $(this).data('id'); if ($chips.find('[data-id="' + id + '"]').length) return;
+      var $c = $('<span class="mt_chip"><button type="button">×</button><input type="hidden" name="menu_item_ids[]"></span>');
+      $c.attr('data-id', id).prepend(document.createTextNode($(this).data('path'))).find('input').val(id);
+      $c.find('button').attr('aria-label', <%= raw l(:button_delete).to_json %>);
+      $chips.append($c); $q.val(''); filter();
+    });
+    $chips.on('click', 'button', function() { $(this).closest('.mt_chip').remove(); });
+  });
+  <% end %>
+<% end %>

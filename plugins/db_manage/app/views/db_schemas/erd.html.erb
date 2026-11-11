@@ -59,7 +59,7 @@
     var $view = $('#erd_view'), scale = 1, svgEl = null;
     function apply() { if (!svgEl) return; svgEl.style.width = (svgEl.viewBox.baseVal.width * scale) + 'px'; svgEl.style.height = (svgEl.viewBox.baseVal.height * scale) + 'px'; $('#erd_pct').text(Math.round(scale * 100) + '%'); }
     function fit() { if (!svgEl) return; var w = svgEl.viewBox.baseVal.width; scale = Math.min(1, ($view.width() - 24) / w); apply(); }
-    window.dbMermaid().then(function(mm) {
+    window.krdsMermaid().then(function(mm) {
       return mm.render('erd_svg_out', $('#erd_src').text());
     }).then(function(r) {
       $view.html(r.svg); svgEl = $view.find('svg')[0]; svgEl.removeAttribute('style'); svgEl.style.maxWidth = 'none'; fit();
@@ -72,26 +72,8 @@
     $view.on('mousedown', function(e) { drag = { x: e.pageX, y: e.pageY, l: this.scrollLeft, t: this.scrollTop }; $view.addClass('on'); });
     $(document).on('mousemove', function(e) { if (!drag) return; $view[0].scrollLeft = drag.l - (e.pageX - drag.x); $view[0].scrollTop = drag.t - (e.pageY - drag.y); })
                .on('mouseup', function() { drag = null; $view.removeClass('on'); });
-    function svgText() {
-      var c = svgEl.cloneNode(true), w = svgEl.viewBox.baseVal.width, h = svgEl.viewBox.baseVal.height;
-      c.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); c.setAttribute('width', w); c.setAttribute('height', h); c.removeAttribute('style');
-      var bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      bg.setAttribute('x', svgEl.viewBox.baseVal.x); bg.setAttribute('y', svgEl.viewBox.baseVal.y); bg.setAttribute('width', w); bg.setAttribute('height', h); bg.setAttribute('fill', '#ffffff');
-      c.insertBefore(bg, c.firstChild);
-      return { text: '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(c), w: w, h: h };
-    }
-    function save(blob, name) { var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function() { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
-    $('#erd_svg').on('click', function(e) { e.preventDefault(); if (!svgEl) return; save(new Blob([svgText().text], { type: 'image/svg+xml' }), base + '.svg'); });
-    $('#erd_png').on('click', function(e) {
-      e.preventDefault(); if (!svgEl) return;
-      var s = svgText(), img = new Image(), k = 2;
-      img.onload = function() {
-        var cv = document.createElement('canvas'); cv.width = s.w * k; cv.height = s.h * k;
-        var g = cv.getContext('2d'); g.fillStyle = '#ffffff'; g.fillRect(0, 0, cv.width, cv.height); g.drawImage(img, 0, 0, cv.width, cv.height);
-        cv.toBlob(function(b) { save(b, base + '.png'); }, 'image/png');
-      };
-      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s.text);
-    });
+    $('#erd_svg').on('click', function(e) { e.preventDefault(); if (svgEl) window.krdsSaveSvg(svgEl, base); });
+    $('#erd_png').on('click', function(e) { e.preventDefault(); if (svgEl) window.krdsSavePng(svgEl, base); });
     // 테이블 선택
     function count() { $('#erd_cnt').text($('.erd_tables input:checked').length); }
     $('#erd_q').on('input', function() { var q = $(this).val().toLowerCase().trim(); $('.erd_tables li').each(function() { $(this).toggle(!q || String($(this).data('name')).indexOf(q) >= 0); }); });

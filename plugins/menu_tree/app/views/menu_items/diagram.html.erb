@@ -1,0 +1,65 @@
+<%# 프로젝트 > 메뉴 구조도 > 구조도 — Mermaid flowchart (완료·진행·일감 없음·미사용 색 구분), .md/.mmd/SVG/PNG %>
+<h2><%= l(:label_menu_tree) %></h2>
+<%= menu_view_tabs(:diagram) %>
+<% if @ordered.empty? %>
+<p class="nodata"><%= l(:label_menu_g_no_rows) %></p>
+<% else %>
+<%= form_tag project_menu_items_diagram_path(@project), :method => :get, :class => 'erd_form' do %>
+  <%= hidden_field_tag 'applied', '1', :id => nil %>
+  <div class="erd_opts">
+    <label class="ag_flabel" for="mt_root"><%= l(:label_menu_dg_root) %></label>
+    <%= select_tag 'root', options_for_select([[l(:label_menu_all), '']] + @roots.map { |m| [m.name, m.id] }, @root&.id), :id => 'mt_root' %>
+    <label class="ag_flabel" for="mt_depth"><%= l(:label_menu_dg_depth) %></label>
+    <%= select_tag 'depth', options_for_select([[l(:label_menu_all), '']] + (1..[(@ordered.map(&:last).max || 0) + 1, 1].max).map { |d| ["#{d}#{l(:label_menu_g_depth)}", d] }, @depth), :id => 'mt_depth' %>
+    <% [['LR', :label_menu_dg_lr], ['TD', :label_menu_dg_td]].each do |v, label| %>
+      <label class="ag_chip"><%= radio_button_tag 'dir', v, @dir == v, :id => nil %><span><%= l(label) %></span></label>
+    <% end %>
+    <label class="ag_chip"><%= check_box_tag 'show_id', '1', @show_id, :id => nil %><span><%= l(:label_menu_dg_show_id) %></span></label>
+    <label class="ag_chip"><%= check_box_tag 'hide_unused', '1', @hide_unused, :id => nil %><span><%= l(:label_menu_dg_hide_unused) %></span></label>
+    <%= submit_tag l(:button_apply), :name => nil %>
+  </div>
+<% end %>
+<div class="erd_bar">
+  <p class="erd_legend mt_legend">
+    <span class="mt_lg mt_lg_done"></span><%= l(:label_menu_lg_done) %>
+    <span class="mt_lg mt_lg_prog"></span><%= l(:label_menu_lg_prog) %>
+    <span class="mt_lg mt_lg_todo"></span><%= l(:label_menu_lg_todo) %>
+    <span class="mt_lg mt_lg_off"></span><%= l(:label_menu_lg_off) %>
+  </p>
+  <p class="erd_zoom">
+    <button type="button" class="btn_line" data-zoom="-1" aria-label="<%= l(:label_menu_zoom_out) %>">−</button>
+    <span id="erd_pct">100%</span>
+    <button type="button" class="btn_line" data-zoom="1" aria-label="<%= l(:label_menu_zoom_in) %>">+</button>
+    <button type="button" class="btn_line" data-zoom="0"><%= l(:label_menu_zoom_fit) %></button>
+  </p>
+  <p class="db_btns">
+    <% q = request.query_parameters.except('download') %>
+    <%= link_to sprite_icon('download', '.md'), project_menu_items_diagram_path(@project, q.merge(:download => 'md')), :class => 'btn_line' %>
+    <%= link_to sprite_icon('download', '.mmd'), project_menu_items_diagram_path(@project, q.merge(:download => 'mmd')), :class => 'btn_line' %>
+    <a href="#" class="btn_line" id="erd_svg"><%= sprite_icon('download', 'SVG') %></a>
+    <a href="#" class="btn_line" id="erd_png"><%= sprite_icon('download', 'PNG') %></a>
+  </p>
+</div>
+<div class="erd_view" id="erd_view" tabindex="0" aria-label="<%= l(:label_menu_view_diagram) %>"><p class="erd_loading"><%= l(:label_loading) %></p></div>
+<pre id="erd_src" hidden><%= @mermaid %></pre>
+<details class="erd_text"><summary><%= l(:label_menu_dg_src) %></summary><pre class="db_sql"><code><%= @mermaid %></code></pre></details>
+<%= javascript_tag do %>
+$(function() {
+  var base = <%= raw "메뉴구조도_#{@project.identifier}_#{User.current.today.strftime('%Y%m%d')}".to_json %>;
+  var $view = $('#erd_view'), scale = 1, svgEl = null;
+  function apply() { if (!svgEl) return; svgEl.style.width = (svgEl.viewBox.baseVal.width * scale) + 'px'; svgEl.style.height = (svgEl.viewBox.baseVal.height * scale) + 'px'; $('#erd_pct').text(Math.round(scale * 100) + '%'); }
+  function fit() { if (!svgEl) return; scale = Math.min(1, ($view.width() - 24) / svgEl.viewBox.baseVal.width); apply(); }
+  window.krdsMermaid().then(function(mm) { return mm.render('mt_dg_out', $('#erd_src').text()); })
+    .then(function(r) { $view.html(r.svg); svgEl = $view.find('svg')[0]; svgEl.removeAttribute('style'); svgEl.style.maxWidth = 'none'; fit(); })
+    .catch(function(e) { $view.html('<p class="db_hintbox"></p>').find('p').text(<%= raw l(:text_menu_dg_error).to_json %> + ' ' + (e && e.message ? e.message : '')); });
+  $('[data-zoom]').on('click', function() { var z = +$(this).data('zoom'); if (z === 0) return fit(); scale = Math.max(0.2, Math.min(3, scale + z * 0.2)); apply(); });
+  var drag = null;
+  $view.on('mousedown', function(e) { drag = { x: e.pageX, y: e.pageY, l: this.scrollLeft, t: this.scrollTop }; $view.addClass('on'); });
+  $(document).on('mousemove', function(e) { if (!drag) return; $view[0].scrollLeft = drag.l - (e.pageX - drag.x); $view[0].scrollTop = drag.t - (e.pageY - drag.y); })
+             .on('mouseup', function() { drag = null; $view.removeClass('on'); });
+  $('#erd_svg').on('click', function(e) { e.preventDefault(); if (svgEl) window.krdsSaveSvg(svgEl, base); });
+  $('#erd_png').on('click', function(e) { e.preventDefault(); if (svgEl) window.krdsSavePng(svgEl, base); });
+});
+<% end %>
+<% end %>
+<% html_title "#{l(:label_menu_view_diagram)} - #{l(:label_menu_tree)}" %>

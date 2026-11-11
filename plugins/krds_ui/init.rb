@@ -9,6 +9,8 @@
 # - documents/_form.html.erb : 편집 화면에도 첨부 추가·삭제 표시 (저장 처리: DocumentAttachmentsPatch)
 # - activities/_activities.html.erb : 작업내역 시간을 오전/오후 12시간제로 표시
 # config/locales/ko.yml : core 한국어 번역 누락분 보충
+# lib/krds_ui/xlsx.rb · xlsx_reader.rb : 엑셀 쓰기·읽기 공통 (rubyzip·nokogiri, 추가 gem 없음)
+# assets/javascripts/mermaid*.js : Mermaid 11.4.1(MIT) 포함 — 본문 ```mermaid 그림, DB ERD·메뉴 구조도 공통 (KrdsUi::MermaidHook)
 # User#initials : 한글 이름이면 아바타에 이름(firstname) 두 글자 표시 (강윤아 → 윤아)
 
 module KrdsUi
@@ -91,10 +93,24 @@ DocumentsController.prepend(KrdsUi::DocumentAttachmentsPatch) unless DocumentsCo
 DocumentsController.prepend(KrdsUi::DocumentListPatch) unless DocumentsController.ancestors.include?(KrdsUi::DocumentListPatch)
 NewsController.prepend(KrdsUi::NewsSearchPatch) unless NewsController.ancestors.include?(KrdsUi::NewsSearchPatch)
 
+require_relative 'lib/krds_ui/xlsx'
+require_relative 'lib/krds_ui/xlsx_reader'
+
+# Mermaid 공통: 본문 ```mermaid 그림, ERD·메뉴 구조도 그리기·저장 (assets/javascripts/mermaid_loader.js)
+module KrdsUi
+  class MermaidHook < Redmine::Hook::ViewListener
+    def view_layouts_base_html_head(context = {})
+      v = context[:controller].view_context
+      (%(<script>window.KRDS_MERMAID_SRC = #{v.javascript_path('plugin_assets/krds_ui/mermaid.min').to_json};</script>\n) +
+        %(<script src="#{ERB::Util.h(v.javascript_path('plugin_assets/krds_ui/mermaid_loader'))}" defer></script>)).html_safe
+    end
+  end
+end
+
 Redmine::Plugin.register :krds_ui do
   name 'KRDS UI'
   author 'kephi-hub'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
-  description 'KRDS 테마용 화면 마크업 (문서·게시판 목록·상세), 문서 범주 검색조건, 문서·뉴스·파일 제목 검색, 문서 편집 첨부 추가·삭제, 번역 보충, 한글 아바타 이니셜'
-  version '1.6.0'
+  description 'Mermaid(본문 그림·ERD·메뉴 구조도), KRDS 테마용 화면 마크업 (문서·게시판 목록·상세), 문서 범주 검색조건, 문서·뉴스·파일 제목 검색, 문서 편집 첨부 추가·삭제, 번역 보충, 한글 아바타 이니셜'
+  version '1.7.0'
 end

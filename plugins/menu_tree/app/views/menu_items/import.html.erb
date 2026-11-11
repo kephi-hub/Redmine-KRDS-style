@@ -1,0 +1,31 @@
+<%# 프로젝트 > 메뉴 구조도 > 가져오기 — 엑셀(xlsx)·CSV, 내보내기 파일 양식 그대로 %>
+<h2><%= link_to l(:label_menu_tree), project_menu_items_path(@project) %> &#187; <%= l(:label_menu_import) %></h2>
+<%= form_tag project_menu_items_import_path(@project), :multipart => true do %>
+  <div class="box">
+    <p><%= l(:text_menu_import) %></p>
+    <p class="gl_cols"><code>1뎁스</code> <code>2뎁스</code> <code>3뎁스</code> <code>…</code> <code>화면 ID</code> <code>URL</code> <code>화면 유형</code> <code>채널</code> <code>사용</code> <code>비고</code> <code>(추가 칼럼)</code></p>
+    <p class="mt_dim"><%= l(:text_menu_import_rules) %></p>
+    <p><%= file_field_tag 'file', :accept => '.xlsx,.csv' %></p>
+    <p>
+      <label class="inline"><%= radio_button_tag 'mode', 'merge', true %> <%= l(:label_menu_import_merge) %></label><br>
+      <label class="inline"><%= radio_button_tag 'mode', 'replace', false %> <%= l(:label_menu_import_replace) %></label>
+    </p>
+    <p><label class="inline"><%= check_box_tag 'new_columns', '1', true %> <%= l(:label_menu_import_new_cols) %></label></p>
+  </div>
+  <p class="form_btns">
+    <%= link_to l(:button_cancel), project_menu_items_path(@project), :class => 'btn_line' %>
+    <%= submit_tag l(:button_import), :data => { :confirm => l(:text_menu_import_confirm) } %>
+  </p>
+<% end %>
+<% if @result %>
+  <h3 class="ag_sec"><%= l(:label_menu_import_result) %></h3>
+  <ul class="ag_legend">
+    <li><%= l(:label_menu_import_created) %> <strong><%= @result[:created] %></strong></li>
+    <li><%= l(:label_menu_import_updated) %> <strong><%= @result[:updated] %></strong></li>
+    <li><%= l(:label_menu_import_cols) %> <strong><%= @result[:columns].size %></strong><% if @result[:columns].any? %> <span class="mt_dim">(<%= @result[:columns].join(', ') %>)</span><% end %></li>
+    <li><%= l(:label_menu_import_failed) %> <strong><%= @result[:errors].size %></strong></li>
+  </ul>
+  <% if @result[:errors].any? %><ul class="gl_errors"><% @result[:errors].first(50).each do |line, msg| %><li><%= line %>번째 줄 — <%= msg %></li><% end %></ul><% end %>
+  <p><%= link_to l(:label_menu_back), project_menu_items_path(@project) %></p>
+<% end %>
+<% html_title l(:label_menu_import) %>

@@ -1,0 +1,14 @@
+<%= error_messages_for @role %>
+<div class="box tabular">
+  <p><%= f.text_field :name, :required => true, :size => 30, :maxlength => 60, :placeholder => '기업회원', :label => :field_name %></p>
+  <p><%= f.text_field :code, :size => 20, :maxlength => 30, :placeholder => 'ROLE_CORP', :label => :field_sys_code %>
+    <em class="info"><%= l(:text_sys_code) %></em></p>
+  <p><%= f.number_field :level, :min => 0, :max => 999, :label => :field_sys_level %>
+    <em class="info"><%= l(:text_sys_level) %></em></p>
+  <p><%= f.text_area :description, :rows => 3, :cols => 60, :label => :field_description %></p>
+  <p><%= f.check_box :active, :label => :field_active %></p>
+</div>
+<p class="form_btns">
+  <%= link_to l(:button_cancel), project_sys_roles_path(@project), :class => 'btn_line' %>
+  <%= submit_tag l(@role.new_record? ? :button_create : :button_save) %>
+</p>

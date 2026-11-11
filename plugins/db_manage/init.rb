@@ -6,15 +6,13 @@
 # - 1.2.0 : SSH 터널(예: Redmine → WEB 서버 → 운영 DB), 비밀번호·개인키 인증, 서버 지문 확인
 # - 1.3.0 : 종류 탭(테이블·뷰·구체화 뷰·함수·프로시저·트리거·DB 잡·시퀀스 — DB 종류마다 다름), 객체 상세(정의 SQL), 숫자 요약,
 #           객체 비교·정의서 시트 추가, 프로젝트 DB 연결의 운영 표시는 DB 서버 구분을 따름(체크박스 제거)
-# - 1.4.0 : ERD (Mermaid, 플러그인에 포함 — 인터넷 불필요) 보기·테이블 선택·추정 관계, .md/.mmd/SVG/PNG 내려받기,
+# - 1.4.0 : ERD (Mermaid — krds_ui 플러그인에 포함, 인터넷 불필요) 보기·테이블 선택·추정 관계, .md/.mmd/SVG/PNG 내려받기,
 #           위키·일감 본문의 ```mermaid 블록을 그림으로
 # 원격 DB 에는 읽기 전용 세션으로 접속해 메타데이터만 읽음 (데이터 조회·변경 SQL 없음)
 require_relative 'lib/db_manage/connector'
 require_relative 'lib/db_manage/tunnel'
-require_relative 'lib/db_manage/xlsx'
 require_relative 'lib/db_manage/analysis'
 require_relative 'lib/db_manage/erd'
-require_relative 'lib/db_manage/hooks'
 require_relative 'lib/db_manage/project_settings_patch'
 
 Redmine::Plugin.register :db_manage do

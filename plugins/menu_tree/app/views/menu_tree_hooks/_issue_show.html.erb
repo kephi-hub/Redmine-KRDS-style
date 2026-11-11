@@ -1,0 +1,13 @@
+<%# 일감 상세: 연결된 메뉴 (메뉴 구조도에서 그 줄로 이동) %>
+<% if MenuTree.enabled_for?(issue.project) && (menus = issue.menu_items.to_a).any? %>
+  <% index = MenuItem.where(project_id: issue.project_id).index_by(&:id) %>
+  <hr />
+  <div class="mt_linked">
+    <p><strong><%= l(:label_menu_item) %></strong></p>
+    <ul>
+      <% menus.each do |m| %>
+        <li><%= link_to m.path(index), project_menu_items_path(issue.project, :focus => m.id) %><% if m.screen_id %> <code><%= m.screen_id %></code><% end %><% if m.url %> <span class="mt_dim"><%= m.url %></span><% end %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

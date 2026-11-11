@@ -1,0 +1,88 @@
+<%# 프로젝트 > 메뉴 구조도 — 엑셀형 표 (assets/javascripts/menu_grid.js 가 JSON 으로 그리고 고침) %>
+<% content_for :header_tags do %><%= javascript_include_tag 'menu_grid', :plugin => 'menu_tree' %><% end %>
+<% can_edit = User.current.allowed_to?(:manage_menu_tree, @project) %>
+<div class="contextual">
+  <% if can_edit %>
+    <%= link_to sprite_icon('import', l(:button_import)), project_menu_items_import_path(@project), :class => 'icon icon-import' %>
+  <% end %>
+  <%= link_to sprite_icon('download', l(:label_menu_export)), project_menu_items_export_path(@project), :class => 'icon icon-download' %>
+</div>
+<h2><%= l(:label_menu_tree) %></h2>
+<p class="subtitle"><%= l(:text_menu_tree) %></p>
+<%= menu_view_tabs(:grid) %>
+
+<ul class="db_stats mt_kpi" id="mt_kpi"></ul>
+
+<div class="mt_tools">
+  <% if can_edit %><button type="button" class="mt_btn mt_primary" id="mt_add_root"><%= sprite_icon('add', l(:label_menu_add_root)) %></button><% end %>
+  <span class="list_field"><input type="search" id="mt_q" placeholder="<%= l(:label_menu_search) %>" aria-label="<%= l(:label_menu_search) %>"></span>
+  <select id="mt_active" aria-label="<%= l(:field_menu_active) %>">
+    <option value=""><%= l(:label_menu_all) %></option><option value="1"><%= l(:label_menu_active_only) %></option><option value="0"><%= l(:label_menu_unused_only) %></option>
+  </select>
+  <button type="button" class="mt_btn" id="mt_expand"><%= l(:label_menu_g_expand) %></button>
+  <button type="button" class="mt_btn" id="mt_collapse"><%= l(:label_menu_g_collapse) %></button>
+  <% if can_edit %><button type="button" class="mt_btn" id="mt_cols_btn"><%= sprite_icon('settings', l(:label_menu_columns)) %></button><% end %>
+  <% if can_edit && User.current.allowed_to?(:add_issues, @project) %><button type="button" class="mt_btn" id="mt_issue_btn" disabled><%= sprite_icon('add', l(:label_menu_make_issues)) %> <b id="mt_sel_cnt">0</b></button><% end %>
+</div>
+<% if can_edit %><p class="mt_help"><%= l(:text_menu_keys) %></p><% end %>
+
+<div class="mt_wrap autoscroll"><table class="list mt_grid" id="mt_grid"><thead></thead><tbody><tr><td class="mt_loading"><%= l(:label_loading) %></td></tr></tbody></table></div>
+<div class="mt_msg" id="mt_msg" role="status" aria-live="polite" hidden></div>
+
+<% if can_edit %>
+<%# 추가 칼럼 관리 %>
+<div id="mt_cols_dialog" class="mt_dialog" style="display:none;">
+  <h3 class="title"><%= l(:label_menu_columns) %></h3>
+  <p class="mt_dim"><%= l(:text_menu_columns) %></p>
+  <% @columns.each do |c| %><%= form_tag project_menu_column_path(@project, c), :method => :patch, :id => "mt_col_#{c.id}" do %><% end %><% end %>
+  <table class="list mt_cols">
+    <thead><tr><th><%= l(:field_name) %></th><th><%= l(:label_menu_col_kind) %></th><th><%= l(:label_menu_col_options) %></th><th></th></tr></thead>
+    <tbody>
+    <% @columns.each do |c| %>
+      <tr>
+        <td><%= text_field_tag 'menu_column[name]', c.name, :form => "mt_col_#{c.id}", :maxlength => 60, :id => nil, :'aria-label' => l(:field_name) %></td>
+        <td><%= select_tag 'menu_column[kind]', options_for_select(MenuColumn::KINDS.map { |k| [l("label_menu_col_#{k}"), k] }, c.kind), :form => "mt_col_#{c.id}", :id => nil, :'aria-label' => l(:label_menu_col_kind) %></td>
+        <td><%= text_area_tag 'menu_column[options]', c.options, :form => "mt_col_#{c.id}", :rows => 2, :id => nil, :placeholder => l(:text_menu_col_options), :'aria-label' => l(:label_menu_col_options) %></td>
+        <td class="buttons">
+          <%= submit_tag l(:button_save), :form => "mt_col_#{c.id}", :name => nil, :class => 'mt_btn' %>
+          <%= link_to sprite_icon('del', l(:button_delete)), project_menu_column_path(@project, c), :method => :delete, :data => { :confirm => l(:text_menu_col_delete) }, :class => 'icon icon-del' %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  <%= form_tag project_menu_columns_path(@project), :class => 'mt_col_new' do %>
+    <%= text_field_tag 'menu_column[name]', '', :maxlength => 60, :placeholder => l(:label_menu_col_new), :id => nil, :required => true, :'aria-label' => l(:label_menu_col_new) %>
+    <%= select_tag 'menu_column[kind]', options_for_select(MenuColumn::KINDS.map { |k| [l("label_menu_col_#{k}"), k] }), :id => nil, :'aria-label' => l(:label_menu_col_kind) %>
+    <%= text_area_tag 'menu_column[options]', '', :rows => 1, :placeholder => l(:text_menu_col_options), :id => nil, :'aria-label' => l(:label_menu_col_options) %>
+    <%= submit_tag l(:button_add), :name => nil %>
+  <% end %>
+  <p class="buttons"><%= link_to_function l(:button_close), 'hideModal(this);', :class => 'btn_line' %></p>
+</div>
+
+<%# 고른 메뉴로 일감 만들기 %>
+<% if User.current.allowed_to?(:add_issues, @project) %>
+<div id="mt_issue_dialog" class="mt_dialog" style="display:none;">
+  <h3 class="title"><%= l(:label_menu_make_issues) %></h3>
+  <form id="mt_issue_form" class="tabular">
+    <p class="mt_dim"><%= l(:text_menu_make_issues) %> <b class="mt_sel_cnt2">0</b></p>
+    <p><label><%= l(:field_tracker) %></label><%= select_tag 'tracker_id', options_from_collection_for_select(@project.trackers.sorted, :id, :name, (@project.trackers.find_by(name: '기능') || @project.trackers.first)&.id), :id => 'mt_tracker' %></p>
+    <p><label><%= l(:field_subject) %></label><%= select_tag 'subject_format', options_for_select([[l(:label_menu_subj_path), 'path'], [l(:label_menu_subj_id_name), 'id_name'], [l(:label_menu_subj_name), 'name']]), :id => 'mt_subj' %></p>
+    <p><label><%= l(:field_assigned_to) %></label><%= select_tag 'assigned_to_id', content_tag(:option, '') + options_from_collection_for_select(@project.assignable_users.sort, :id, :name), :id => 'mt_assignee' %></p>
+    <p><label><%= l(:field_parent_issue) %></label><%= text_field_tag 'parent_issue_id', '', :size => 8, :id => 'mt_parent', :placeholder => '#' %></p>
+    <p><label><%= l(:field_start_date) %></label><%= date_field_tag 'start_date', '', :id => 'mt_start' %></p>
+    <p><label><%= l(:field_due_date) %></label><%= date_field_tag 'due_date', '', :id => 'mt_due' %></p>
+    <p><label class="inline"><%= check_box_tag 'skip_linked', '1', true, :id => 'mt_skip' %> <%= l(:label_menu_skip_linked) %></label></p>
+  </form>
+  <p class="buttons">
+    <button type="button" class="mt_btn mt_primary" id="mt_issue_go"><%= l(:button_create) %></button>
+    <%= link_to_function l(:button_cancel), 'hideModal(this);', :class => 'btn_line' %>
+  </p>
+</div>
+<% end %>
+<% end %>
+
+<%= javascript_tag do %>
+  window.MT_CONFIG = <%= raw menu_grid_config(@columns).to_json %>;
+<% end %>
+<% html_title l(:label_menu_tree) %>

@@ -1,8 +1,8 @@
-# 간단한 엑셀(xlsx) 생성 — 추가 gem 없이 Redmine 에 들어 있는 rubyzip 으로 만듦
+# 간단한 엑셀(xlsx) 생성 — 추가 gem 없이 Redmine 에 들어 있는 rubyzip 으로 만듦 (DB 정의서·ERD·메뉴 구조도 공통)
 # sheets: [{ name:, header: [...], rows: [[...]], widths: [...] }] — 머리줄 굵게·배경, 첫 줄 고정, 자동 필터
 require 'zip'
 
-module DbManage
+module KrdsUi
   module Xlsx
     module_function
 

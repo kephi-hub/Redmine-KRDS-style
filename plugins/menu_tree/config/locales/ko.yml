@@ -1,0 +1,173 @@
+ko:
+  project_module_menu_tree: 메뉴 구조도
+  project_module_sys_roles: 시스템 권한
+  permission_view_menu_tree: 메뉴 구조도 보기
+  permission_manage_menu_tree: 메뉴 구조도 편집
+  permission_view_sys_roles: 시스템 권한 보기
+  permission_manage_sys_roles: 시스템 권한 편집
+  label_menu_tree: 메뉴 구조도
+  label_menu_item: 메뉴
+  label_menu_pick: 메뉴 이름·화면 ID 로 찾아 추가
+  text_menu_tree: 개발할 시스템의 메뉴(화면) 목록입니다. 뎁스 칸은 가장 깊은 메뉴에 맞춰 자동으로 늘어나고, 메뉴마다 일감을 여러 개 연결할 수 있습니다.
+  label_menu_view_grid: 표
+  label_menu_view_diagram: 구조도
+  label_menu_view_status: 현황
+  label_menu_export: 엑셀 내보내기
+  label_menu_import: 메뉴 가져오기
+  label_menu_add_root: 1뎁스 메뉴 추가
+  label_menu_search: 메뉴명·화면 ID·URL 로 찾기
+  field_menu_active: 사용
+  field_menu_screen_id: 화면 ID
+  label_menu_all: 전체
+  label_menu_active_only: 사용 중
+  label_menu_unused_only: 미사용
+  label_menu_columns: 칼럼 관리
+  label_menu_make_issues: 고른 메뉴로 일감 만들기
+  text_menu_keys: "칸을 누르면 바로 고칩니다 — Enter 저장 후 아래로, Tab 다음 칸, Esc 취소. 메뉴명 칸에서 Tab 들여쓰기 · Shift+Tab 내어쓰기, ⋮⋮ 를 끌어 옮기기(위·아래 가장자리는 앞·뒤, 가운데는 하위로)."
+  text_menu_columns: 프로젝트에 필요한 칼럼을 더합니다. 선택 목록은 한 줄에 하나씩 적으세요.
+  label_menu_col_kind: 형식
+  label_menu_col_options: 선택 목록
+  label_menu_col_text: 텍스트
+  label_menu_col_list: 선택 목록
+  label_menu_col_bool: 체크
+  label_menu_col_date: 날짜
+  label_menu_col_new: 새 칼럼 이름
+  text_menu_col_options: 선택 목록일 때만 (한 줄에 하나)
+  text_menu_col_delete: 칼럼을 지우면 모든 메뉴의 이 칼럼 값도 지워집니다. 계속할까요?
+  text_menu_make_issues: 고른 메뉴마다 일감을 하나씩 만들고 메뉴에 연결합니다. 고른 메뉴
+  label_menu_subj_path: "[화면 ID] 메뉴 경로 (고객관리 > 고객목록)"
+  label_menu_subj_id_name: "[화면 ID] 메뉴명"
+  label_menu_subj_name: 메뉴명
+  label_menu_skip_linked: 이미 일감이 연결된 메뉴는 건너뛰기
+  label_menu_new_name: 새 메뉴
+  label_menu_g_depth: 뎁스
+  label_menu_g_screen_id: 화면 ID
+  label_menu_g_url: URL
+  label_menu_g_type: 화면 유형
+  label_menu_g_channel: 채널
+  label_menu_g_roles: 대상 권한
+  label_menu_g_active: 사용
+  label_menu_g_issues: 일감
+  label_menu_g_progress: 진행률
+  label_menu_g_note: 비고
+  label_menu_g_add_child: 하위 메뉴 추가
+  label_menu_g_add_below: 아래에 메뉴 추가
+  label_menu_g_indent: 들여쓰기 (하위로)
+  label_menu_g_outdent: 내어쓰기 (상위로)
+  label_menu_g_up: 위로
+  label_menu_g_down: 아래로
+  label_menu_g_delete: 삭제
+  label_menu_g_delete_confirm: "'%{name}' 메뉴와 하위 메뉴 %{count}개를 지웁니다. 연결된 일감은 남고 연결만 풀립니다. 계속할까요?"
+  label_menu_g_issues_view: 연결된 일감 보기
+  label_menu_g_issue_new: 새 일감
+  label_menu_g_saved: 저장했습니다
+  label_menu_g_error: 저장하지 못했습니다
+  label_menu_g_none: 없음
+  label_menu_g_yes: 사용
+  label_menu_g_no: 미사용
+  label_menu_g_new_name: 새 메뉴
+  label_menu_g_expand: 모두 펼치기
+  label_menu_g_collapse: 모두 접기
+  label_menu_g_no_rows: 등록된 메뉴가 없습니다. 메뉴를 추가하거나 엑셀로 가져오세요.
+  label_menu_g_drag: 끌어서 옮기기
+  label_menu_g_select_all: 모두 고르기
+  label_menu_g_done: 완료
+  label_menu_g_subtotal: 하위 메뉴 일감 합계
+  label_menu_g_k_menus: 전체 메뉴
+  label_menu_g_k_screens: 화면 (말단 메뉴)
+  label_menu_g_k_linked: 일감 연결 화면
+  label_menu_g_k_done: 완료 화면
+  label_menu_g_k_issues: 연결 일감
+  label_menu_g_k_ratio: 진행률
+  label_menu_type_list: 목록
+  label_menu_type_detail: 상세
+  label_menu_type_form: 등록·수정
+  label_menu_type_popup: 팝업
+  label_menu_type_tab: 탭
+  label_menu_type_link: 링크
+  label_menu_type_none: 유형 없음
+  label_menu_channel_both: 공통
+  label_menu_channel_pc: PC
+  label_menu_channel_mobile: 모바일
+  label_menu_dg_root: 1뎁스
+  label_menu_dg_depth: 표시 뎁스
+  label_menu_dg_lr: 가로
+  label_menu_dg_td: 세로
+  label_menu_dg_show_id: 화면 ID 표시
+  label_menu_dg_hide_unused: 미사용 메뉴 빼기
+  label_menu_dg_src: Mermaid 원문 보기
+  text_menu_dg_error: 구조도를 그리지 못했습니다.
+  label_menu_lg_done: 일감 모두 완료
+  label_menu_lg_prog: 진행 중
+  label_menu_lg_todo: 일감 없음
+  label_menu_lg_off: 미사용
+  label_menu_zoom_in: 확대
+  label_menu_zoom_out: 축소
+  label_menu_zoom_fit: 화면 맞춤
+  label_menu_st_by_root: 1뎁스별 현황
+  label_menu_st_root: 1뎁스 메뉴
+  label_menu_st_by_type: 화면 유형별
+  label_menu_st_no_issue: 일감이 없는 화면
+  label_menu_st_all_linked: 모든 화면에 일감이 연결되어 있습니다.
+  label_menu_st_more: "외 %{count}개"
+  text_menu_import: 엑셀(xlsx) 또는 CSV 파일을 올리세요. 첫 줄(머리줄)에 뎁스 칸이 있어야 합니다. [엑셀 내보내기] 파일을 고쳐서 다시 올려도 됩니다.
+  text_menu_import_rules: "뎁스 칸 이름: 1뎁스·2뎁스… / 1 Depth / Level 1 / 대메뉴·중메뉴·소메뉴. 윗 뎁스 칸이 비어 있으면 바로 윗줄 값을 이어받습니다(셀 병합 가능). 같은 경로의 메뉴는 합쳐집니다. 화면 유형: 목록·상세·등록·수정·팝업·탭·링크, 채널: 공통·PC·모바일, 사용: Y/N."
+  label_menu_import_merge: 기존 메뉴에 합치기 (같은 경로는 값만 갱신)
+  label_menu_import_replace: 기존 메뉴를 모두 지우고 새로 만들기 (일감 연결·권한 설정도 지워짐)
+  label_menu_import_new_cols: 머리줄에 모르는 칼럼이 있으면 추가 칼럼으로 만들기
+  text_menu_import_confirm: 메뉴를 가져옵니다. 계속할까요?
+  label_menu_import_result: 가져오기 결과
+  label_menu_import_created: 새 메뉴
+  label_menu_import_updated: 값 갱신
+  label_menu_import_cols: 새 칼럼
+  label_menu_import_failed: 오류
+  label_menu_back: 메뉴 구조도로 돌아가기
+  error_menu_bad_field: 고칠 수 없는 칸입니다.
+  error_menu_cannot_indent: 바로 위에 같은 뎁스의 메뉴가 없어 들여쓸 수 없습니다.
+  error_menu_cannot_outdent: 1뎁스 메뉴는 내어쓸 수 없습니다.
+  error_menu_cycle: 메뉴를 자기 자신이나 하위 메뉴 안으로 옮길 수 없습니다.
+  error_menu_no_file: 파일을 선택해 주세요.
+  error_menu_bad_file: 파일을 읽을 수 없습니다. 엑셀(xlsx) 또는 CSV 파일인지 확인하세요.
+  error_menu_no_depth: 머리줄에서 뎁스 칸(1뎁스·2뎁스… 또는 대메뉴·중메뉴…)을 찾지 못했습니다.
+  notice_menu_imported: "가져오기를 마쳤습니다. 새 메뉴 %{created}개, 값 갱신 %{updated}개"
+  notice_menu_issues_created: "일감 %{created}개를 만들었습니다 (건너뜀 %{skipped}개)."
+  label_sys_roles: 시스템 권한
+  label_sys_roles_list: 권한 등급
+  label_sys_matrix: 메뉴 권한 매트릭스
+  label_sys_role_new: 새 권한 등급
+  label_sys_export: 엑셀 내보내기
+  text_sys_roles: 개발할 시스템의 사용자 권한 등급입니다. 등급 숫자가 클수록 높은 권한이며, 메뉴 권한 매트릭스에서 메뉴마다 접근 수준을 정합니다.
+  label_sys_no_roles: 등록된 권한 등급이 없습니다.
+  text_sys_roles_example: "예: 비회원(0) · 일반회원(10) · 기업회원(20) · 운영자(80) · 최고관리자(99)"
+  field_sys_level: 등급
+  field_sys_code: 코드
+  label_sys_menu_count: 접근 메뉴 수
+  text_sys_role_delete: 이 권한 등급과 메뉴 권한 설정이 지워집니다. 계속할까요?
+  text_sys_code: 영문·숫자·밑줄(_)·하이픈(-), 개발 코드에서 쓰는 권한 코드 (예 ROLE_ADMIN)
+  text_sys_level: 숫자가 클수록 높은 등급 (매트릭스에서 높은 등급이 왼쪽)
+  text_sys_matrix: 메뉴마다 권한 등급별 접근 수준을 정합니다. 메뉴 구조도의 "대상 권한" 칸에 표시됩니다.
+  text_sys_need_menu: 메뉴 권한 매트릭스를 쓰려면 프로젝트 설정 > 모듈에서 "메뉴 구조도"도 켜야 합니다.
+  label_sys_access_none: 접근 없음
+  label_sys_access_read: 조회 (R)
+  label_sys_access_write: 조회·등록·수정 (CRU)
+  label_sys_access_full: 조회·등록·수정·삭제 (CRUD)
+  text_sys_matrix_tip: "칸을 누를 때마다 없음 → R → CRU → CRUD 로 바뀝니다. 열 머리의 [모두 조회] 로 그 등급 전체를 조회 가능(다시 누르면 모두 없음), 메뉴명 옆 ↓ 로 그 메뉴 값을 하위 메뉴 전체에 적용합니다. 다 고친 뒤 [저장]을 누르세요."
+  label_sys_col_read: 모두 조회
+  text_sys_apply_down: 이 메뉴의 권한을 하위 메뉴 전체에 적용
+  label_sys_changed: "%{count}칸 바뀜 — 저장해야 반영됩니다"
+  activerecord:
+    attributes:
+      menu_item:
+        name: 메뉴명
+        screen_id: 화면 ID
+        url: URL
+        screen_type: 화면 유형
+        channel: 채널
+        parent_id: 상위 메뉴
+      menu_column:
+        name: 칼럼 이름
+        kind: 형식
+      sys_role:
+        name: 이름
+        code: 코드
+        level: 등급

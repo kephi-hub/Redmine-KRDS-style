@@ -31,6 +31,8 @@ en:
   text_access_level_none: "menu hidden"
   label_access_area_glossary: Glossary
   label_access_area_db: DB
+  label_access_area_menu: Menu tree
+  label_access_area_sysroles: System roles
   label_access_area_project: "Project settings and members"
   label_access_area_issues: "Issues"
   label_access_area_time: "Spent time"

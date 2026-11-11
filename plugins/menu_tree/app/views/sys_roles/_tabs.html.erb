@@ -1,0 +1,6 @@
+<div class="tabs">
+  <ul>
+    <li><%= link_to l(:label_sys_roles_list), project_sys_roles_path(@project), :class => (current == :list ? 'selected' : nil) %></li>
+    <li><%= link_to l(:label_sys_matrix), project_sys_roles_matrix_path(@project), :class => (current == :matrix ? 'selected' : nil) %></li>
+  </ul>
+</div>

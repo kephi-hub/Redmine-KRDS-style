@@ -1,0 +1,33 @@
+<%# 프로젝트 > 시스템 권한 — 개발 대상 시스템의 사용자 권한 등급 %>
+<% can_edit = User.current.allowed_to?(:manage_sys_roles, @project) %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('add', l(:label_sys_role_new)), new_project_sys_role_path(@project), :class => 'icon icon-add' %><% end %>
+  <%= link_to sprite_icon('download', l(:label_sys_export)), project_sys_roles_export_path(@project), :class => 'icon icon-download' %>
+</div>
+<h2><%= l(:label_sys_roles) %></h2>
+<p class="subtitle"><%= l(:text_sys_roles) %></p>
+<%= render :partial => 'sys_roles/tabs', :locals => { :current => :list } %>
+<% if @roles.empty? %>
+  <p class="nodata"><%= l(:label_sys_no_roles) %></p>
+  <p class="db_hintbox"><%= l(:text_sys_roles_example) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list sr_list">
+  <thead><tr><th><%= l(:field_sys_level) %></th><th class="name"><%= l(:field_name) %></th><th><%= l(:field_sys_code) %></th><th class="desc"><%= l(:field_description) %></th><th><%= l(:label_sys_menu_count) %></th><th><%= l(:field_active) %></th><th></th></tr></thead>
+  <tbody>
+  <% @roles.each do |r| %>
+    <tr class="<%= 'sr_off' unless r.active? %>">
+      <td class="level"><span class="sr_level"><%= r.level %></span></td>
+      <td class="name"><strong><%= r.name %></strong></td>
+      <td class="code"><% if r.code %><code><%= r.code %></code><% end %></td>
+      <td class="desc"><%= r.description %></td>
+      <td class="count"><%= @counts[r.id].to_i %></td>
+      <td class="active"><span class="mt_yn <%= 'on' if r.active? %>"><%= r.active? ? l(:general_text_Yes) : l(:general_text_No) %></span></td>
+      <td class="buttons"><% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_sys_role_path(@project, r), :class => 'icon icon-edit' %> <%= link_to sprite_icon('del', l(:button_delete)), project_sys_role_path(@project, r), :method => :delete, :data => { :confirm => l(:text_sys_role_delete) }, :class => 'icon icon-del' %><% end %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<% end %>
+<% html_title l(:label_sys_roles) %>
