@@ -10,7 +10,7 @@
   <li><span><%= l(:label_qa_m_covered) %></span><strong><%= @kpi[:covered] %></strong></li>
   <li><span><%= l(:label_qa_m_cases) %></span><strong><%= @kpi[:cases] %></strong></li>
   <li><span><%= l(:label_qa_result_pass) %></span><strong><%= @kpi[:pass] %></strong></li>
-  <li class="<%= 'on' if @kpi[:fail].positive? %>"><span><%= l(:label_qa_result_fail) %></span><strong><%= @kpi[:fail] %></strong></li>
+  <li><span><%= l(:label_qa_result_fail) %></span><strong class="<%= 'qa_fail' if @kpi[:fail].positive? %>"><%= @kpi[:fail] %></strong></li>
   <li><span><%= l(:label_qa_progress) %></span><strong><%= @kpi[:cases].positive? ? (@kpi[:pass] * 100 / @kpi[:cases]) : 0 %>%</strong></li>
 </ul>
 <% can_edit = User.current.allowed_to?(:manage_qa_tests, @project) %>

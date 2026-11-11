@@ -1195,12 +1195,18 @@ table.list.qa_menus tr.qa_d0 td.name{font-weight:700;}
 .qa_runbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin:0 0 12px;}
 .qa_runbar .mt_help{flex:1 1 100%;margin:0;}
 .qa_runbar label{display:inline-flex;align-items:center;gap:6px;font-size:0.875rem;}
-table.list.qa_run td.code,table.list.qa_run td.result,table.list.qa_run td.tester,table.list.qa_run td.defect{white-space:nowrap;}
-table.list.qa_run td.note{width:30%;}
-table.list.qa_run tr.qa_row>td:first-child{box-shadow:inset 3px 0 0 var(--gray_20);}
-table.list.qa_run tr.qa_row[data-r=pass]>td:first-child{box-shadow:inset 3px 0 0 var(--suc_60);}
-table.list.qa_run tr.qa_row[data-r=fail]>td:first-child{box-shadow:inset 3px 0 0 var(--dan_60);}
-table.list.qa_run tr.qa_row[data-r=hold]>td:first-child,table.list.qa_run tr.qa_row[data-r=retest]>td:first-child{box-shadow:inset 3px 0 0 var(--war_60);}
+table.list.qa_run,table.list.qa_run>tbody{display:block;}
+table.list.qa_run>thead{display:none;}
+table.list.qa_run tr.qa_row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:12px 10px 12px 14px;border-bottom:1px solid var(--gray_20);box-shadow:inset 3px 0 0 var(--gray_20);}
+table.list.qa_run tr.qa_row[data-r=pass]{box-shadow:inset 3px 0 0 var(--suc_60);}
+table.list.qa_run tr.qa_row[data-r=fail]{box-shadow:inset 3px 0 0 var(--dan_60);}
+table.list.qa_run tr.qa_row[data-r=hold],table.list.qa_run tr.qa_row[data-r=retest]{box-shadow:inset 3px 0 0 var(--war_60);}
+table.list.qa_run tr.qa_row>td{display:block;padding:0;border:0;}
+table.list.qa_run tr.qa_row>td.name{flex:1 1 70%;}
+table.list.qa_run tr.qa_row>td.note{flex:1 1 50%;}
+table.list.qa_run tr.qa_row>td.tester{flex:1 1 100%;font-size:0.75rem;}
+table.list.qa_run tr.qa_row>td.defect{flex:1 1 100%;}
+table.list.qa_list td,table.list.qa_trace td,table.list.qa_mini td{word-break:keep-all;}
 table.list.qa_run tr.qa_row.on{background:var(--war_5);}
 .qa_note{width:100%;}
 .qa_path{display:block;font-size:0.75rem;}
@@ -1243,6 +1249,18 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 
 /* ===== 데스크톱 (900px 이상) ===== */
 @media (min-width:900px){
+table.list.qa_run{display:table;}
+table.list.qa_run>thead{display:table-header-group;}
+table.list.qa_run>tbody{display:table-row-group;}
+table.list.qa_run tr.qa_row{display:table-row;padding:0;border:0;box-shadow:none;}
+table.list.qa_run tr.qa_row>td{display:table-cell;padding:8px 6px;border-top:1px solid var(--gray_10);}
+table.list.qa_run tr.qa_row>td:first-child{padding-left:12px;box-shadow:inset 3px 0 0 var(--gray_20);}
+table.list.qa_run tr.qa_row[data-r=pass]>td:first-child{box-shadow:inset 3px 0 0 var(--suc_60);}
+table.list.qa_run tr.qa_row[data-r=fail]>td:first-child{box-shadow:inset 3px 0 0 var(--dan_60);}
+table.list.qa_run tr.qa_row[data-r=hold]>td:first-child,table.list.qa_run tr.qa_row[data-r=retest]>td:first-child{box-shadow:inset 3px 0 0 var(--war_60);}
+table.list.qa_run tr.qa_row>td.code,table.list.qa_run tr.qa_row>td.result,table.list.qa_run tr.qa_row>td.tester,table.list.qa_run tr.qa_row>td.defect{white-space:nowrap;}
+table.list.qa_run tr.qa_row>td.note{width:30%;}
+table.list.qa_run tr.qa_row>td.tester{font-size:inherit;}
 .db_stats.db_kpi{grid-template-columns:repeat(4,1fr);gap:8px;}
 .erd_tables{grid-template-columns:repeat(3,1fr);}
 .db_props{grid-template-columns:repeat(2,1fr);column-gap:24px;}
