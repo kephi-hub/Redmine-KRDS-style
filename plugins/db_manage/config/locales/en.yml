@@ -101,6 +101,63 @@ en:
   label_db_ssh_reset: Reset fingerprint (server replaced)
   text_db_ssh_fp_first: Recorded on the first connection after saving; a different key is refused afterwards.
   label_db_ssh_via: "via SSH %{route}"
+  label_db_kind_table: Tables
+  label_db_kind_view: Views
+  label_db_kind_matview: Materialized views
+  label_db_kind_function: Functions
+  label_db_kind_procedure: Procedures
+  label_db_kind_trigger: Triggers
+  label_db_kind_event: DB jobs
+  label_db_kind_sequence: Sequences
+  label_db_filter_any: Filter by name or comment
+  label_db_shown: "%{kind} %{shown} / %{total}"
+  label_db_none_kind: "No %{kind}."
+  label_db_args: Arguments
+  label_db_returns: Returns
+  label_db_definition: Definition
+  label_db_def_ok: Available
+  label_db_def_none: No access
+  label_db_timing: Timing
+  label_db_schedule: Schedule
+  label_db_last_run: Last run
+  label_db_ends: Ends
+  label_db_seq_start: Start
+  label_db_seq_inc: Increment
+  label_db_seq_min: Min
+  label_db_seq_max: Max
+  label_db_seq_cycle: Cycle
+  label_db_seq_cache: Cache
+  label_db_seq_owned: Owned by
+  label_db_enabled: Enabled
+  label_db_disabled: Disabled
+  label_db_columns_total: Columns
+  label_db_rows_total: Rows (est.)
+  label_db_term_rate: Glossary match
+  label_db_back_kind: "Back to %{kind}"
+  label_db_language: Language
+  label_db_volatility: Volatility
+  label_db_access: Data access
+  label_db_deterministic: Deterministic
+  label_db_security: Security
+  label_db_owner: Owner / definer
+  label_db_created: Created
+  label_db_altered: Altered
+  label_db_objects_diff: Object differences (views, functions, triggers …)
+  label_db_obj_summary: "same %{same} · different %{diff}"
+  label_db_objects_same: Objects and definitions are the same.
+  label_db_def_changed: Definition differs
+  label_db_def_unknown: Cannot compare (no access)
+  text_db_link_env_info: Production/development follows the selected DB server (Administration → DB servers).
+  text_db_def_none: No permission to read the definition (SQL).
+  text_db_hint_mariadb_function: "Read-only accounts cannot see routines on MariaDB. Add: GRANT SELECT ON mysql.proc TO 'user'@'host';"
+  text_db_hint_mariadb_procedure: "Read-only accounts cannot see routines on MariaDB. Add: GRANT SELECT ON mysql.proc TO 'user'@'host';"
+  text_db_hint_mariadb_event: "To see MariaDB events add: GRANT SELECT ON mysql.event TO 'user'@'host';"
+  text_db_hint_mariadb_trigger: MariaDB shows triggers only with the TRIGGER privilege, which also allows creating and dropping triggers.
+  text_db_hint_mysql_function: "Read-only accounts cannot see routines on MySQL 8. Add: GRANT SHOW_ROUTINE ON *.* TO 'user'@'host';"
+  text_db_hint_mysql_procedure: "Read-only accounts cannot see routines on MySQL 8. Add: GRANT SHOW_ROUTINE ON *.* TO 'user'@'host';"
+  text_db_hint_mysql_event: MySQL 8 shows events only with the EVENT privilege, which also allows changing events.
+  text_db_hint_mysql_trigger: MySQL 8 shows triggers only with the TRIGGER privilege, which also allows creating and dropping triggers.
+  text_db_hint_postgresql_event: pg_cron jobs are visible only to the account that created them.
   activerecord:
     attributes:
       db_server:

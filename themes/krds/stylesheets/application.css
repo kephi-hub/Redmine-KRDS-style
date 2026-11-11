@@ -904,6 +904,27 @@ a.gl_term:hover{border-bottom-style:solid;text-decoration:none;}
 #content .db_ssh [hidden],#content .db_ssh_hint[hidden]{display:none;}
 .db_fp{font-size:0.8125rem;word-break:break-all;}
 .db_via{display:block;margin:2px 0 0;font-size:0.75rem;color:var(--pri_60);}
+.db_kinds{display:flex;position:relative;gap:6px;padding:0 0 4px;margin:0 0 12px;overflow-x:auto;}
+#content a.db_kind{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border:1px solid var(--gray_30);border-radius:18px;background:var(--gray_0);font-size:0.875rem;font-weight:500;white-space:nowrap;color:var(--gray_70);}
+#content a.db_kind:hover{border-color:var(--pri_50);text-decoration:none;color:var(--pri_60);}
+#content a.db_kind.on{border-color:var(--pri_50);background:var(--pri_50);color:var(--gray_0);}
+.db_kcnt{display:inline-flex;align-items:center;justify-content:center;height:20px;padding:0 7px;border-radius:10px;background:var(--gray_10);font-size:0.75rem;font-weight:700;color:var(--gray_70);}
+a.db_kind.on .db_kcnt{background:var(--gray_0);color:var(--pri_60);}
+#content .db_panel[hidden],#content .db_nomatch[hidden]{display:none;}
+.db_hintbox{padding:12px 16px;margin:0 0 16px;border:1px solid var(--war_10);border-radius:var(--radius_m);background:var(--war_5);font-size:0.875rem;color:var(--war_60);word-break:break-all;}
+.db_props{display:grid;grid-template-columns:1fr;gap:0;margin:0 0 20px;border-top:2px solid var(--gray_80);}
+.db_props>div{display:flex;gap:12px;padding:10px 4px;border-bottom:1px solid var(--gray_20);}
+.db_props dt{flex:0 0 33%;font-size:0.875rem;font-weight:700;color:var(--gray_70);}
+.db_props dd{flex:1 1 auto;margin:0;font-size:0.875rem;color:var(--gray_90);word-break:break-all;}
+.db_sql{max-height:520px;padding:16px;margin:0 0 20px;overflow:auto;border:1px solid var(--gray_20);border-radius:var(--radius_m);background:var(--gray_5);font-size:0.8125rem;line-height:1.6;white-space:pre;}
+.db_foot{margin:24px 0 0;}
+.db_foot li{padding:10px 14px;}
+.db_foot li strong{font-size:1.125rem;}
+.db_foot li a{display:flex;flex-direction:column;gap:4px;color:inherit;text-decoration:none;}
+.db_foot li a:hover strong{color:var(--pri_60);}
+.db_foot li em{font-size:0.75rem;font-style:normal;color:var(--gray_50);}
+.db_foot li.db_fixed{background:var(--gray_5);}
+table.list.db_list td.args code{font-size:0.8125rem;white-space:normal;word-break:break-all;}
 .db_adapter.db_mariadb{background:var(--suc_10);color:var(--suc_60);}
 .db_adapter.db_postgresql{background:var(--pri_10);color:var(--pri_60);}
 .db_head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin:0 0 16px;}
@@ -991,6 +1012,8 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 
 /* ===== 데스크톱 (900px 이상) ===== */
 @media (min-width:900px){
+.db_props{grid-template-columns:repeat(2,1fr);column-gap:24px;}
+.db_props dt{flex:0 0 140px;}
 #content table.ag_perm th.area{white-space:nowrap;}
 #content table.ag_perm tr.ag_prow th.area{padding-left:34px;}
 .ag_rowtog .ag_lv{display:inline-flex;}
@@ -1079,6 +1102,7 @@ table.list.db_list tr.db_row>td.name,table.list.db_cols tr.db_col>td.name{white-
 
 /* ===== 넓은 화면 (1200px 이상) ===== */
 @media (min-width:1200px){
+.db_foot{grid-template-columns:repeat(5,1fr);}
 .dep_list{grid-template-columns:repeat(3,1fr);}
 #admin-index #admin-menu ul{grid-template-columns:repeat(4,1fr);}
 }

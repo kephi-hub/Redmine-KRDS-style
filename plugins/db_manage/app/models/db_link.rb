@@ -14,6 +14,11 @@ class DbLink < ApplicationRecord
     db_server.adapter == 'postgresql' ? 'public' : db_server.database_name
   end
 
+  # 운영 여부는 DB 서버의 개발/운영 구분을 따름 (db_links.production 칸은 005 에서 삭제)
+  def production?
+    db_server&.production? || false
+  end
+
   def connector
     db_server.connector(schema)
   end

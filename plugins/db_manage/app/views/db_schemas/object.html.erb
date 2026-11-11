@@ -1,0 +1,40 @@
+<%# 프로젝트 > DB > 함수·프로시저·트리거·DB 잡·시퀀스 상세 — 속성과 정의(SQL) %>
+<% kind_label = l("label_db_kind_#{params[:kind]}") %>
+<h2><%= link_to l(:label_db_manage), project_db_schemas_path(@project, :link => @link.id, :kind => params[:kind]) %> &#187; <%= @link.name %> &#187; <%= kind_label %> &#187; <%= @object ? @object[:name] : params[:key] %></h2>
+<%= render :partial => 'error' %>
+<% if @object %>
+  <% o = @object %>
+  <% if o[:comment] %><p class="subtitle"><%= o[:comment] %></p><% end %>
+  <% props = [
+       [l(:label_db_args), (o[:args].nil? ? nil : content_tag(:code, o[:args].presence || '()'))],
+       [l(:label_db_returns), o[:returns]],
+       [l(:field_db_table), (link_to(o[:table], project_db_table_path(@project, @link, o[:table])) if o[:table])],
+       [l(:label_db_timing), (content_tag(:code, o[:timing]) if o[:timing])],
+       [l(:label_db_schedule), o[:schedule]],
+       [l(:field_status), (db_status_tag(o[:status]) if o[:status])],
+       [l(:label_db_last_run), o[:last_run]],
+       [l(:label_db_ends), o[:ends]],
+       [l(:field_db_type), o[:type]],
+       [l(:label_db_seq_start), o[:start]], [l(:label_db_seq_inc), o[:increment]],
+       [l(:label_db_seq_min), o[:min]], [l(:label_db_seq_max), o[:max]],
+       [l(:label_db_seq_cycle), (o[:cycle].nil? ? nil : (o[:cycle] ? 'Y' : 'N'))], [l(:label_db_seq_cache), o[:cache]],
+       [l(:label_db_seq_owned), o[:owned_by]],
+       [l(:label_db_language), o[:language]], [l(:label_db_volatility), o[:volatility]],
+       [l(:label_db_access), o[:access]], [l(:label_db_deterministic), o[:deterministic]],
+       [l(:label_db_security), o[:security]], [l(:label_db_owner), o[:definer]],
+       [l(:label_db_created), o[:created]], [l(:label_db_altered), o[:altered]]
+     ].reject { |_, v| v.blank? } %>
+  <dl class="db_props">
+    <% props.each do |k, v| %><div><dt><%= k %></dt><dd><%= v %></dd></div><% end %>
+  </dl>
+  <% unless params[:kind] == 'sequence' %>
+  <h3 class="ag_sec"><%= l(:label_db_definition) %></h3>
+  <% if o[:definition] %>
+    <pre class="db_sql"><code><%= o[:definition] %></code></pre>
+  <% else %>
+    <p class="db_hintbox"><%= l(:text_db_def_none) %><% if (hint = db_kind_hint(@snapshot[:flavor], params[:kind])) %><br><%= hint %><% end %></p>
+  <% end %>
+  <% end %>
+<% end %>
+<p class="form_btns"><%= link_to l(:label_db_back_kind, :kind => kind_label), project_db_schemas_path(@project, :link => @link.id, :kind => params[:kind]), :class => 'btn_line' %></p>
+<% html_title "#{@object&.dig(:name) || params[:key]} - #{l(:label_db_manage)}" %>

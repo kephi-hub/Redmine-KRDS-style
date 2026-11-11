@@ -43,4 +43,34 @@ module DbSchemasHelper
     else v.nil? || v == '' ? '-' : v.to_s
     end
   end
+
+  # 종류 탭 이름·개수
+  def db_kind_label(kind)
+    l("label_db_kind_#{kind}")
+  end
+
+  def db_kind_items(snap, kind)
+    case kind
+    when 'table' then snap[:tables].reject { |t| t[:view] }
+    when 'view' then snap[:tables].select { |t| t[:view] && !t[:matview] }
+    when 'matview' then snap[:tables].select { |t| t[:matview] }
+    else snap.dig(:objects, kind)
+    end
+  end
+
+  # 목록이 비었을 때 DB 종류별 필요한 권한 안내 (조사 결과: MariaDB·MySQL 은 조회 전용 계정에 안 보이는 객체가 있음)
+  def db_kind_hint(flavor, kind)
+    key = "text_db_hint_#{flavor}_#{kind}"
+    I18n.exists?(key, current_language) ? l(key) : nil
+  end
+
+  def db_object_path(link, kind, key)
+    project_db_object_path(@project, link, kind, key)
+  end
+
+  def db_status_tag(status)
+    return '' if status.blank?
+    on = status.to_s.start_with?('ENABLED')
+    content_tag(:span, on ? l(:label_db_enabled) : l(:label_db_disabled), class: "db_term #{on ? 'db_ok' : 'db_missing'}")
+  end
 end

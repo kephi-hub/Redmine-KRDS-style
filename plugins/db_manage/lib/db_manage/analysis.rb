@@ -38,6 +38,35 @@ module DbManage
       result
     end
 
+    # 테이블 외 객체(뷰·함수·프로시저·트리거·DB 잡·시퀀스) 비교: 한쪽에만 있음 / 정의 다름
+    # MariaDB 뷰 정의에는 스키마 이름이 들어가므로(`sample_dev`.`TB`) 지우고, 공백은 하나로 맞춰 비교
+    def compare_objects(a, b, schema_a, schema_b)
+      kinds = ((a[:kinds] || []) | (b[:kinds] || [])) - ['table']
+      kinds.filter_map do |kind|
+        la = a.dig(:objects, kind); lb = b.dig(:objects, kind)
+        next if la.nil? && lb.nil?
+        ia = (la || []).index_by { |o| o[:key] }; ib = (lb || []).index_by { |o| o[:key] }
+        rows = []
+        (ia.keys - ib.keys).sort.each { |k| rows << { kind: kind, key: k, name: ia[k][:name], state: :only_a } }
+        (ib.keys - ia.keys).sort.each { |k| rows << { kind: kind, key: k, name: ib[k][:name], state: :only_b } }
+        (ia.keys & ib.keys).sort.each do |k|
+          da = norm_def(ia[k][:definition], schema_a); db = norm_def(ib[k][:definition], schema_b)
+          state = if da.nil? || db.nil? then (da == db ? nil : :unknown)
+                  elsif da != db then :changed
+                  end
+          rows << { kind: kind, key: k, name: ia[k][:name], state: state } if state
+        end
+        same = (ia.keys & ib.keys).size - rows.count { |r| %i(changed unknown).include?(r[:state]) }
+        { kind: kind, rows: rows, same: same }
+      end
+    end
+
+    def norm_def(text, schema)
+      return nil if text.blank?
+      t = text.to_s.gsub(/`#{Regexp.escape(schema.to_s)}`\./, '').gsub(/"?#{Regexp.escape(schema.to_s)}"?\./, '')
+      t.gsub(/\s+/, ' ').strip
+    end
+
     # 약어(대문자) → 용어. 같은 약어가 있으면 프로젝트 용어 우선. 용어사전 플러그인이 없으면 nil
     def term_map(project)
       return nil unless defined?(GlossaryTerm)

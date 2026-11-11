@@ -11,7 +11,7 @@
   <div class="table-list-header"><div class="table-list-cell"><%= l(:label_db_link) %></div></div>
   <% links.each do |link| %>
   <div class="table-list-row">
-    <div class="table-list-cell name"><%= link.name %><% if link.production? %> <span class="dep_prod"><%= l(:label_db_production) %></span><% end %></div>
+    <div class="table-list-cell name"><%= link.name %> <span class="db_env <%= link.production? ? 'db_prod' : 'db_dev' %>"><%= link.db_server.env_label %></span></div>
     <div class="table-list-cell description"><%= link.db_server %> · <%= link.db_server.adapter_label %> · <code><%= link.schema %></code></div>
     <div class="table-list-cell buttons">
       <%= link_to sprite_icon('edit', l(:button_edit)), edit_project_db_link_path(@project, link), :class => 'icon icon-edit' %>

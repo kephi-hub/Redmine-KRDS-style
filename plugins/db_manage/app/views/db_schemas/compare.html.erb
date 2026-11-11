@@ -64,6 +64,36 @@
     </div>
     <% end %>
   <% end %>
+  <% if @objects.present? %>
+    <h3 class="ag_sec"><%= l(:label_db_objects_diff) %></h3>
+    <% diff_rows = @objects.flat_map { |g| g[:rows] } %>
+    <ul class="db_tags">
+      <% @objects.each do |g| %><li><%= l("label_db_kind_#{g[:kind]}") %> <span><%= l(:label_db_obj_summary, :same => g[:same], :diff => g[:rows].size) %></span></li><% end %>
+    </ul>
+    <% if diff_rows.empty? %>
+      <p class="db_allsame"><%= l(:label_db_objects_same) %></p>
+    <% else %>
+    <div class="autoscroll">
+    <table class="list db_difftbl">
+      <thead><tr><th><%= l(:label_db_diff_kind) %></th><th class="name"><%= l(:field_name) %></th><th><%= l(:field_status) %></th></tr></thead>
+      <tbody>
+      <% diff_rows.each do |r| %>
+        <tr class="<%= 'db_missing_row' if %i(only_a only_b).include?(r[:state]) %>">
+          <td><%= l("label_db_kind_#{r[:kind]}") %></td>
+          <td class="name"><code><%= r[:name] %></code><% if r[:key] != r[:name] %> <span class="db_dim"><%= r[:key].delete_prefix(r[:name]) %></span><% end %></td>
+          <td><%= case r[:state]
+                  when :only_a then l(:label_db_column_only, :name => @a.name)
+                  when :only_b then l(:label_db_column_only, :name => @b.name)
+                  when :changed then l(:label_db_def_changed)
+                  else l(:label_db_def_unknown)
+                  end %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+    </div>
+    <% end %>
+  <% end %>
 <% end %>
 <% end %>
 <% html_title "#{l(:label_db_compare)} - #{l(:label_db_manage)}" %>

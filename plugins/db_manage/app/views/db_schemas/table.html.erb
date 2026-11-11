@@ -2,7 +2,7 @@
 <h2><%= link_to l(:label_db_manage), project_db_schemas_path(@project, :link => @link.id) %> &#187; <%= @link.name %> &#187; <%= params[:table] %></h2>
 <%= render :partial => 'error' %>
 <% if @table %>
-<p class="subtitle"><%= @table[:comment].presence || l(:label_db_no_comment) %><% if @table[:view] %> · <%= l(:label_db_view) %><% end %><% unless @table[:view] %> · <%= l(:label_db_rows) %> <%= db_number(@table[:rows]) %><% end %></p>
+<p class="subtitle"><%= @table[:comment].presence || l(:label_db_no_comment) %><% if @table[:view] %> · <%= l(@table[:matview] ? :label_db_kind_matview : :label_db_kind_view) %><% end %><% unless @table[:view] %> · <%= l(:label_db_rows) %> <%= db_number(@table[:rows]) %><% end %></p>
 <div class="autoscroll">
 <table class="list db_cols">
   <thead><tr>
@@ -31,6 +31,19 @@
   </tbody>
 </table>
 </div>
+<% if @triggers.any? %>
+  <h3 class="ag_sec"><%= l(:label_db_kind_trigger) %></h3>
+  <ul class="db_tags"><% @triggers.each do |t| %><li><%= link_to t[:name], project_db_object_path(@project, @link, 'trigger', t[:key]) %> <span><%= t[:timing] %></span></li><% end %></ul>
 <% end %>
-<p class="form_btns"><%= link_to l(:label_db_back), project_db_schemas_path(@project, :link => @link.id), :class => 'btn_line' %></p>
+<% if @table[:view] %>
+  <h3 class="ag_sec"><%= l(:label_db_definition) %></h3>
+  <% if @view && @view[:definition] %>
+    <pre class="db_sql"><code><%= @view[:definition] %></code></pre>
+  <% else %>
+    <p class="db_hintbox"><%= l(:text_db_def_none) %></p>
+  <% end %>
+<% end %>
+<% end %>
+<% back_kind = @table ? (@table[:matview] ? 'matview' : (@table[:view] ? 'view' : 'table')) : 'table' %>
+<p class="form_btns"><%= link_to l(:label_db_back_kind, :kind => l("label_db_kind_#{back_kind}")), project_db_schemas_path(@project, :link => @link.id, :kind => back_kind), :class => 'btn_line' %></p>
 <% html_title "#{params[:table]} - #{l(:label_db_manage)}" %>

@@ -71,7 +71,7 @@ ko:
   text_db_user_info: 조회 전용 계정 권장 (information_schema 를 읽을 수 있어야 함)
   text_db_schema_info: 비워 두면 PostgreSQL 은 public, MariaDB·MySQL 은 서버의 DB 이름
   text_db_production_info: 운영 DB 는 탭에 '운영' 표시, 비교 화면에서 기본 비교 대상(B)
-  text_db_project: 프로젝트 DB 의 테이블·컬럼 구조를 봅니다. 테이블 정의서(엑셀) 내려받기, 개발/운영 비교, 용어사전 점검을 할 수 있습니다.
+  text_db_project: 프로젝트 DB 의 테이블·뷰·함수·프로시저·트리거·DB 잡 등을 종류별로 봅니다(DB 종류마다 탭이 다름). 테이블 정의서(엑셀), 개발/운영 비교, 용어사전 점검도 할 수 있습니다.
   text_db_compare: 두 DB 의 테이블과 컬럼(타입·NULL·기본값·설명·키) 차이를 보여 줍니다.
   text_db_check: 모든 컬럼명을 용어사전의 약어와 대조합니다. 같은 이름의 컬럼은 하나로 묶어 보여 줍니다.
   text_db_check_csv: 미등록 컬럼을 용어사전 가져오기 양식(CSV)으로 받아 정리한 뒤 용어사전에 올릴 수 있습니다.
@@ -101,6 +101,63 @@ ko:
   label_db_ssh_reset: 지문 초기화 (서버를 바꾼 경우)
   text_db_ssh_fp_first: 저장 후 첫 연결 때 기록되고, 다음부터 다르면 연결을 거부합니다.
   label_db_ssh_via: "SSH 경유 %{route}"
+  label_db_kind_table: 테이블
+  label_db_kind_view: 뷰
+  label_db_kind_matview: 구체화 뷰
+  label_db_kind_function: 함수
+  label_db_kind_procedure: 프로시저
+  label_db_kind_trigger: 트리거
+  label_db_kind_event: DB 잡
+  label_db_kind_sequence: 시퀀스
+  label_db_filter_any: 이름·설명으로 찾기
+  label_db_shown: "%{kind} %{shown} / %{total}건"
+  label_db_none_kind: "%{kind}이(가) 없습니다."
+  label_db_args: 인자
+  label_db_returns: 반환
+  label_db_definition: 정의
+  label_db_def_ok: 있음
+  label_db_def_none: 권한 없음
+  label_db_timing: 시점
+  label_db_schedule: 일정
+  label_db_last_run: 마지막 실행
+  label_db_ends: 종료
+  label_db_seq_start: 시작
+  label_db_seq_inc: 증가
+  label_db_seq_min: 최소
+  label_db_seq_max: 최대
+  label_db_seq_cycle: 순환
+  label_db_seq_cache: 캐시
+  label_db_seq_owned: 연결 컬럼
+  label_db_enabled: 사용
+  label_db_disabled: 중지
+  label_db_columns_total: 전체 컬럼
+  label_db_rows_total: 추정 행 합계
+  label_db_term_rate: 용어 일치
+  label_db_back_kind: "%{kind} 목록으로"
+  label_db_language: 언어
+  label_db_volatility: 변동성
+  label_db_access: 데이터 접근
+  label_db_deterministic: 결정적
+  label_db_security: 실행 권한
+  label_db_owner: 소유자·정의자
+  label_db_created: 생성
+  label_db_altered: 수정
+  label_db_objects_diff: 뷰·함수·트리거 등 객체 차이
+  label_db_obj_summary: "같음 %{same} · 차이 %{diff}"
+  label_db_objects_same: 객체 구성과 정의가 같습니다.
+  label_db_def_changed: 정의 다름
+  label_db_def_unknown: 정의 비교 불가 (권한)
+  text_db_link_env_info: 운영/개발 표시는 고른 DB 서버의 구분을 따릅니다 (관리 → DB 서버).
+  text_db_def_none: 정의(SQL)를 볼 권한이 없습니다.
+  text_db_hint_mariadb_function: "MariaDB 는 조회 전용 계정에 함수·프로시저가 보이지 않습니다. 읽기 전용 권한을 더하세요: GRANT SELECT ON mysql.proc TO '계정'@'호스트';"
+  text_db_hint_mariadb_procedure: "MariaDB 는 조회 전용 계정에 함수·프로시저가 보이지 않습니다. 읽기 전용 권한을 더하세요: GRANT SELECT ON mysql.proc TO '계정'@'호스트';"
+  text_db_hint_mariadb_event: "MariaDB 이벤트(DB 잡)를 보려면 읽기 전용 권한을 더하세요: GRANT SELECT ON mysql.event TO '계정'@'호스트';"
+  text_db_hint_mariadb_trigger: MariaDB 는 TRIGGER 권한이 있어야 트리거가 보입니다. 이 권한은 트리거를 만들고 지울 수도 있어 조회 전용 계정에는 권장하지 않습니다.
+  text_db_hint_mysql_function: "MySQL 8 은 조회 전용 계정에 함수·프로시저가 보이지 않습니다. 읽기 전용 권한을 더하세요: GRANT SHOW_ROUTINE ON *.* TO '계정'@'호스트';"
+  text_db_hint_mysql_procedure: "MySQL 8 은 조회 전용 계정에 함수·프로시저가 보이지 않습니다. 읽기 전용 권한을 더하세요: GRANT SHOW_ROUTINE ON *.* TO '계정'@'호스트';"
+  text_db_hint_mysql_event: MySQL 8 은 EVENT 권한이 있어야 이벤트(DB 잡)가 보입니다. 이벤트를 만들고 지울 수도 있는 권한이라 조회 전용 계정에는 권장하지 않습니다.
+  text_db_hint_mysql_trigger: MySQL 8 은 TRIGGER 권한이 있어야 트리거가 보입니다. 이 권한은 트리거를 만들고 지울 수도 있어 조회 전용 계정에는 권장하지 않습니다.
+  text_db_hint_postgresql_event: pg_cron 작업은 작업을 만든 계정으로 접속해야 보입니다.
   activerecord:
     attributes:
       db_server:

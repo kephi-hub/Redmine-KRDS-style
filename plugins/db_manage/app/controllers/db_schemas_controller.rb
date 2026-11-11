@@ -8,27 +8,41 @@ class DbSchemasController < ApplicationController
   before_action :find_project_by_project_id
   before_action :authorize
   before_action :load_links
-  before_action :find_link, only: [:table, :export, :check]
+  before_action :find_link, only: [:table, :object, :export, :check]
 
   def index
     @link = @links.find { |l| l.id.to_s == params[:link].to_s } || @links.first
     return unless @link
-    @snapshot = snapshot(@link)
+    @snapshot = snapshot(@link, objects: true)
     @terms = DbManage::Analysis.term_map(@project)
+    @kind = @snapshot && @snapshot[:kinds].include?(params[:kind]) ? params[:kind] : 'table'
   end
 
   def table
-    @snapshot = snapshot(@link)
+    @snapshot = snapshot(@link, objects: true)
     return unless @snapshot
     @table = @snapshot[:tables].find { |t| t[:name] == params[:table] }
     return render_404 unless @table
     @columns = @snapshot[:columns][@table[:name]] || []
     @terms = DbManage::Analysis.term_map(@project)
+    # 뷰·구체화 뷰는 정의(SQL)도, 테이블은 걸린 트리거도 보여 줌
+    @view = (@snapshot.dig(:objects, 'view').to_a + @snapshot.dig(:objects, 'matview').to_a).find { |v| v[:name] == @table[:name] } if @table[:view]
+    @triggers = @snapshot.dig(:objects, 'trigger').to_a.select { |t| t[:table] == @table[:name] }
+  end
+
+  # 함수·프로시저·트리거·DB 잡·시퀀스 상세 (정의 SQL 포함)
+  def object
+    @snapshot = snapshot(@link, objects: true)
+    return unless @snapshot
+    @kind = params[:kind].to_s
+    return render_404 unless @snapshot[:kinds].include?(@kind) && !%w(table view matview).include?(@kind)
+    @object = @snapshot.dig(:objects, @kind).to_a.find { |o| o[:key] == params[:key] }
+    render_404 unless @object
   end
 
   # 테이블 정의서 — 시트 1: 테이블 목록, 시트 2: 컬럼 정의
   def export
-    snap = snapshot(@link)
+    snap = snapshot(@link, objects: true)
     return redirect_to(project_db_schemas_path(@project, link: @link.id)) unless snap
     terms = DbManage::Analysis.term_map(@project)
     tables = snap[:tables].each_with_index.map do |t, i|
@@ -46,6 +60,19 @@ class DbSchemasController < ApplicationController
       { name: '컬럼 정의', header: %w(테이블명 테이블\ 설명 No 컬럼명 데이터\ 타입 Null 기본값 키 참조 설명 용어), rows: columns,
         widths: [26, 24, 6, 26, 20, 6, 18, 10, 24, 36, 18] }
     ]
+    # 시트 3: 뷰 정의·함수·프로시저·트리거·DB 잡·시퀀스 (엑셀 칸 최대 글자 수 때문에 정의는 3만 자까지)
+    objects = []
+    (snap[:kinds] - ['table']).each do |kind|
+      snap.dig(:objects, kind).to_a.each do |o|
+        detail = o[:args] || o[:table] || o[:schedule] || (o[:start] && "#{o[:start]} 부터 #{o[:increment]}씩")
+        extra = o[:returns] || o[:timing] || o[:type]
+        objects << [l("label_db_kind_#{kind}"), o[:name], detail, extra, o[:status], o[:comment], o[:definition].to_s[0, 30_000]]
+      end
+    end
+    if objects.any?
+      sheets << { name: '뷰·함수·트리거·잡', header: %w(종류 이름 인자·대상·일정 반환·시점·타입 상태 설명 정의), rows: objects,
+                  widths: [12, 28, 30, 22, 10, 30, 60] }
+    end
     name = "테이블정의서_#{@project.identifier}_#{@link.name}_#{User.current.today.strftime('%Y%m%d')}.xlsx"
     send_data DbManage::Xlsx.build(sheets), filename: name,
               type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -57,8 +84,10 @@ class DbSchemasController < ApplicationController
     @a = @links.find { |l| l.id.to_s == params[:a].to_s } || @links.find { |l| !l.production? } || @links.first
     @b = @links.find { |l| l.id.to_s == params[:b].to_s } || (@links - [@a]).find(&:production?) || (@links - [@a]).first
     return if @a == @b
-    sa = snapshot(@a); sb = sa && snapshot(@b)
-    @result = DbManage::Analysis.compare(sa, sb) if sa && sb
+    sa = snapshot(@a, objects: true); sb = sa && snapshot(@b, objects: true)
+    return unless sa && sb
+    @result = DbManage::Analysis.compare(sa, sb)
+    @objects = DbManage::Analysis.compare_objects(sa, sb, @a.schema, @b.schema)
   end
 
   # 컬럼명(중복 제거)을 용어사전 약어와 대조. format=csv 는 미등록 컬럼을 용어사전 가져오기 양식으로
@@ -106,8 +135,8 @@ class DbSchemasController < ApplicationController
   end
 
   # 접속 실패는 화면에 메시지로 보여 주고 nil
-  def snapshot(link)
-    link.connector.snapshot
+  def snapshot(link, objects: false)
+    link.connector.snapshot(objects: objects)
   rescue DbManage::Error => e
     @db_error = "#{link.name}: #{e.message}"
     nil
