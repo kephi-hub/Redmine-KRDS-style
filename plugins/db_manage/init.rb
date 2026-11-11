@@ -9,11 +9,13 @@
 # - 1.4.0 : ERD (Mermaid — krds_ui 플러그인에 포함, 인터넷 불필요) 보기·테이블 선택·추정 관계, .md/.mmd/SVG/PNG 내려받기,
 #           위키·일감 본문의 ```mermaid 블록을 그림으로
 # - 1.5.0 : DB 종류별 처리 분리(Dialect), 인덱스 정보, 화면 캐시(10분·새로 고침), 다단계 SSH(최대 3대), 용어 점검(설명 누락·불일치), ERD draw.io
+# - 1.6.0 : 구조 변경 이력(저장본 비교, rake 자동 저장), SQL 조회(조회 문장만·읽기 전용·시간/건수 제한·실행 기록, 운영 DB 별도 권한)
 # 원격 DB 에는 읽기 전용 세션으로 접속해 메타데이터만 읽음 (데이터 조회·변경 SQL 없음)
 require_relative 'lib/db_manage/dialect_base'
 require_relative 'lib/db_manage/dialect_mysql'
 require_relative 'lib/db_manage/dialect_postgresql'
 require_relative 'lib/db_manage/connector'
+require_relative 'lib/db_manage/sql_guard'
 require_relative 'lib/db_manage/tunnel'
 require_relative 'lib/db_manage/analysis'
 require_relative 'lib/db_manage/erd'
@@ -23,13 +25,16 @@ Redmine::Plugin.register :db_manage do
   name 'DB 관리'
   author 'kephi-hub'
   description 'DB 서버 접속정보 관리, 프로젝트 DB 스키마 조회·테이블 정의서·개발/운영 비교·용어 점검'
-  version '1.5.0'
+  version '1.6.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
 
   project_module :db_manage do
-    permission :view_db_schema, { db_schemas: [:index, :table, :object, :export, :compare, :check, :erd] }, read: true
-    permission :manage_db_links, { projects: :settings, db_links: [:new, :create, :edit, :update, :destroy] }, require: :member
+    permission :view_db_schema, { db_schemas: [:index, :table, :object, :export, :compare, :check, :erd, :history, :history_diff] }, read: true
+    permission :manage_db_links, { projects: :settings, db_links: [:new, :create, :edit, :update, :destroy], db_schemas: [:save_history, :query_log] }, require: :member
+    # SQL 조회: 개발 DB 와 운영 DB 권한을 따로 (운영은 기본으로 아무 역할에도 주지 않음)
+    permission :run_db_query, { db_schemas: [:query] }, require: :member
+    permission :run_db_query_production, { db_schemas: [:query] }, require: :member
   end
 
   menu :project_menu, :db_schemas, { controller: 'db_schemas', action: 'index' },
@@ -45,6 +50,7 @@ end
 
 ProjectsHelper.prepend(DbManage::ProjectSettingsPatch) unless ProjectsHelper.ancestors.include?(DbManage::ProjectSettingsPatch)
 Project.has_many :db_links, dependent: :destroy unless Project.reflect_on_association(:db_links)
+DbLink.has_many :db_snapshots, dependent: :delete_all unless DbLink.reflect_on_association(:db_snapshots)
 
 # 비밀번호가 로그에 남지 않게
 Rails.application.config.filter_parameters += [:password, :ssh_password, :ssh_private_key, :ssh_passphrase]

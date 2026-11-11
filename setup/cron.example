@@ -1,3 +1,7 @@
 # SVN/Git 커밋을 5분마다 가져와 일감에 연결 (refs/fixes/closes, @시간)
 # 설치: KEY 를 .env 의 REDMINE_SYS_API_KEY 값으로 바꿔 /etc/cron.d/redmine_fetch 로 저장 후 chmod 600
 */5 * * * * root curl -s -m 240 -o /dev/null "http://localhost:3000/sys/fetch_changesets?key=KEY"
+
+# DB 관리: 프로젝트 DB 구조를 매일 새벽 3시에 저장 (바뀐 경우만, 변경 이력 화면에서 비교)
+# 설치: /etc/cron.d/redmine_db_snapshot 로 저장 (경로는 서버의 Redmine 폴더로)
+0 3 * * * root cd /root/redmine && docker compose exec -T -u redmine redmine sh -c 'SECRET_KEY_BASE=$REDMINE_SECRET_KEY_BASE bundle exec rake redmine:db_manage:snapshot' >> /var/log/redmine_db_snapshot.log 2>&1

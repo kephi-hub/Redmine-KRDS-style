@@ -1,0 +1,51 @@
+<%# 프로젝트 > DB > SQL 조회 — 조회 문장 하나만, 읽기 전용·시간/건수 제한, 실행은 모두 기록 %>
+<h2><%= link_to l(:label_db_manage), project_db_schemas_path(@project, :link => @link.id) %> &#187; <%= @link.name %> &#187; <%= l(:label_db_query) %></h2>
+<% if @link.production? %><div class="flash warning db_prodwarn"><%= l(:text_db_query_prod) %></div><% end %>
+<p class="subtitle"><%= l(:text_db_query, :sec => [@link.db_server.timeout * 3, 60].min) %></p>
+<%= form_tag project_db_query_path(@project, @link), :id => 'db_qform', :class => 'db_qform' do %>
+  <%= text_area_tag 'sql', @sql, :rows => 8, :id => 'db_sql', :spellcheck => false, :placeholder => "SELECT * FROM 테이블 WHERE …", :'aria-label' => 'SQL' %>
+  <div class="db_qbar">
+    <label for="db_limit"><%= l(:label_db_query_limit) %></label>
+    <%= select_tag 'limit', options_for_select(DbSchemasController::QUERY_LIMITS.map { |n| ["#{n}건", n] }, @limit), :id => 'db_limit' %>
+    <%= submit_tag l(:label_db_query_run), :name => nil, :id => 'db_run', :data => { :disable_with => l(:label_db_query_running) } %>
+    <button type="submit" name="csv" value="1" class="btn_line" id="db_csv"><%= l(:label_db_query_csv) %></button>
+    <span class="db_dim"><%= l(:text_db_query_keys) %></span>
+    <% if User.current.allowed_to?(:manage_db_links, @project) %><%= link_to l(:label_db_query_log), project_db_query_log_path(@project, @link), :class => 'db_qlog' %><% end %>
+  </div>
+<% end %>
+<% if @error %><div class="flash error db_error"><%= @error %></div><% end %>
+<% if @result %>
+  <p class="db_qmeta"><%= l(:label_db_query_meta, :rows => @result[:rows].size, :ms => @ms) %><% if @result[:truncated] %> · <strong><%= l(:label_db_query_truncated, :limit => @limit) %></strong><% end %></p>
+  <% if @result[:columns].empty? %>
+    <p class="nodata"><%= l(:label_no_data) %></p>
+  <% else %>
+  <div class="db_qwrap">
+  <table class="list db_qres">
+    <thead><tr><th class="no">#</th><% @result[:columns].each do |c| %><th><%= c %></th><% end %></tr></thead>
+    <tbody>
+    <% @result[:rows].each_with_index do |row, i| %>
+      <tr><td class="no"><%= i + 1 %></td><% row.each do |v| %><% s = v.to_s %><td<%= raw(' class="null"') if v.nil? %><%= raw(%( title="#{ERB::Util.h(s.truncate(2000))}")) if s.size > 200 %>><%= v.nil? ? 'NULL' : (s.valid_encoding? ? s.truncate(200) : "(binary #{s.bytesize} bytes)") %></td><% end %></tr>
+    <% end %>
+    </tbody>
+  </table>
+  </div>
+  <% end %>
+<% end %>
+<% if @recent.any? %>
+  <h3 class="ag_sec"><%= l(:label_db_query_recent) %></h3>
+  <ul class="db_qrecent">
+    <% @recent.each do |q| %>
+      <li><button type="button" class="db_qreuse" data-sql="<%= q.sql %>"><code><%= q.sql.to_s.squish.truncate(140) %></code></button>
+        <span class="db_term <%= { 'ok' => 'db_ok', 'error' => 'db_type', 'blocked' => 'db_missing' }[q.status] %>"><%= l("label_db_query_status_#{q.status}") %></span>
+        <span class="db_dim"><%= format_time(q.created_at) %></span></li>
+    <% end %>
+  </ul>
+<% end %>
+<p class="form_btns"><%= link_to l(:label_db_back), project_db_schemas_path(@project, :link => @link.id), :class => 'btn_line' %></p>
+<%= javascript_tag do %>
+$(function() {
+  $('#db_sql').on('keydown', function(e) { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); $('#db_run').trigger('click'); } });
+  $('.db_qreuse').on('click', function() { $('#db_sql').val($(this).data('sql')).trigger('focus'); });
+});
+<% end %>
+<% html_title "#{l(:label_db_query)} - #{@link.name}" %>

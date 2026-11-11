@@ -1,0 +1,81 @@
+<%# 두 구조의 차이 (DB 비교·변경 이력 공통) — result: Analysis.compare, objects: Analysis.compare_objects, name_a/name_b: 이름 %>
+  <ul class="db_stats">
+    <li><span><%= l(:label_db_only_in, :name => name_a) %></span><strong><%= result[:only_a].size %></strong></li>
+    <li><span><%= l(:label_db_only_in, :name => name_b) %></span><strong><%= result[:only_b].size %></strong></li>
+    <li class="<%= 'on' if result[:changed].any? %>"><span><%= l(:label_db_changed) %></span><strong><%= result[:changed].size %></strong></li>
+    <li><span><%= l(:label_db_same) %></span><strong><%= result[:same] %></strong></li>
+  </ul>
+  <% if result[:only_a].empty? && result[:only_b].empty? && result[:changed].empty? %>
+  <p class="db_allsame"><%= l(:label_db_all_same) %></p>
+  <% end %>
+  <% [[result[:only_a], name_a], [result[:only_b], name_b]].each do |tables, label| %>
+    <% next if tables.empty? %>
+    <h3 class="ag_sec"><%= l(:label_db_only_in, :name => label) %></h3>
+    <ul class="db_tags"><% tables.each do |t| %><li><code><%= t[:name] %></code><% if t[:comment] %> <span><%= t[:comment] %></span><% end %></li><% end %></ul>
+  <% end %>
+  <% if result[:changed].any? %>
+    <h3 class="ag_sec"><%= l(:label_db_changed) %></h3>
+    <% result[:changed].each do |ch| %>
+    <div class="db_diff">
+      <h4><code><%= ch[:table] %></code><% if ch[:comment_a] != ch[:comment_b] %> <span class="db_dim"><%= l(:label_db_comment_diff) %>: <%= ch[:comment_a].presence || '-' %> ↔ <%= ch[:comment_b].presence || '-' %></span><% end %></h4>
+      <% if ch[:diffs].any? %>
+      <div class="autoscroll">
+      <table class="list db_difftbl">
+        <thead><tr><th class="name"><%= l(:field_db_column) %></th><th><%= l(:label_db_diff_kind) %></th><th><%= name_a %></th><th><%= name_b %></th></tr></thead>
+        <tbody>
+        <% ch[:diffs].each do |d| %>
+          <% if d[:kind] == :changed %>
+            <% d[:fields].each_with_index do |f, i| %>
+            <tr>
+              <td class="name"><% if i.zero? %><code><%= d[:column] %></code><% end %></td>
+              <td class="kind"><%= l("label_db_field_#{f}") %></td>
+              <td class="a"><%= db_diff_value(d[:a], f) %></td>
+              <td class="b"><%= db_diff_value(d[:b], f) %></td>
+            </tr>
+            <% end %>
+          <% else %>
+            <tr class="db_missing_row">
+              <td class="name"><code><%= d[:column] %></code></td>
+              <td class="kind"><%= l(:label_db_column_only, :name => (d[:kind] == :only_a ? name_a : name_b)) %></td>
+              <td class="a"><%= d[:a] ? d[:a][:type] : '—' %></td>
+              <td class="b"><%= d[:b] ? d[:b][:type] : '—' %></td>
+            </tr>
+          <% end %>
+        <% end %>
+        </tbody>
+      </table>
+      </div>
+      <% end %>
+    </div>
+    <% end %>
+  <% end %>
+  <% if objects.present? %>
+    <h3 class="ag_sec"><%= l(:label_db_objects_diff) %></h3>
+    <% diff_rows = objects.flat_map { |g| g[:rows] } %>
+    <ul class="db_tags">
+      <% objects.each do |g| %><li><%= l("label_db_kind_#{g[:kind]}") %> <span><%= l(:label_db_obj_summary, :same => g[:same], :diff => g[:rows].size) %></span></li><% end %>
+    </ul>
+    <% if diff_rows.empty? %>
+      <p class="db_allsame"><%= l(:label_db_objects_same) %></p>
+    <% else %>
+    <div class="autoscroll">
+    <table class="list db_difftbl">
+      <thead><tr><th><%= l(:label_db_diff_kind) %></th><th class="name"><%= l(:field_name) %></th><th><%= l(:field_status) %></th></tr></thead>
+      <tbody>
+      <% diff_rows.each do |r| %>
+        <tr class="<%= 'db_missing_row' if %i(only_a only_b).include?(r[:state]) %>">
+          <td><%= l("label_db_kind_#{r[:kind]}") %></td>
+          <td class="name"><code><%= r[:name] %></code><% if r[:key] != r[:name] %> <span class="db_dim"><%= r[:key].delete_prefix(r[:name]) %></span><% end %></td>
+          <td><%= case r[:state]
+                  when :only_a then l(:label_db_column_only, :name => name_a)
+                  when :only_b then l(:label_db_column_only, :name => name_b)
+                  when :changed then l(:label_db_def_changed)
+                  else l(:label_db_def_unknown)
+                  end %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+    </div>
+    <% end %>
+  <% end %>

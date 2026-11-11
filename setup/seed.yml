@@ -119,6 +119,7 @@ roles:
   - manage_menu_tree
   - manage_sys_roles
   - view_db_schema
+  - run_db_query
   - add_issues
   - edit_issues
   - edit_own_issues
@@ -216,6 +217,7 @@ roles:
   - manage_menu_tree
   - manage_sys_roles
   - view_db_schema
+  - run_db_query
   - add_issues
   - edit_issues
   - edit_own_issues

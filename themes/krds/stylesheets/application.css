@@ -989,6 +989,25 @@ table.list.db_cols td.name code{font-size:0.9375rem;color:var(--gray_95);}
 #content a.db_refresh .icon-svg{width:14px;height:14px;}
 #content .db_hop .btn_line,#content #db_hop_add{display:inline-flex;align-items:center;height:32px;padding:0 12px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.8125rem;font-weight:500;color:var(--pri_60);cursor:pointer;}
 #content .db_hop .db_hop_del{border-color:var(--dan_50);color:var(--dan_60);}
+.db_hist_save{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 16px;}
+#content table.db_hist td{text-align:left;}
+#content table.db_hist tr.on td.comment{font-weight:500;}
+.db_qform textarea{width:100%;padding:10px 12px;border:1px solid var(--gray_30);border-radius:var(--radius_m);font-family:Consolas,"D2Coding",monospace;font-size:0.875rem;line-height:1.5;}
+.db_qbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0 16px;}
+#content .db_qbar .btn_line{display:inline-flex;align-items:center;height:36px;padding:0 14px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.875rem;font-weight:500;color:var(--pri_60);cursor:pointer;}
+#content a.db_qlog{margin:0 0 0 auto;font-size:0.875rem;}
+.db_prodwarn{margin:0 0 12px;}
+.db_qmeta{margin:0 0 8px;font-size:0.875rem;color:var(--gray_70);}
+.db_qwrap{max-height:65vh;overflow:auto;border:1px solid var(--gray_20);border-radius:var(--radius_m);}
+#content table.db_qres{margin:0;border-top:0;font-size:0.8125rem;}
+#content table.db_qres th{position:sticky;top:0;z-index:1;white-space:nowrap;text-align:left;}
+#content table.db_qres td{padding:6px 10px;white-space:nowrap;text-align:left;font-family:Consolas,"D2Coding",monospace;}
+#content table.db_qres td.null{font-style:italic;color:var(--gray_40);}
+#content table.db_qres .no{color:var(--gray_50);text-align:right;}
+.db_qrecent{padding:0;margin:0 0 16px;list-style:none;}
+.db_qrecent li{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:6px 0;border-bottom:1px solid var(--gray_10);}
+.db_qreuse{padding:0;border:0;background:none;text-align:left;cursor:pointer;}
+.db_qreuse:hover code{color:var(--pri_60);text-decoration:underline;}
 .db_hop{padding:8px 0 4px;margin:10px 0;border:0;border-top:1px dashed var(--gray_30);}
 .db_hop legend{padding:0 6px 0 0;font-size:0.875rem;font-weight:700;color:var(--gray_80);}
 #content .db_hop[hidden],#content .db_hop [hidden],#content #db_hop_add[hidden]{display:none;}

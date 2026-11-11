@@ -1,0 +1,26 @@
+<%# 프로젝트 > DB > SQL 조회 실행 기록 (최근 300건) %>
+<h2><%= link_to l(:label_db_manage), project_db_schemas_path(@project, :link => @link.id) %> &#187; <%= @link.name %> &#187; <%= l(:label_db_query_log) %></h2>
+<p class="subtitle"><%= l(:text_db_query_log) %></p>
+<% if @logs.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list db_hist db_qlogs">
+  <thead><tr><th><%= l(:label_db_history_at) %></th><th><%= l(:field_user) %></th><th><%= l(:field_status) %></th><th><%= l(:label_db_query_rows) %></th><th><%= l(:label_db_query_ms) %></th><th class="comment">SQL</th></tr></thead>
+  <tbody>
+  <% @logs.each do |q| %>
+    <tr>
+      <td><%= format_time(q.created_at) %></td>
+      <td><%= q.user&.name %></td>
+      <td><span class="db_term <%= { 'ok' => 'db_ok', 'error' => 'db_type', 'blocked' => 'db_missing' }[q.status] %>"><%= l("label_db_query_status_#{q.status}") %></span></td>
+      <td><%= q.row_count %></td>
+      <td><%= q.duration_ms %></td>
+      <td class="comment"><details><summary><code><%= q.sql.to_s.squish.truncate(120) %></code></summary><pre class="db_sql"><code><%= q.sql %></code></pre></details><% if q.message %><span class="db_dim"><%= q.message %></span><% end %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<% end %>
+<p class="form_btns"><%= link_to l(:label_db_query), project_db_query_path(@project, @link), :class => 'btn_line' %></p>
+<% html_title l(:label_db_query_log) %>

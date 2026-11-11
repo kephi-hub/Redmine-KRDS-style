@@ -8,7 +8,7 @@ class DbSchemasController < ApplicationController
   before_action :find_project_by_project_id
   before_action :authorize
   before_action :load_links
-  before_action :find_link, only: [:table, :object, :export, :check, :erd]
+  before_action :find_link, only: [:table, :object, :export, :check, :erd, :history, :save_history, :history_diff, :query, :query_log]
 
   def index
     @link = @links.find { |l| l.id.to_s == params[:link].to_s } || @links.first
@@ -108,6 +108,81 @@ class DbSchemasController < ApplicationController
     end
   end
 
+  # SQL 조회 — 조회 문장 하나, 읽기 전용 트랜잭션·시간·건수 제한, 모든 실행(거부 포함) 기록
+  QUERY_LIMITS = [100, 500, 1000].freeze
+
+  def query
+    perm = @link.production? ? :run_db_query_production : :run_db_query
+    return deny_access unless User.current.allowed_to?(perm, @project)
+    @limit = QUERY_LIMITS.include?(params[:limit].to_i) ? params[:limit].to_i : QUERY_LIMITS.first
+    @recent = DbQueryLog.where(db_link_id: @link.id, user_id: User.current.id).recent.limit(10).to_a
+    return unless request.post?
+    @sql = params[:sql].to_s
+    clean, reason = DbManage::SqlGuard.check(@sql)
+    if reason
+      log_query('blocked', message: reason)
+      return @error = reason
+    end
+    t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    begin
+      @result = @link.connector.select(clean, limit: @limit, seconds: [@link.db_server.timeout * 3, 60].min)
+    rescue DbManage::Error => e
+      log_query('error', message: e.message, ms: elapsed(t0))
+      return @error = e.message
+    end
+    @ms = elapsed(t0)
+    log_query('ok', rows: @result[:rows].size, ms: @ms)
+    return unless params[:csv] == '1'
+    data = CSV.generate do |csv|
+      csv << @result[:columns]
+      @result[:rows].each { |r| csv << r }
+    end
+    send_data "\uFEFF" + data, type: 'text/csv; charset=utf-8',
+              filename: "SQL_#{@project.identifier}_#{@link.name}_#{User.current.today.strftime('%Y%m%d')}.csv"
+  end
+
+  # SQL 조회 실행 기록 (DB 연결 관리 권한)
+  def query_log
+    @logs = DbQueryLog.where(db_link_id: @link.id).recent.includes(:user).limit(300).to_a
+  end
+
+  # 구조 변경 이력: 저장본 목록 (바로 앞 저장본과의 차이 요약)
+  def history
+    @snapshots = @link.db_snapshots.recent.includes(:user).limit(DbSnapshot::KEEP).to_a
+  end
+
+  # 지금 구조 저장 (바뀌었을 때만)
+  def save_history
+    state, rec = DbSnapshot.capture(@link, User.current)
+    flash[:notice] = state == :saved ? l(:notice_db_snapshot_saved, tables: rec.table_count) : l(:notice_db_snapshot_same)
+  rescue DbManage::Error => e
+    flash[:error] = e.message
+  ensure
+    redirect_to project_db_history_path(@project, @link) unless performed?
+  end
+
+  # 저장본 비교: 기본은 바로 앞 저장본 → 이 저장본, base=current 면 이 저장본 → 지금 DB
+  def history_diff
+    @snap = @link.db_snapshots.find_by(id: params[:id])
+    return render_404 unless @snap
+    if params[:base] == 'current'
+      cur = snapshot(@link)
+      return unless cur
+      @older, @newer = @snap.structure, cur
+      @name_a, @name_b = l(:label_db_history_this), l(:label_db_history_now)
+      @time_a, @time_b = @snap.created_at, nil
+    else
+      base = params[:base].present? ? @link.db_snapshots.find_by(id: params[:base]) : @link.db_snapshots.where('created_at < ? OR (created_at = ? AND id < ?)', @snap.created_at, @snap.created_at, @snap.id).recent.first
+      return @first = true unless base
+      @base = base
+      @older, @newer = base.structure, @snap.structure
+      @name_a, @name_b = l(:label_db_history_prev), l(:label_db_history_this)
+      @time_a, @time_b = base.created_at, @snap.created_at
+    end
+    @result = DbManage::Analysis.compare(@older, @newer)
+    @objects = DbManage::Analysis.compare_objects(@older, @newer, @link.schema, @link.schema)
+  end
+
   # 두 DB(기본: 운영 아님 ↔ 운영) 의 테이블·컬럼 차이
   def compare
     return if @links.size < 2
@@ -169,6 +244,15 @@ class DbSchemasController < ApplicationController
   end
 
   private
+
+  def log_query(status, rows: nil, ms: nil, message: nil)
+    DbQueryLog.create!(db_link_id: @link.id, user_id: User.current.id, sql: @sql.to_s.truncate(20_000), status: status,
+                       row_count: rows, duration_ms: ms, message: message.to_s.truncate(250).presence, created_at: Time.now)
+  end
+
+  def elapsed(t0)
+    ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - t0) * 1000).round
+  end
 
   def load_links
     @links = @project.db_links.includes(:db_server).sorted.to_a

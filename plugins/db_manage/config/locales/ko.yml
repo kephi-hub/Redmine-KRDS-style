@@ -204,6 +204,52 @@ ko:
   label_db_col_comment: 컬럼 설명
   label_db_term_name: 용어사전 이름
   text_db_erd_drawio: draw.io(diagrams.net)에서 열어 위치·선을 직접 고칠 수 있는 파일
+  label_db_history: 변경 이력
+  text_db_history: DB 구조(테이블·컬럼·인덱스·뷰·함수 등 정의)를 저장해 두고, 저장본끼리 또는 지금 DB 와 비교합니다. 구조가 바뀌었을 때만 저장됩니다.
+  button_db_snapshot: 지금 구조 저장
+  label_db_snapshotting: 저장하는 중…
+  text_db_history_auto: 서버 cron 으로 하루 한 번 자동 저장할 수 있습니다 (setup/cron.example).
+  label_db_history_none: 저장된 구조가 없습니다.
+  label_db_history_at: 저장 시각
+  label_db_history_by: 저장
+  label_db_history_objects: 객체
+  label_db_history_changes: 앞 저장본과 비교
+  label_db_history_auto: 자동
+  label_db_history_first: 처음 저장
+  label_db_history_added: "테이블 추가 %{count}"
+  label_db_history_removed: "테이블 삭제 %{count}"
+  label_db_history_changed: "테이블 변경 %{count}"
+  label_db_history_obj_changed: "객체 변경 %{count}"
+  label_db_history_nochange: 테이블·객체 변화 없음
+  label_db_history_diff: 바뀐 내용
+  label_db_history_vs_now: 지금 DB 와 비교
+  label_db_history_first_long: 처음 저장한 구조라 비교할 앞 저장본이 없습니다.
+  text_db_history_diff: "%{a} → %{b} 사이에 바뀐 내용입니다."
+  label_db_history_now: 지금 DB
+  notice_db_snapshot_saved: "구조를 저장했습니다 (테이블 %{tables}개)."
+  notice_db_snapshot_same: 앞 저장본과 구조가 같아 저장하지 않았습니다.
+  permission_run_db_query: SQL 조회 (개발 DB)
+  permission_run_db_query_production: SQL 조회 (운영 DB)
+  label_db_query: SQL 조회
+  text_db_query: "조회 문장(SELECT·WITH·SHOW·DESC·EXPLAIN) 하나만 실행합니다. 읽기 전용으로 실행되고 %{sec}초가 지나면 멈춥니다. 실행한 문장은 모두 기록됩니다."
+  text_db_query_prod: 운영 DB 입니다. 조회만 가능하지만 무거운 조회는 서비스에 부담을 줄 수 있으니 조건(WHERE)과 건수를 줄여 실행하세요. 개인정보 조회는 업무에 필요한 범위로만.
+  label_db_query_limit: 최대
+  label_db_query_run: 실행
+  label_db_query_running: 실행 중…
+  label_db_query_csv: CSV 로 받기
+  text_db_query_keys: Ctrl+Enter 로 실행
+  label_db_query_log: 실행 기록
+  label_db_query_meta: "%{rows}건 · %{ms}ms"
+  label_db_query_truncated: "%{limit}건까지만 표시 (더 있음)"
+  label_db_query_recent: 내가 최근 실행한 문장
+  label_db_query_status_ok: 성공
+  label_db_query_status_error: 오류
+  label_db_query_status_blocked: 거부
+  text_db_query_log: 이 DB 에서 실행한 SQL 조회 기록입니다 (거부·오류 포함, 최근 300건).
+  label_db_query_rows: 건수
+  label_db_query_ms: 시간(ms)
+  label_db_history_prev: 이전 저장본
+  label_db_history_this: 이 저장본
   activerecord:
     attributes:
       db_server:

@@ -1,0 +1,12 @@
+<%# 프로젝트 > DB > 변경 이력 > 비교 %>
+<h2><%= link_to l(:label_db_manage), project_db_schemas_path(@project, :link => @link.id) %> &#187; <%= link_to l(:label_db_history), project_db_history_path(@project, @link) %> &#187; <%= format_time(@snap.created_at) %></h2>
+<%= render :partial => 'error' %>
+<% if @first %>
+  <p class="nodata"><%= l(:label_db_history_first_long) %></p>
+<% elsif @result %>
+  <% sec = ->(t) { t ? t.in_time_zone(User.current.time_zone || Time.zone).strftime('%Y-%m-%d %H:%M:%S') : l(:label_db_history_now) } %>
+  <p class="subtitle"><%= l(:text_db_history_diff, :a => "#{@name_a} (#{sec.call(@time_a)})", :b => "#{@name_b} (#{sec.call(@time_b)})") %></p>
+  <%= render :partial => 'diff', :locals => { :result => @result, :objects => @objects, :name_a => @name_a, :name_b => @name_b } %>
+<% end %>
+<p class="form_btns"><%= link_to l(:label_db_history), project_db_history_path(@project, @link), :class => 'btn_line' %></p>
+<% html_title l(:label_db_history) %>

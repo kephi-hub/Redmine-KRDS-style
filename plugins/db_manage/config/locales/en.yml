@@ -204,6 +204,52 @@ en:
   label_db_col_comment: Column comment
   label_db_term_name: Glossary term
   text_db_erd_drawio: File you can edit in draw.io (diagrams.net)
+  label_db_history: History
+  text_db_history: Saves the DB structure (tables, columns, indexes, object definitions) and compares saved versions or the current DB. Saved only when changed.
+  button_db_snapshot: Save structure now
+  label_db_snapshotting: Saving…
+  text_db_history_auto: A daily cron job can save automatically (setup/cron.example).
+  label_db_history_none: No saved structures.
+  label_db_history_at: Saved at
+  label_db_history_by: By
+  label_db_history_objects: Objects
+  label_db_history_changes: Changes since previous
+  label_db_history_auto: Automatic
+  label_db_history_first: First save
+  label_db_history_added: "%{count} tables added"
+  label_db_history_removed: "%{count} tables removed"
+  label_db_history_changed: "%{count} tables changed"
+  label_db_history_obj_changed: "%{count} objects changed"
+  label_db_history_nochange: No table or object changes
+  label_db_history_diff: Changes
+  label_db_history_vs_now: Compare with current DB
+  label_db_history_first_long: This is the first saved structure.
+  text_db_history_diff: "Changes between %{a} and %{b}."
+  label_db_history_now: Current DB
+  notice_db_snapshot_saved: "Structure saved (%{tables} tables)."
+  notice_db_snapshot_same: Structure unchanged; not saved.
+  permission_run_db_query: SQL query (development DB)
+  permission_run_db_query_production: SQL query (production DB)
+  label_db_query: SQL query
+  text_db_query: "Runs one read-only statement (SELECT, WITH, SHOW, DESC, EXPLAIN), stopped after %{sec} seconds. Every run is logged."
+  text_db_query_prod: Production DB. Keep queries small (WHERE, row limit) and access personal data only as needed.
+  label_db_query_limit: Max
+  label_db_query_run: Run
+  label_db_query_running: Running…
+  label_db_query_csv: Download CSV
+  text_db_query_keys: Ctrl+Enter to run
+  label_db_query_log: Query log
+  label_db_query_meta: "%{rows} rows · %{ms}ms"
+  label_db_query_truncated: "Showing first %{limit} rows (more exist)"
+  label_db_query_recent: My recent statements
+  label_db_query_status_ok: OK
+  label_db_query_status_error: Error
+  label_db_query_status_blocked: Blocked
+  text_db_query_log: SQL queries run on this DB (including blocked and failed, last 300).
+  label_db_query_rows: Rows
+  label_db_query_ms: Time (ms)
+  label_db_history_prev: Previous
+  label_db_history_this: This version
   activerecord:
     attributes:
       db_server:

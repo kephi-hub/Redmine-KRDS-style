@@ -7,6 +7,11 @@ resources :projects, only: [] do
   resources :db_links, only: [:new, :create, :edit, :update, :destroy]
   get 'db', to: 'db_schemas#index', as: 'db_schemas'
   get 'db/compare', to: 'db_schemas#compare', as: 'db_compare'
+  get 'db/:link_id/history', to: 'db_schemas#history', as: 'db_history'
+  post 'db/:link_id/history', to: 'db_schemas#save_history'
+  get 'db/:link_id/history/:id', to: 'db_schemas#history_diff', as: 'db_history_diff', constraints: { id: /\d+/ }
+  match 'db/:link_id/query', to: 'db_schemas#query', via: [:get, :post], as: 'db_query'
+  get 'db/:link_id/query/log', to: 'db_schemas#query_log', as: 'db_query_log'
   get 'db/:link_id/check', to: 'db_schemas#check', as: 'db_check'
   get 'db/:link_id/erd', to: 'db_schemas#erd', as: 'db_erd', format: false
   get 'db/:link_id/export', to: 'db_schemas#export', as: 'db_export'

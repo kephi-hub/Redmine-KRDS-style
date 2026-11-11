@@ -1,0 +1,44 @@
+<%# 프로젝트 > DB > 변경 이력 — 저장본 목록, 바로 앞 저장본과의 차이 요약 %>
+<% can_save = User.current.allowed_to?(:manage_db_links, @project) %>
+<h2><%= link_to l(:label_db_manage), project_db_schemas_path(@project, :link => @link.id) %> &#187; <%= @link.name %> &#187; <%= l(:label_db_history) %></h2>
+<p class="subtitle"><%= l(:text_db_history) %></p>
+<% if can_save %>
+  <%= form_tag project_db_history_path(@project, @link), :class => 'db_hist_save' do %>
+    <%= submit_tag l(:button_db_snapshot), :name => nil, :data => { :disable_with => l(:label_db_snapshotting) } %>
+    <span class="db_dim"><%= l(:text_db_history_auto) %></span>
+  <% end %>
+<% end %>
+<% if @snapshots.empty? %>
+  <p class="nodata"><%= l(:label_db_history_none) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list db_hist">
+  <thead><tr><th class="name"><%= l(:label_db_history_at) %></th><th><%= l(:label_db_history_by) %></th><th><%= l(:label_db_kind_table) %></th><th><%= l(:label_db_columns_total) %></th><th><%= l(:label_db_history_objects) %></th><th class="comment"><%= l(:label_db_history_changes) %></th><th></th></tr></thead>
+  <tbody>
+  <% @snapshots.each_with_index do |sn, i| %>
+    <% s = sn.summary_hash %>
+    <tr class="<%= 'on' if sn.changed? %>">
+      <td class="name"><%= format_time(sn.created_at) %></td>
+      <td><%= sn.user ? sn.user.name : l(:label_db_history_auto) %></td>
+      <td><%= sn.table_count %></td>
+      <td><%= sn.column_count %></td>
+      <td><%= sn.object_count %></td>
+      <td class="comment">
+        <% if s.nil? %><span class="db_dim"><%= l(:label_db_history_first) %></span>
+        <% else %>
+          <% parts = [[:only_b, :label_db_history_added], [:only_a, :label_db_history_removed], [:changed, :label_db_history_changed], [:objects, :label_db_history_obj_changed]].select { |k, _| s[k].to_i.positive? } %>
+          <%= parts.any? ? safe_join(parts.map { |k, label| content_tag(:span, l(label, :count => s[k]), :class => "db_term #{k == :only_a ? 'db_type' : 'db_ok'}") }, ' ') : content_tag(:span, l(:label_db_history_nochange), :class => 'db_dim') %>
+        <% end %>
+      </td>
+      <td class="buttons">
+        <% if s %><%= link_to l(:label_db_history_diff), project_db_history_diff_path(@project, @link, sn) %><% end %>
+        <% if i.zero? %> · <%= link_to l(:label_db_history_vs_now), project_db_history_diff_path(@project, @link, sn, :base => 'current') %><% end %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<% end %>
+<p class="form_btns"><%= link_to l(:label_db_back), project_db_schemas_path(@project, :link => @link.id), :class => 'btn_line' %></p>
+<% html_title "#{l(:label_db_history)} - #{@link.name}" %>
