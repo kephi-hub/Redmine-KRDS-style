@@ -52,7 +52,6 @@ code,pre,kbd,tt,samp{font-family:"D2Coding","Consolas","Menlo",monospace,var(--f
 /* ===== 메인 메뉴: KRDS 메인 메뉴 2뎁스 (krds_ui MenuGroups) — 수치·색은 KRDS Component Kit _main_menu.scss 기준(rem 10px → px 환산) =====
  * PC: 1뎁스 56px·19px 굵게, 열림·현재 위치는 아래 4px 막대(secondary-70), 꺾쇠 회전 / 2뎁스 패널: 제목 24px, 4열 링크(점) / 어둡게(검정 75%)
  * 모바일: 메뉴 레이어 전체 화면, 왼쪽 1뎁스 세로 탭 124px(secondary-5) + 오른쪽 2뎁스 묶음 */
-#header{position:relative;z-index:62;padding-bottom:57px;}
 #main-menu{right:0;left:0;bottom:0;width:auto;padding:0 8px;margin:0;border-top:1px solid var(--gray_20);}
 #main-menu ul.gnb_menu{display:flex;align-items:stretch;gap:4px;}
 #main-menu .gnb_menu>li{display:block;margin:0;}
@@ -81,7 +80,7 @@ code,pre,kbd,tt,samp{font-family:"D2Coding","Consolas","Menlo",monospace,var(--f
 .gnb_list a.gnb_link.on::before{background:var(--sec_80);}
 .gnb_dim{position:fixed;top:0;right:0;bottom:0;left:0;z-index:61;background:rgba(0,0,0,0.75);}
 .gnb_dim[hidden]{display:none;}
-#wrapper .flyout-menu{display:flex;position:fixed;top:0;right:-100%;bottom:0;z-index:100;flex-direction:column;width:100%;height:100%;overflow-y:auto;border-left:0;transition:right 0.3s;}
+#wrapper .flyout-menu{display:flex;position:fixed;top:0;right:-100%;bottom:0;z-index:1000;flex-direction:column;width:100%;height:100%;overflow-y:auto;border-left:0;transition:right 0.3s;}
 html.flyout-is-active #wrapper .flyout-menu{right:0;}
 .flyout-is-active #wrapper,.flyout-is-active #wrapper #header{right:0;}
 .mnav_head{display:flex;position:sticky;top:0;z-index:3;align-items:center;justify-content:space-between;height:56px;padding:0 8px 0 20px;border-bottom:1px solid var(--gray_20);background:var(--gray_0);font-size:1.125rem;font-weight:700;color:var(--gray_90);}
@@ -1385,6 +1384,7 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 
 /* ===== 데스크톱 (900px 이상) ===== */
 @media (min-width:900px){
+#header{position:relative;z-index:62;padding-bottom:57px;}
 .gnb_list{grid-template-columns:repeat(3,1fr);}
 table.list.qa_run{display:table;}
 table.list.qa_run>thead{display:table-header-group;}
