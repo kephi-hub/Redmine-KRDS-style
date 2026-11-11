@@ -1,4 +1,4 @@
-<%# 프로젝트 > DB — DB 별 탭, 종류 탭(테이블·뷰·함수·프로시저·트리거·DB 잡·시퀀스 — DB 종류마다 다름), 아래 숫자 요약 %>
+<%# 프로젝트 > DB — DB 별 탭, 종류 탭(테이블·뷰·함수·프로시저·트리거·DB 잡·시퀀스 — DB 종류마다 다름), 그 아래 숫자 요약(KPI) %>
 <h2><%= l(:label_db_manage) %></h2>
 <p class="subtitle"><%= l(:text_db_project) %></p>
 
@@ -22,6 +22,20 @@
       <a href="<%= project_db_schemas_path(@project, :link => @link.id, :kind => kind) %>" class="db_kind<%= ' on' if kind == @kind %>" data-kind="<%= kind %>" role="tab" aria-selected="<%= kind == @kind %>"><%= db_kind_label(kind) %><span class="db_kcnt"><%= db_kind_items(snap, kind).size %></span></a>
     <% end %>
   </div>
+  <%# 숫자 요약(KPI): 종류별 개수(누르면 그 탭), 컬럼 수, 추정 행 수, 용어 일치 — 종류 탭 바로 아래 %>
+  <% tables = db_kind_items(snap, 'table'); all_cols = cols.values.flatten; rows_sum = tables.sum { |t| t[:rows].to_i } %>
+  <ul class="db_stats db_kpi">
+    <% kinds.each do |kind| %>
+      <li class="<%= 'on' if kind == @kind %>" data-kind="<%= kind %>"><a href="<%= project_db_schemas_path(@project, :link => @link.id, :kind => kind) %>" data-kind="<%= kind %>"><span><%= db_kind_label(kind) %></span><strong><%= db_number(db_kind_items(snap, kind).size) %></strong></a></li>
+    <% end %>
+    <li class="db_fixed"><span><%= l(:label_db_columns_total) %></span><strong><%= db_number(all_cols.size) %></strong></li>
+    <li class="db_fixed"><span><%= l(:label_db_rows_total) %></span><strong><%= db_number(rows_sum) %></strong></li>
+    <% if @terms && all_cols.any? %>
+      <% okc = all_cols.count { |c| DbManage::Analysis.term_status(c, @terms).first == :ok } %>
+      <li class="db_fixed"><span><%= l(:label_db_term_rate) %></span><strong><%= (okc * 100.0 / all_cols.size).round %>%</strong><em><%= okc %> / <%= all_cols.size %></em></li>
+    <% end %>
+  </ul>
+
   <div class="list_bar">
     <p class="list_total"><span id="db_shown"></span></p>
     <p class="list_search"><span class="list_field"><input type="search" id="db_filter" placeholder="<%= l(:label_db_filter_any) %>" aria-label="<%= l(:label_db_filter_any) %>"></span></p>
@@ -120,19 +134,6 @@
   </div>
   <% end %>
 
-  <%# 아래 숫자 요약: 종류별 개수(누르면 그 탭), 컬럼 수, 추정 행 수, 용어 일치 %>
-  <% tables = db_kind_items(snap, 'table'); all_cols = cols.values.flatten; rows_sum = tables.sum { |t| t[:rows].to_i } %>
-  <ul class="db_stats db_foot">
-    <% kinds.each do |kind| %>
-      <li class="<%= 'on' if kind == @kind %>" data-kind="<%= kind %>"><a href="<%= project_db_schemas_path(@project, :link => @link.id, :kind => kind) %>" data-kind="<%= kind %>"><span><%= db_kind_label(kind) %></span><strong><%= db_number(db_kind_items(snap, kind).size) %></strong></a></li>
-    <% end %>
-    <li class="db_fixed"><span><%= l(:label_db_columns_total) %></span><strong><%= db_number(all_cols.size) %></strong></li>
-    <li class="db_fixed"><span><%= l(:label_db_rows_total) %></span><strong><%= db_number(rows_sum) %></strong></li>
-    <% if @terms && all_cols.any? %>
-      <% okc = all_cols.count { |c| DbManage::Analysis.term_status(c, @terms).first == :ok } %>
-      <li class="db_fixed"><span><%= l(:label_db_term_rate) %></span><strong><%= (okc * 100.0 / all_cols.size).round %>%</strong><em><%= okc %> / <%= all_cols.size %></em></li>
-    <% end %>
-  </ul>
 
   <%= javascript_tag do %>
   $(function() {
@@ -154,7 +155,7 @@
       e.preventDefault();
       var k = $(this).data('kind');
       $('.db_kind').removeClass('on').attr('aria-selected', 'false').filter('[data-kind="' + k + '"]').addClass('on').attr('aria-selected', 'true');
-      $('.db_foot li[data-kind]').removeClass('on').filter('[data-kind="' + k + '"]').addClass('on');
+      $('.db_kpi li[data-kind]').removeClass('on').filter('[data-kind="' + k + '"]').addClass('on');
       $('.db_panel').prop('hidden', true).filter('[data-kind="' + k + '"]').prop('hidden', false);
       try { history.replaceState(null, '', this.href); } catch (err) {}
       filter(); reveal();
