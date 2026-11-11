@@ -167,8 +167,9 @@ $(function() {
     });
   }, 1000);
   <% if @project.deploy_runs.active.exists? || @history.any? { |r| DeployRun::ACTIVE.include?(r[:status]) } %>
+  // 상태 확인은 10초마다 조용히 (Redmine 공통 '읽는 중...' 표시는 띄우지 않음 — 진행 행에 스피너·진행바가 있으므로)
   var timer = setInterval(function() {
-    $.getJSON('<%= j project_deploys_status_path(@project) %>').done(function(d) {
+    $.ajax({ url: '<%= j project_deploys_status_path(@project) %>', dataType: 'json', global: false, cache: false }).done(function(d) {
       if (d.changed || d.active === 0) { clearInterval(timer); location.reload(); }
     });
   }, 10000);
