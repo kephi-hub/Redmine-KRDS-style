@@ -1396,6 +1396,11 @@ table.list.db_codes tr.db_codegrp th{padding:10px 8px;background:var(--gray_5);t
 #content .repo_bar~h2.breadcrumbs{margin:0 0 12px;font-size:1rem;font-weight:500;color:var(--gray_60);}
 #content .repo_bar~h2.breadcrumbs a{color:var(--pri_60);}
 #content table#browser,#content table.list.entries{width:100%;}
+#content .repo_btns>a.icon,#content .repo_btns .drdn-trigger{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 14px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.875rem;font-weight:500;color:var(--pri_60);text-decoration:none;}
+#content .repo_btns .drdn-trigger{width:36px;padding:0;}
+#content .repo_btns>a.icon:hover,#content .repo_btns .drdn-trigger:hover{background:var(--pri_5);}
+#content .repo_btns>a.icon .icon-svg{width:16px;height:16px;}
+#content table#browser{display:block;overflow-x:auto;}
 
 /* 이전·다음 버튼: Redmine 은 600px 미만에서 너비 32% 로 고정해 글자가 잘림 → 글자 너비대로 */
 #wrapper .pagination ul.pages li.current,#wrapper .pagination ul.pages li.previous,#wrapper .pagination ul.pages li.next{width:auto;overflow:visible;}
@@ -1427,6 +1432,7 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 
 /* ===== 데스크톱 (900px 이상) ===== */
 @media (min-width:900px){
+#content table#browser{display:table;overflow:visible;}
 #header{position:relative;z-index:62;padding-bottom:57px;}
 #top-menu{position:relative;z-index:62;}
 .gnb_list{grid-template-columns:repeat(3,1fr);}

@@ -154,6 +154,9 @@ $(function() {
   var $btns = $('#content > .repo_bar .repo_btns');
   if (!$btns.length) return;
   var $ctx = $('#content > .contextual').first();
-  if ($ctx.length) $btns.prepend($ctx.children());
+  if ($ctx.length) $btns.prepend($ctx.contents());
+  // 원본의 "|" 구분 글자는 버튼 줄에서 지움
+  $btns.find('*').addBack().contents().filter(function() { return this.nodeType === 3 && /^[\s|]*$/.test(this.nodeValue); }).remove();
+  $btns.find('form').contents().filter(function() { return this.nodeType === 3; }).each(function() { this.nodeValue = this.nodeValue.replace(/\|/g, ''); });
   $ctx.remove();
 });
