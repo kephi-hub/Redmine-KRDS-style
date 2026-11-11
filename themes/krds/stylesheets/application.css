@@ -279,26 +279,26 @@ div.fileover span.add_attachment,p.custom-field-filedroplistner.fileover span.ad
 .bbs_reply{display:flex;justify-content:flex-end;margin:16px 0;}
 #content .bbs_reply a{display:inline-flex;align-items:center;height:40px;padding:0 20px;font-size:0.9375rem;font-weight:500;}
 /* 설정 > 게시판 — 행을 카드처럼, 편집(회색)·삭제(빨강) 테두리 버튼, 새 게시판 버튼은 오른쪽 */
-:is(#tab-content-boards,#tab-content-deploys)>p:first-child{display:flex;justify-content:flex-end;margin:0 0 12px;}
-:is(#tab-content-boards,#tab-content-deploys) .table-list.boards{display:block;width:100%;border-bottom:0;}
-:is(#tab-content-boards,#tab-content-deploys) .table-list-header{display:block;}
-:is(#tab-content-boards,#tab-content-deploys) .table-list-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:14px 8px;border-bottom:1px solid var(--gray_20);}
-:is(#tab-content-boards,#tab-content-deploys) .table-list-row:hover{background:var(--gray_5);}
-:is(#tab-content-boards,#tab-content-deploys) .table-list-cell{display:block;padding:0;}
-:is(#tab-content-boards,#tab-content-deploys) .table-list-header .table-list-cell{padding:0;}
-:is(#tab-content-boards,#tab-content-deploys) .table-list-cell.name{flex:1 1 100%;width:auto;font-size:1rem;font-weight:700;}
-:is(#tab-content-boards,#tab-content-deploys) .table-list-cell.name a{color:var(--gray_90);}
-:is(#tab-content-boards,#tab-content-deploys) .table-list-cell.name a:hover{color:var(--pri_60);}
-:is(#tab-content-boards,#tab-content-deploys) .table-list-cell.description{flex:1 1 160px;font-size:0.875rem;color:var(--gray_60);}
-:is(#tab-content-boards,#tab-content-deploys) .table-list-cell.buttons{display:flex;align-items:center;gap:8px;width:auto;margin:0 0 0 auto;}
-:is(#tab-content-boards,#tab-content-deploys) .buttons a.icon,td.row_btns a.icon{display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 12px;margin:0;border:1px solid var(--gray_40);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.875rem;font-weight:500;color:var(--gray_80);}
-:is(#tab-content-boards,#tab-content-deploys) .buttons a.icon:hover,td.row_btns a.icon:hover{background:var(--gray_10);text-decoration:none;}
-:is(#tab-content-boards,#tab-content-deploys) .buttons a.icon .icon-svg,td.row_btns a.icon .icon-svg{width:16px;height:16px;stroke:currentColor;color:inherit;}
-:is(#tab-content-boards,#tab-content-deploys) .buttons a.icon-del,td.row_btns a.icon-del{border-color:var(--dan_50);color:var(--dan_50);}
-:is(#tab-content-boards,#tab-content-deploys) .buttons a.icon-del:hover,td.row_btns a.icon-del:hover{background:var(--dan_5);color:var(--dan_60);}
-:is(#tab-content-boards,#tab-content-deploys) .sort-handle{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius_s);color:var(--gray_50);}
-:is(#tab-content-boards,#tab-content-deploys) .sort-handle:hover{background:var(--gray_10);}
-:is(#tab-content-boards,#tab-content-deploys) .sort-handle .icon-svg{stroke:currentColor;}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links)>p:first-child{display:flex;justify-content:flex-end;margin:0 0 12px;}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .table-list.boards{display:block;width:100%;border-bottom:0;}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .table-list-header{display:block;}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .table-list-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:14px 8px;border-bottom:1px solid var(--gray_20);}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .table-list-row:hover{background:var(--gray_5);}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .table-list-cell{display:block;padding:0;}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .table-list-header .table-list-cell{padding:0;}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .table-list-cell.name{flex:1 1 100%;width:auto;font-size:1rem;font-weight:700;}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .table-list-cell.name a{color:var(--gray_90);}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .table-list-cell.name a:hover{color:var(--pri_60);}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .table-list-cell.description{flex:1 1 160px;font-size:0.875rem;color:var(--gray_60);}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .table-list-cell.buttons{display:flex;align-items:center;gap:8px;width:auto;margin:0 0 0 auto;}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .buttons a.icon,td.row_btns a.icon{display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 12px;margin:0;border:1px solid var(--gray_40);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.875rem;font-weight:500;color:var(--gray_80);}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .buttons a.icon:hover,td.row_btns a.icon:hover{background:var(--gray_10);text-decoration:none;}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .buttons a.icon .icon-svg,td.row_btns a.icon .icon-svg{width:16px;height:16px;stroke:currentColor;color:inherit;}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .buttons a.icon-del,td.row_btns a.icon-del{border-color:var(--dan_50);color:var(--dan_50);}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .buttons a.icon-del:hover,td.row_btns a.icon-del:hover{background:var(--dan_5);color:var(--dan_60);}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .sort-handle{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius_s);color:var(--gray_50);}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .sort-handle:hover{background:var(--gray_10);}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .sort-handle .icon-svg{stroke:currentColor;}
 td.row_btns{text-align:right;white-space:nowrap;}
 /* 역할·업무흐름 안내 (access_guide 플러그인) — 권한 한눈에 보기, 업무흐름 간편 설정 */
 .ag_legend{display:flex;flex-wrap:wrap;gap:8px 20px;padding:12px 16px;margin:0 0 20px;border:1px solid var(--gray_20);border-radius:var(--radius_m);background:var(--gray_5);list-style:none;font-size:0.8125rem;color:var(--gray_70);}
@@ -1018,7 +1018,7 @@ div#activity dd.grouped{margin-left:9em;}
 .list_search{flex:0 1 auto;justify-content:flex-end;}
 .list_field{flex:none;}
 #content .list_field input[type=search]{flex:none;width:240px;}
-:is(#tab-content-boards,#tab-content-deploys) .table-list-cell.name{flex:0 0 28%;}
+:is(#tab-content-boards,#tab-content-deploys,#tab-content-db_links) .table-list-cell.name{flex:0 0 28%;}
 .dep_list{grid-template-columns:repeat(2,1fr);}
 table.list.dep_runs{display:table;}
 table.list.dep_runs thead{display:table-header-group;}

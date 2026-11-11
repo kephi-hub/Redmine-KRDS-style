@@ -12,7 +12,7 @@
   <% links.each do |link| %>
   <div class="table-list-row">
     <div class="table-list-cell name"><%= link.name %><% if link.production? %> <span class="dep_prod"><%= l(:label_db_production) %></span><% end %></div>
-    <div class="table-list-cell description"><%= link.db_server %> · <code><%= link.db_server.adapter_label %> <%= link.schema %></code></div>
+    <div class="table-list-cell description"><%= link.db_server %> · <%= link.db_server.adapter_label %> · <code><%= link.schema %></code></div>
     <div class="table-list-cell buttons">
       <%= link_to sprite_icon('edit', l(:button_edit)), edit_project_db_link_path(@project, link), :class => 'icon icon-edit' %>
       <%= delete_link project_db_link_path(@project, link) %>
