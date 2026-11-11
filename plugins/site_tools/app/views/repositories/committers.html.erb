@@ -1,0 +1,50 @@
+<%# 저장소 > 사용자 (Redmine 원본 화면 + [지금 사용자 기준으로 자동 연결] 버튼, site_tools 플러그인) %>
+<h2><%= l(:label_repository) %></h2>
+
+<%= simple_format(l(:text_repository_usernames_mapping)) %>
+
+<% if @committers.empty? %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<% unmapped = @committers.count { |_, uid| uid.to_i <= 0 } %>
+<%= form_tag(refresh_committer_maps_path, :class => 'st_bar') do %>
+  <%= hidden_field_tag 'repository_id', @repository.id, :id => nil %>
+  <span class="db_dim"><%= l(:text_committer_auto, :count => unmapped) %></span>
+  <label class="inline"><%= check_box_tag 'remap', '1', false %> <%= l(:label_committer_remap) %></label>
+  <%= submit_tag l(:label_committer_refresh) %>
+<% end %>
+
+<%= form_tag({}) do %>
+<table class="list">
+<thead>
+  <tr>
+    <th><%= l(:field_login) %></th>
+    <th><%= l(:label_user) %></th>
+  </tr>
+</thead>
+<tbody>
+<% i = 0 -%>
+<% @committers.each do |committer, user_id| -%>
+  <tr class="<%= 'st_unmapped' if user_id.to_i <= 0 %>">
+    <td><%= committer %></td>
+    <td>
+      <%= hidden_field_tag "committers[#{i}][]", committer, :id => nil %>
+      <%= select_tag "committers[#{i}][]",
+                      content_tag(
+                            'option',
+                            "-- #{l :actionview_instancetag_blank_option} --",
+                            :value => ''
+                          ) +
+                        options_from_collection_for_select(
+                            @users, 'id', 'name', user_id.to_i
+                          ) %>
+    </td>
+  </tr>
+  <% i += 1 -%>
+<% end -%>
+</tbody>
+</table>
+<p><%= submit_tag(l(:button_save)) %></p>
+<% end %>
+
+<% end %>

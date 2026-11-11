@@ -1,0 +1,60 @@
+ko:
+  label_smtp_settings: 메일 서버(SMTP)
+  text_smtp_settings: 알림 메일을 보낼 메일 서버를 설정합니다. 저장하면 바로 적용되며(재시작 불필요), 비밀번호는 암호화해 저장합니다.
+  text_smtp_file_configured: 서버의 config/configuration.yml 에 메일 설정(email_delivery)이 있어 그 설정을 씁니다. 이 화면에서 바꾸려면 파일의 설정을 지우고 재시작하세요.
+  label_smtp_state_on: 메일 발송 사용 중
+  label_smtp_state_off: 메일 발송 꺼짐 — 알림 메일이 나가지 않습니다
+  label_smtp_enabled: 메일 발송 사용
+  text_smtp_enabled: 끄면 일감 알림 등 모든 메일을 보내지 않습니다.
+  label_smtp_address: 서버 주소
+  label_smtp_port: 포트
+  label_smtp_security: 보안 연결
+  text_smtp_security: "보통 STARTTLS 는 587, SSL/TLS 는 465, 사내 중계 서버는 25 포트"
+  label_smtp_sec_starttls: STARTTLS
+  label_smtp_sec_ssl: SSL/TLS
+  label_smtp_sec_none: 사용 안 함
+  label_smtp_auth: 인증 방식
+  label_smtp_auth_login: LOGIN
+  label_smtp_auth_plain: PLAIN
+  label_smtp_auth_cram_md5: CRAM-MD5
+  label_smtp_auth_none: 인증 없음
+  label_smtp_user: 계정
+  label_smtp_password: 비밀번호
+  text_smtp_password_keep: 저장된 비밀번호 유지 (바꿀 때만 입력)
+  label_smtp_clear_password: 저장된 비밀번호 지우기
+  label_smtp_from: 보내는 주소
+  text_smtp_from: 메일의 보낸 사람 주소 (관리 > 설정 > 이메일 알림의 "발신 메일 주소" 와 같은 값). 메일 서버 계정과 같은 도메인이어야 하는 경우가 많습니다.
+  label_smtp_domain: HELO 도메인
+  text_smtp_domain: 비워 두면 기본값 (사내 메일 서버가 요구할 때만)
+  label_smtp_verify: 인증서 확인
+  text_smtp_verify: 사내 메일 서버가 자체 서명 인증서를 쓰면 끄세요.
+  label_smtp_timeout: 시간 제한(초)
+  label_smtp_test: 시험 메일
+  label_smtp_test_send: 시험 메일 보내기
+  text_smtp_test: 저장하기 전에 지금 입력한 값으로 보냅니다. 비밀번호를 비워 두면 저장된 값을 씁니다.
+  label_smtp_testing: 보내는 중…
+  label_smtp_test_error: 요청을 보내지 못했습니다.
+  label_smtp_notifications: 이메일 알림 설정
+  notice_smtp_saved_on: 메일 서버 설정을 저장하고 메일 발송을 켰습니다.
+  notice_smtp_saved_off: 메일 서버 설정을 저장했습니다. 메일 발송은 꺼져 있습니다.
+  notice_smtp_test_ok: "%{to} 로 시험 메일을 보냈습니다. 받은편지함(스팸함 포함)을 확인하세요."
+  error_smtp_test: "보내지 못했습니다: %{message}"
+  error_smtp_no_to: 받을 메일 주소를 확인하세요.
+  error_smtp_address: 서버 주소를 확인하세요 (예 smtp.example.com).
+  error_smtp_port: 포트는 1~65535 사이 숫자입니다.
+  label_committer_maps: 저장소 사용자 연결
+  text_committer_maps: "저장소 커밋의 작성자(커미터)를 지금 Redmine 사용자와 연결해 이름으로 보여 줍니다. 커미터가 사용자 로그인 ID 나 메일과 같으면 자동으로 연결하며, 사용자를 새로 만들거나 로그인 ID 를 바꾸면 같은 ID 의 커밋이 자동으로 연결됩니다."
+  label_committer_k_repos: 저장소
+  label_committer_k_mapped: 연결된 커미터
+  label_committer_k_unmapped: 미연결 커미터
+  label_committer_k_can: 자동 연결 가능
+  label_committer_remap: 이미 연결된 커미터도 로그인 ID 기준으로 다시 맞추기
+  label_committer_refresh_all: 모든 저장소 갱신
+  label_committer_refresh: 지금 사용자 기준으로 자동 연결
+  text_committer_refresh_confirm: 모든 저장소의 커미터를 지금 사용자 기준으로 연결합니다. 계속할까요?
+  label_committer_unmapped_list: 미연결 커미터
+  label_committer_default_repo: (기본 저장소)
+  label_committer_edit: 직접 연결
+  text_committer_auto: "미연결 %{count}명 — 로그인 ID·메일이 같은 사용자와 자동으로 연결합니다."
+  notice_committers_refreshed: "커미터 %{mapped}명을 연결했습니다. 맞는 사용자가 없는 커미터 %{unmatched}명"
+  notice_committers_refreshed_all: "모든 저장소에서 커미터 %{mapped}명을 연결했습니다."

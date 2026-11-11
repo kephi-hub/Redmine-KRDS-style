@@ -46,6 +46,7 @@ services:
       - ./plugins/db_manage:/usr/src/redmine/plugins/db_manage:z   # DB 관리 (DB 서버 접속정보·스키마 조회, DB 테이블은 시작 때 자동 생성)
       - ./plugins/menu_tree:/usr/src/redmine/plugins/menu_tree:z   # 메뉴 구조도·시스템 권한 (DB 테이블은 시작 때 자동 생성)
       - ./plugins/qa_trace:/usr/src/redmine/plugins/qa_trace:z   # 요구사항 추적·테스트 (DB 테이블은 시작 때 자동 생성)
+      - ./plugins/site_tools:/usr/src/redmine/plugins/site_tools:z   # 관리 도구 (메일 서버 SMTP 설정, 저장소 커미터 자동 연결)
       - ./setup:/usr/src/redmine/setup:z   # 기준 설정 스크립트 (apply_settings.rb)
 
 volumes:

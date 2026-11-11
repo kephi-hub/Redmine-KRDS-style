@@ -1,0 +1,52 @@
+<%# 관리 > 메일 서버(SMTP) %>
+<h2><%= l(:label_smtp_settings) %></h2>
+<p class="subtitle"><%= l(:text_smtp_settings) %></p>
+<% if SiteTools::Smtp.file_configured? %>
+  <p class="db_hintbox"><%= l(:text_smtp_file_configured) %></p>
+<% else %>
+<p class="st_state <%= 'on' if ActionMailer::Base.perform_deliveries %>"><%= l(ActionMailer::Base.perform_deliveries ? :label_smtp_state_on : :label_smtp_state_off) %></p>
+<%= form_tag(smtp_settings_path, :id => 'smtp_form') do %>
+<div class="box tabular">
+  <p><label for="smtp_enabled"><%= l(:label_smtp_enabled) %></label><%= check_box_tag 'enabled', '1', @cfg['enabled'] == '1', :id => 'smtp_enabled' %>
+    <em class="info"><%= l(:text_smtp_enabled) %></em></p>
+  <p><label for="smtp_address"><%= l(:label_smtp_address) %> <span class="required">*</span></label><%= text_field_tag 'address', @cfg['address'], :id => 'smtp_address', :size => 40, :placeholder => 'smtp.example.com' %></p>
+  <p><label for="smtp_port"><%= l(:label_smtp_port) %></label><%= number_field_tag 'port', @cfg['port'], :id => 'smtp_port', :min => 1, :max => 65535 %></p>
+  <p><label for="smtp_security"><%= l(:label_smtp_security) %></label><%= select_tag 'security', options_for_select(SiteTools::Smtp::SECURITY.map { |k| [l("label_smtp_sec_#{k}"), k] }, @cfg['security']), :id => 'smtp_security' %>
+    <em class="info"><%= l(:text_smtp_security) %></em></p>
+  <p><label for="smtp_auth"><%= l(:label_smtp_auth) %></label><%= select_tag 'authentication', options_for_select(SiteTools::Smtp::AUTH.map { |k| [l("label_smtp_auth_#{k}"), k] }, @cfg['authentication']), :id => 'smtp_auth' %></p>
+  <p class="st_auth"><label for="smtp_user"><%= l(:label_smtp_user) %></label><%= text_field_tag 'user_name', @cfg['user_name'], :id => 'smtp_user', :size => 40, :autocomplete => 'off' %></p>
+  <p class="st_auth"><label for="smtp_pass"><%= l(:label_smtp_password) %></label><%= password_field_tag 'password', nil, :id => 'smtp_pass', :size => 40, :autocomplete => 'new-password', :placeholder => (@has_password ? l(:text_smtp_password_keep) : nil) %>
+    <% if @has_password %><label class="inline"><%= check_box_tag 'clear_password', '1', false %> <%= l(:label_smtp_clear_password) %></label><% end %></p>
+  <p><label for="smtp_from"><%= l(:label_smtp_from) %></label><%= email_field_tag 'mail_from', Setting.mail_from, :id => 'smtp_from', :size => 40 %>
+    <em class="info"><%= l(:text_smtp_from) %></em></p>
+  <p><label for="smtp_domain"><%= l(:label_smtp_domain) %></label><%= text_field_tag 'domain', @cfg['domain'], :id => 'smtp_domain', :size => 30 %>
+    <em class="info"><%= l(:text_smtp_domain) %></em></p>
+  <p><label for="smtp_verify"><%= l(:label_smtp_verify) %></label><%= check_box_tag 'verify', '1', @cfg['verify'] == '1', :id => 'smtp_verify' %>
+    <em class="info"><%= l(:text_smtp_verify) %></em></p>
+  <p><label for="smtp_timeout"><%= l(:label_smtp_timeout) %></label><%= number_field_tag 'timeout', @cfg['timeout'], :id => 'smtp_timeout', :min => 3, :max => 60 %></p>
+  <p class="db_test_row"><label for="smtp_test_to"><%= l(:label_smtp_test) %></label>
+    <%= email_field_tag 'test_to', User.current.mail, :id => 'smtp_test_to', :size => 30 %>
+    <button type="button" class="btn_line" id="smtp_test_btn" data-url="<%= test_smtp_settings_path %>"><%= sprite_icon('email', l(:label_smtp_test_send)) %></button>
+    <span id="smtp_test_result" class="db_test_result" role="status" aria-live="polite"></span>
+    <em class="info"><%= l(:text_smtp_test) %></em></p>
+</div>
+<p class="form_btns"><%= link_to l(:label_smtp_notifications), { :controller => 'settings', :action => 'edit', :tab => 'notifications' }, :class => 'btn_line' %><%= submit_tag l(:button_save) %></p>
+<% end %>
+<%= javascript_tag do %>
+$(function() {
+  var ports = { starttls: '587', ssl: '465', none: '25' };
+  $('#smtp_security').on('change', function() { var $p = $('#smtp_port'); if (!$p.val() || ['587', '465', '25'].indexOf($p.val()) >= 0) $p.val(ports[this.value]); });
+  function auth() { $('.st_auth').prop('hidden', $('#smtp_auth').val() === 'none'); }
+  $('#smtp_auth').on('change', auth); auth();
+  $('#smtp_test_btn').on('click', function() {
+    var $b = $(this), $r = $('#smtp_test_result');
+    $b.prop('disabled', true); $r.removeClass('on db_fail').text(<%= raw l(:label_smtp_testing).to_json %>);
+    $.ajax({ url: $b.data('url'), method: 'POST', data: $b.closest('form').serialize(), dataType: 'json' })
+      .done(function(res) { $r.toggleClass('on', res.ok).toggleClass('db_fail', !res.ok).text(res.message); })
+      .fail(function() { $r.addClass('db_fail').text(<%= raw l(:label_smtp_test_error).to_json %>); })
+      .always(function() { $b.prop('disabled', false); });
+  });
+});
+<% end %>
+<% end %>
+<% html_title l(:label_smtp_settings) %>

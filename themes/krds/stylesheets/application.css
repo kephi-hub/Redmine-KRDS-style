@@ -1235,6 +1235,14 @@ table.list.db_pvtbl tr.db_pvrow.on{background:var(--war_5);}
 table.list.db_pvtbl tr.db_gone td.col code{text-decoration:line-through;}
 .db_pvnote{width:100%;}
 
+/* 관리 도구 (site_tools) — 메일 서버 상태, 커미터 연결 */
+.st_state{display:inline-flex;align-items:center;height:28px;padding:0 12px;margin:0 0 16px;border-radius:14px;background:var(--dan_5);font-size:0.875rem;font-weight:700;color:var(--dan_60);}
+.st_state.on{background:var(--suc_10);color:var(--suc_60);}
+.st_bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin:0 0 16px;}
+table.list.st_list td{text-align:center;}
+table.list.st_list td.name{text-align:left;word-break:keep-all;}
+table.list tr.st_unmapped td:first-child{font-weight:700;color:var(--war_60);}
+
 /* 이전·다음 버튼: Redmine 은 600px 미만에서 너비 32% 로 고정해 글자가 잘림 → 글자 너비대로 */
 #wrapper .pagination ul.pages li.current,#wrapper .pagination ul.pages li.previous,#wrapper .pagination ul.pages li.next{width:auto;overflow:visible;}
 
