@@ -46,7 +46,7 @@ module KrdsUi
       menu_items_for(menu, project) { |n| nodes << n }
       return nil if nodes.empty?
       lis = krds_entries(nodes, project, current_menu_item).map do |n, caption, url, sel|
-        content_tag(:li, krds_link(caption, url, sel, "gnb_trigger is_link #{n.name}"))
+        content_tag(:li, link_to(caption, url, class: "gnb_trigger is_link #{n.name}#{' selected' if sel}", 'aria-current': (sel ? 'page' : nil)))
       end
       content_tag(:ul, safe_join(lis), class: 'gnb_menu')
     end
