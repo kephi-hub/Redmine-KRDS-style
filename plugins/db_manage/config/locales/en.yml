@@ -83,6 +83,24 @@ en:
   label_db_test_error: Connection test request failed.
   text_db_env_info: Used as the default production flag when linking to a project.
   text_db_test_info: Tests the values entered now without saving. While editing, a blank password uses the saved one.
+  label_db_ssh: Use SSH tunnel
+  text_db_ssh_info: Connect through an SSH server (e.g. web server) when the DB is not directly reachable. The tunnel is open only while reading.
+  text_db_host_via_ssh: SSH tunnel on — DB address as seen from the SSH server (e.g. 127.0.0.1)
+  field_db_ssh_host: SSH server
+  field_db_ssh_user: SSH account
+  text_db_ssh_user_info: A dedicated account allowed only port forwarding is recommended
+  field_db_ssh_auth: SSH auth
+  label_db_ssh_password: Password
+  label_db_ssh_key: Private key
+  field_db_ssh_key: Private key
+  text_db_ssh_key_info: OpenSSH or PEM (ed25519, RSA, ECDSA). Paste the file content.
+  label_db_ssh_key_keep: Saved · leave blank to keep
+  field_db_ssh_passphrase: Key passphrase
+  text_db_ssh_passphrase_info: Only if the key is encrypted (blank keeps the saved one)
+  label_db_ssh_fingerprint: SSH host fingerprint
+  label_db_ssh_reset: Reset fingerprint (server replaced)
+  text_db_ssh_fp_first: Recorded on the first connection after saving; a different key is refused afterwards.
+  label_db_ssh_via: "via SSH %{route}"
   activerecord:
     attributes:
       db_server:
@@ -96,6 +114,12 @@ en:
         timeout: Timeout
         production: Environment
         note: Note
+        ssh_host: SSH server
+        ssh_port: SSH port
+        ssh_username: SSH account
+        ssh_auth: SSH auth
+        ssh_password_encrypted: SSH password
+        ssh_key_encrypted: Private key
       db_link:
         name: Name
         db_server: DB server

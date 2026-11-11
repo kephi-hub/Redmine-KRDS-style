@@ -9,7 +9,8 @@
     <em class="info"><%= l(:text_db_env_info) %></em></p>
   <p><%= f.select :adapter, DbServer.adapter_options, { :required => true, :label => :field_db_adapter }, { :id => 'db_adapter' } %>
     <em class="info"><%= l(:text_db_adapter_info) %></em></p>
-  <p><%= f.text_field :host, :required => true, :size => 40, :maxlength => 255, :placeholder => '192.168.10.10', :label => :field_db_host %></p>
+  <p><%= f.text_field :host, :required => true, :size => 40, :maxlength => 255, :placeholder => '192.168.10.10', :label => :field_db_host %>
+    <em class="info db_ssh_hint"<%= raw(' hidden') unless @server.ssh_enabled? %>><%= l(:text_db_host_via_ssh) %></em></p>
   <p><%= f.number_field :port, :required => true, :min => 1, :max => 65535, :id => 'db_port', :label => :field_db_port %></p>
   <p><%= f.text_field :database_name, :required => true, :size => 40, :maxlength => 128, :label => :field_db_database %>
     <em class="info"><%= l(:text_db_database_info) %></em></p>
@@ -17,6 +18,36 @@
     <em class="info"><%= l(:text_db_user_info) %></em></p>
   <p><%= f.password_field :password, :value => '', :required => @server.new_record?, :size => 30, :autocomplete => 'new-password', :label => :field_password %>
     <% if @server.password_set? %><em class="info"><%= l(:label_db_password_keep) %></em><% end %></p>
+  <div class="db_ssh">
+    <p><%= f.check_box :ssh_enabled, :label => :label_db_ssh, :id => 'db_ssh_on' %>
+      <em class="info"><%= l(:text_db_ssh_info) %></em></p>
+    <div class="db_ssh_body" id="db_ssh_body"<%= raw(' hidden') unless @server.ssh_enabled? %>>
+      <p><%= f.text_field :ssh_host, :size => 40, :maxlength => 255, :placeholder => 'web.example.com', :label => :field_db_ssh_host %></p>
+      <p><%= f.number_field :ssh_port, :min => 1, :max => 65535, :label => :field_db_port %></p>
+      <p><%= f.text_field :ssh_username, :size => 30, :maxlength => 120, :autocomplete => 'off', :label => :field_db_ssh_user %>
+        <em class="info"><%= l(:text_db_ssh_user_info) %></em></p>
+      <p><label><%= l(:field_db_ssh_auth) %></label>
+        <span class="db_env_pick">
+          <label class="inline"><%= f.radio_button :ssh_auth, 'password', :class => 'db_ssh_auth' %> <%= l(:label_db_ssh_password) %></label>
+          <label class="inline"><%= f.radio_button :ssh_auth, 'key', :class => 'db_ssh_auth' %> <%= l(:label_db_ssh_key) %></label>
+        </span></p>
+      <p class="db_auth_pw"<%= raw(' hidden') if @server.ssh_auth == 'key' %>><%= f.password_field :ssh_password, :value => '', :size => 30, :autocomplete => 'new-password', :label => :field_password %>
+        <% if @server.ssh_password_encrypted.present? %><em class="info"><%= l(:label_db_password_keep) %></em><% end %></p>
+      <div class="db_auth_key"<%= raw(' hidden') unless @server.ssh_auth == 'key' %>>
+        <p><%= f.text_area :ssh_private_key, :value => '', :rows => 5, :cols => 60, :spellcheck => false, :autocomplete => 'off', :placeholder => "-----BEGIN OPENSSH PRIVATE KEY-----\n...", :label => :field_db_ssh_key %>
+          <em class="info"><%= @server.ssh_key_encrypted.present? ? l(:label_db_ssh_key_keep) : l(:text_db_ssh_key_info) %></em></p>
+        <p><%= f.password_field :ssh_passphrase, :value => '', :size => 30, :autocomplete => 'new-password', :label => :field_db_ssh_passphrase %>
+          <em class="info"><%= l(:text_db_ssh_passphrase_info) %></em></p>
+      </div>
+      <p><label><%= l(:label_db_ssh_fingerprint) %></label>
+        <% if @server.ssh_host_key.present? %>
+          <code class="db_fp"><%= @server.ssh_host_key %></code>
+          <label class="inline"><%= f.check_box :ssh_reset_host_key, :label => false, :no_label => true %> <%= l(:label_db_ssh_reset) %></label>
+        <% else %>
+          <span class="db_dim"><%= l(:text_db_ssh_fp_first) %></span>
+        <% end %></p>
+    </div>
+  </div>
   <p><%= f.number_field :timeout, :min => 1, :max => 60, :label => :field_db_timeout %></p>
   <p><%= f.text_field :note, :size => 60, :maxlength => 255, :label => :field_db_note %></p>
   <p class="db_test_row"><label></label>
@@ -35,6 +66,12 @@ $(function() {
   $('#db_adapter').on('change', function() {
     var $p = $('#db_port'), v = $p.val();
     if (!v || defaults.indexOf(v) >= 0) $p.val($(this).find('option:selected').data('port'));
+  });
+  // SSH 터널 칸 보이기, 인증 방식에 따라 비밀번호/개인키 칸
+  $('#db_ssh_on').on('change', function() { $('#db_ssh_body, .db_ssh_hint').prop('hidden', !this.checked); });
+  $('.db_ssh_auth').on('change', function() {
+    var key = $('.db_ssh_auth:checked').val() === 'key';
+    $('.db_auth_key').prop('hidden', !key); $('.db_auth_pw').prop('hidden', key);
   });
   // 저장 전 연결 시험: 지금 입력한 값으로 접속 (_method 는 빼고 보냄)
   $('#db_test_btn').on('click', function() {

@@ -64,8 +64,34 @@ module DbManage
       end
     end
 
-    def connect
-      conn = mariadb? ? open_mariadb : open_postgresql
+    # SSH 터널을 쓰면 터널 안쪽(127.0.0.1:임시 포트)으로 접속, 첫 연결 때 SSH 서버 지문을 저장
+    def connect(&block)
+      return direct(@server.host, @server.port, &block) unless @server.ssh_enabled?
+      Tunnel.open(@server) do |host, port, fingerprint|
+        result = direct(host, port, &block)
+        if @server.persisted? && @server.ssh_host_key.blank? && fingerprint
+          @server.update_column(:ssh_host_key, fingerprint)
+        end
+        @fingerprint = fingerprint
+        result
+      end
+    rescue DbManage::Error
+      raise
+    rescue LoadError
+      raise Error, 'SSH 라이브러리를 불러올 수 없습니다. 관리자에게 문의하세요.'
+    rescue StandardError => e
+      raise Error, "SSH 터널 실패: #{e.message.to_s.lines.first.to_s.strip.truncate(200)}"
+    end
+
+    public
+
+    # 연결 시험 때 보여 줄 SSH 서버 지문
+    attr_reader :fingerprint
+
+    private
+
+    def direct(host, port)
+      conn = mariadb? ? open_mariadb(host, port) : open_postgresql(host, port)
       yield conn
     rescue DbManage::Error
       raise
@@ -81,20 +107,20 @@ module DbManage
       end
     end
 
-    def open_mariadb
+    def open_mariadb(host, port)
       require 'mysql2'
       t = @server.timeout
-      c = Mysql2::Client.new(host: @server.host, port: @server.port, username: @server.username, password: @server.password,
+      c = Mysql2::Client.new(host: host, port: port, username: @server.username, password: @server.password,
                              database: @server.database_name, connect_timeout: t, read_timeout: t * 3, write_timeout: t,
                              encoding: 'utf8mb4', reconnect: false)
       c.query('SET SESSION TRANSACTION READ ONLY')
       c
     end
 
-    def open_postgresql
+    def open_postgresql(host, port)
       require 'pg'
       t = @server.timeout
-      PG.connect(host: @server.host, port: @server.port, dbname: @server.database_name, user: @server.username,
+      PG.connect(host: host, port: port, dbname: @server.database_name, user: @server.username,
                  password: @server.password, connect_timeout: t, sslmode: 'prefer', application_name: 'redmine_db_manage',
                  options: "-c statement_timeout=#{t * 3000} -c default_transaction_read_only=on")
     end

@@ -1,2 +1,7 @@
-# MariaDB·MySQL 접속용 — Redmine 공식 이미지에 이미 설치되어 있어 이미지 재빌드 없이 사용 (PostgreSQL 은 Redmine 기본 pg 사용)
+# DB 관리 플러그인 gem
+# - mysql2: MariaDB·MySQL 접속 (공식 이미지에 이미 설치됨)
+# - net-ssh (+ ed25519·bcrypt_pbkdf: ed25519 개인키): DB 서버 SSH 터널 — Dockerfile 이 이 파일로 이미지에 설치
 gem 'mysql2', '~> 0.5.0'
+gem 'net-ssh', '~> 7.3'
+gem 'ed25519', '~> 1.3'
+gem 'bcrypt_pbkdf', '~> 1.1'

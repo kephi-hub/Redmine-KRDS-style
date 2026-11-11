@@ -83,6 +83,24 @@ ko:
   label_db_test_error: 연결 시험 요청에 실패했습니다.
   text_db_env_info: 프로젝트에 연결할 때 '운영' 표시의 기본값이 됩니다.
   text_db_test_info: 저장하지 않고 지금 입력한 값으로 접속해 봅니다. 편집 중 비밀번호를 비워 두면 저장된 비밀번호를 씁니다.
+  label_db_ssh: SSH 터널 사용
+  text_db_ssh_info: DB 에 바로 접속할 수 없을 때 SSH 서버(예 WEB 서버)를 거쳐 접속합니다. 조회하는 동안만 터널을 열고 바로 닫습니다.
+  text_db_host_via_ssh: SSH 터널 사용 중 — SSH 서버에서 본 DB 주소 (예 127.0.0.1, DB 내부 IP)
+  field_db_ssh_host: SSH 서버
+  field_db_ssh_user: SSH 계정
+  text_db_ssh_user_info: 쉘 접속을 막고 포트 전달만 허용한 전용 계정 권장
+  field_db_ssh_auth: SSH 인증
+  label_db_ssh_password: 비밀번호
+  label_db_ssh_key: 개인키
+  field_db_ssh_key: 개인키
+  text_db_ssh_key_info: OpenSSH·PEM 형식 (ed25519, RSA, ECDSA). 파일 내용을 그대로 붙여 넣으세요.
+  label_db_ssh_key_keep: 저장되어 있음 · 비워 두면 기존 개인키 유지
+  field_db_ssh_passphrase: 키 암호
+  text_db_ssh_passphrase_info: 개인키에 암호를 걸어 둔 경우만 (비워 두면 기존 값 유지)
+  label_db_ssh_fingerprint: SSH 서버 지문
+  label_db_ssh_reset: 지문 초기화 (서버를 바꾼 경우)
+  text_db_ssh_fp_first: 저장 후 첫 연결 때 기록되고, 다음부터 다르면 연결을 거부합니다.
+  label_db_ssh_via: "SSH 경유 %{route}"
   activerecord:
     attributes:
       db_server:
@@ -96,6 +114,12 @@ ko:
         timeout: 응답 대기(초)
         production: 구분
         note: 메모
+        ssh_host: SSH 서버
+        ssh_port: SSH 포트
+        ssh_username: SSH 계정
+        ssh_auth: SSH 인증
+        ssh_password_encrypted: SSH 비밀번호
+        ssh_key_encrypted: 개인키
       db_link:
         name: 이름
         db_server: DB 서버

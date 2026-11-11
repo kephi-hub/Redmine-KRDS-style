@@ -60,12 +60,25 @@ class DbServersController < ApplicationController
   def test_connection
     stored = DbServer.find_by(id: params[:id]) if params[:id].present?
     server = DbServer.new(server_params.except(:name, :note))
-    server.password_encrypted = stored.password_encrypted if params.dig(:db_server, :password).blank? && stored
+    if stored
+      server.password_encrypted = stored.password_encrypted if params.dig(:db_server, :password).blank?
+      # SSH 비밀값도 비워 두면 저장된 값, 같은 SSH 서버면 저장된 지문으로 확인
+      server.ssh_password_encrypted ||= stored.ssh_password_encrypted
+      server.ssh_key_encrypted ||= stored.ssh_key_encrypted
+      server.ssh_passphrase_encrypted ||= stored.ssh_passphrase_encrypted
+      same = stored.ssh_host == server.ssh_host && stored.ssh_port == server.ssh_port && params.dig(:db_server, :ssh_reset_host_key) != '1'
+      server.ssh_host_key = stored.ssh_host_key if same
+    end
     server.valid?
-    keys = %i(adapter host port database_name username timeout password_encrypted)
+    keys = %i(adapter host port database_name username timeout password_encrypted ssh_host ssh_port ssh_username ssh_auth
+              ssh_password_encrypted ssh_key_encrypted)
     errors = server.errors.select { |e| keys.include?(e.attribute) }
     return render json: { ok: false, message: errors.map(&:full_message).uniq.join(', ') } if errors.any?
-    render json: { ok: true, message: l(:notice_db_connected, name: server.host, version: server.connector.version) }
+    connector = server.connector
+    version = connector.version
+    message = l(:notice_db_connected, name: server.host, version: version)
+    message += " · #{l(:label_db_ssh_fingerprint)} #{connector.fingerprint}" if connector.fingerprint
+    render json: { ok: true, message: message }
   rescue DbManage::Error => e
     render json: { ok: false, message: e.message }
   end
@@ -79,6 +92,8 @@ class DbServersController < ApplicationController
   end
 
   def server_params
-    params.require(:db_server).permit(:name, :production, :adapter, :host, :port, :database_name, :username, :password, :timeout, :note)
+    params.require(:db_server).permit(:name, :production, :adapter, :host, :port, :database_name, :username, :password, :timeout, :note,
+                                      :ssh_enabled, :ssh_host, :ssh_port, :ssh_username, :ssh_auth, :ssh_password, :ssh_private_key,
+                                      :ssh_passphrase, :ssh_reset_host_key)
   end
 end

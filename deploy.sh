@@ -13,7 +13,7 @@ echo "[변경] $(git log --oneline "$OLD..$NEW" | wc -l)개 커밋"
 git log --oneline "$OLD..$NEW" | sed 's/^/  /'
 CHANGED=$(git diff --name-only "$OLD" "$NEW")
 
-if echo "$CHANGED" | grep -qE '^(Dockerfile|compose\.yaml|plugins/vault_ko/(build\.rb|snippets/.*))$'; then
+if echo "$CHANGED" | grep -qE '^(Dockerfile|compose\.yaml|plugins/db_manage/Gemfile|plugins/vault_ko/(build\.rb|snippets/.*))$'; then
   echo "[이미지·구성 변경] 다시 빌드합니다"
   docker compose up -d --build
 else

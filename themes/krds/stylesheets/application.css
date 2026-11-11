@@ -899,6 +899,11 @@ a.gl_term:hover{border-bottom-style:solid;text-decoration:none;}
 .db_test_result{display:inline-block;margin:0 0 0 10px;font-size:0.875rem;color:var(--gray_60);vertical-align:middle;word-break:break-all;}
 .db_test_result.on{font-weight:500;color:var(--suc_60);}
 .db_test_result.db_fail{font-weight:500;color:var(--dan_60);}
+.db_ssh{padding:8px 0 4px;margin:8px 0;border-top:1px dashed var(--gray_30);border-bottom:1px dashed var(--gray_30);}
+.db_ssh_body{padding:4px 0 0;}
+#content .db_ssh [hidden],#content .db_ssh_hint[hidden]{display:none;}
+.db_fp{font-size:0.8125rem;word-break:break-all;}
+.db_via{display:block;margin:2px 0 0;font-size:0.75rem;color:var(--pri_60);}
 .db_adapter.db_mariadb{background:var(--suc_10);color:var(--suc_60);}
 .db_adapter.db_postgresql{background:var(--pri_10);color:var(--pri_60);}
 .db_head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin:0 0 16px;}
