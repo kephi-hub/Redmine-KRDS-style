@@ -1,0 +1,28 @@
+<%# 요구사항 목록 · 추적표 공통: 버튼, 제목, 탭, KPI, 필터 (locals: current) %>
+<% can_edit = User.current.allowed_to?(:manage_qa_requirements, @project) %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('add', l(:label_qa_req_new)), new_project_qa_requirement_path(@project), :class => 'icon icon-add' %><% end %>
+  <% if can_edit %><%= link_to sprite_icon('import', l(:label_qa_import)), project_qa_requirements_import_path(@project), :class => 'icon icon-import' %><% end %>
+  <%= link_to sprite_icon('download', l(:label_qa_export)), project_qa_requirements_export_path(@project), :class => 'icon icon-download' %>
+</div>
+<h2><%= l(:label_qa_requirements) %></h2>
+<p class="subtitle"><%= l(current == :trace ? :text_qa_trace : :text_qa_requirements) %></p>
+<%= render :partial => 'qa_requirements/tabs', :locals => { :current => current } %>
+<% path = current == :trace ? method(:project_qa_requirements_trace_path) : method(:project_qa_requirements_path) %>
+<% cards = [['all', nil], ['confirmed', nil], ['no_menu', 'no_menu'], ['no_test', 'no_test'], ['fail', 'fail'], ['pass', 'pass']] %>
+<% cards << ['deleted_open', 'deleted_open'] if @kpi['deleted_open'].positive? %>
+<ul class="db_stats mt_kpi">
+  <% cards.each do |key, risk| %>
+    <% args = key == 'confirmed' ? { :status => 'confirmed' } : (risk ? { :risk => risk } : {}) %>
+    <% on = key == 'confirmed' ? (@status == 'confirmed' && !@risk) : (risk ? @risk == risk : (!@risk && !@status && !@category && @q.blank?)) %>
+    <li class="<%= 'on' if on %>"><%= link_to path.call(@project, args) do %><span><%= l("label_qa_k_#{key}") %></span><strong><%= @kpi[key] %></strong><% end %></li>
+  <% end %>
+</ul>
+<%= form_tag(path.call(@project), :method => :get, :class => 'qa_filter') do %>
+  <%= hidden_field_tag 'risk', @risk if @risk %>
+  <%= select_tag 'category', options_for_select([[l(:label_qa_category_all), '']] + qa_cat_options, @category), :'aria-label' => l(:label_qa_category) %>
+  <%= select_tag 'status', options_for_select([[l(:label_qa_status_alive), '']] + QaRequirement::STATUSES.map { |s| [qa_status_label(s), s] } + [[l(:label_qa_status_all), 'all']], @status), :'aria-label' => l(:field_status) %>
+  <%= search_field_tag 'q', @q, :placeholder => l(:label_qa_search), :'aria-label' => l(:label_qa_search) %>
+  <%= submit_tag l(:label_qa_filter), :name => nil %>
+  <% if @risk || @status || @category || @q.present? %><%= link_to l(:label_qa_clear), path.call(@project), :class => 'qa_clear' %><% end %>
+<% end %>

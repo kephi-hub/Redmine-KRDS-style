@@ -1,0 +1,6 @@
+<div class="tabs">
+  <ul>
+    <li><%= link_to l(:label_qa_req_list), project_qa_requirements_path(@project), :class => (current == :list ? 'selected' : nil) %></li>
+    <li><%= link_to l(:label_qa_trace), project_qa_requirements_trace_path(@project), :class => (current == :trace ? 'selected' : nil) %></li>
+  </ul>
+</div>

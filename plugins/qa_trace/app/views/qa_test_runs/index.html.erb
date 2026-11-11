@@ -1,0 +1,30 @@
+<%# 프로젝트 > 테스트 > 회차 %>
+<% can_edit = User.current.allowed_to?(:manage_qa_tests, @project) %>
+<%= render :partial => 'qa_test_cases/tabs', :locals => { :current => :runs } %>
+<% if @runs.empty? %>
+  <p class="nodata"><%= l(:label_qa_no_runs) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list qa_list">
+  <thead><tr><th class="name"><%= l(:label_qa_run_name) %></th><th><%= l(:label_qa_kind) %></th><th><%= l(:label_qa_run_period) %></th><th><%= l(:field_status) %></th><th><%= l(:label_qa_run_target) %></th><th><%= l(:label_qa_result_pass) %></th><th><%= l(:label_qa_result_fail) %></th><th><%= l(:label_qa_result_none) %></th><th><%= l(:label_qa_progress) %></th><th></th></tr></thead>
+  <tbody>
+  <% @runs.each do |r| %>
+    <% c = r.counts %>
+    <tr class="<%= 'qa_del' unless r.open? %>">
+      <td class="name"><%= link_to r.name, project_qa_test_run_path(@project, r) %></td>
+      <td><%= qa_kind_label(r.kind) %></td>
+      <td class="period"><%= [r.start_on, r.end_on].compact.map { |d| format_date(d) }.join(' ~ ') %></td>
+      <td><span class="mt_yn <%= 'on' if r.open? %>"><%= l(r.open? ? :label_qa_run_open : :label_qa_run_closed) %></span></td>
+      <td><%= r.total %></td>
+      <td><%= c['pass'].to_i %></td>
+      <td class="<%= 'qa_fail' if c['fail'].to_i.positive? %>"><%= c['fail'].to_i %></td>
+      <td><%= c['none'].to_i %></td>
+      <td class="bar"><%= qa_bar(r.total - c['none'].to_i, r.total) %></td>
+      <td class="buttons"><% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_qa_test_run_path(@project, r), :class => 'icon icon-edit' %><% end %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<% end %>
+<% html_title l(:label_qa_t_runs) %>

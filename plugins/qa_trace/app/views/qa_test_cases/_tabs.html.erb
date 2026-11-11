@@ -1,0 +1,17 @@
+<%# 테스트 공통: 버튼, 제목, 탭 (locals: current) %>
+<% can_edit = User.current.allowed_to?(:manage_qa_tests, @project) %>
+<div class="contextual">
+  <% if can_edit && current == :runs %><%= link_to sprite_icon('add', l(:label_qa_run_new)), new_project_qa_test_run_path(@project), :class => 'icon icon-add' %><% end %>
+  <% if can_edit && current != :runs %><%= link_to sprite_icon('add', l(:label_qa_case_new)), new_project_qa_test_case_path(@project), :class => 'icon icon-add' %>
+    <%= link_to sprite_icon('import', l(:label_qa_import)), project_qa_test_cases_import_path(@project), :class => 'icon icon-import' %><% end %>
+  <% if current != :runs %><%= link_to sprite_icon('download', l(:label_qa_export)), project_qa_test_cases_export_path(@project), :class => 'icon icon-download' %><% end %>
+</div>
+<h2><%= l(:label_qa_tests) %></h2>
+<p class="subtitle"><%= l(current == :menus ? :text_qa_menus : :text_qa_tests) %></p>
+<div class="tabs">
+  <ul>
+    <li><%= link_to l(:label_qa_t_cases), project_qa_test_cases_path(@project), :class => (current == :cases ? 'selected' : nil) %></li>
+    <li><%= link_to l(:label_qa_t_runs), project_qa_test_runs_path(@project), :class => (current == :runs ? 'selected' : nil) %></li>
+    <% if QaTrace::Trace.menus_on?(@project) %><li><%= link_to l(:label_qa_t_menus), project_qa_test_cases_menus_path(@project), :class => (current == :menus ? 'selected' : nil) %></li><% end %>
+  </ul>
+</div>

@@ -1,0 +1,36 @@
+<%# 여러 개 고르기 (칩) — locals: pick_id, field(name), sent(보냈음 표시 이름), items([{id:, chip:, label:, sub:, q:, depth:}]), chosen(id 목록), placeholder %>
+<% by_id = items.index_by { |i| i[:id] } %>
+<span class="mt_pick" id="<%= pick_id %>">
+  <%= hidden_field_tag sent, '1', :id => nil %>
+  <span class="mt_chips">
+    <% chosen.each do |id| %><% if (it = by_id[id]) %><span class="mt_chip" data-id="<%= id %>"><%= it[:chip] %><button type="button" aria-label="<%= l(:button_delete) %>">×</button><input type="hidden" name="<%= field %>" value="<%= id %>"></span><% end %><% end %>
+  </span>
+  <span class="mt_finder">
+    <input type="search" class="mt_q" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>" autocomplete="off">
+    <span class="mt_drop" hidden>
+      <% items.each do |it| %>
+        <a href="#" data-id="<%= it[:id] %>" data-chip="<%= it[:chip] %>" data-q="<%= it[:q].to_s.downcase %>" style="padding-left:<%= 10 + it[:depth].to_i * 14 %>px"><%= it[:label] %><% if it[:sub] %> <code><%= it[:sub] %></code><% end %></a>
+      <% end %>
+    </span>
+  </span>
+</span>
+<%= javascript_tag do %>
+$(function() {
+  var $p = $('#<%= j pick_id %>');
+  if ($p.data('ready')) return; $p.data('ready', 1);
+  var $q = $p.find('.mt_q'), $d = $p.find('.mt_drop'), $chips = $p.find('.mt_chips');
+  function filter() { var q = $q.val().toLowerCase().trim(); $d.find('a').each(function() { $(this).toggle(!q || String($(this).data('q')).indexOf(q) >= 0); }); }
+  $q.on('focus input', function() { filter(); $d.prop('hidden', false); });
+  $q.on('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); var $f = $d.find('a:visible').first(); if ($f.length) $f.trigger('mousedown'); } if (e.key === 'Escape') $d.prop('hidden', true); });
+  $(document).on('mousedown', function(e) { if (!$(e.target).closest('#<%= j pick_id %> .mt_finder').length) $d.prop('hidden', true); });
+  $d.on('mousedown', 'a', function(e) {
+    e.preventDefault();
+    var id = $(this).data('id'); if ($chips.find('[data-id="' + id + '"]').length) return;
+    var $c = $('<span class="mt_chip"><button type="button">×</button><input type="hidden"></span>');
+    $c.attr('data-id', id).prepend(document.createTextNode($(this).data('chip'))).find('input').attr('name', <%= raw field.to_json %>).val(id);
+    $c.find('button').attr('aria-label', <%= raw l(:button_delete).to_json %>);
+    $chips.append($c); $q.val(''); filter();
+  });
+  $chips.on('click', 'button', function() { $(this).closest('.mt_chip').remove(); });
+});
+<% end %>

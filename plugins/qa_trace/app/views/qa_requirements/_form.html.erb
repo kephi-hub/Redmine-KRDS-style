@@ -1,0 +1,30 @@
+<%= error_messages_for @req %>
+<div class="box tabular">
+  <p><%= f.select :category, qa_cat_options, { :required => true, :label => :label_qa_category } %></p>
+  <p><%= f.text_field :code, :size => 16, :maxlength => 30, :placeholder => 'SFR-001', :label => :label_qa_code %>
+    <em class="info"><%= l(:text_qa_code) %></em></p>
+  <p><%= f.text_field :name, :required => true, :size => 60, :maxlength => 200, :label => :label_qa_name %></p>
+  <p><%= f.text_area :description, :rows => 8, :cols => 60, :label => :label_qa_description %></p>
+  <p><%= f.text_field :source, :size => 40, :maxlength => 200, :placeholder => '제안요청서 p.32 / 착수회의록', :label => :label_qa_source %></p>
+  <p><%= f.select :priority, QaRequirement::PRIORITIES.map { |p| [qa_priority_label(p), p] }, { :label => :label_qa_priority } %></p>
+  <p><%= f.select :status, QaRequirement::STATUSES.map { |s| [qa_status_label(s), s] }, { :label => :field_status } %></p>
+  <p><%= f.select :parent_id, @parents.map { |r| [r.to_s.truncate(80), r.id] }, { :include_blank => true, :label => :label_qa_parent } %></p>
+  <p><label><%= l(:label_qa_menus) %></label>
+    <% if @menus_on %>
+      <% index = @ordered.to_h { |m, _| [m.id, m] } %>
+      <% chosen = params[:menus_sent] == '1' ? Array(params[:menu_item_ids]).map(&:to_i) : @req.menu_item_ids %>
+      <%= render :partial => 'qa_trace/pick', :locals => { :pick_id => 'qa_menu_pick', :field => 'menu_item_ids[]', :sent => 'menus_sent', :chosen => chosen, :placeholder => l(:label_qa_menu_pick),
+            :items => @ordered.map { |m, d| { :id => m.id, :chip => m.path(index), :label => m.name, :sub => m.screen_id, :q => "#{m.path(index)} #{m.screen_id}", :depth => d } } } %>
+    <% else %>
+      <span class="mt_dim"><%= l(:text_qa_need_menu) %></span>
+    <% end %>
+  </p>
+  <p><label for="issue_ids"><%= l(:label_qa_issue_ids) %></label>
+    <%= text_field_tag 'issue_ids', params.key?(:issue_ids) ? params[:issue_ids] : @req.issue_ids.sort.map { |i| "##{i}" }.join(', '), :size => 40 %>
+    <em class="info"><%= l(:text_qa_issue_ids) %></em></p>
+</div>
+<p class="form_btns">
+  <%= link_to l(:button_cancel), @req.new_record? ? project_qa_requirements_path(@project) : project_qa_requirement_path(@project, @req), :class => 'btn_line' %>
+  <% if @req.new_record? %><%= submit_tag l(:label_qa_save_continue), :name => 'continue', :class => 'btn_line' %><% end %>
+  <%= submit_tag l(@req.new_record? ? :button_create : :button_save) %>
+</p>

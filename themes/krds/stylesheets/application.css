@@ -1149,6 +1149,71 @@ button.sr_cell:disabled{cursor:default;}
 .sr_down{width:22px;height:22px;padding:0;margin:0 0 0 6px;border:1px solid var(--gray_30);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.75rem;color:var(--gray_60);cursor:pointer;}
 .sr_down:hover{border-color:var(--pri_50);color:var(--pri_60);}
 
+/* 요구사항 · 테스트 (qa_trace 플러그인) — 필터, 배지(data-k 로 색), 추적표, 상세, 결과 입력 */
+.qa_filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 16px;}
+.qa_filter select,.qa_filter input[type=search]{flex:1 1 100%;}
+.qa_clear{font-size:0.875rem;}
+.qa_chk{display:inline-flex;align-items:center;gap:4px;font-size:0.875rem;}
+.qa_badge{display:inline-flex;align-items:center;height:20px;padding:0 7px;margin:1px 0;border-radius:10px;background:var(--gray_10);font-size:0.6875rem;font-weight:700;white-space:nowrap;color:var(--gray_70);}
+.qa_badge[data-k=confirmed]{background:var(--pri_10);color:var(--pri_70);}
+.qa_badge[data-k=changed],.qa_badge[data-k=hold],.qa_badge[data-k=no_menu],.qa_badge[data-k=no_test]{background:var(--war_5);color:var(--war_60);}
+.qa_badge[data-k=deleted],.qa_badge[data-k=skip]{border:1px dashed var(--gray_30);background:var(--gray_0);color:var(--gray_50);}
+.qa_badge[data-k=pass]{background:var(--suc_10);color:var(--suc_60);}
+.qa_badge[data-k=fail],.qa_badge[data-k=deleted_open]{background:var(--dan_5);color:var(--dan_60);}
+.qa_badge[data-k=retest]{border:1px solid var(--war_60);background:var(--war_5);color:var(--war_60);}
+.qa_prio{font-size:0.8125rem;font-weight:700;color:var(--gray_60);}
+.qa_prio[data-k=high]{color:var(--dan_60);}
+.qa_prio[data-k=low]{font-weight:400;color:var(--gray_50);}
+table.list.qa_list td.code,table.list.qa_list td.cat,table.list.qa_list td.name,table.list.qa_list td.menus,table.list.qa_list td.reqs,table.list.qa_list td.risk{text-align:left;}
+table.list.qa_list td.code,table.list.qa_list td.bar,table.list.qa_list td.period{white-space:nowrap;}
+table.list tr.qa_del td,table.list tr.qa_del td a{color:var(--gray_50);}
+table.list.qa_trace td,table.list.qa_mini td,table.list.qa_run td{text-align:left;vertical-align:top;}
+table.list.qa_trace td.code{white-space:nowrap;}
+.qa_cell{padding:0;margin:0;list-style:none;}
+.qa_cell li{margin:0 0 4px;white-space:nowrap;}
+.qa_closed a,tr.qa_closed td{color:var(--gray_50);}
+li.qa_closed a{text-decoration:line-through;}
+.qa_box{padding:16px;margin:0 0 24px;border:1px solid var(--gray_20);border-radius:var(--radius_m);background:var(--gray_0);}
+#content .qa_tit{margin:0 0 8px;font-size:1.25rem;color:var(--gray_95);}
+.qa_meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 12px;font-size:0.875rem;}
+.qa_desc{padding:12px 0 0;border-top:1px solid var(--gray_10);}
+.qa_hint{font-size:0.8125rem;}
+.qa_total{margin:8px 0 0;font-size:0.8125rem;}
+.qa_log{padding:0;margin:0 0 24px;list-style:none;}
+.qa_log>li{padding:10px 0;border-top:1px solid var(--gray_10);font-size:0.875rem;}
+.qa_when{display:block;margin:0 0 4px;font-size:0.8125rem;color:var(--gray_50);}
+.qa_log ul{padding:0 0 0 18px;margin:0;}
+.qa_steps{margin:0;}
+.qa_steps dt{margin:12px 0 4px;font-size:0.8125rem;font-weight:700;color:var(--gray_70);}
+.qa_steps dd{margin:0;font-size:0.875rem;}
+.qa_steps dd p{margin:0 0 4px;}
+table.list.qa_menus td.name{text-align:left;}
+table.list.qa_menus tr.qa_empty td{color:var(--gray_50);}
+table.list.qa_menus tr.qa_d0 td.name{font-weight:700;}
+.qa_fail{font-weight:700;color:var(--dan_60);}
+.qa_add{font-size:0.8125rem;white-space:nowrap;}
+.qa_runbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin:0 0 12px;}
+.qa_runbar .mt_help{flex:1 1 100%;margin:0;}
+.qa_runbar label{display:inline-flex;align-items:center;gap:6px;font-size:0.875rem;}
+table.list.qa_run td.code,table.list.qa_run td.result,table.list.qa_run td.tester,table.list.qa_run td.defect{white-space:nowrap;}
+table.list.qa_run td.note{width:30%;}
+table.list.qa_run tr.qa_row>td:first-child{box-shadow:inset 3px 0 0 var(--gray_20);}
+table.list.qa_run tr.qa_row[data-r=pass]>td:first-child{box-shadow:inset 3px 0 0 var(--suc_60);}
+table.list.qa_run tr.qa_row[data-r=fail]>td:first-child{box-shadow:inset 3px 0 0 var(--dan_60);}
+table.list.qa_run tr.qa_row[data-r=hold]>td:first-child,table.list.qa_run tr.qa_row[data-r=retest]>td:first-child{box-shadow:inset 3px 0 0 var(--war_60);}
+table.list.qa_run tr.qa_row.on{background:var(--war_5);}
+.qa_note{width:100%;}
+.qa_path{display:block;font-size:0.75rem;}
+.qa_more summary{font-weight:500;color:var(--gray_90);cursor:pointer;}
+.qa_more[open] summary{margin:0 0 6px;}
+#content .qa_defect{display:inline-flex;align-items:center;height:28px;padding:0 10px;margin:4px 0 0;border:1px solid var(--dan_60);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.75rem;font-weight:500;white-space:nowrap;color:var(--dan_60);cursor:pointer;}
+#content .qa_defect:hover{background:var(--dan_5);}
+#content .qa_defect[hidden]{display:none;}
+.qa_savebar{position:sticky;bottom:0;z-index:5;padding:12px 0;border-top:1px solid var(--gray_20);background:var(--gray_0);}
+.qa_changed{margin:0 auto 0 0;font-size:0.875rem;color:var(--war_60);}
+#content .qa_changed[hidden]{display:none;}
+#content .form_btns .btn_line.qa_danger{margin-right:auto;border-color:var(--dan_60);color:var(--dan_60);}
+
 /* 이전·다음 버튼: Redmine 은 600px 미만에서 너비 32% 로 고정해 글자가 잘림 → 글자 너비대로 */
 #wrapper .pagination ul.pages li.current,#wrapper .pagination ul.pages li.previous,#wrapper .pagination ul.pages li.next{width:auto;overflow:visible;}
 
@@ -1169,6 +1234,8 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 
 /* ===== 태블릿 (600px 이상) ===== */
 @media (min-width:600px){
+.qa_filter select,.qa_filter input[type=search]{flex:0 1 auto;}
+.qa_filter input[type=search]{flex-basis:240px;}
 .mt_tools .list_field{flex:0 1 300px;}
 .ag_tools .list_field{flex:0 1 320px;}
 #admin-index #admin-menu ul{grid-template-columns:repeat(2,1fr);}

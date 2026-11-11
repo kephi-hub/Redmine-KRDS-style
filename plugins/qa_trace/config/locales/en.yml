@@ -1,0 +1,10 @@
+en:
+  project_module_qa_requirements: Requirements
+  project_module_qa_tests: Tests
+  permission_view_qa_requirements: View requirements
+  permission_manage_qa_requirements: Manage requirements
+  permission_view_qa_tests: View tests
+  permission_run_qa_tests: Record test results
+  permission_manage_qa_tests: Manage test cases and runs
+  label_qa_requirements: Requirements
+  label_qa_tests: Tests

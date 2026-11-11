@@ -1,0 +1,117 @@
+<%# 프로젝트 > 테스트 > 회차 — 결과 입력 (여러 줄 한 번에 저장), 불합격 → 결함 일감 %>
+<% can_edit = User.current.allowed_to?(:manage_qa_tests, @project) %>
+<% can_run = @run.open? && User.current.allowed_to?(:run_qa_tests, @project) %>
+<% can_defect = can_run && User.current.allowed_to?(:add_issues, @project) %>
+<div class="contextual">
+  <% if can_edit %>
+    <%= link_to sprite_icon('edit', l(:button_edit)), edit_project_qa_test_run_path(@project, @run), :class => 'icon icon-edit' %>
+    <%= link_to sprite_icon('reload', l(:label_qa_run_sync)), sync_project_qa_test_run_path(@project, @run), :method => :post, :title => l(:text_qa_run_sync), :class => 'icon icon-reload' %>
+  <% end %>
+  <%= link_to sprite_icon('download', l(:label_qa_export)), export_project_qa_test_run_path(@project, @run), :class => 'icon icon-download' %>
+</div>
+<h2><%= link_to l(:label_qa_tests), project_qa_test_runs_path(@project) %> &#187; <%= @run.name %></h2>
+<p class="subtitle"><%= qa_kind_label(@run.kind) %> · <%= [@run.start_on, @run.end_on].compact.map { |d| format_date(d) }.join(' ~ ') %>
+  <span class="mt_yn <%= 'on' if @run.open? %>"><%= l(@run.open? ? :label_qa_run_open : :label_qa_run_closed) %></span></p>
+<% if @run.note.present? %><p class="mt_help"><%= @run.note %></p><% end %>
+<% done = @all_count - @counts['none'].to_i %>
+<ul class="db_stats mt_kpi">
+  <li class="<%= 'on' unless @filter %>"><%= link_to project_qa_test_run_path(@project, @run) do %><span><%= l(:label_qa_run_target) %></span><strong><%= @all_count %></strong><% end %></li>
+  <% %w(pass fail hold none).each do |k| %>
+    <li class="<%= 'on' if @filter == k %>"><%= link_to project_qa_test_run_path(@project, @run, :result => k) do %><span><%= qa_result_label(k) %></span><strong><%= @counts[k].to_i %></strong><% end %></li>
+  <% end %>
+  <% if @retest.positive? %><li class="<%= 'on' if @filter == 'retest' %>"><%= link_to project_qa_test_run_path(@project, @run, :result => 'retest') do %><span><%= l(:label_qa_retest) %></span><strong><%= @retest %></strong><% end %></li>
+  <% else %><li><span><%= l(:label_qa_progress) %></span><strong><%= @all_count.positive? ? done * 100 / @all_count : 0 %>%</strong></li><% end %>
+</ul>
+<%= form_tag(project_qa_test_run_path(@project, @run), :method => :get, :class => 'qa_filter') do %>
+  <%= select_tag 'result', options_for_select([[l(:label_qa_result_all), '']] + QaTestResult::RESULTS.map { |k| [qa_result_label(k), k] } + [[l(:label_qa_retest), 'retest']], @filter), :'aria-label' => l(:label_qa_result) %>
+  <%= search_field_tag 'q', @q, :placeholder => l(:label_qa_search), :'aria-label' => l(:label_qa_search) %>
+  <%= submit_tag l(:label_qa_filter), :name => nil %>
+  <% if @filter || @q.present? %><%= link_to l(:label_qa_clear), project_qa_test_run_path(@project, @run), :class => 'qa_clear' %><% end %>
+<% end %>
+<% if @all_count.zero? %>
+  <p class="nodata"><%= l(:label_qa_no_cases) %></p>
+<% elsif @results.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<% unless @run.open? %><p class="db_hintbox"><%= l(:text_qa_run_closed) %></p><% end %>
+<%= form_tag(save_project_qa_test_run_path(@project, @run), :id => 'qa_run_form') do %>
+  <%= hidden_field_tag 'filter_result', @filter, :id => nil %>
+  <%= hidden_field_tag 'filter_q', @q, :id => nil %>
+  <% if can_run %>
+  <div class="qa_runbar">
+    <p class="mt_help"><%= l(:text_qa_run_tip) %></p>
+    <% if can_defect && @trackers.any? %><label><%= l(:label_qa_defect_tracker) %> <%= select_tag 'tracker_id', options_from_collection_for_select(@trackers, :id, :name, @tracker&.id) %></label><% end %>
+  </div>
+  <% end %>
+  <div class="autoscroll">
+  <table class="list qa_run">
+    <thead><tr><th><%= l(:label_qa_case_code) %></th><th class="name"><%= l(:label_qa_case_name) %></th><th><%= l(:label_qa_result) %></th><th class="note"><%= l(:label_qa_note) %></th><th><%= l(:label_qa_tester) %></th><th><%= l(:label_qa_defect) %></th></tr></thead>
+    <tbody>
+    <% @results.each do |r| %>
+      <% c = r.qa_test_case %>
+      <% m = @index[c.menu_item_id] %>
+      <tr id="qr_<%= r.id %>" data-r="<%= r.retest? ? 'retest' : r.result %>" class="qa_row <%= 'mt_focus' if params[:focus].to_i == r.id %>">
+        <td class="code"><%= link_to c.code, project_qa_test_case_path(@project, c) %></td>
+        <td class="name">
+          <% if m %><span class="mt_dim qa_path"><%= m.path(@index) %></span><% end %>
+          <details class="qa_more"><summary><%= c.name %></summary>
+            <dl class="qa_steps">
+              <% if c.precondition.present? %><dt><%= l(:label_qa_precondition) %></dt><dd><%= simple_format(h(c.precondition)) %></dd><% end %>
+              <dt><%= l(:label_qa_steps) %></dt><dd><%= c.steps.present? ? simple_format(h(c.steps)) : '-' %></dd>
+              <dt><%= l(:label_qa_expected) %></dt><dd><%= c.expected.present? ? simple_format(h(c.expected)) : '-' %></dd>
+            </dl>
+          </details>
+        </td>
+        <% if can_run %>
+          <td class="result"><%= select_tag "r[#{r.id}][result]", options_for_select(QaTestResult::RESULTS.map { |k| [qa_result_label(k), k] }, r.result), :class => 'qa_sel', :'aria-label' => "#{c.code} #{l(:label_qa_result)}", :data => { :orig => r.result } %><% if r.retest? %> <%= qa_result_badge('fail', true) %><% end %></td>
+          <td class="note"><%= text_field_tag "r[#{r.id}][note]", r.note, :class => 'qa_note', :'aria-label' => "#{c.code} #{l(:label_qa_note)}", :data => { :orig => r.note.to_s } %></td>
+        <% else %>
+          <td class="result"><%= qa_result_badge(r.result, r.retest?) %></td>
+          <td class="note"><%= r.note %></td>
+        <% end %>
+        <td class="tester"><% if r.user %><%= r.user %><br><span class="mt_dim"><%= format_time(r.tested_at) %></span><% end %></td>
+        <td class="defect">
+          <% if r.issue %><%= link_to "##{r.issue_id}", issue_path(r.issue), :title => r.issue.subject %> <span class="mt_dim"><%= r.issue.status %></span><% end %>
+          <% if can_defect && (r.issue.nil? || r.issue.closed?) %>
+            <button type="submit" class="qa_defect" formaction="<%= defect_project_qa_test_run_path(@project, @run, :result_id => r.id) %>" <%= 'hidden' unless r.result == 'fail' %>><%= l(:label_qa_defect_make) %></button>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  </div>
+  <% if can_run %>
+  <p class="form_btns qa_savebar">
+    <span class="qa_changed" hidden></span>
+    <%= submit_tag l(:label_qa_save_results) %>
+  </p>
+  <% end %>
+<% end %>
+<% if can_run %>
+<%= javascript_tag do %>
+$(function() {
+  var $f = $('#qa_run_form'), $msg = $f.find('.qa_changed'), tpl = <%= raw l(:label_qa_changed, :count => '__N__').to_json %>, dirty = false;
+  function refresh() {
+    var n = 0;
+    $f.find('tr.qa_row').each(function() {
+      var $tr = $(this), $s = $tr.find('.qa_sel'), $n = $tr.find('.qa_note');
+      var ch = $s.val() !== String($s.data('orig')) || $n.val() !== String($n.data('orig'));
+      $tr.toggleClass('on', ch); if (ch) n++;
+      if (!$tr.data('r0')) $tr.data('r0', $tr.attr('data-r'));
+      $tr.attr('data-r', ch ? $s.val() : $tr.data('r0'));
+      $tr.find('.qa_defect').prop('hidden', $s.val() !== 'fail');
+    });
+    dirty = n > 0;
+    $msg.prop('hidden', !dirty).text(tpl.replace('__N__', n));
+  }
+  $f.on('change input', '.qa_sel, .qa_note', refresh);
+  $f.on('keydown', '.qa_note', function(e) { if (e.key === 'Enter') { e.preventDefault(); $(this).closest('tr').next('tr').find('.qa_sel').focus(); } });
+  $f.on('submit', function() { dirty = false; });
+  $(window).on('beforeunload', function() { if (dirty) return true; });
+  var $focus = $f.find('tr.mt_focus'); if ($focus.length) $focus[0].scrollIntoView({ block: 'center' });
+});
+<% end %>
+<% end %>
+<% end %>
+<% html_title @run.name %>

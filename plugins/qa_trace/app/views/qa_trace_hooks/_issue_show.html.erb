@@ -1,0 +1,21 @@
+<%# 일감 상세: 연결된 요구사항 · 테스트 결함 출처 %>
+<% project = issue.project %>
+<% reqs = QaTrace.requirements_on?(project) ? QaRequirement.joins(:qa_requirement_issues).where(qa_requirement_issues: { issue_id: issue.id }).sorted.to_a : [] %>
+<% defects = QaTrace.tests_on?(project) ? QaTestResult.where(issue_id: issue.id).includes(:qa_test_case, :qa_test_run).to_a : [] %>
+<% if reqs.any? || defects.any? %>
+  <hr />
+  <div class="mt_linked">
+    <% if reqs.any? %>
+      <p><strong><%= l(:label_qa_requirements) %></strong></p>
+      <ul>
+        <% reqs.each do |r| %><li><%= link_to r.code, project_qa_requirement_path(r.project, r) %> <%= r.name %> <%= qa_status_badge(r.status) %></li><% end %>
+      </ul>
+    <% end %>
+    <% if defects.any? %>
+      <p><strong><%= l(:label_qa_defect_from) %></strong></p>
+      <ul>
+        <% defects.each do |d| %><li><%= link_to d.qa_test_run.name, project_qa_test_run_path(d.qa_test_run.project, d.qa_test_run, :focus => d.id) %> · <%= link_to d.qa_test_case.code, project_qa_test_case_path(d.qa_test_case.project, d.qa_test_case) %> <%= d.qa_test_case.name %> <%= qa_result_badge(d.result, d.retest?) %></li><% end %>
+      </ul>
+    <% end %>
+  </div>
+<% end %>

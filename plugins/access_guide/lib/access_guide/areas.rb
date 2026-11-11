@@ -24,6 +24,8 @@ module AccessGuide
     { key: 'db', view: %i[view_db_schema], write: %i[run_db_query], manage: %i[manage_db_links run_db_query_production] },
     { key: 'menu', view: %i[view_menu_tree], write: %i[manage_menu_tree], manage: %i[] },
     { key: 'sysroles', view: %i[view_sys_roles], write: %i[], manage: %i[manage_sys_roles] },
+    { key: 'requirements', view: %i[view_qa_requirements], write: %i[manage_qa_requirements], manage: %i[] },
+    { key: 'tests', view: %i[view_qa_tests], write: %i[run_qa_tests], manage: %i[manage_qa_tests] },
     { key: 'calendar', view: %i[view_calendar view_gantt], write: %i[], manage: %i[] },
   ].freeze
 

@@ -1,0 +1,3 @@
+<h2><%= link_to l(:label_qa_tests), project_qa_test_cases_path(@project) %> &#187; <%= link_to @case.code, project_qa_test_case_path(@project, @case) %> &#187; <%= l(:button_edit) %></h2>
+<%= labelled_form_for @case, :url => project_qa_test_case_path(@project, @case), :method => :patch do |f| %><%= render :partial => 'form', :locals => { :f => f } %><% end %>
+<% html_title l(:label_qa_case_edit) %>

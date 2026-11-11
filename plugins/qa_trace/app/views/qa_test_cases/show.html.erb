@@ -1,0 +1,36 @@
+<%# 프로젝트 > 테스트 > 케이스 상세 — 내용, 요구사항, 회차별 결과 %>
+<% can_edit = User.current.allowed_to?(:manage_qa_tests, @project) %>
+<div class="contextual">
+  <% if can_edit %>
+    <%= link_to sprite_icon('edit', l(:button_edit)), edit_project_qa_test_case_path(@project, @case), :class => 'icon icon-edit' %>
+    <%= link_to sprite_icon('add', l(:label_qa_case_add)), new_project_qa_test_case_path(@project, :kind => @case.kind, :menu_item_id => @case.menu_item_id), :class => 'icon icon-add' %>
+    <%= link_to sprite_icon('del', l(:button_delete)), project_qa_test_case_path(@project, @case), :method => :delete, :data => { :confirm => l(:text_qa_case_delete) }, :class => 'icon icon-del' %>
+  <% end %>
+</div>
+<h2><%= link_to l(:label_qa_tests), project_qa_test_cases_path(@project) %> &#187; <%= @case.code %></h2>
+<div class="qa_box">
+  <h3 class="qa_tit"><%= @case.name %></h3>
+  <p class="qa_meta"><span class="qa_badge"><%= qa_kind_label(@case.kind) %></span> <span class="mt_yn <%= 'on' if @case.active? %>"><%= @case.active? ? l(:general_text_Yes) : l(:general_text_No) %></span>
+    <% if (m = @index[@case.menu_item_id]) %><span class="mt_dim"><%= m.path(@index) %><% if m.screen_id %> (<%= m.screen_id %>)<% end %></span><% end %></p>
+  <% reqs = @case.qa_requirements.sorted.to_a %>
+  <% if reqs.any? %><p class="qa_meta"><%= l(:label_qa_requirements) %>: <% reqs.each do |r| %><%= link_to r.code, project_qa_requirement_path(@project, r), :title => r.name %> <% end %></p><% end %>
+  <dl class="qa_steps">
+    <dt><%= l(:label_qa_precondition) %></dt><dd><%= @case.precondition.present? ? simple_format(h(@case.precondition)) : '-' %></dd>
+    <dt><%= l(:label_qa_steps) %></dt><dd><%= @case.steps.present? ? simple_format(h(@case.steps)) : '-' %></dd>
+    <dt><%= l(:label_qa_expected) %></dt><dd><%= @case.expected.present? ? simple_format(h(@case.expected)) : '-' %></dd>
+  </dl>
+</div>
+<h3><%= l(:label_qa_case_runs) %></h3>
+<% if @results.any? %>
+<div class="autoscroll"><table class="list qa_mini">
+  <thead><tr><th class="name"><%= l(:label_qa_run_name) %></th><th><%= l(:label_qa_result) %></th><th><%= l(:label_qa_tester) %></th><th class="name"><%= l(:label_qa_note) %></th><th><%= l(:label_qa_defect) %></th></tr></thead>
+  <tbody><% @results.each do |r| %><tr>
+    <td class="name"><%= link_to r.qa_test_run.name, project_qa_test_run_path(@project, r.qa_test_run, :focus => r.id) %></td>
+    <td><%= qa_result_badge(r.result, r.retest?) %></td>
+    <td><% if r.user %><%= r.user %> <span class="mt_dim"><%= format_time(r.tested_at) %></span><% end %></td>
+    <td class="name"><%= r.note %></td>
+    <td><% if r.issue %><%= link_to "##{r.issue_id}", issue_path(r.issue) %> <span class="mt_dim"><%= r.issue.status %></span><% end %></td>
+  </tr><% end %></tbody>
+</table></div>
+<% else %><p class="nodata"><%= l(:label_qa_none) %></p><% end %>
+<% html_title "#{@case.code} #{@case.name}" %>

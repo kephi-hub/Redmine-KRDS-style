@@ -1,0 +1,34 @@
+<%# 프로젝트 > 요구사항 — 목록 %>
+<% can_edit = User.current.allowed_to?(:manage_qa_requirements, @project) %>
+<%= render :partial => 'qa_requirements/head', :locals => { :current => :list } %>
+<% if @kpi['all'].zero? && @reqs.empty? %>
+  <p class="nodata"><%= l(:label_qa_no_reqs) %></p>
+  <p class="db_hintbox"><%= l(:text_qa_no_reqs_hint) %></p>
+<% elsif @reqs.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list qa_list">
+  <thead><tr><th><%= l(:label_qa_code) %></th><th><%= l(:label_qa_category) %></th><th class="name"><%= l(:label_qa_name) %></th><th><%= l(:label_qa_priority) %></th><th><%= l(:field_status) %></th><% if @menus_on %><th><%= l(:label_qa_menus) %></th><% end %><th><%= l(:label_qa_issues) %></th><th><%= l(:label_qa_test) %></th><th><%= l(:label_qa_risk) %></th><th></th></tr></thead>
+  <tbody>
+  <% @reqs.each do |r| %>
+    <% i = @info[r.id] %>
+    <tr class="<%= 'qa_del' if r.deleted? %>">
+      <td class="code"><%= link_to r.code, project_qa_requirement_path(@project, r) %></td>
+      <td class="cat"><%= qa_cat_label(r.category) %></td>
+      <td class="name"><%= link_to r.name, project_qa_requirement_path(@project, r) %><% if r.parent_id %> <span class="mt_dim">↳ <%= @reqs.find { |x| x.id == r.parent_id }&.code %></span><% end %></td>
+      <td class="prio"><span class="qa_prio" data-k="<%= r.priority %>"><%= qa_priority_label(r.priority) %></span></td>
+      <td class="status"><%= qa_status_badge(r.status) %></td>
+      <% if @menus_on %><td class="count"><%= i[:menus].size.positive? ? i[:menus].size : '-' %></td><% end %>
+      <td class="bar"><%= i[:issues].any? ? qa_bar(i[:issues_closed], i[:issues].size) : '-' %></td>
+      <td class="bar"><%= i[:cases].any? ? qa_bar(i[:pass], i[:cases].size) : '-' %></td>
+      <td class="risk"><% i[:risks].each do |k| %><%= qa_risk_badge(k) %> <% end %><% if i[:state] == 'pass' %><%= content_tag(:span, l(:label_qa_state_pass), :class => 'qa_badge', :data => { :k => 'pass' }) %><% end %></td>
+      <td class="buttons"><% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_qa_requirement_path(@project, r), :class => 'icon icon-edit' %><% end %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<p class="mt_dim qa_total"><%= l(:label_total) %> <%= @reqs.size %></p>
+<% end %>
+<% html_title l(:label_qa_requirements) %>

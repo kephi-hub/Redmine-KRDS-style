@@ -1,0 +1,63 @@
+<%# 프로젝트 > 요구사항 > 상세 — 내용, 연결(메뉴 · 일감 · 테스트), 하위 요구사항, 변경 이력 %>
+<% can_edit = User.current.allowed_to?(:manage_qa_requirements, @project) %>
+<div class="contextual">
+  <% if can_edit %>
+    <%= link_to sprite_icon('edit', l(:button_edit)), edit_project_qa_requirement_path(@project, @req), :class => 'icon icon-edit' %>
+    <%= link_to sprite_icon('add', l(:label_qa_children)), new_project_qa_requirement_path(@project, :category => @req.category, :parent_id => @req.id), :class => 'icon icon-add' %>
+    <%= link_to sprite_icon('del', l(:button_delete)), project_qa_requirement_path(@project, @req), :method => :delete, :data => { :confirm => l(:text_qa_req_delete) }, :class => 'icon icon-del' %>
+  <% end %>
+</div>
+<h2><%= link_to l(:label_qa_requirements), project_qa_requirements_path(@project) %> &#187; <%= @req.code %></h2>
+<div class="qa_box">
+  <h3 class="qa_tit"><%= @req.name %></h3>
+  <p class="qa_meta"><%= qa_status_badge(@req.status) %> <span class="qa_prio" data-k="<%= @req.priority %>"><%= l(:label_qa_priority) %> <%= qa_priority_label(@req.priority) %></span> <span class="mt_dim"><%= qa_cat_label(@req.category) %></span>
+    <% @info[:risks].each do |k| %><%= qa_risk_badge(k) %> <% end %></p>
+  <dl class="db_props">
+    <% if @req.parent %><div><dt><%= l(:label_qa_parent) %></dt><dd><%= link_to @req.parent.to_s, project_qa_requirement_path(@project, @req.parent) %></dd></div><% end %>
+    <% if @req.source.present? %><div><dt><%= l(:label_qa_source) %></dt><dd><%= @req.source %></dd></div><% end %>
+    <div><dt><%= l(:field_updated_on) %></dt><dd><%= format_time(@req.updated_at) %></dd></div>
+  </dl>
+  <% if @req.description.present? %><div class="wiki qa_desc"><%= simple_format(h(@req.description)) %></div><% end %>
+</div>
+
+<% if QaTrace::Trace.menus_on?(@project) %>
+<h3><%= l(:label_qa_menus) %> <span class="mt_dim">(<%= @info[:menus].size %>)</span></h3>
+<% if @info[:menus].any? %>
+  <ul class="mt_nolist"><% @info[:menus].each do |m| %><li><%= link_to m.path(@info[:menu_index]), project_menu_items_path(@project, :focus => m.id) %><% if m.screen_id %> <code><%= m.screen_id %></code><% end %></li><% end %></ul>
+  <p class="mt_dim qa_hint"><%= l(:text_qa_menu_cases) %></p>
+<% else %><p class="nodata"><%= l(:label_qa_none) %></p><% end %>
+<% end %>
+
+<h3><%= l(:label_qa_issues) %> <span class="mt_dim">(<%= @info[:issues_closed] %>/<%= @info[:issues].size %>)</span></h3>
+<% if @info[:issues].any? %>
+<div class="autoscroll"><table class="list qa_mini">
+  <thead><tr><th>#</th><th><%= l(:field_tracker) %></th><th class="name"><%= l(:field_subject) %></th><th><%= l(:field_status) %></th><th><%= l(:field_assigned_to) %></th><th><%= l(:field_done_ratio) %></th></tr></thead>
+  <tbody><% @info[:issues].each do |x| %><tr class="<%= 'qa_closed' if x.closed? %>"><td><%= link_to "##{x.id}", issue_path(x) %></td><td><%= x.tracker %></td><td class="name"><%= link_to x.subject, issue_path(x) %></td><td><%= x.status %></td><td><%= x.assigned_to %></td><td><%= x.done_ratio %>%</td></tr><% end %></tbody>
+</table></div>
+<% else %><p class="nodata"><%= l(:label_qa_none) %></p><% end %>
+
+<% if @project.module_enabled?(:qa_tests) && User.current.allowed_to?(:view_qa_tests, @project) %>
+<h3><%= l(:label_qa_cases) %> <span class="mt_dim">(<%= @info[:pass] %>/<%= @info[:cases].size %>)</span></h3>
+<% if @info[:cases].any? %>
+<div class="autoscroll"><table class="list qa_mini">
+  <thead><tr><th><%= l(:label_qa_case_code) %></th><th><%= l(:label_qa_kind) %></th><th class="name"><%= l(:label_qa_case_name) %></th><th><%= l(:label_qa_latest) %></th></tr></thead>
+  <tbody><% @info[:cases].each do |c| %><% res = @info[:results][c.id] %><tr><td><%= link_to c.code, project_qa_test_case_path(@project, c) %></td><td><%= qa_kind_label(c.kind) %></td><td class="name"><%= c.name %></td><td><%= qa_result_badge(res&.result || 'none', res&.retest?) %></td></tr><% end %></tbody>
+</table></div>
+<% else %><p class="nodata"><%= l(:label_qa_none) %></p><% end %>
+<% end %>
+
+<% if @children.any? %>
+<h3><%= l(:label_qa_children) %></h3>
+<ul class="mt_nolist"><% @children.each do |c| %><li><%= link_to c.code, project_qa_requirement_path(@project, c) %> <%= c.name %> <%= qa_status_badge(c.status) %></li><% end %></ul>
+<% end %>
+
+<h3><%= l(:label_qa_history) %></h3>
+<% if @logs.any? %>
+<ul class="qa_log">
+  <% @logs.each do |g| %>
+    <li><span class="qa_when"><%= format_time(g.created_at) %> · <%= g.user || l(:label_user_anonymous) %></span>
+      <ul><% g.entries.each do |f, o, n| %><li><%= qa_log_text(f, o, n) %></li><% end %></ul></li>
+  <% end %>
+</ul>
+<% else %><p class="nodata"><%= l(:label_qa_none) %></p><% end %>
+<% html_title "#{@req.code} #{@req.name}" %>

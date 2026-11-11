@@ -1,0 +1,17 @@
+<%= error_messages_for @run %>
+<div class="box tabular">
+  <p><%= f.text_field :name, :required => true, :size => 40, :maxlength => 100, :placeholder => '1차 통합테스트', :label => :label_qa_run_name %></p>
+  <p><%= f.select :kind, QaTestCase::KINDS.map { |k| [qa_kind_label(k), k] }, { :include_blank => l(:label_qa_kind_all), :label => :label_qa_kind }, :disabled => @run.persisted? %>
+    <em class="info"><%= l(:text_qa_run_kind) %></em></p>
+  <p><%= f.date_field :start_on, :label => :field_start_date %><%= calendar_for('qa_test_run_start_on') %></p>
+  <p><%= f.date_field :end_on, :label => :field_due_date %><%= calendar_for('qa_test_run_end_on') %></p>
+  <% if @run.persisted? %>
+    <p><%= f.select :status, QaTestRun::STATUSES.map { |s| [l(s == 'open' ? :label_qa_run_open : :label_qa_run_closed), s] }, { :label => :field_status } %></p>
+  <% end %>
+  <p><%= f.text_area :note, :rows => 3, :cols => 60, :label => :field_description %></p>
+</div>
+<p class="form_btns">
+  <% if @run.persisted? %><%= link_to l(:button_delete), project_qa_test_run_path(@project, @run), :method => :delete, :data => { :confirm => l(:text_qa_run_delete) }, :class => 'btn_line qa_danger' %><% end %>
+  <%= link_to l(:button_cancel), @run.new_record? ? project_qa_test_runs_path(@project) : project_qa_test_run_path(@project, @run), :class => 'btn_line' %>
+  <%= submit_tag l(@run.new_record? ? :button_create : :button_save) %>
+</p>

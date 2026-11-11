@@ -1,0 +1,14 @@
+<%# 가져오기 결과 (locals: result) %>
+<% if result %>
+  <h3><%= l(:label_qa_import_result) %></h3>
+  <ul class="db_stats mt_kpi">
+    <li><span><%= l(:label_qa_import_created) %></span><strong><%= result[:created] %></strong></li>
+    <li><span><%= l(:label_qa_import_updated) %></span><strong><%= result[:updated] %></strong></li>
+    <li class="<%= 'on' if result[:errors].any? %>"><span><%= l(:label_qa_import_failed) %></span><strong><%= result[:errors].size %></strong></li>
+  </ul>
+  <% if result[:errors].any? %>
+    <ul class="mt_nolist">
+      <% result[:errors].sort_by(&:first).first(200).each do |line, msg| %><li><%= line %>행 — <%= msg %></li><% end %>
+    </ul>
+  <% end %>
+<% end %>

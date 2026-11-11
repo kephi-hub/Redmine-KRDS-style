@@ -1,0 +1,36 @@
+<%# 프로젝트 > 테스트 > 케이스 %>
+<% can_edit = User.current.allowed_to?(:manage_qa_tests, @project) %>
+<%= render :partial => 'qa_test_cases/tabs', :locals => { :current => :cases } %>
+<%= form_tag(project_qa_test_cases_path(@project), :method => :get, :class => 'qa_filter') do %>
+  <%= select_tag 'kind', options_for_select([[l(:label_qa_kind_all), '']] + QaTestCase::KINDS.map { |k| [qa_kind_label(k), k] }, @kind), :'aria-label' => l(:label_qa_kind) %>
+  <%= select_tag 'result', options_for_select([[l(:label_qa_result_all), '']] + QaTestResult::RESULTS.map { |k| [qa_result_label(k), k] }, @result), :'aria-label' => l(:label_qa_latest) %>
+  <%= search_field_tag 'q', @q, :placeholder => l(:label_qa_search), :'aria-label' => l(:label_qa_search) %>
+  <label class="qa_chk"><%= check_box_tag 'all', '1', params[:all] == '1' %> <%= l(:label_qa_include_unused) %></label>
+  <%= submit_tag l(:label_qa_filter), :name => nil %>
+  <% if @kind || @result || @q.present? || params[:all] == '1' %><%= link_to l(:label_qa_clear), project_qa_test_cases_path(@project), :class => 'qa_clear' %><% end %>
+<% end %>
+<% if @cases.empty? %>
+  <p class="nodata"><%= l(QaTestCase.where(project_id: @project.id).exists? ? :label_no_data : :label_qa_no_cases) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list qa_list">
+  <thead><tr><th><%= l(:label_qa_case_code) %></th><th><%= l(:label_qa_kind) %></th><% if @menus_on %><th><%= l(:label_qa_menus) %></th><% end %><th class="name"><%= l(:label_qa_case_name) %></th><th><%= l(:label_qa_requirements) %></th><th><%= l(:label_qa_latest) %></th><th></th></tr></thead>
+  <tbody>
+  <% @cases.each do |c| %>
+    <% res = @latest[c.id] %>
+    <tr class="<%= 'qa_del' unless c.active? %>">
+      <td class="code"><%= link_to c.code, project_qa_test_case_path(@project, c) %></td>
+      <td><%= qa_kind_label(c.kind) %></td>
+      <% if @menus_on %><td class="menus"><% if (m = @index[c.menu_item_id]) %><%= m.path(@index) %><% if m.screen_id %> <code><%= m.screen_id %></code><% end %><% else %><span class="mt_dim">-</span><% end %></td><% end %>
+      <td class="name"><%= link_to c.name, project_qa_test_case_path(@project, c) %></td>
+      <td class="reqs"><%= (@reqs[c.id] || []).join(', ').presence || '-' %></td>
+      <td><%= qa_result_badge(res&.result || 'none', res&.retest?) %></td>
+      <td class="buttons"><% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_qa_test_case_path(@project, c), :class => 'icon icon-edit' %><% end %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<p class="mt_dim qa_total"><%= l(:label_total) %> <%= @cases.size %></p>
+<% end %>
+<% html_title l(:label_qa_tests) %>

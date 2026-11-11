@@ -1,0 +1,14 @@
+<h2><%= link_to l(:label_qa_requirements), project_qa_requirements_path(@project) %> &#187; <%= l(:label_qa_import) %></h2>
+<%= form_tag project_qa_requirements_import_path(@project), :multipart => true do %>
+  <div class="box">
+    <p><%= l(:text_qa_import_req) %></p>
+    <p class="mt_help"><%= l(:text_qa_import_req_rules) %></p>
+    <p><%= file_field_tag 'file', :accept => '.xlsx,.csv' %></p>
+  </div>
+  <p class="form_btns">
+    <%= link_to l(:label_qa_back_reqs), project_qa_requirements_path(@project), :class => 'btn_line' %>
+    <%= submit_tag l(:label_qa_import) %>
+  </p>
+<% end %>
+<%= render :partial => 'qa_trace/import_result', :locals => { :result => @result } %>
+<% html_title l(:label_qa_import) %>

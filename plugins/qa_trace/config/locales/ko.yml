@@ -1,0 +1,187 @@
+ko:
+  project_module_qa_requirements: 요구사항
+  project_module_qa_tests: 테스트
+  permission_view_qa_requirements: 요구사항 보기
+  permission_manage_qa_requirements: 요구사항 편집
+  permission_view_qa_tests: 테스트 보기
+  permission_run_qa_tests: 테스트 결과 입력
+  permission_manage_qa_tests: 테스트 케이스·회차 편집
+  label_qa_requirements: 요구사항
+  label_qa_tests: 테스트
+  label_qa_req_list: 목록
+  label_qa_trace: 추적표
+  label_qa_req_new: 새 요구사항
+  label_qa_req_edit: 요구사항 수정
+  label_qa_export: 엑셀 내보내기
+  label_qa_import: 엑셀 가져오기
+  text_qa_requirements: "요구사항을 공공 표준 분류(SFR 기능 · PER 성능 · SIR 인터페이스 …)로 관리하고 메뉴 · 일감 · 테스트와 연결해 추적합니다."
+  text_qa_trace: 요구사항마다 연결된 메뉴(하위 메뉴 포함), 일감, 테스트 케이스와 최근 결과를 한 표로 봅니다.
+  label_qa_no_reqs: 등록된 요구사항이 없습니다.
+  text_qa_no_reqs_hint: "[새 요구사항] 으로 하나씩 등록하거나, 제안요청서의 요구사항 표를 엑셀로 가져오세요."
+  label_qa_k_all: 전체 요구사항
+  label_qa_k_confirmed: 확정
+  label_qa_k_no_menu: 메뉴 미연결
+  label_qa_k_no_test: 테스트 없음
+  label_qa_k_fail: 불합격 있음
+  label_qa_k_pass: 테스트 통과
+  label_qa_k_deleted_open: 삭제 · 일감 진행 중
+  label_qa_code: 요구사항 ID
+  label_qa_category: 분류
+  label_qa_category_all: 모든 분류
+  label_qa_name: 요구사항명
+  label_qa_description: 상세 내용
+  label_qa_source: 출처
+  label_qa_priority: 중요도
+  label_qa_parent: 상위 요구사항
+  label_qa_menus: 메뉴
+  label_qa_issues: 일감
+  label_qa_cases: 테스트 케이스
+  label_qa_test: 테스트
+  label_qa_risk: 위험
+  label_qa_children: 하위 요구사항
+  label_qa_history: 변경 이력
+  label_qa_status_all: 모든 상태(삭제 포함)
+  label_qa_status_alive: 삭제 빼고
+  label_qa_status_received: 접수
+  label_qa_status_confirmed: 확정
+  label_qa_status_changed: 변경
+  label_qa_status_deleted: 삭제
+  label_qa_priority_high: 상
+  label_qa_priority_normal: 중
+  label_qa_priority_low: 하
+  label_qa_risk_no_menu: 메뉴 미연결
+  label_qa_risk_no_test: 테스트 없음
+  label_qa_risk_fail: 불합격
+  label_qa_risk_deleted_open: 삭제됐는데 일감 진행 중
+  label_qa_state_pass: 통과
+  label_qa_search: ID · 이름 · 내용으로 찾기
+  label_qa_filter: 찾기
+  label_qa_clear: 초기화
+  label_qa_none: 없음
+  label_qa_save_continue: 저장 후 계속 등록
+  text_qa_code: 비워 두면 분류에 맞춰 자동 (예 SFR-001). 제안요청서의 고유번호를 그대로 써도 됩니다.
+  text_qa_issue_ids: "일감 번호를 쉼표나 띄어쓰기로 (예: 12, 15 #20)"
+  label_qa_issue_ids: 연결 일감 번호
+  label_qa_menu_pick: 메뉴 이름 · 화면 ID 로 찾아 추가
+  text_qa_need_menu: 메뉴를 연결하려면 프로젝트 설정 > 모듈에서 "메뉴 구조도" 를 켜세요.
+  text_qa_menu_cases: 하위 메뉴에 연결된 테스트 케이스도 이 요구사항의 테스트로 봅니다.
+  text_qa_req_delete: 이 요구사항과 연결(메뉴 · 일감 · 테스트 케이스) · 변경 이력을 지웁니다. 보통은 상태를 "삭제" 로 바꾸는 편이 이력이 남아 좋습니다. 계속할까요?
+  label_qa_log_created: 등록
+  label_qa_log_imported: 엑셀로 등록
+  label_qa_log_description: 상세 내용 수정
+  label_qa_field_menus: 메뉴
+  label_qa_field_issues: 일감
+  label_qa_field_cases: 테스트 케이스
+  label_qa_field_code: 요구사항 ID
+  label_qa_field_category: 분류
+  label_qa_field_name: 요구사항명
+  label_qa_field_source: 출처
+  text_qa_import_req: 엑셀(xlsx) 또는 CSV 파일을 올리세요. 머리줄에서 칸 이름을 찾습니다. [엑셀 내보내기] 파일을 고쳐서 다시 올려도 됩니다.
+  text_qa_import_req_rules: "칸 이름: 요구사항 ID(고유번호) · 분류(SFR 또는 기능) · 요구사항명 · 상세 내용 · 출처 · 중요도(상/중/하) · 상태(접수/확정/변경/삭제) · 상위 ID · 메뉴(화면 ID 또는 경로, 여러 개는 줄바꿈). ID 가 같은 요구사항은 값만 갱신되고 변경 이력이 남습니다. ID 가 비어 있으면 새로 만들고 번호를 자동으로 붙입니다."
+  text_qa_import_case: 엑셀(xlsx) 또는 CSV 파일을 올리세요. 머리줄에서 칸 이름을 찾습니다. [엑셀 내보내기] 파일을 고쳐서 다시 올려도 됩니다.
+  text_qa_import_case_rules: "칸 이름: 케이스 ID · 종류(단위/통합/인수) · 화면 ID 또는 메뉴 · 요구사항 ID(여러 개는 쉼표) · 케이스명 · 사전조건 · 절차 · 기대결과 · 사용(Y/N). ID 가 같은 케이스는 값만 갱신, 비어 있으면 TC-001 처럼 자동 번호."
+  label_qa_import_result: 가져오기 결과
+  label_qa_import_created: 새로 만듦
+  label_qa_import_updated: 값 갱신
+  label_qa_import_failed: 오류
+  label_qa_back_reqs: 요구사항으로 돌아가기
+  label_qa_back_tests: 테스트로 돌아가기
+  error_qa_no_file: 파일을 선택해 주세요.
+  error_qa_bad_file: 파일을 읽을 수 없습니다. 엑셀(xlsx) 또는 CSV 파일인지 확인하세요.
+  error_qa_no_header_req: 머리줄에서 "요구사항명" 칸을 찾지 못했습니다.
+  error_qa_no_header_case: 머리줄에서 "케이스명" 칸을 찾지 못했습니다.
+  notice_qa_imported: "가져오기를 마쳤습니다. 새로 만듦 %{created}개, 값 갱신 %{updated}개"
+  warning_qa_issue_missing: "일감 %{ids} 을(를) 찾을 수 없어 연결하지 않았습니다."
+  label_qa_t_cases: 케이스
+  label_qa_t_runs: 회차
+  label_qa_t_menus: 메뉴별 현황
+  text_qa_tests: 화면(메뉴)별 테스트 케이스를 만들고, 회차(예 1차 통합테스트)마다 결과를 기록합니다. 불합격이면 결함 일감을 바로 만들 수 있습니다.
+  label_qa_case_new: 새 케이스
+  label_qa_case_edit: 케이스 수정
+  label_qa_case_code: 케이스 ID
+  label_qa_case_name: 케이스명
+  label_qa_kind: 종류
+  label_qa_kind_all: 전체 종류
+  label_qa_kind_unit: 단위
+  label_qa_kind_integration: 통합
+  label_qa_kind_acceptance: 인수
+  label_qa_precondition: 사전조건
+  label_qa_steps: 절차
+  label_qa_expected: 기대결과
+  label_qa_latest: 최근 결과
+  label_qa_include_unused: 사용 안 하는 케이스도
+  label_qa_no_cases: 등록된 테스트 케이스가 없습니다.
+  text_qa_case_code: 비워 두면 TC-001 처럼 자동
+  text_qa_case_delete: 이 케이스와 모든 회차의 결과를 지웁니다. 보통은 "사용" 을 끄는 편이 결과가 남아 좋습니다. 계속할까요?
+  label_qa_req_pick: 요구사항 ID · 이름으로 찾아 추가
+  text_qa_need_reqs: 요구사항을 연결하려면 프로젝트 설정 > 모듈에서 "요구사항" 을 켜세요.
+  label_qa_case_runs: 회차별 결과
+  label_qa_run_new: 새 회차
+  label_qa_run_edit: 회차 수정
+  label_qa_run_name: 회차 이름
+  label_qa_run_period: 기간
+  label_qa_run_open: 진행 중
+  label_qa_run_closed: 종료
+  label_qa_run_target: 대상
+  label_qa_progress: 진행률
+  label_qa_no_runs: 등록된 회차가 없습니다.
+  text_qa_run_kind: 이 종류의 "사용" 케이스가 대상이 됩니다. 비워 두면 모든 종류.
+  text_qa_run_delete: 이 회차와 결과를 모두 지웁니다(결함 일감은 남음). 계속할까요?
+  label_qa_run_sync: 새 케이스 대상에 추가
+  text_qa_run_sync: 회차를 만든 뒤 추가된 케이스를 대상에 넣습니다. 이미 있는 결과는 그대로입니다.
+  label_qa_result: 결과
+  label_qa_result_all: 모든 결과
+  label_qa_result_none: 미수행
+  label_qa_result_pass: 합격
+  label_qa_result_fail: 불합격
+  label_qa_result_hold: 보류
+  label_qa_result_skip: 제외
+  label_qa_retest: 재테스트
+  label_qa_tester: 수행
+  label_qa_note: 비고 · 실제 결과
+  label_qa_defect: 결함 일감
+  label_qa_defect_make: 결함 일감 만들기
+  label_qa_defect_tracker: 결함 트래커
+  label_qa_defect_from: 테스트 결함
+  label_qa_save_results: 결과 저장
+  text_qa_run_tip: 결과와 비고를 고른 뒤 [결과 저장] 을 누르세요. 불합격 줄의 [결함 일감 만들기] 는 결과를 먼저 저장하고, 비고를 "실제 결과" 로 넣어 일감을 만듭니다. 결함 일감이 완료되면 "재테스트" 로 표시됩니다.
+  text_qa_run_closed: 종료된 회차입니다. 결과를 고치려면 회차 수정에서 상태를 "진행 중" 으로 바꾸세요.
+  label_qa_changed: "%{count}줄 바뀜 — 저장해야 반영됩니다"
+  notice_qa_run_created: "회차를 만들었습니다. 대상 케이스 %{count}개"
+  notice_qa_run_synced: "새 케이스 %{count}개를 대상에 넣었습니다."
+  notice_qa_results_saved: "결과 %{count}줄을 저장했습니다."
+  notice_qa_defect_created: "결함 일감 #%{id} 을(를) 만들었습니다."
+  warning_qa_defect_exists: "이미 진행 중인 결함 일감 #%{id} 이(가) 있습니다."
+  error_qa_run_closed: 종료된 회차는 결과를 고칠 수 없습니다.
+  label_qa_m_menu: 메뉴
+  label_qa_m_reqs: 요구사항
+  label_qa_m_screens: 화면 (말단 메뉴)
+  label_qa_m_covered: 케이스 있는 화면
+  label_qa_m_cases: 케이스
+  text_qa_menus: 메뉴마다 사용 중인 케이스 수와 최근 결과입니다. 회색 줄은 케이스가 없는 메뉴입니다.
+  label_qa_case_add: 케이스 추가
+  activerecord:
+    attributes:
+      qa_requirement:
+        code: 요구사항 ID
+        category: 분류
+        name: 요구사항명
+        description: 상세 내용
+        source: 출처
+        priority: 중요도
+        status: 상태
+        parent_id: 상위 요구사항
+      qa_test_case:
+        code: 케이스 ID
+        kind: 종류
+        menu_item_id: 메뉴
+        name: 케이스명
+        precondition: 사전조건
+        steps: 절차
+        expected: 기대결과
+      qa_test_run:
+        name: 회차 이름
+        kind: 종류
+        start_on: 시작일
+        end_on: 종료일
+        status: 상태

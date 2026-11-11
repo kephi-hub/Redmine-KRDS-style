@@ -1,0 +1,28 @@
+<%= error_messages_for @case %>
+<div class="box tabular">
+  <p><%= f.select :kind, QaTestCase::KINDS.map { |k| [qa_kind_label(k), k] }, { :label => :label_qa_kind } %></p>
+  <p><%= f.text_field :code, :size => 16, :maxlength => 30, :placeholder => 'TC-001', :label => :label_qa_case_code %>
+    <em class="info"><%= l(:text_qa_case_code) %></em></p>
+  <p><%= f.text_field :name, :required => true, :size => 60, :maxlength => 200, :label => :label_qa_case_name %></p>
+  <% if @menus_on %>
+    <p><%= f.select :menu_item_id, qa_menu_options(@ordered), { :include_blank => true, :label => :label_qa_menus } %></p>
+  <% end %>
+  <p><label><%= l(:label_qa_requirements) %></label>
+    <% if @reqs_on %>
+      <% chosen = params[:reqs_sent] == '1' ? Array(params[:qa_requirement_ids]).map(&:to_i) : @case.qa_requirement_ids %>
+      <%= render :partial => 'qa_trace/pick', :locals => { :pick_id => 'qa_req_pick', :field => 'qa_requirement_ids[]', :sent => 'reqs_sent', :chosen => chosen, :placeholder => l(:label_qa_req_pick),
+            :items => @all_reqs.map { |r| { :id => r.id, :chip => r.code, :label => r.name, :sub => r.code, :q => "#{r.code} #{r.name}" } } } %>
+    <% else %>
+      <span class="mt_dim"><%= l(:text_qa_need_reqs) %></span>
+    <% end %>
+  </p>
+  <p><%= f.text_area :precondition, :rows => 3, :cols => 60, :label => :label_qa_precondition %></p>
+  <p><%= f.text_area :steps, :rows => 6, :cols => 60, :placeholder => "1. 로그인 화면으로 이동\n2. 아이디·비밀번호 입력\n3. [로그인] 누름", :label => :label_qa_steps %></p>
+  <p><%= f.text_area :expected, :rows => 3, :cols => 60, :label => :label_qa_expected %></p>
+  <p><%= f.check_box :active, :label => :field_active %></p>
+</div>
+<p class="form_btns">
+  <%= link_to l(:button_cancel), @case.new_record? ? project_qa_test_cases_path(@project) : project_qa_test_case_path(@project, @case), :class => 'btn_line' %>
+  <% if @case.new_record? %><%= submit_tag l(:label_qa_save_continue), :name => 'continue', :class => 'btn_line' %><% end %>
+  <%= submit_tag l(@case.new_record? ? :button_create : :button_save) %>
+</p>
