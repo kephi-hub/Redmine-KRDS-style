@@ -34,4 +34,21 @@
 </table>
 </div>
 <% end %>
+<h3><%= l(:label_repo_export_logs) %></h3>
+<% if @exports.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list st_list">
+  <thead><tr><th><%= l(:label_date) %></th><th><%= l(:label_repo_export_who) %></th><th class="name"><%= l(:label_project) %></th><th class="name"><%= l(:label_repo_export_path) %></th><th><%= l(:label_revision) %></th><th><%= l(:label_repo_export_size) %></th><th><%= l(:field_status) %></th></tr></thead>
+  <tbody>
+  <% @exports.each do |x| %>
+    <tr><td><%= format_time(x.created_at) %></td><td><%= x.user %></td><td class="name"><%= x.project&.name %></td><td class="name"><code>/<%= x.path %></code></td><td><%= x.rev %></td>
+      <td><%= x.bytes ? number_to_human_size(x.bytes) : '-' %><% if x.files %> <span class="db_dim">(<%= x.files %>)</span><% end %></td>
+      <td><% if x.status == 'ok' %><span class="mt_yn on">OK</span><% else %><span class="qa_fail" title="<%= x.message %>"><%= x.message.to_s.truncate(40) %></span><% end %></td></tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<% end %>
 <% html_title l(:label_committer_maps) %>

@@ -9,6 +9,7 @@ class CommitterMapsController < ApplicationController
   def index
     return deny_access unless User.current.admin?
     @rows = SiteTools::Committers.overview
+    @exports = RepoExportLog.recent.includes(:user, :project).limit(30).to_a
   end
 
   # repository_id 가 있으면 그 저장소만(저장소 관리 권한), 없으면 전체(관리자)

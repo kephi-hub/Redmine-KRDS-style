@@ -58,3 +58,17 @@ ko:
   text_committer_auto: "미연결 %{count}명 — 로그인 ID·메일이 같은 사용자와 자동으로 연결합니다."
   notice_committers_refreshed: "커미터 %{mapped}명을 연결했습니다. 맞는 사용자가 없는 커미터 %{unmatched}명"
   notice_committers_refreshed_all: "모든 저장소에서 커미터 %{mapped}명을 연결했습니다."
+  permission_export_repository: 소스코드 다운로드
+  label_repo_export: 소스코드 다운로드
+  label_repo_export_root: 저장소 전체
+  text_repo_export_title: "%{where} 를 리비전 %{rev} 기준으로 zip 파일로 받습니다"
+  text_repo_export_confirm: "%{where} (리비전 %{rev}) 의 소스 전체를 zip 으로 받습니다. 크기에 따라 몇 분 걸릴 수 있습니다. 계속할까요?"
+  error_repo_export_type: SVN · Git 저장소만 소스코드 다운로드를 지원합니다.
+  error_repo_export_busy: 다른 소스코드 다운로드를 만드는 중입니다. 잠시 뒤 다시 시도하세요.
+  error_repo_export_large: 2GB 를 넘어 받을 수 없습니다. 하위 폴더로 들어가서 받으세요.
+  error_repo_export_timeout: 10분 안에 끝나지 않아 중단했습니다. 하위 폴더로 들어가서 받으세요.
+  error_repo_export_failed: "소스를 가져오지 못했습니다: %{message}"
+  label_repo_export_logs: 최근 소스코드 다운로드
+  label_repo_export_who: 받은 사람
+  label_repo_export_path: 경로
+  label_repo_export_size: 크기

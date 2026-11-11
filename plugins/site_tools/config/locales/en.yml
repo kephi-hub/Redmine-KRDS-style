@@ -1,3 +1,5 @@
 en:
   label_smtp_settings: Mail server (SMTP)
   label_committer_maps: Repository committers
+  permission_export_repository: Download source code
+  label_repo_export: Download source

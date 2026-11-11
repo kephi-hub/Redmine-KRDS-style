@@ -17,7 +17,7 @@ module AccessGuide
     { key: 'news', view: %i[view_news], write: %i[comment_news], manage: %i[manage_news] },
     { key: 'wiki', view: %i[view_wiki_pages view_wiki_edits export_wiki_pages view_wiki_page_watchers], write: %i[edit_wiki_pages add_wiki_page_watchers],
       manage: %i[manage_wiki delete_wiki_pages rename_wiki_pages protect_wiki_pages delete_wiki_pages_attachments delete_wiki_page_watchers] },
-    { key: 'repository', view: %i[view_changesets browse_repository], write: %i[commit_access manage_related_issues], manage: %i[manage_repository] },
+    { key: 'repository', view: %i[view_changesets browse_repository], write: %i[commit_access manage_related_issues export_repository], manage: %i[manage_repository] },
     { key: 'keys', view: %i[view_keys download_keys keys_all whitelist_keys], write: %i[edit_keys], manage: %i[manage_whitelist_keys export_keys] },
     { key: 'deploys', view: %i[view_deploys], write: %i[run_deploys], manage: %i[run_production_deploys manage_deploy_targets] },
     { key: 'glossary', view: %i[view_glossary], write: %i[manage_glossary], manage: %i[] },
