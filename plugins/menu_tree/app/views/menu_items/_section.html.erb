@@ -1,5 +1,0 @@
-<%# 메뉴 구조도 · 시스템 권한 구역 탭 (프로젝트 메뉴에서는 하나로 합쳐 보임) — locals: current (:menu | :roles) %>
-<%= krds_section_tabs([
-      (@project.module_enabled?(:menu_tree) && User.current.allowed_to?(:view_menu_tree, @project) ? [l(:label_menu_tree), project_menu_items_path(@project), current == :menu] : nil),
-      (@project.module_enabled?(:sys_roles) && User.current.allowed_to?(:view_sys_roles, @project) ? [l(:label_sys_roles), project_sys_roles_path(@project), current == :roles] : nil)
-    ]) if respond_to?(:krds_section_tabs) %>

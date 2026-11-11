@@ -5,7 +5,6 @@
   <% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_pm_change_request_path(@project, c), :class => 'icon icon-edit' %>
     <%= link_to sprite_icon('del', l(:button_delete)), project_pm_change_request_path(@project, c), :method => :delete, :data => { :confirm => l(:text_are_you_sure) }, :class => 'icon icon-del' %><% end %>
 </div>
-<%= pm_req_section(:cr) %>
 <h2><%= link_to l(:label_pm_crs), project_pm_change_requests_path(@project) %> &#187; <%= c.code %></h2>
 <div class="qa_box">
   <h3 class="qa_tit"><%= c.title %></h3>

@@ -81,36 +81,70 @@ $(function() {
   });
 });
 
-/* 프로젝트 메뉴 대분류: 지금 대분류의 메뉴 줄(.nav_sub)을 머리글 바로 아래로 (krds_ui MenuGroups) */
-$(function() {
-  var $sub = $('#main-menu > .nav_sub');
-  if ($sub.length) $sub.insertAfter('#header');
-});
-
-/* 프로젝트 메뉴 대분류 펼침 패널 (KRDS 메인 메뉴형): 데스크톱에서 대분류를 누르면 머리글 아래 전체 너비 패널,
- * 다시 누르기·닫기 버튼·Esc·바깥 누르기로 닫힘, aria-expanded 로 상태 표시. 모바일은 오른쪽 메뉴 패널 그대로 */
+/* 메인 메뉴 — KRDS 메인 메뉴 2뎁스 (krds_ui MenuGroups)
+ * PC: 1뎁스 버튼을 누르면(마우스오버 아님) 머리글 아래 2뎁스 패널 + 화면 어둡게. 다시 누르기·바깥·어두운 곳·Esc 로 닫힘(Esc 는 1뎁스로 초점)
+ * 모바일: 메뉴 레이어를 전체 화면으로, 위에 "전체 메뉴"·닫기, 일반 메뉴를 위쪽 버튼 줄로, 프로젝트 메뉴는 왼쪽 세로 탭 + 오른쪽 2뎁스(스크롤 위치에 따라 탭 표시) */
 $(function() {
   var $panels = $('.gnb_panel');
-  if (!$panels.length) return;
-  var $layer = $('<div class="gnb_layer"></div>').insertAfter('#header');
-  $panels.appendTo($layer);
-  function desktop() { return window.matchMedia('(min-width:900px)').matches; }
-  function close(focus) {
-    var $t = $('#main-menu a.nav_grp[aria-expanded="true"]');
-    $t.attr('aria-expanded', 'false');
-    $layer.find('.gnb_panel').prop('hidden', true);
-    if (focus && $t.length) $t.trigger('focus');
+  if ($panels.length) {
+    var $layer = $('<div class="gnb_layer"></div>').insertAfter('#header');
+    var $dim = $('<div class="gnb_dim" hidden></div>').appendTo('body');
+    $panels.appendTo($layer);
+    var close = function(focus) {
+      var $t = $('#main-menu .gnb_trigger[aria-expanded="true"]');
+      $t.attr('aria-expanded', 'false');
+      $layer.find('.gnb_panel').prop('hidden', true);
+      $dim.prop('hidden', true);
+      if (focus && $t.length) $t.trigger('focus');
+    };
+    $(document).on('click', '#main-menu .gnb_trigger[aria-controls]', function(e) {
+      e.preventDefault();
+      var $t = $(this), open = $t.attr('aria-expanded') === 'true';
+      close(false);
+      if (open) return;
+      $t.attr('aria-expanded', 'true');
+      $('#' + $t.attr('aria-controls')).prop('hidden', false);
+      $dim.prop('hidden', false);
+    });
+    $dim.on('click', function() { close(false); });
+    $(document).on('keydown', function(e) { if (e.key === 'Escape' && !$dim.prop('hidden')) close(true); });
+    $(document).on('click', function(e) { if (!$(e.target).closest('#main-menu, .gnb_layer').length) close(false); });
+    $(window).on('resize', function() { if (!window.matchMedia('(min-width:900px)').matches) close(false); });
   }
-  $('#main-menu').on('click', 'a.nav_grp[aria-controls]', function(e) {
-    if (!desktop()) return;
+
+  var $fly = $('.js-flyout-menu');
+  if (!$fly.length) return;
+  var $head = $('<div class="mnav_head"><span>전체 메뉴</span><button type="button" class="mnav_close"></button></div>');
+  $head.find('.mnav_close').attr('aria-label', '메뉴 닫기').html('&times;').on('click', function() { if (typeof closeFlyout === 'function') closeFlyout(); });
+  $fly.prepend($head);
+  // 일반 메뉴(초기화면·내 페이지 …)는 사용자 정보 바로 아래 버튼 줄로
+  var $gen = $fly.find('.js-general-menu');
+  $gen.prev('h3').hide();
+  var $after = $fly.find('.flyout-menu__avatar').length ? $fly.find('.flyout-menu__avatar') : $head;
+  $gen.insertAfter($after);
+  var $m = $('#main-menu .mnav');
+  var $pm = $fly.find('.js-project-menu');
+  if (!$m.length || !$pm.length) return;
+  $pm.prev('h3').hide();
+  $m.prependTo($pm);
+  var $tabs = $m.find('.mnav_tabs a'), $secs = $m.find('.mnav_sec');
+  $tabs.on('click', function(e) {
     e.preventDefault();
-    var $t = $(this), open = $t.attr('aria-expanded') === 'true';
-    close(false);
-    if (open) return;
-    $t.attr('aria-expanded', 'true');
-    $('#' + $t.attr('aria-controls')).prop('hidden', false);
+    var $s = $($(this).attr('href'));
+    if (!$s.length) return;
+    $fly.scrollTop($fly.scrollTop() + ($s.offset().top - $fly.offset().top) - 56);
   });
-  $layer.on('click', '.gnb_close', function() { close(true); });
-  $(document).on('keydown', function(e) { if (e.key === 'Escape') close(true); });
-  $(document).on('click', function(e) { if (!$(e.target).closest('#main-menu, .gnb_layer').length) close(false); });
+  $fly.on('scroll', function() {
+    var top = $fly.offset().top + 64, cur = null;
+    $secs.each(function() { if ($(this).offset().top <= top + 4) cur = this.id; });
+    if (!cur) cur = $secs.first().attr('id');
+    $tabs.each(function() { var on = $(this).attr('href') === '#' + cur; $(this).toggleClass('on', on).attr('aria-selected', on ? 'true' : 'false'); });
+  });
+  // 레이어를 열면 지금 메뉴가 있는 묶음으로
+  $(document).on('click', '.js-flyout-menu-toggle-button', function() {
+    setTimeout(function() {
+      var $cur = $m.find('.mnav_sec a.on').closest('.mnav_sec');
+      if ($cur.length) $fly.scrollTop($fly.scrollTop() + ($cur.offset().top - $fly.offset().top) - 56);
+    }, 50);
+  });
 });

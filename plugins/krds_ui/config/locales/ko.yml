@@ -57,7 +57,8 @@ ko:
   label_nav_docs: 산출물
   label_nav_collab: 협업
   label_nav_etc: 기타
-  label_nav_section: 구역
+  label_nav_main: 메인 메뉴
+  label_nav_all: 전체 메뉴
   label_nav_close: 메뉴 닫기
   label_nav_desc_overview: 프로젝트 현황과 최근 활동
   label_nav_desc_work: 할 일 · 일정 · 투입 시간

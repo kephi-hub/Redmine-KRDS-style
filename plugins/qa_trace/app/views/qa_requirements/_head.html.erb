@@ -5,10 +5,6 @@
   <% if can_edit %><%= link_to sprite_icon('import', l(:label_qa_import)), project_qa_requirements_import_path(@project), :class => 'icon icon-import' %><% end %>
   <%= link_to sprite_icon('download', l(:label_qa_export)), project_qa_requirements_export_path(@project), :class => 'icon icon-download' %>
 </div>
-<%= krds_section_tabs([
-      [l(:label_qa_requirements), project_qa_requirements_path(@project), true],
-      (defined?(PmChangeRequest) && @project.module_enabled?(:change_requests) && User.current.allowed_to?(:view_change_requests, @project) ? [l(:label_pm_crs), project_pm_change_requests_path(@project), false] : nil)
-    ]) if respond_to?(:krds_section_tabs) %>
 <h2><%= l(:label_qa_requirements) %></h2>
 <p class="subtitle"><%= l(current == :trace ? :text_qa_trace : :text_qa_requirements) %></p>
 <%= render :partial => 'qa_requirements/tabs', :locals => { :current => current } %>

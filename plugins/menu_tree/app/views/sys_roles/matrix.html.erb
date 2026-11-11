@@ -3,7 +3,6 @@
 <div class="contextual">
   <%= link_to sprite_icon('download', l(:label_sys_export)), project_sys_roles_export_path(@project), :class => 'icon icon-download' %>
 </div>
-<%= render :partial => 'menu_items/section', :locals => { :current => :roles } %>
 <h2><%= l(:label_sys_roles) %></h2>
 <p class="subtitle"><%= l(:text_sys_matrix) %></p>
 <%= render :partial => 'sys_roles/tabs', :locals => { :current => :matrix } %>

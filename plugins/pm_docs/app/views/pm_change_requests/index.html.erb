@@ -4,7 +4,6 @@
   <% if can_edit %><%= link_to sprite_icon('add', l(:label_pm_cr_new)), new_project_pm_change_request_path(@project), :class => 'icon icon-add' %><% end %>
   <%= link_to sprite_icon('download', l(:label_pm_cr_export)), project_pm_change_requests_export_path(@project), :class => 'icon icon-download' %>
 </div>
-<%= pm_req_section(:cr) %>
 <h2><%= l(:label_pm_crs) %></h2>
 <p class="subtitle"><%= l(:text_pm_crs) %></p>
 <ul class="db_stats mt_kpi">

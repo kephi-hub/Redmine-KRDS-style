@@ -11,7 +11,7 @@
 # config/locales/ko.yml : core 한국어 번역 누락분 보충
 # lib/krds_ui/xlsx.rb · xlsx_reader.rb : 엑셀 쓰기·읽기 공통 (rubyzip·nokogiri, 추가 gem 없음)
 # assets/javascripts/mermaid*.js : Mermaid 11.4.1(MIT) 포함 — 본문 ```mermaid 그림, DB ERD·메뉴 구조도 공통 (KrdsUi::MermaidHook)
-# 프로젝트 메뉴 대분류 : KrdsUi::MenuGroups (lib/krds_ui/menu_groups.rb) — 위쪽 대분류 + 아래 줄 메뉴, 합친 메뉴는 화면 안 구역 탭(krds_section_tabs)
+# 메인 메뉴 : KrdsUi::MenuGroups (lib/krds_ui/menu_groups.rb) — KRDS 메인 메뉴 2뎁스(PC 펼침 패널, 모바일 세로 탭 레이어)
 # User#initials : 한글 이름이면 아바타에 이름(firstname) 두 글자 표시 (강윤아 → 윤아)
 
 module KrdsUi
@@ -97,9 +97,8 @@ NewsController.prepend(KrdsUi::NewsSearchPatch) unless NewsController.ancestors.
 require_relative 'lib/krds_ui/xlsx'
 require_relative 'lib/krds_ui/xlsx_reader'
 require_relative 'lib/krds_ui/menu_groups'
-# 프로젝트 메뉴 대분류(개요·일감·설계·개발·운영·산출물·협업)와 합친 메뉴의 구역 탭
+# 메인 메뉴: KRDS 메인 메뉴 2뎁스 형태(PC 펼침 패널 · 모바일 세로 탭), 프로젝트 메뉴는 대분류 아래 2뎁스
 Redmine::MenuManager::MenuHelper.prepend(KrdsUi::MenuHelperPatch) unless Redmine::MenuManager::MenuHelper.ancestors.include?(KrdsUi::MenuHelperPatch)
-ApplicationHelper.include(KrdsUi::SectionTabsHelper) unless ApplicationHelper.ancestors.include?(KrdsUi::SectionTabsHelper)
 
 # Mermaid 공통: 본문 ```mermaid 그림, ERD·메뉴 구조도 그리기·저장 (assets/javascripts/mermaid_loader.js)
 module KrdsUi

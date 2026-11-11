@@ -24,13 +24,4 @@ module PmDocsHelper
     pct = total.to_i.positive? ? done * 100 / total : 0
     content_tag(:span, content_tag(:span, '', style: "width:#{pct}%"), class: 'mt_bar') + content_tag(:span, "#{pct}%", class: 'mt_pct')
   end
-
-  # 요구사항 · 변경요청 구역 탭 (프로젝트 메뉴에서는 하나로 합쳐 보임)
-  def pm_req_section(current)
-    return ''.html_safe unless respond_to?(:krds_section_tabs)
-    krds_section_tabs([
-      (@project.module_enabled?(:qa_requirements) && User.current.allowed_to?(:view_qa_requirements, @project) ? [l(:label_qa_requirements), project_qa_requirements_path(@project), current == :req] : nil),
-      (@project.module_enabled?(:change_requests) && User.current.allowed_to?(:view_change_requests, @project) ? [l(:label_pm_crs), project_pm_change_requests_path(@project), current == :cr] : nil)
-    ])
-  end
 end

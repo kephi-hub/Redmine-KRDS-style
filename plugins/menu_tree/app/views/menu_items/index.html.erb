@@ -7,7 +7,6 @@
   <% end %>
   <%= link_to sprite_icon('download', l(:label_menu_export)), project_menu_items_export_path(@project), :class => 'icon icon-download' %>
 </div>
-<%= render :partial => 'menu_items/section', :locals => { :current => :menu } %>
 <h2><%= l(:label_menu_tree) %></h2>
 <p class="subtitle"><%= l(:text_menu_tree) %></p>
 <%= menu_view_tabs(:grid) %>

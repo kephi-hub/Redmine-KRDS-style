@@ -1,103 +1,99 @@
-# 프로젝트 메뉴 대분류 — 위쪽은 대분류(개요·일감·설계·개발·운영·산출물·협업), 지금 대분류의 메뉴는 아래 한 줄(.nav_sub)
-# - 대분류 링크는 그 안에서 쓸 수 있는 첫 메뉴, 쓸 수 있는 메뉴가 없으면 숨김
-# - 합친 메뉴(MERGED): 대표 메뉴가 보이면 위쪽 메뉴에서는 숨기고 화면 안 구역 탭으로 (대표가 없으면 그대로 보임)
-# - 목록에 없는 메뉴(새 플러그인)는 "기타"
+# 메인 메뉴 — KRDS 메인 메뉴(2뎁스) 형태 (https://www.krds.go.kr/html/site/component/component_03_02.html)
+# - PC: 1뎁스는 하위 메뉴가 있으면 버튼(꺾쇠·열림 막대), 없으면 링크. 누르면(마우스오버 아님) 머리글 아래 전체 너비 2뎁스 패널 + 화면 어둡게
+#   (theme.js 가 패널을 머리글 아래로 옮기고 열기·닫기·Esc 처리)
+# - 모바일: 오른쪽 메뉴 레이어 안에 왼쪽 1뎁스 세로 탭 + 오른쪽 2뎁스 묶음(이어서 스크롤, 스크롤 위치에 따라 탭 표시) — .mnav
+# - 프로젝트 메뉴: 대분류(개요·일감·설계·개발·운영·산출물·협업) 아래 2뎁스, 목록에 없는 메뉴(새 플러그인)는 "기타"
+# - 초기화면 등 프로젝트 밖 메뉴(application_menu): 1뎁스 링크만
 # - 권한·주소는 Redmine 메뉴 그대로 (menu_items_for 가 권한 확인)
 module KrdsUi
   module MenuGroups
     GROUPS = [
       [:overview, %i(overview activity)],
       [:work, %i(issues new_issue gantt calendar roadmap time_entries)],
-      [:design, %i(qa_requirements menu_items glossary)],
+      [:design, %i(qa_requirements change_requests menu_items sys_roles glossary)],
       [:dev, %i(repository programs db_schemas qa_tests deploys)],
       [:ops, %i(ops_assets ops_schedules ops_incidents ops_interfaces keys)],
       [:docs, %i(deliverables meetings risks documents files)],
       [:collab, %i(wiki boards news)]
     ].freeze
-    MERGED = { sys_roles: :menu_items, change_requests: :qa_requirements }.freeze
     FIXED = %i(new_object settings).freeze
   end
 
-  # KRDS 메인 메뉴형 펼침 패널 (데스크톱): 왼쪽 대분류 제목·설명, 오른쪽 하위 메뉴(이름 + 한 줄 설명)
-  module GnbPanel
-    private
-
-    def krds_gnb_panel(pid, key, label, entries)
-      links = entries.map do |n, caption, url, sel|
-        desc = l("label_nav_desc_#{n.name}", default: '')
-        content_tag(:li, link_to(safe_join([content_tag(:strong, caption), (content_tag(:span, desc) if desc.present?)].compact), url,
-                                 class: (sel ? 'on' : nil), 'aria-current': (sel ? 'page' : nil)))
-      end
-      head = content_tag(:div, content_tag(:strong, label, class: 'gnb_tit') + content_tag(:p, l("label_nav_desc_#{key}", default: '')), class: 'gnb_head')
-      close = content_tag(:button, content_tag(:span, l(:label_nav_close), class: 'gnb_sr'), type: 'button', class: 'gnb_close')
-      content_tag(:div, content_tag(:div, head + content_tag(:ul, safe_join(links), class: 'gnb_list') + close, class: 'gnb_inner'),
-                  id: pid, class: 'gnb_panel', hidden: true, role: 'region', 'aria-label': label)
-    end
-  end
-
   module MenuHelperPatch
-    include GnbPanel
-
     def render_main_menu(project)
-      return super unless project && !project.new_record? && controller.current_menu(project) == :project_menu
-      krds_grouped_menu(project) || super
+      menu = controller.current_menu(project)
+      return super unless menu
+      return (krds_grouped_menu(project) || super) if menu == :project_menu && project && !project.new_record?
+      krds_flat_menu(menu, project) || super
     end
 
     private
+
+    def krds_entries(nodes, project, current)
+      nodes.map do |n|
+        caption, url, _ = extract_node_details(n, project)
+        [n, caption, url, n.name == current]
+      end
+    end
+
+    def krds_link(caption, url, sel, css)
+      link_to(caption, url, class: [css, (sel ? 'on' : nil)].compact.join(' '), 'aria-current': (sel ? 'page' : nil))
+    end
+
+    # 프로젝트 밖 메뉴: 1뎁스 링크만 (모바일 레이어에서는 목록)
+    def krds_flat_menu(menu, project)
+      nodes = []
+      menu_items_for(menu, project) { |n| nodes << n }
+      return nil if nodes.empty?
+      lis = krds_entries(nodes, project, current_menu_item).map do |n, caption, url, sel|
+        content_tag(:li, krds_link(caption, url, sel, "gnb_trigger is_link #{n.name}"))
+      end
+      content_tag(:ul, safe_join(lis), class: 'gnb_menu')
+    end
 
     def krds_grouped_menu(project)
       nodes = []
       menu_items_for(:project_menu, project) { |n| nodes << n }
       return nil if nodes.empty?
       by = nodes.index_by(&:name)
-      merged = KrdsUi::MenuGroups::MERGED
-      hidden = merged.select { |child, parent| by[child] && by[parent] }.keys
       current = current_menu_item
-      current = merged[current] if hidden.include?(current)
-      known = KrdsUi::MenuGroups::GROUPS.flat_map(&:last) + merged.keys + KrdsUi::MenuGroups::FIXED
-      groups = KrdsUi::MenuGroups::GROUPS.map do |key, names|
-        list = names.flat_map { |n| [n] + merged.select { |c, p| p == n && !hidden.include?(c) }.keys }
-        [key, list.filter_map { |n| by[n] }]
-      end
-      etc = nodes.reject { |n| known.include?(n.name) }
-      groups << [:etc, etc]
+      known = KrdsUi::MenuGroups::GROUPS.flat_map(&:last) + KrdsUi::MenuGroups::FIXED
+      groups = KrdsUi::MenuGroups::GROUPS.map { |key, names| [key, names.filter_map { |n| by[n] }] }
+      groups << [:etc, nodes.reject { |n| known.include?(n.name) }]
       groups.reject! { |_, list| list.empty? }
-      sub = nil
       lis = []
+      mtabs = []
+      msecs = []
       lis << render_menu_node(by[:new_object], project) if by[:new_object]
       groups.each do |key, list|
-        entries = list.map { |n| caption, url, _ = extract_node_details(n, project); [n, caption, url, n.name == current] }
+        entries = krds_entries(list, project, current)
         active = entries.any?(&:last)
         label = l("label_nav_#{key}")
-        first = entries.first
+        pid = "gnb_p_#{key}"
+        mid = "mnav_#{key}"
+        links = safe_join(entries.map { |_, caption, url, sel| content_tag(:li, krds_link(caption, url, sel, 'gnb_link')) })
         if entries.size == 1
-          lis << content_tag(:li, link_to(label, first[2], class: "nav_grp #{'selected' if active}".strip, title: first[1]))
+          _, caption, url, sel = entries.first
+          lis << content_tag(:li, link_to(label, url, class: "gnb_trigger is_link#{' selected' if active}", title: caption, 'aria-current': (sel ? 'page' : nil)))
         else
-          items = safe_join(entries.map { |n, caption, url, sel| content_tag(:li, render_single_menu_node(n, caption, url, sel)) })
-          pid = "gnb_p_#{key}"
-          trigger = link_to(safe_join([label, content_tag(:span, '', class: 'gnb_arrow', 'aria-hidden': 'true')]), first[2],
-                            class: "nav_grp #{'selected' if active}".strip, 'aria-expanded': 'false', 'aria-controls': pid)
-          lis << content_tag(:li, trigger + content_tag(:ul, items, class: 'menu-children') + krds_gnb_panel(pid, key, label, entries), class: 'nav_parent')
-          sub = items if active
+          trigger = content_tag(:button, label, type: 'button', class: "gnb_trigger#{' selected' if active}", 'aria-expanded': 'false', 'aria-controls': pid)
+          panel = content_tag(:div, content_tag(:div, content_tag(:h2, label, class: 'gnb_tit') + content_tag(:ul, links, class: 'gnb_list'), class: 'gnb_inner'),
+                              id: pid, class: 'gnb_panel', hidden: true)
+          lis << content_tag(:li, trigger + panel)
         end
+        mtabs << content_tag(:li, link_to(label, "##{mid}", class: (active ? 'on' : nil), 'aria-selected': (active ? 'true' : 'false')))
+        msecs << content_tag(:div, content_tag(:h2, label, class: 'mnav_tit') + content_tag(:ul, links), id: mid, class: 'mnav_sec')
       end
       if (s = by[:settings])
         caption, url, sel = extract_node_details(s, project)
-        lis << content_tag(:li, render_single_menu_node(s, caption, url, sel))
+        lis << content_tag(:li, link_to(caption, url, class: "gnb_trigger is_link#{' selected' if sel}", 'aria-current': (sel ? 'page' : nil)))
+        mid = 'mnav_settings'
+        mtabs << content_tag(:li, link_to(caption, "##{mid}", class: (sel ? 'on' : nil), 'aria-selected': (sel ? 'true' : 'false')))
+        msecs << content_tag(:div, content_tag(:h2, caption, class: 'mnav_tit') + content_tag(:ul, content_tag(:li, krds_link(caption, url, sel, 'gnb_link'))), id: mid, class: 'mnav_sec')
       end
-      html = content_tag(:ul, safe_join(lis))
-      html += content_tag(:div, content_tag(:ul, sub), class: 'nav_sub') if sub
-      html
-    end
-  end
-
-  # 합친 메뉴의 화면 위 구역 탭 — items: [[이름, 주소, 지금 화면?], …] (보일 것만), 2개 이상일 때만
-  module SectionTabsHelper
-    def krds_section_tabs(items)
-      items = items.compact
-      return ''.html_safe if items.size < 2
-      content_tag(:nav, safe_join(items.map { |label, url, on| link_to(label, url, class: (on ? 'on' : nil), 'aria-current': (on ? 'page' : nil)) }),
-                  class: 'nav_sec', 'aria-label': l(:label_nav_section))
+      mobile = content_tag(:div, content_tag(:ul, safe_join(mtabs), class: 'mnav_tabs') + content_tag(:div, safe_join(msecs), class: 'mnav_body'),
+                           class: 'mnav', 'aria-label': l(:label_nav_main))
+      content_tag(:ul, safe_join(lis), class: 'gnb_menu') + mobile
     end
   end
 end

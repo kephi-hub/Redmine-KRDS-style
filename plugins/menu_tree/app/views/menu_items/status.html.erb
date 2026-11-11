@@ -1,5 +1,4 @@
 <%# 프로젝트 > 메뉴 구조도 > 현황 — 화면(말단 메뉴) 기준 일감 연결·완료·진행률, 1뎁스별·화면 유형별, 일감 없는 화면 %>
-<%= render :partial => 'menu_items/section', :locals => { :current => :menu } %>
 <h2><%= l(:label_menu_tree) %></h2>
 <%= menu_view_tabs(:status) %>
 <% if @ordered.empty? %>

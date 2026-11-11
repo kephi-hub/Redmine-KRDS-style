@@ -1,4 +1,3 @@
-<%= pm_req_section(:cr) %>
 <h2><%= link_to l(:label_pm_crs), project_pm_change_requests_path(@project) %> &#187; <%= link_to @cr.code, project_pm_change_request_path(@project, @cr) %> &#187; <%= l(:button_edit) %></h2>
 <%= labelled_form_for @cr, :url => project_pm_change_request_path(@project, @cr), :method => :patch do |f| %>
   <%= render :partial => 'pm_change_requests/form', :locals => { :f => f } %>
