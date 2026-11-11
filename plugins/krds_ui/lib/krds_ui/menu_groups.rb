@@ -20,7 +20,7 @@ module KrdsUi
     # 2뎁스 메뉴 아이콘 (Redmine 6 기본 아이콘 세트 config/icon_source.yml 의 이름), 없는 메뉴는 FALLBACK
     ICONS = {
       overview: 'project', activity: 'history',
-      issues: 'issue', new_issue: 'add', gantt: 'stats', calendar: 'bookmarked', roadmap: 'package', time_entries: 'time',
+      issues: 'issue', new_issue: 'add', gantt: 'stats', calendar: 'calendar', roadmap: 'package', time_entries: 'time',
       qa_requirements: 'checked', change_requests: 'issue-edit', menu_items: 'list', sys_roles: 'roles', glossary: 'bulb',
       repository: 'changeset', programs: 'apps', db_schemas: 'table-multiple', qa_tests: 'shield-check', deploys: 'arrow-narrow-right',
       ops_assets: 'server-authentication', ops_schedules: 'hourglass', ops_incidents: 'alert-circle', ops_interfaces: 'link', keys: 'key',
@@ -28,6 +28,12 @@ module KrdsUi
       wiki: 'wiki-page', boards: 'message', news: 'news', settings: 'settings'
     }.freeze
     FALLBACK_ICON = 'arrow-right'
+    # Redmine 기본 아이콘 세트에 없는 아이콘 — Tabler Icons(MIT) 선 아이콘을 그대로 (stroke 는 CSS)
+    INLINE_ICONS = {
+      'calendar' => '<svg class="s18 icon-svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' \
+                    '<path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"/><path d="M16 3v4"/><path d="M8 3v4"/>' \
+                    '<path d="M4 11h16"/><path d="M11 15h1"/><path d="M12 15v3"/></svg>'
+    }.freeze
     # 프로젝트 모듈 선택 화면의 대분류 (메뉴와 같은 묶음, 목록에 없는 모듈은 "기타")
     MODULE_GROUPS = [
       [:work, %w(issue_tracking time_tracking gantt calendar)],
@@ -57,7 +63,9 @@ module KrdsUi
     end
 
     def krds_link(caption, url, sel, css, name = nil)
-      body = name ? safe_join([content_tag(:span, sprite_icon(KrdsUi::MenuGroups::ICONS[name] || KrdsUi::MenuGroups::FALLBACK_ICON), class: 'gnb_ico', 'aria-hidden': 'true'),
+      icon = KrdsUi::MenuGroups::ICONS[name] || KrdsUi::MenuGroups::FALLBACK_ICON
+      svg = KrdsUi::MenuGroups::INLINE_ICONS[icon]&.html_safe || sprite_icon(icon)
+      body = name ? safe_join([content_tag(:span, svg, class: 'gnb_ico', 'aria-hidden': 'true'),
                                content_tag(:span, caption)]) : caption
       link_to(body, url, class: [css, (sel ? 'on' : nil)].compact.join(' '), 'aria-current': (sel ? 'page' : nil))
     end

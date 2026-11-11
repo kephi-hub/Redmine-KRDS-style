@@ -148,3 +148,12 @@ $(function() {
     }, 50);
   });
 });
+
+/* 저장소 화면: 원본 오른쪽 버튼(통계·더보기·개정판)을 "저장소" 제목 줄(.repo_bar, site_tools 훅) 버튼 영역으로 */
+$(function() {
+  var $btns = $('#content > .repo_bar .repo_btns');
+  if (!$btns.length) return;
+  var $ctx = $('#content > .contextual').first();
+  if ($ctx.length) $btns.prepend($ctx.children());
+  $ctx.remove();
+});
