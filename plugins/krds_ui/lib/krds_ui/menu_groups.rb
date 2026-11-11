@@ -17,6 +17,17 @@ module KrdsUi
       [:collab, %i(wiki boards news)]
     ].freeze
     FIXED = %i(new_object settings).freeze
+    # 2뎁스 메뉴 아이콘 (Redmine 6 기본 아이콘 세트 config/icon_source.yml 의 이름), 없는 메뉴는 FALLBACK
+    ICONS = {
+      overview: 'project', activity: 'history',
+      issues: 'issue', new_issue: 'add', gantt: 'stats', calendar: 'bookmarked', roadmap: 'package', time_entries: 'time',
+      qa_requirements: 'checked', change_requests: 'issue-edit', menu_items: 'list', sys_roles: 'roles', glossary: 'bulb',
+      repository: 'changeset', programs: 'apps', db_schemas: 'table-multiple', qa_tests: 'shield-check', deploys: 'arrow-narrow-right',
+      ops_assets: 'server-authentication', ops_schedules: 'hourglass', ops_incidents: 'alert-circle', ops_interfaces: 'link', keys: 'key',
+      deliverables: 'folder-open', meetings: 'comments', risks: 'warning', documents: 'document', files: 'file',
+      wiki: 'wiki-page', boards: 'message', news: 'news', settings: 'settings'
+    }.freeze
+    FALLBACK_ICON = 'arrow-right'
     # 프로젝트 모듈 선택 화면의 대분류 (메뉴와 같은 묶음, 목록에 없는 모듈은 "기타")
     MODULE_GROUPS = [
       [:work, %w(issue_tracking time_tracking gantt calendar)],
@@ -45,8 +56,10 @@ module KrdsUi
       end
     end
 
-    def krds_link(caption, url, sel, css)
-      link_to(caption, url, class: [css, (sel ? 'on' : nil)].compact.join(' '), 'aria-current': (sel ? 'page' : nil))
+    def krds_link(caption, url, sel, css, name = nil)
+      body = name ? safe_join([content_tag(:span, sprite_icon(KrdsUi::MenuGroups::ICONS[name] || KrdsUi::MenuGroups::FALLBACK_ICON), class: 'gnb_ico', 'aria-hidden': 'true'),
+                               content_tag(:span, caption)]) : caption
+      link_to(body, url, class: [css, (sel ? 'on' : nil)].compact.join(' '), 'aria-current': (sel ? 'page' : nil))
     end
 
     # 프로젝트 밖 메뉴: 1뎁스 링크만 (모바일 레이어에서는 목록)
@@ -80,7 +93,7 @@ module KrdsUi
         label = l("label_nav_#{key}")
         pid = "gnb_p_#{key}"
         mid = "mnav_#{key}"
-        links = safe_join(entries.map { |_, caption, url, sel| content_tag(:li, krds_link(caption, url, sel, 'gnb_link')) })
+        links = safe_join(entries.map { |n, caption, url, sel| content_tag(:li, krds_link(caption, url, sel, 'gnb_link', n.name)) })
         if entries.size == 1
           _, caption, url, sel = entries.first
           lis << content_tag(:li, link_to(label, url, class: "gnb_trigger is_link#{' selected' if active}", title: caption, 'aria-current': (sel ? 'page' : nil)))
@@ -98,7 +111,7 @@ module KrdsUi
         lis << content_tag(:li, link_to(caption, url, class: "gnb_trigger is_link#{' selected' if sel}", 'aria-current': (sel ? 'page' : nil)))
         mid = 'mnav_settings'
         mtabs << content_tag(:li, link_to(caption, "##{mid}", class: (sel ? 'on' : nil), 'aria-selected': (sel ? 'true' : 'false')))
-        msecs << content_tag(:div, content_tag(:h2, caption, class: 'mnav_tit') + content_tag(:ul, content_tag(:li, krds_link(caption, url, sel, 'gnb_link'))), id: mid, class: 'mnav_sec')
+        msecs << content_tag(:div, content_tag(:h2, caption, class: 'mnav_tit') + content_tag(:ul, content_tag(:li, krds_link(caption, url, sel, 'gnb_link', :settings))), id: mid, class: 'mnav_sec')
       end
       mobile = content_tag(:div, content_tag(:ul, safe_join(mtabs), class: 'mnav_tabs') + content_tag(:div, safe_join(msecs), class: 'mnav_body'),
                            class: 'mnav', 'aria-label': l(:label_nav_main))
