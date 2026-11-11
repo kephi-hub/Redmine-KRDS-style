@@ -982,6 +982,16 @@ table.list.db_cols td.name code{font-size:0.9375rem;color:var(--gray_95);}
 .db_key{display:inline-flex;align-items:center;height:20px;padding:0 6px;border-radius:var(--radius_s);font-size:0.6875rem;font-weight:700;}
 .db_key.db_pk{background:var(--war_10);color:var(--war_60);}
 .db_key.db_uk{background:var(--pri_10);color:var(--pri_60);}
+.db_key.db_ix{background:var(--gray_10);color:var(--gray_70);}
+.db_idxcol{display:inline-block;margin:0 8px 0 0;font-family:monospace;font-size:0.8125rem;}
+.db_read{margin:0 0 10px;font-size:0.8125rem;color:var(--gray_50);}
+#content a.db_refresh{display:inline-flex;align-items:center;gap:4px;}
+#content a.db_refresh .icon-svg{width:14px;height:14px;}
+#content .db_hop .btn_line,#content #db_hop_add{display:inline-flex;align-items:center;height:32px;padding:0 12px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.8125rem;font-weight:500;color:var(--pri_60);cursor:pointer;}
+#content .db_hop .db_hop_del{border-color:var(--dan_50);color:var(--dan_60);}
+.db_hop{padding:8px 0 4px;margin:10px 0;border:0;border-top:1px dashed var(--gray_30);}
+.db_hop legend{padding:0 6px 0 0;font-size:0.875rem;font-weight:700;color:var(--gray_80);}
+#content .db_hop[hidden],#content .db_hop [hidden],#content #db_hop_add[hidden]{display:none;}
 .db_key.db_fk{background:var(--suc_10);color:var(--suc_60);}
 .db_ref{font-size:0.8125rem;color:var(--gray_50);}
 .db_term{display:inline-flex;align-items:center;min-height:24px;padding:0 8px;border-radius:12px;font-size:0.75rem;font-weight:500;}

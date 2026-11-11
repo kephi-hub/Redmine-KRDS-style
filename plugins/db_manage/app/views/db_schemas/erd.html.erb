@@ -43,6 +43,7 @@
       <% q = request.query_parameters.except('download') %>
       <%= link_to sprite_icon('download', '.md'), project_db_erd_path(@project, @link, q.merge(:download => 'md')), :class => 'btn_line', :title => l(:text_db_erd_md) %>
       <%= link_to sprite_icon('download', '.mmd'), project_db_erd_path(@project, @link, q.merge(:download => 'mmd')), :class => 'btn_line', :title => l(:text_db_erd_mmd) %>
+      <%= link_to sprite_icon('download', 'draw.io'), project_db_erd_path(@project, @link, q.merge(:download => 'drawio')), :class => 'btn_line', :title => l(:text_db_erd_drawio) %>
       <a href="#" class="btn_line" id="erd_svg"><%= sprite_icon('download', 'SVG') %></a>
       <a href="#" class="btn_line" id="erd_png"><%= sprite_icon('download', 'PNG') %></a>
     </p>

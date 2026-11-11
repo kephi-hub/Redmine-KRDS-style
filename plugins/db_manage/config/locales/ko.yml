@@ -178,6 +178,32 @@ ko:
   text_db_erd_error: ERD 를 그리지 못했습니다.
   text_db_erd_md: 마크다운 문서 (```mermaid 블록 + 테이블 목록)
   text_db_erd_mmd: Mermaid 원문
+  label_db_hop: "%{n}번째 경유 서버"
+  text_db_hop_host: 앞 서버에서 본 이 서버의 주소
+  label_db_hop_delete: 이 경유 서버 빼기
+  label_db_hop_add: 경유 서버 추가
+  text_db_hop_info: "예: Redmine → WEB → WAS → DB 처럼 여러 서버를 거쳐야 할 때 (최대 3대). DB 호스트는 마지막 서버에서 본 주소로 적습니다."
+  label_db_read_at: "%{time} 에 읽은 정보 (10분 동안 보관)"
+  label_db_refresh: 새로 고침
+  label_db_indexes: 인덱스
+  text_db_no_index: 인덱스가 없습니다.
+  label_db_idx_kind: 구분
+  label_db_idx_columns: 컬럼 (순서)
+  label_db_idx_method: 방식
+  label_db_indexed: 인덱스에 포함된 컬럼
+  label_db_check_tab_name: "컬럼명 점검 (%{count})"
+  label_db_check_tab_comment: "설명 누락 (%{count})"
+  label_db_check_tab_mismatch: "설명 불일치 (%{count})"
+  text_db_check_comment: 설명(코멘트)이 없는 테이블·컬럼입니다. 정의서·ERD 품질을 위해 채워 두면 좋습니다.
+  label_db_no_comment_tables: 설명 없는 테이블
+  label_db_no_comment_columns: 설명 없는 컬럼
+  label_db_all_commented: 모두 설명이 있습니다.
+  label_db_more: "외 %{count}개"
+  text_db_check_mismatch: 용어사전에 있는 컬럼인데, 컬럼 설명이 용어 이름과 다른 것입니다. (용어 이름으로 시작하면 같은 것으로 봅니다)
+  label_db_no_mismatch: 용어 이름과 다른 설명이 없습니다.
+  label_db_col_comment: 컬럼 설명
+  label_db_term_name: 용어사전 이름
+  text_db_erd_drawio: draw.io(diagrams.net)에서 열어 위치·선을 직접 고칠 수 있는 파일
   activerecord:
     attributes:
       db_server:

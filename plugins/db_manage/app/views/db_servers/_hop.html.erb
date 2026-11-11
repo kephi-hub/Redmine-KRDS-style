@@ -1,0 +1,27 @@
+<%# SSH 경유 서버 (첫 서버 다음) — i: 0·1, hop: 저장된 값(비밀값은 표시하지 않음) %>
+<% n = "db_server[ssh_hops][#{i}]"; key = hop && hop[:auth] == 'key' %>
+<fieldset class="db_hop" data-hop="<%= i %>"<%= raw(' hidden') unless hop %>>
+  <legend><%= l(:label_db_hop, :n => i + 2) %></legend>
+  <p><label><%= l(:field_db_ssh_host) %></label><%= text_field_tag "#{n}[host]", hop && hop[:host], :size => 40, :maxlength => 255, :id => nil, :placeholder => 'was.internal', :'aria-label' => l(:field_db_ssh_host) %>
+    <em class="info"><%= l(:text_db_hop_host) %></em></p>
+  <p><label><%= l(:field_db_port) %></label><%= number_field_tag "#{n}[port]", (hop && hop[:port]) || 22, :min => 1, :max => 65535, :id => nil, :'aria-label' => l(:field_db_port) %></p>
+  <p><label><%= l(:field_db_ssh_user) %></label><%= text_field_tag "#{n}[username]", hop && hop[:username], :size => 30, :maxlength => 120, :autocomplete => 'off', :id => nil, :'aria-label' => l(:field_db_ssh_user) %></p>
+  <p><label><%= l(:field_db_ssh_auth) %></label>
+    <span class="db_env_pick">
+      <label class="inline"><%= radio_button_tag "#{n}[auth]", 'password', !key, :class => 'db_hop_auth', :id => nil %> <%= l(:label_db_ssh_password) %></label>
+      <label class="inline"><%= radio_button_tag "#{n}[auth]", 'key', key, :class => 'db_hop_auth', :id => nil %> <%= l(:label_db_ssh_key) %></label>
+    </span></p>
+  <p class="db_hop_pw"<%= raw(' hidden') if key %>><label><%= l(:field_password) %></label><%= password_field_tag "#{n}[password]", '', :size => 30, :autocomplete => 'new-password', :id => nil, :'aria-label' => l(:field_password) %>
+    <% if hop && hop[:password].present? %><em class="info"><%= l(:label_db_password_keep) %></em><% end %></p>
+  <div class="db_hop_key"<%= raw(' hidden') unless key %>>
+    <p><label><%= l(:field_db_ssh_key) %></label><%= text_area_tag "#{n}[private_key]", '', :rows => 4, :cols => 60, :spellcheck => false, :autocomplete => 'off', :id => nil, :placeholder => "-----BEGIN OPENSSH PRIVATE KEY-----", :'aria-label' => l(:field_db_ssh_key) %>
+      <% if hop && hop[:private_key].present? %><em class="info"><%= l(:label_db_ssh_key_keep) %></em><% end %></p>
+    <p><label><%= l(:field_db_ssh_passphrase) %></label><%= password_field_tag "#{n}[passphrase]", '', :size => 30, :autocomplete => 'new-password', :id => nil, :'aria-label' => l(:field_db_ssh_passphrase) %></p>
+  </div>
+  <p><label><%= l(:label_db_ssh_fingerprint) %></label>
+    <% if hop && hop[:fingerprint].present? %>
+      <code class="db_fp"><%= hop[:fingerprint] %></code>
+      <label class="inline"><%= check_box_tag "#{n}[reset]", '1', false, :id => nil %> <%= l(:label_db_ssh_reset) %></label>
+    <% else %><span class="db_dim"><%= l(:text_db_ssh_fp_first) %></span><% end %></p>
+  <p><button type="button" class="btn_line db_hop_del"><%= l(:label_db_hop_delete) %></button></p>
+</fieldset>

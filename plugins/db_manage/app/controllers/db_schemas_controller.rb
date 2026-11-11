@@ -60,6 +60,13 @@ class DbSchemasController < ApplicationController
       { name: '컬럼 정의', header: %w(테이블명 테이블\ 설명 No 컬럼명 데이터\ 타입 Null 기본값 키 참조 설명 용어), rows: columns,
         widths: [26, 24, 6, 26, 20, 6, 18, 10, 24, 36, 18] }
     ]
+    idx_rows = []
+    snap[:tables].each do |t|
+      (snap[:indexes].to_h[t[:name]] || []).each do |i|
+        idx_rows << [t[:name], i[:name], i[:primary] ? 'PK' : (i[:unique] ? 'UNIQUE' : 'INDEX'), i[:columns].join(', '), i[:method]]
+      end
+    end
+    sheets << { name: '인덱스', header: %w(테이블명 인덱스명 구분 컬럼(순서) 방식), rows: idx_rows, widths: [26, 30, 10, 50, 10] } if idx_rows.any?
     # 시트 3: 뷰 정의·함수·프로시저·트리거·DB 잡·시퀀스 (엑셀 칸 최대 글자 수 때문에 정의는 3만 자까지)
     objects = []
     (snap[:kinds] - ['table']).each do |kind|
@@ -92,6 +99,8 @@ class DbSchemasController < ApplicationController
     case params[:download]
     when 'mmd'
       send_data @erd[:mermaid], filename: "#{base}.mmd", type: 'text/plain; charset=utf-8'
+    when 'drawio'
+      send_data DbManage::Erd.drawio(@erd, "#{@project.name} #{@link.name} ERD"), filename: "#{base}.drawio", type: 'application/xml; charset=utf-8'
     when 'md'
       info = "- DB: #{helpers.db_link_info(@link)}
 - 생성: #{format_time(Time.now)} · 테이블 #{@erd[:tables].size} · 관계 #{@erd[:relations].size}"
@@ -142,6 +151,21 @@ class DbSchemasController < ApplicationController
                        filename: "미등록컬럼_#{@project.identifier}_#{@link.name}_#{User.current.today.strftime('%Y%m%d')}.csv")
     end
     @shown = @status ? @rows.select { |r| r[:status] == @status } : @rows
+    @tab = %w(name comment mismatch).include?(params[:tab]) ? params[:tab] : 'name'
+    # 설명(코멘트)이 없는 테이블·컬럼
+    @no_comment_tables = snap[:tables].reject { |t| t[:view] || t[:comment].present? }
+    @no_comment_columns = snap[:tables].reject { |t| t[:view] }.flat_map do |t|
+      (snap[:columns][t[:name]] || []).select { |c| c[:comment].blank? }.map { |c| [t[:name], c] }
+    end
+    # 용어사전에 있는 컬럼인데 설명이 용어 이름과 다른 것
+    @mismatch = snap[:tables].reject { |t| t[:view] }.flat_map do |t|
+      (snap[:columns][t[:name]] || []).filter_map do |c|
+        term = @terms[c[:name].to_s.upcase]
+        next unless term && c[:comment].present?
+        a = c[:comment].to_s.gsub(/\s+/, ''); b = term.name.to_s.gsub(/\s+/, '')
+        [t[:name], c, term] unless a == b || a.start_with?(b)
+      end
+    end
   end
 
   private
@@ -156,8 +180,14 @@ class DbSchemasController < ApplicationController
   end
 
   # 접속 실패는 화면에 메시지로 보여 주고 nil
+  # 화면마다 DB 에 새로 접속하지 않게 10분 동안 보관 (객체 정의까지 한 번에). refresh=1 이면 새로 읽음
+  CACHE_TTL = 10.minutes
+
   def snapshot(link, objects: false)
-    link.connector.snapshot(objects: objects)
+    key = ['db_manage', 'snapshot', link.id, link.db_server.id, link.db_server.updated_at.to_i, link.schema].join('/')
+    Rails.cache.delete(key) if params[:refresh] == '1' && !@refreshed&.include?(link.id)
+    (@refreshed ||= []) << link.id
+    Rails.cache.fetch(key, expires_in: CACHE_TTL) { link.connector.snapshot(objects: true) }
   rescue DbManage::Error => e
     @db_error = "#{link.name}: #{e.message}"
     nil

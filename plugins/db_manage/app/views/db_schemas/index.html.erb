@@ -16,6 +16,7 @@
 </div>
 <%= render :partial => 'error' %>
 <% if @snapshot %>
+  <p class="db_read"><%= l(:label_db_read_at, :time => format_time(@snapshot[:read_at])) %> · <%= link_to sprite_icon('reload', l(:label_db_refresh)), project_db_schemas_path(@project, :link => @link.id, :kind => @kind, :refresh => 1), :class => 'db_refresh' %></p>
   <% snap = @snapshot; cols = snap[:columns]; kinds = snap[:kinds].reject { |k| db_kind_items(snap, k).nil? } %>
   <div class="db_kinds" role="tablist">
     <% kinds.each do |kind| %>

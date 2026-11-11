@@ -31,6 +31,27 @@
   </tbody>
 </table>
 </div>
+<% idx = @snapshot[:indexes].to_h[@table[:name]] || [] %>
+<% unless @table[:view] %>
+  <h3 class="ag_sec"><%= l(:label_db_indexes) %> <span class="db_dim"><%= idx.size %></span></h3>
+  <% if idx.empty? %><p class="db_hintbox"><%= l(:text_db_no_index) %></p><% else %>
+  <div class="autoscroll">
+  <table class="list db_cols db_idx">
+    <thead><tr><th class="name"><%= l(:field_name) %></th><th><%= l(:label_db_idx_kind) %></th><th class="comment"><%= l(:label_db_idx_columns) %></th><th><%= l(:label_db_idx_method) %></th></tr></thead>
+    <tbody>
+    <% idx.each do |i| %>
+      <tr class="db_col">
+        <td class="name"><code><%= i[:name] %></code></td>
+        <td class="kind"><span class="db_key <%= i[:primary] ? 'db_pk' : (i[:unique] ? 'db_uk' : 'db_ix') %>"><%= i[:primary] ? 'PK' : (i[:unique] ? 'UNIQUE' : 'INDEX') %></span></td>
+        <td class="comment"><%= safe_join(i[:columns].each_with_index.map { |col, n| content_tag(:span, "#{n + 1}. #{col}", :class => 'db_idxcol') }, ' ') %></td>
+        <td class="method"><%= i[:method] %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  </div>
+  <% end %>
+<% end %>
 <% if @triggers.any? %>
   <h3 class="ag_sec"><%= l(:label_db_kind_trigger) %></h3>
   <ul class="db_tags"><% @triggers.each do |t| %><li><%= link_to t[:name], project_db_object_path(@project, @link, 'trigger', t[:key]) %> <span><%= t[:timing] %></span></li><% end %></ul>

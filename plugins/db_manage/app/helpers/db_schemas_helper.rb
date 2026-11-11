@@ -1,7 +1,7 @@
 module DbSchemasHelper
   # PK·UK·FK 배지 (FK 는 참조 대상 툴팁)
   def db_key_tags(col)
-    safe_join(col[:keys].map { |k| content_tag(:span, k, class: "db_key db_#{k.downcase}", title: (k == 'FK' ? "→ #{col[:ref]}" : nil)) }, ' ')
+    safe_join(col[:keys].map { |k| content_tag(:span, k, class: "db_key db_#{k.downcase}", title: (k == 'FK' ? "→ #{col[:ref]}" : (k == 'IX' ? l(:label_db_indexed) : nil))) }, ' ')
   end
 
   def db_term_tag(status, term)

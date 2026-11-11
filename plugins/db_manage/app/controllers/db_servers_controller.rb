@@ -59,7 +59,10 @@ class DbServersController < ApplicationController
   # 아직 저장하지 않은 폼 값으로 연결 시험 (편집 중 비밀번호를 비워 두면 저장된 비밀번호 사용)
   def test_connection
     stored = DbServer.find_by(id: params[:id]) if params[:id].present?
-    server = DbServer.new(server_params.except(:name, :note))
+    server = DbServer.new
+    # 경유 서버 비밀값·지문은 순번별로 이어받으므로 저장된 값을 먼저 넣고 폼 값을 덮어씀
+    server.ssh_hops_encrypted = stored.ssh_hops_encrypted if stored
+    server.assign_attributes(server_params.except(:name, :note))
     if stored
       server.password_encrypted = stored.password_encrypted if params.dig(:db_server, :password).blank?
       # SSH 비밀값도 비워 두면 저장된 값, 같은 SSH 서버면 저장된 지문으로 확인
@@ -72,7 +75,7 @@ class DbServersController < ApplicationController
     server.valid?
     keys = %i(adapter host port database_name username timeout password_encrypted ssh_host ssh_port ssh_username ssh_auth
               ssh_password_encrypted ssh_key_encrypted)
-    errors = server.errors.select { |e| keys.include?(e.attribute) }
+    errors = server.errors.select { |e| keys.include?(e.attribute) || (e.attribute == :base && e.message.include?('경유')) }
     return render json: { ok: false, message: errors.map(&:full_message).uniq.join(', ') } if errors.any?
     connector = server.connector
     version = connector.version
@@ -94,6 +97,6 @@ class DbServersController < ApplicationController
   def server_params
     params.require(:db_server).permit(:name, :production, :adapter, :host, :port, :database_name, :username, :password, :timeout, :note,
                                       :ssh_enabled, :ssh_host, :ssh_port, :ssh_username, :ssh_auth, :ssh_password, :ssh_private_key,
-                                      :ssh_passphrase, :ssh_reset_host_key)
+                                      :ssh_passphrase, :ssh_reset_host_key, ssh_hops: {})
   end
 end

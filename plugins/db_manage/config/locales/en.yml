@@ -178,6 +178,32 @@ en:
   text_db_erd_error: Could not draw the ERD.
   text_db_erd_md: Markdown document (```mermaid block + table list)
   text_db_erd_mmd: Mermaid source
+  label_db_hop: "Hop %{n}"
+  text_db_hop_host: Address of this server as seen from the previous one
+  label_db_hop_delete: Remove this hop
+  label_db_hop_add: Add hop
+  text_db_hop_info: "When several servers must be passed (e.g. Redmine → WEB → WAS → DB, up to 3). DB host is as seen from the last server."
+  label_db_read_at: "Read at %{time} (kept for 10 minutes)"
+  label_db_refresh: Refresh
+  label_db_indexes: Indexes
+  text_db_no_index: No indexes.
+  label_db_idx_kind: Kind
+  label_db_idx_columns: Columns (order)
+  label_db_idx_method: Method
+  label_db_indexed: Column is part of an index
+  label_db_check_tab_name: "Column names (%{count})"
+  label_db_check_tab_comment: "Missing comments (%{count})"
+  label_db_check_tab_mismatch: "Comment differs (%{count})"
+  text_db_check_comment: Tables and columns without a comment.
+  label_db_no_comment_tables: Tables without comment
+  label_db_no_comment_columns: Columns without comment
+  label_db_all_commented: All have comments.
+  label_db_more: "and %{count} more"
+  text_db_check_mismatch: Columns found in the glossary whose comment differs from the term name.
+  label_db_no_mismatch: No differing comments.
+  label_db_col_comment: Column comment
+  label_db_term_name: Glossary term
+  text_db_erd_drawio: File you can edit in draw.io (diagrams.net)
   activerecord:
     attributes:
       db_server:

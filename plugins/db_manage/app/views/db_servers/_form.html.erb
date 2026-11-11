@@ -46,6 +46,10 @@
         <% else %>
           <span class="db_dim"><%= l(:text_db_ssh_fp_first) %></span>
         <% end %></p>
+      <% hops = @server.ssh_hops %>
+      <% DbServer::MAX_HOPS.times do |i| %><%= render :partial => 'db_servers/hop', :locals => { :i => i, :hop => hops[i] } %><% end %>
+      <p class="db_hop_add_row"><button type="button" class="btn_line" id="db_hop_add"<%= raw(' hidden') if hops.size >= DbServer::MAX_HOPS %>><%= l(:label_db_hop_add) %></button>
+        <em class="info"><%= l(:text_db_hop_info) %></em></p>
     </div>
   </div>
   <p><%= f.number_field :timeout, :min => 1, :max => 60, :label => :field_db_timeout %></p>
@@ -72,6 +76,19 @@ $(function() {
   $('.db_ssh_auth').on('change', function() {
     var key = $('.db_ssh_auth:checked').val() === 'key';
     $('.db_auth_key').prop('hidden', !key); $('.db_auth_pw').prop('hidden', key);
+  });
+  // 경유 서버: 추가(숨긴 칸 보이기)·삭제(칸 비우고 숨김)·인증 방식 전환
+  $('#db_hop_add').on('click', function() {
+    var $next = $('.db_hop[hidden]').first(); $next.prop('hidden', false);
+    if (!$('.db_hop[hidden]').length) $(this).prop('hidden', true);
+  });
+  $(document).on('click', '.db_hop_del', function() {
+    var $f = $(this).closest('.db_hop'); $f.find('input[type=text], input[type=password], textarea').val(''); $f.prop('hidden', true);
+    $('#db_hop_add').prop('hidden', false);
+  });
+  $(document).on('change', '.db_hop_auth', function() {
+    var $f = $(this).closest('.db_hop'), key = $f.find('.db_hop_auth:checked').val() === 'key';
+    $f.find('.db_hop_key').prop('hidden', !key); $f.find('.db_hop_pw').prop('hidden', key);
   });
   // 저장 전 연결 시험: 지금 입력한 값으로 접속 (_method 는 빼고 보냄)
   $('#db_test_btn').on('click', function() {

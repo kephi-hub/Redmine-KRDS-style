@@ -6,6 +6,48 @@
 <% else %>
 <%= render :partial => 'error' %>
 <% if @rows %>
+  <div class="tabs">
+    <ul>
+      <li><%= link_to l(:label_db_check_tab_name, :count => @counts[:missing].to_i + @counts[:type].to_i), project_db_check_path(@project, @link), :class => (@tab == 'name' ? 'selected' : nil) %></li>
+      <li><%= link_to l(:label_db_check_tab_comment, :count => @no_comment_tables.size + @no_comment_columns.size), project_db_check_path(@project, @link, :tab => 'comment'), :class => (@tab == 'comment' ? 'selected' : nil) %></li>
+      <li><%= link_to l(:label_db_check_tab_mismatch, :count => @mismatch.size), project_db_check_path(@project, @link, :tab => 'mismatch'), :class => (@tab == 'mismatch' ? 'selected' : nil) %></li>
+    </ul>
+  </div>
+  <% if @tab == 'comment' %>
+    <p class="db_info"><%= l(:text_db_check_comment) %></p>
+    <h3 class="ag_sec"><%= l(:label_db_no_comment_tables) %> <span class="db_dim"><%= @no_comment_tables.size %></span></h3>
+    <% if @no_comment_tables.empty? %><p class="db_allsame"><%= l(:label_db_all_commented) %></p><% else %>
+      <ul class="db_tags"><% @no_comment_tables.each do |t| %><li><%= link_to t[:name], project_db_table_path(@project, @link, t[:name]) %></li><% end %></ul>
+    <% end %>
+    <h3 class="ag_sec"><%= l(:label_db_no_comment_columns) %> <span class="db_dim"><%= @no_comment_columns.size %></span></h3>
+    <% if @no_comment_columns.empty? %><p class="db_allsame"><%= l(:label_db_all_commented) %></p><% else %>
+    <div class="autoscroll">
+    <table class="list db_cols">
+      <thead><tr><th class="name"><%= l(:field_db_table) %></th><th><%= l(:field_db_column) %></th><th><%= l(:field_db_type) %></th><th><%= l(:field_db_key) %></th></tr></thead>
+      <tbody>
+      <% @no_comment_columns.first(500).each do |t, c| %>
+        <tr class="db_col"><td class="name"><%= link_to t, project_db_table_path(@project, @link, t) %></td><td class="col"><code><%= c[:name] %></code></td><td class="type"><%= c[:type] %></td><td class="keys"><%= db_key_tags(c) %></td></tr>
+      <% end %>
+      </tbody>
+    </table>
+    </div>
+    <% if @no_comment_columns.size > 500 %><p class="db_dim"><%= l(:label_db_more, :count => @no_comment_columns.size - 500) %></p><% end %>
+    <% end %>
+  <% elsif @tab == 'mismatch' %>
+    <p class="db_info"><%= l(:text_db_check_mismatch) %></p>
+    <% if @mismatch.empty? %><p class="db_allsame"><%= l(:label_db_no_mismatch) %></p><% else %>
+    <div class="autoscroll">
+    <table class="list db_cols">
+      <thead><tr><th class="name"><%= l(:field_db_table) %></th><th><%= l(:field_db_column) %></th><th class="comment"><%= l(:label_db_col_comment) %></th><th><%= l(:label_db_term_name) %></th></tr></thead>
+      <tbody>
+      <% @mismatch.first(500).each do |t, c, term| %>
+        <tr class="db_col"><td class="name"><%= link_to t, project_db_table_path(@project, @link, t) %></td><td class="col"><code><%= c[:name] %></code></td><td class="comment"><%= c[:comment] %></td><td class="term"><span class="db_term db_type"><%= term.name %></span></td></tr>
+      <% end %>
+      </tbody>
+    </table>
+    </div>
+    <% end %>
+  <% else %>
   <ul class="db_stats">
     <% [[nil, l(:label_all), @rows.size], [:ok, l(:label_db_term_ok), @counts[:ok].to_i], [:type, l(:label_db_term_type_short), @counts[:type].to_i], [:missing, l(:label_db_term_missing), @counts[:missing].to_i]].each do |st, label, n| %>
     <li class="<%= 'on' if @status == st %>"><%= link_to project_db_check_path(@project, @link, :status => st) do %><span><%= label %></span><strong><%= n %></strong><% end %></li>
@@ -45,6 +87,7 @@
     </tbody>
   </table>
   </div>
+  <% end %>
   <% end %>
 <% end %>
 <% end %>
