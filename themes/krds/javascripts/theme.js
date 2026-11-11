@@ -140,8 +140,8 @@ $(function() {
     if (!cur) cur = $secs.first().attr('id');
     $tabs.each(function() { var on = $(this).attr('href') === '#' + cur; $(this).toggleClass('on', on).attr('aria-selected', on ? 'true' : 'false'); });
   });
-  // 레이어를 열면 지금 메뉴가 있는 묶음으로
-  $(document).on('click', '.js-flyout-menu-toggle-button', function() {
+  // 레이어를 열면 지금 메뉴가 있는 묶음으로 (코어 핸들러가 stopPropagation 하므로 버튼에 직접 건다)
+  $('.js-flyout-menu-toggle-button').on('click', function() {
     setTimeout(function() {
       var $cur = $m.find('.mnav_sec a.on').closest('.mnav_sec');
       if ($cur.length) $fly.scrollTop($fly.scrollTop() + ($cur.offset().top - $fly.offset().top) - 56);
