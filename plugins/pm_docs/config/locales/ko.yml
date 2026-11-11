@@ -6,6 +6,7 @@ ko:
   project_module_risks: 이슈·위험
   permission_view_deliverables: 산출물 보기
   permission_manage_deliverables: 산출물 관리
+  permission_approve_deliverables: 산출물 승인·반려
   permission_view_change_requests: 변경요청 보기
   permission_manage_change_requests: 변경요청 등록·분석
   permission_approve_change_requests: 변경요청 승인·반려
@@ -82,6 +83,36 @@ ko:
   label_pm_include_auto: 자동 생성 포함
   text_pm_include_auto: 테이블 정의서 · 공통코드는 DB 에 접속해 만들므로 시간이 걸릴 수 있습니다.
   label_pm_package_make: zip 만들기
+  label_pm_include_source: 소스코드 포함
+  text_pm_include_source: 저장소 소스 전체를 zip 으로 넣습니다(저장소마다 최대 2GB · 10분). 크기가 커서 기본은 빼 둡니다.
+  label_pm_review: 검토 · 승인
+  label_pm_review_note: 의견
+  text_pm_review_note: 반려할 때는 이유를 꼭 적어 주세요
+  label_pm_op_request: 검토 요청
+  label_pm_op_approve: 승인
+  label_pm_op_reject: 반려
+  label_pm_op_submit: 제출
+  label_pm_op_reopen: 다시 작성으로
+  text_pm_op_request: 검토를 요청할까요?
+  text_pm_op_approve: 승인할까요?
+  text_pm_op_reject: 반려할까요? (작성 중으로 돌아갑니다)
+  text_pm_op_submit: 제출로 바꿀까요? (제출일이 오늘로 기록됩니다)
+  text_pm_op_reopen: 작성 중으로 되돌릴까요?
+  text_pm_wait_approve: 승인 권한이 있는 사람이 검토합니다.
+  notice_pm_review_request: 검토를 요청했습니다.
+  notice_pm_review_approve: 승인했습니다.
+  notice_pm_review_reject: 반려했습니다.
+  notice_pm_review_submit: 제출로 바꿨습니다.
+  notice_pm_review_reopen: 작성 중으로 되돌렸습니다.
+  error_pm_review_state: 지금 상태에서는 할 수 없는 처리입니다. 화면을 새로 고쳐 보세요.
+  error_pm_reject_note: 반려할 때는 의견(이유)을 적어 주세요.
+  label_pm_act_request: 검토 요청
+  label_pm_act_approve: 승인
+  label_pm_act_reject: 반려
+  label_pm_act_submit: 제출
+  label_pm_act_reopen: 되돌림
+  label_pm_act_edit: 상태 수정
+  label_pm_act_upload: 파일 올림
   error_pm_package_busy: 다른 일괄 다운로드를 만드는 중입니다. 잠시 뒤 다시 시도하세요.
   # 변경요청
   text_pm_crs: 요구사항 변경 요청을 접수하고 영향(요구사항 · 메뉴 · 인터페이스 · 테이블 · 공수 · 일정)을 분석해 승인·반려합니다. 승인하면 연결 요구사항이 "변경"으로 바뀌고 이력에 남습니다.

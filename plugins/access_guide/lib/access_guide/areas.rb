@@ -30,7 +30,7 @@ module AccessGuide
     { key: 'schedules', view: %i[view_ops_schedules], write: %i[manage_ops_schedules], manage: %i[] },
     { key: 'opslogs', view: %i[view_ops_logs], write: %i[manage_ops_logs], manage: %i[] },
     { key: 'interfaces', view: %i[view_ops_interfaces], write: %i[manage_ops_interfaces], manage: %i[] },
-    { key: 'deliverables', view: %i[view_deliverables], write: %i[manage_deliverables], manage: %i[] },
+    { key: 'deliverables', view: %i[view_deliverables], write: %i[manage_deliverables], manage: %i[approve_deliverables] },
     { key: 'changes', view: %i[view_change_requests], write: %i[manage_change_requests], manage: %i[approve_change_requests] },
     { key: 'programs', view: %i[view_programs], write: %i[manage_programs], manage: %i[] },
     { key: 'meetings', view: %i[view_meetings], write: %i[manage_meetings], manage: %i[] },

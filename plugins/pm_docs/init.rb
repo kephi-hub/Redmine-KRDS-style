@@ -14,13 +14,15 @@ Redmine::Plugin.register :pm_docs do
   name '산출물 관리'
   author 'kephi-hub'
   description '산출물(단계별·자동 생성·일괄 다운로드), 변경요청, 프로그램 목록, 회의록, 이슈·위험 관리대장'
-  version '1.0.0'
+  version '1.1.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
 
   project_module :deliverables do
     permission :view_deliverables, { pm_deliverables: [:index, :show, :generate, :package] }, read: true
-    permission :manage_deliverables, { pm_deliverables: [:new, :create, :edit, :update, :destroy, :attach, :seed] }, require: :member
+    permission :manage_deliverables, { pm_deliverables: [:new, :create, :edit, :update, :destroy, :attach, :seed, :review] }, require: :member
+    # 승인·반려·되돌림 (검토 요청·제출은 산출물 관리 권한)
+    permission :approve_deliverables, { pm_deliverables: [:review] }, require: :member
   end
   project_module :change_requests do
     permission :view_change_requests, { pm_change_requests: [:index, :show, :export] }, read: true

@@ -5,6 +5,7 @@ class PmDeliverable < ApplicationRecord
 
   belongs_to :project
   belongs_to :owner, class_name: 'User', optional: true
+  has_many :pm_deliverable_reviews, -> { order(created_at: :desc, id: :desc) }, dependent: :delete_all
   acts_as_attachable view_permission: :view_deliverables, edit_permission: :manage_deliverables, delete_permission: :manage_deliverables
 
   validates :name, presence: true, length: { maximum: 150 }
@@ -22,6 +23,19 @@ class PmDeliverable < ApplicationRecord
 
   def late?(today = Date.current)
     due_on && due_on < today && !done?
+  end
+
+  # 검토 흐름: 상태 → [가능한 동작]
+  FLOW = { 'none' => %w(request), 'writing' => %w(request), 'review' => %w(approve reject), 'approved' => %w(submit reopen), 'submitted' => %w(reopen) }.freeze
+  NEXT = { 'request' => 'review', 'approve' => 'approved', 'reject' => 'writing', 'submit' => 'submitted', 'reopen' => 'writing' }.freeze
+
+  def log!(user, action, from: nil, to: nil, note: nil)
+    PmDeliverableReview.create!(pm_deliverable_id: id, user_id: user&.id, action: action, status_from: from, status_to: to, version: version, note: note.presence, created_at: Time.now)
+  end
+
+  # 마지막 승인
+  def last_approval
+    pm_deliverable_reviews.find { |r| r.action == 'approve' }
   end
 
   def latest_attachment

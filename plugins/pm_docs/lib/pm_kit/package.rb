@@ -21,7 +21,7 @@ module PmKit
     end
 
     # 반환: [zip 경로, 파일 이름, { files:, auto:, missing: }]
-    def build(project, list, auto: true)
+    def build(project, list, auto: true, source: false)
       raise PmKit::Error, I18n.t(:error_pm_package_busy) unless LOCK.try_lock
       begin
         path = dir.join("#{SecureRandom.hex(8)}.zip").to_s
@@ -39,10 +39,14 @@ module PmKit
               stat[:files] += 1
               put = true
             end
-            if auto && d.auto_kind.present?
+            if auto && d.auto_kind.present? && (source || !PmKit::AutoDocs.heavy?(d.auto_kind))
               PmKit::AutoDocs.generate(d.auto_kind, project).each do |name, data|
                 zos.put_next_entry("#{folder}/#{clean(name)}")
-                zos.write data
+                if data.is_a?(Hash)
+                  File.open(data[:path], 'rb') { |io| IO.copy_stream(io, zos) }
+                else
+                  zos.write data
+                end
                 stat[:auto] += 1
                 put = true
               end

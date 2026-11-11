@@ -134,6 +134,7 @@ roles:
   - view_meetings
   - view_risks
   - manage_deliverables
+  - approve_deliverables
   - manage_change_requests
   - approve_change_requests
   - manage_programs

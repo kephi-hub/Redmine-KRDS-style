@@ -5,6 +5,7 @@ resources :projects, only: [] do
   resources :pm_deliverables, path: 'deliverables' do
     member do
       post :attach
+      post :review
       get :generate
     end
   end

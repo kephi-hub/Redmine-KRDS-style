@@ -9,6 +9,10 @@
     <p><label for="pm_req_only"><%= l(:label_pm_required_only) %></label><%= check_box_tag 'required_only', '1', false, :id => 'pm_req_only' %></p>
     <p><label for="pm_auto"><%= l(:label_pm_include_auto) %></label><%= check_box_tag 'auto', '1', true, :id => 'pm_auto' %>
       <em class="info"><%= l(:text_pm_include_auto) %></em></p>
+    <% if PmKit::AutoDocs.available?('source', @project) %>
+    <p><label for="pm_source"><%= l(:label_pm_include_source) %></label><%= check_box_tag 'source', '1', false, :id => 'pm_source' %>
+      <em class="info"><%= l(:text_pm_include_source) %></em></p>
+    <% end %>
   </div>
   <pre class="db_sql pm_tree"><code>산출물_<%= @project.identifier %>_날짜.zip
 ├─ 산출물목록.xlsx

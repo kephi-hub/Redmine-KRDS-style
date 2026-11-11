@@ -85,6 +85,40 @@ module PmKit
                               ["테스트결과서_#{run.name.gsub(%r{[\\/:*?"<>|\s]+}, '_')}.xlsx", QaTrace::Sheet.export_run(p, run, results)]
                             end
                           } },
+      'unit_tests' => { label: '단위 테스트 결과서 (단위 회차)', available: ->(p) { defined?(QaTrace) && mod?(p, :qa_tests) },
+                        generate: ->(p) { PmKit::AutoDocs.runs(p, 'unit') } },
+      'integration_tests' => { label: '통합 테스트 결과서 (통합 회차)', available: ->(p) { defined?(QaTrace) && mod?(p, :qa_tests) },
+                               generate: ->(p) { PmKit::AutoDocs.runs(p, 'integration') } },
+      'acceptance_tests' => { label: '인수 테스트 결과서 (인수 회차)', available: ->(p) { defined?(QaTrace) && mod?(p, :qa_tests) },
+                              generate: ->(p) { PmKit::AutoDocs.runs(p, 'acceptance') } },
+      'defects' => { label: '결함 조치 내역', available: ->(p) { mod?(p, :issue_tracking) },
+                     generate: ->(p) { [["결함조치내역_#{today}.xlsx", PmKit::Sheet.defects(p)]] } },
+      'wbs' => { label: 'WBS(일감 · 버전)', available: ->(p) { mod?(p, :issue_tracking) },
+                 generate: ->(p) { [["WBS_#{today}.xlsx", PmKit::Sheet.wbs(p)]] } },
+      'erd' => { label: 'ERD (DB 연결별 .md · draw.io)', available: ->(p) { defined?(DbManage::Erd) && mod?(p, :db_manage) },
+                 generate: lambda { |p|
+                   DbLink.where(project_id: p.id).includes(:db_server).sorted.flat_map do |link|
+                     name = "ERD_#{link.name}_#{today}"
+                     begin
+                       erd = DbManage::Erd.build(link.connector.snapshot, tables: nil, columns: 'all', inferred: true)
+                       title = "#{p.name} · #{link.name} ERD"
+                       info = "- 생성: #{PmKit::Sheet.fmt(Time.now)} · 테이블 #{erd[:tables].size} · 관계 #{erd[:relations].size}"
+                       [["#{name}.md", DbManage::Erd.markdown(title, info, erd)], ["#{name}.drawio", DbManage::Erd.drawio(erd, title)]]
+                     rescue StandardError => e
+                       [PmKit::AutoDocs.safely(name) { raise e }]
+                     end
+                   end
+                 } },
+      'source' => { label: '소스코드 (저장소별 zip)', heavy: true,
+                    available: ->(p) { defined?(SiteTools::RepoExport) && mod?(p, :repository) && p.repositories.any? && User.current.allowed_to?(:export_repository, p) },
+                    generate: lambda { |p|
+                      p.repositories.select { |r| SiteTools::RepoExport.supported?(r) }.map do |repo|
+                        zip, name, _, _ = SiteTools::RepoExport.build(repo, '', nil)
+                        [name, { path: zip }]
+                      rescue StandardError => e
+                        PmKit::AutoDocs.safely("소스코드_#{repo.identifier.presence || p.identifier}") { raise e }
+                      end
+                    } },
       'interfaces' => { label: '인터페이스 정의서', available: ->(p) { defined?(OpsKit) && mod?(p, :ops_interfaces) },
                         generate: ->(p) { [["인터페이스정의서_#{today}.xlsx", OpsKit::Sheet.interfaces(OpsInterface.where(project_id: p.id).includes(:ops_schedule).sorted.to_a)]] } },
       'schedules' => { label: '배치 정의서', available: ->(p) { defined?(OpsKit) && mod?(p, :ops_schedules) },
@@ -101,6 +135,18 @@ module PmKit
       'meetings' => { label: '회의록 모음', available: ->(p) { mod?(p, :meetings) },
                       generate: ->(p) { [["회의록모음_#{today}.xlsx", PmKit::Sheet.meetings(PmMeeting.where(project_id: p.id).order(:held_at).to_a)]] } }
     }.freeze
+
+    # 테스트 결과서 — 회차 종류별 (종류 없는 회차는 "테스트 결과서(전체)" 쪽)
+    def runs(project, kind)
+      QaTestRun.where(project_id: project.id, kind: kind).sorted.map do |run|
+        results = run.qa_test_results.includes(:qa_test_case, :user, issue: :status).to_a.sort_by { |r| r.qa_test_case.code }
+        ["테스트결과서_#{run.name.gsub(%r{[\\/:*?"<>|\s]+}, '_')}.xlsx", QaTrace::Sheet.export_run(project, run, results)]
+      end
+    end
+
+    def heavy?(kind)
+      !!KINDS.dig(kind, :heavy)
+    end
 
     def safely(name)
       yield

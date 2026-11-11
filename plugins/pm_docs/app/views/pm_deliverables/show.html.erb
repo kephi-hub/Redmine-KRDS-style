@@ -16,6 +16,33 @@
   </dl>
   <% if d.note.present? %><div class="qa_desc"><%= simple_format(h(d.note)) %></div><% end %>
 </div>
+<% ops = PmDeliverable::FLOW[d.status] || [] %>
+<% can_approve = User.current.allowed_to?(:approve_deliverables, @project) %>
+<% allowed = ops.select { |op| %w(approve reject reopen).include?(op) ? can_approve : can_edit } %>
+<h3><%= l(:label_pm_review) %></h3>
+<ol class="pm_flow" aria-label="<%= l(:label_pm_review) %>">
+  <% PmDeliverable::STATUSES.each do |st| %><li class="<%= 'on' if st == d.status %><%= ' done' if PmDeliverable::STATUSES.index(st) < PmDeliverable::STATUSES.index(d.status) %>"><%= pm_label('dstatus', st) %></li><% end %>
+</ol>
+<% if allowed.any? %>
+  <%= form_tag(review_project_pm_deliverable_path(@project, d), :class => 'pm_decide') do %>
+    <p><label for="pm_rnote"><%= l(:label_pm_review_note) %></label><%= text_area_tag 'note', nil, :id => 'pm_rnote', :rows => 2, :class => 'oa_wide', :placeholder => l(:text_pm_review_note) %></p>
+    <p class="form_btns">
+      <% allowed.each do |op| %><%= button_tag l("label_pm_op_#{op}"), :name => 'op', :value => op, :class => (%w(reject reopen).include?(op) ? 'btn_line' : nil), :data => { :confirm => l("text_pm_op_#{op}") } %><% end %>
+    </p>
+  <% end %>
+<% elsif d.status == 'review' %>
+  <p class="db_dim"><%= l(:text_pm_wait_approve) %></p>
+<% end %>
+<% if (hist = d.pm_deliverable_reviews.includes(:user).to_a).any? %>
+  <ul class="qa_log pm_hist">
+    <% hist.each do |r| %>
+      <li><span class="qa_when"><%= format_time(r.created_at) %> · <%= r.user || l(:label_user_anonymous) %><% if r.version.present? %> · <%= r.version %><% end %></span>
+        <%= pm_badge(l("label_pm_act_#{r.action}"), r.action == 'reject' ? 'rejected' : (r.action == 'approve' ? 'approved' : 'review')) %>
+        <% if r.status_from && r.status_to && r.status_from != r.status_to %><span class="db_dim"><%= pm_label('dstatus', r.status_from) %> → <%= pm_label('dstatus', r.status_to) %></span><% end %>
+        <% if r.note.present? %><div class="pm_hnote"><%= r.note %></div><% end %></li>
+    <% end %>
+  </ul>
+<% end %>
 <% if d.auto_kind %>
   <h3><%= l(:label_pm_auto) %></h3>
   <p class="db_info"><%= PmKit::AutoDocs::KINDS[d.auto_kind][:label] %> — <%= l(:text_pm_auto) %></p>

@@ -7,7 +7,7 @@ class PmDeliverablesController < ApplicationController
 
   before_action :find_project_by_project_id
   before_action :authorize
-  before_action :find_deliverable, only: [:show, :edit, :update, :destroy, :attach, :generate]
+  before_action :find_deliverable, only: [:show, :edit, :update, :destroy, :attach, :generate, :review]
 
   def index
     all = PmDeliverable.where(project_id: @project.id).includes(:owner, :attachments).sorted.to_a
@@ -46,9 +46,11 @@ class PmDeliverablesController < ApplicationController
   end
 
   def update
+    from = @deliverable.status
     @deliverable.assign_attributes(deliverable_params)
     @deliverable.submitted_on ||= User.current.today if @deliverable.status == 'submitted'
     if @deliverable.save
+      @deliverable.log!(User.current, 'edit', from: from, to: @deliverable.status) if from != @deliverable.status
       flash[:notice] = l(:notice_successful_update)
       redirect_to project_pm_deliverable_path(@project, @deliverable)
     else
@@ -68,10 +70,40 @@ class PmDeliverablesController < ApplicationController
     @deliverable.status = 'writing' if @deliverable.status == 'none'
     @deliverable.save_attachments(params[:attachments])
     if @deliverable.save && @deliverable.unsaved_attachments.blank?
+      names = @deliverable.saved_attachments.map(&:filename).join(', ')
+      @deliverable.log!(User.current, 'upload', note: names) if names.present?
       flash[:notice] = l(:notice_pm_attached)
     else
       render_attachment_warning_if_needed(@deliverable)
     end
+    redirect_to project_pm_deliverable_path(@project, @deliverable)
+  end
+
+  # 검토 흐름: op = request(검토 요청) | approve | reject | submit | reopen, note(의견 — 반려 때는 필수)
+  APPROVER_OPS = %w(approve reject reopen).freeze
+
+  def review
+    op = params[:op].to_s
+    return render_404 unless PmDeliverable::NEXT.key?(op)
+    perm = APPROVER_OPS.include?(op) ? :approve_deliverables : :manage_deliverables
+    return deny_access unless User.current.allowed_to?(perm, @project)
+    unless (PmDeliverable::FLOW[@deliverable.status] || []).include?(op)
+      flash[:error] = l(:error_pm_review_state)
+      return redirect_to(project_pm_deliverable_path(@project, @deliverable))
+    end
+    note = params[:note].to_s.strip
+    if op == 'reject' && note.empty?
+      flash[:error] = l(:error_pm_reject_note)
+      return redirect_to(project_pm_deliverable_path(@project, @deliverable))
+    end
+    from = @deliverable.status
+    @deliverable.status = PmDeliverable::NEXT[op]
+    @deliverable.submitted_on = User.current.today if op == 'submit'
+    PmDeliverable.transaction do
+      @deliverable.save!
+      @deliverable.log!(User.current, op, from: from, to: @deliverable.status, note: note)
+    end
+    flash[:notice] = l("notice_pm_review_#{op}")
     redirect_to project_pm_deliverable_path(@project, @deliverable)
   end
 
@@ -88,9 +120,16 @@ class PmDeliverablesController < ApplicationController
       flash[:error] = l(:error_pm_auto_unavailable)
       return redirect_to(project_pm_deliverable_path(@project, @deliverable))
     end
-    return send_data(files.first[1], filename: files.first[0], type: files.first[0].end_with?('.txt') ? 'text/plain' : PmKit::Sheet::XLSX) if files.size == 1
+    if files.size == 1
+      name, data = files.first
+      return send_file(data[:path], filename: name, type: 'application/zip') if data.is_a?(Hash)
+      return send_data(data, filename: name, type: name.end_with?('.txt') ? 'text/plain' : (name.end_with?('.xlsx') ? PmKit::Sheet::XLSX : 'application/octet-stream'))
+    end
     buffer = Zip::OutputStream.write_buffer do |zos|
-      files.each { |name, data| zos.put_next_entry(name); zos.write data }
+      files.each do |name, data|
+        zos.put_next_entry(name)
+        data.is_a?(Hash) ? File.open(data[:path], 'rb') { |io| IO.copy_stream(io, zos) } : zos.write(data)
+      end
     end
     send_data buffer.string, filename: "#{PmKit::Package.clean(@deliverable.name)}_#{User.current.today.strftime('%Y%m%d')}.zip", type: 'application/zip'
   end
@@ -102,10 +141,10 @@ class PmDeliverablesController < ApplicationController
     phases = Array(params[:phases]) & PmDeliverable::PHASES
     list = @all.select { |d| phases.include?(d.phase) }
     list = list.select(&:required) if params[:required_only] == '1'
-    path, name, stat = PmKit::Package.build(@project, list, auto: params[:auto] == '1')
+    path, name, stat = PmKit::Package.build(@project, list, auto: params[:auto] == '1', source: params[:source] == '1')
     Rails.logger.info("[pm_docs] 산출물 패키지 #{@project.identifier} #{User.current.login} #{stat.inspect}")
     send_file path, filename: name, type: 'application/zip', disposition: 'attachment'
-  rescue PmKit::Error => e
+  rescue PmKit::Error, SiteTools::RepoExport::Error => e
     flash.now[:error] = e.message
   end
 

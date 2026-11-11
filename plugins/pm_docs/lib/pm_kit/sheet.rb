@@ -61,11 +61,69 @@ module PmKit
     def deliverables(list)
       rows = list.map do |d|
         a = d.latest_attachment
+        ap = d.last_approval
         [LABEL['phase'][d.phase], d.code, d.name, d.required ? 'Y' : 'N', LABEL['dstatus'][d.status], d.version, d.owner&.name, d.due_on&.to_s, d.submitted_on&.to_s,
-         d.auto_kind ? PmKit::AutoDocs::KINDS[d.auto_kind][:label] : nil, a&.filename, d.attachments.size, d.note]
+         ap&.user&.name, ap && fmt(ap.created_at), d.auto_kind ? PmKit::AutoDocs::KINDS[d.auto_kind]&.dig(:label) : nil, a&.filename, d.attachments.size, d.note]
       end
-      KrdsUi::Xlsx.build([{ name: '산출물 목록', header: %w(단계 ID 산출물 필수 상태 버전 담당 마감일 제출일 자동\ 생성 최신\ 파일 파일\ 수 비고), rows: rows,
-                            widths: [8, 10, 30, 6, 8, 8, 10, 12, 12, 24, 30, 8, 30] }])
+      hist = list.flat_map do |d|
+        d.pm_deliverable_reviews.map do |r|
+          [d.code, d.name, fmt(r.created_at), r.user&.name, ACT[r.action], r.status_from && LABEL['dstatus'][r.status_from], r.status_to && LABEL['dstatus'][r.status_to], r.version, r.note]
+        end
+      end
+      KrdsUi::Xlsx.build([
+        { name: '산출물 목록', header: %w(단계 ID 산출물 필수 상태 버전 담당 마감일 제출일 승인자 승인일시 자동\ 생성 최신\ 파일 파일\ 수 비고), rows: rows,
+          widths: [8, 10, 30, 6, 8, 8, 10, 12, 12, 10, 17, 24, 30, 8, 30] },
+        { name: '검토·승인 이력', header: %w(ID 산출물 일시 처리자 처리 이전\ 상태 바뀐\ 상태 버전 의견), rows: hist, widths: [10, 30, 17, 10, 10, 10, 10, 8, 40] }
+      ])
     end
+
+    ACT = { 'request' => '검토 요청', 'approve' => '승인', 'reject' => '반려', 'submit' => '제출', 'reopen' => '되돌림', 'edit' => '수정', 'upload' => '파일 올림' }.freeze
+
+    # WBS: 일감 트리(상위 → 하위) 번호 1, 1.1, 1.1.1 …
+    def wbs(project)
+      issues = Issue.where(project_id: project.id).includes(:tracker, :status, :assigned_to, :fixed_version).to_a
+      by_parent = issues.group_by(&:parent_id)
+      ids = issues.map(&:id).to_set
+      roots = issues.select { |i| i.parent_id.nil? || !ids.include?(i.parent_id) }
+      order = ->(l) { l.sort_by { |i| [i.start_date || Date.new(9999), i.id] } }
+      rows = []
+      walk = lambda do |list, prefix|
+        order.call(list).each_with_index do |i, n|
+          no = prefix ? "#{prefix}.#{n + 1}" : (n + 1).to_s
+          depth = no.count('.')
+          rows << [no, "#{'  ' * depth}#{i.subject}", i.tracker&.name, i.assigned_to&.name, i.start_date&.to_s, i.due_date&.to_s, i.done_ratio, i.status&.name,
+                   i.fixed_version&.name, i.estimated_hours, "##{i.id}"]
+          walk.call(by_parent[i.id] || [], no)
+        end
+      end
+      walk.call(roots, nil)
+      versions = project.shared_versions.sort.map { |v| [v.name, v.effective_date&.to_s, v.status, v.completed_percent.to_i, v.description] }
+      KrdsUi::Xlsx.build([
+        { name: 'WBS', header: %w(WBS 작업 유형 담당 시작일 완료\ 예정일 진척(%) 상태 버전 예상(시간) 일감), rows: rows, widths: [10, 50, 10, 10, 12, 12, 8, 10, 14, 10, 8] },
+        { name: '마일스톤(버전)', header: %w(버전 완료일 상태 진척(%) 설명), rows: versions, widths: [20, 12, 8, 8, 40] }
+      ])
+    end
+
+    # 결함 조치 내역: "결함" 트래커 일감 + 테스트 불합격으로 만든 일감, 원인 회차·케이스와 재테스트 결과
+    def defects(project)
+      from_tests = defined?(QaTestResult) ? QaTestResult.joins(:qa_test_run).where(qa_test_runs: { project_id: project.id }).where.not(issue_id: nil).includes(:qa_test_run, :qa_test_case).to_a : []
+      by_issue = from_tests.group_by(&:issue_id)
+      ids = Issue.where(project_id: project.id).joins(:tracker).where(trackers: { name: '결함' }).pluck(:id) | by_issue.keys
+      latest = defined?(QaTrace) ? QaTrace::Trace.latest_results(project) : {}
+      rows = Issue.where(id: ids).includes(:status, :assigned_to, :tracker).order(:id).map do |i|
+        src = by_issue[i.id]&.first
+        retest = src && latest[src.qa_test_case_id]
+        [i.id, i.subject, i.tracker&.name, src ? "#{src.qa_test_run.name} · #{src.qa_test_case.code}" : nil, i.status&.name, i.assigned_to&.name,
+         i.created_on && fmt(i.created_on), i.closed_on && fmt(i.closed_on), retest ? LABEL_RESULT[retest.result] : nil, i.done_ratio]
+      end
+      open = rows.count { |r| Issue.find_by(id: r[0])&.closed? == false }
+      summary = [['결함 수', rows.size], ['조치 완료', rows.size - open], ['미조치', open]]
+      KrdsUi::Xlsx.build([
+        { name: '결함 조치 내역', header: %w(일감 제목 유형 발견(회차·케이스) 상태 담당 등록 조치\ 완료 재테스트 진척(%)), rows: rows, widths: [8, 40, 8, 28, 10, 10, 17, 17, 10, 8] },
+        { name: '요약', header: %w(항목 값), rows: summary, widths: [14, 10] }
+      ])
+    end
+
+    LABEL_RESULT = { 'none' => '미수행', 'pass' => '합격', 'fail' => '불합격', 'hold' => '보류', 'skip' => '제외' }.freeze
   end
 end
