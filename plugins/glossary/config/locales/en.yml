@@ -18,6 +18,7 @@ en:
   label_glossary_updated: Overwritten
   label_glossary_skipped: Skipped
   label_glossary_failed: Errors
+  label_glossary_dropped: Discarded terms excluded
   label_glossary_line: "Line %{line}"
   label_glossary_back: Back to glossary
   field_glossary_name: Term
@@ -33,6 +34,7 @@ en:
   text_glossary_common: Terms shared by all projects. Shown as 'Common' in project glossaries.
   text_glossary_abbr: Uppercase letters, digits and underscore only (e.g. CUST_NO). Used to check DB column names.
   text_glossary_import: Upload a CSV saved from Excel. The first line must contain the headers below; 'Term' is required.
+  text_glossary_import_mois: "The Korean MOIS public data standard terms CSV can be uploaded as is. Discarded terms are excluded."
   error_glossary_no_file: Choose a CSV file.
   error_glossary_bad_csv: Cannot read the CSV file or the 'Term' header is missing.
   error_glossary_no_name: Term is empty

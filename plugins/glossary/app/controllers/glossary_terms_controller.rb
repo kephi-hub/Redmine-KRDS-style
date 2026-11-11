@@ -88,12 +88,14 @@ class GlossaryTermsController < ApplicationController
     rows = parse_csv(file.read)
     return import_error(l(:error_glossary_bad_csv)) unless rows
     overwrite = params[:overwrite] == '1'
-    @result = { created: 0, updated: 0, skipped: 0, errors: [] }
+    @result = { created: 0, updated: 0, skipped: 0, dropped: @mois_dropped.to_i, mois: !@mois_dropped.nil?, errors: [] }
+    # 행안부 표준용어처럼 1만 건이 넘는 파일도 있어 기존 용어를 한 번에 읽어 둠
+    existing = GlossaryTerm.where(project_id: @project&.id).index_by { |t| t.name.downcase }
     GlossaryTerm.transaction do
       rows.each_with_index do |attrs, i|
         line = i + 2
         next @result[:errors] << [line, l(:error_glossary_no_name)] if attrs['name'].blank?
-        term = GlossaryTerm.where(project_id: @project&.id).where('LOWER(name) = ?', attrs['name'].strip.downcase).first
+        term = existing[attrs['name'].strip.downcase]
         if term && !overwrite
           @result[:skipped] += 1
           next
@@ -103,6 +105,7 @@ class GlossaryTermsController < ApplicationController
         term.attributes = attrs.slice(*GlossaryTerm::COLUMNS).transform_values { |v| v.to_s.strip.presence }
         term.updated_by = User.current
         if term.save
+          existing[term.name.downcase] = term
           created ? @result[:created] += 1 : @result[:updated] += 1
         else
           @result[:errors] << [line, "#{attrs['name']}: #{term.errors.full_messages.join(', ')}"]
@@ -168,6 +171,11 @@ class GlossaryTermsController < ApplicationController
     text = raw.to_s.dup.force_encoding('UTF-8').delete_prefix("﻿")
     text = raw.to_s.dup.force_encoding('CP949').encode('UTF-8', invalid: :replace, undef: :replace) unless text.valid_encoding?
     table = CSV.parse(text, headers: true)
+    # 행정안전부 공공데이터 공통표준용어 CSV 는 그대로 받아 칸을 바꿔 넣음
+    if Glossary::Mois.match?(table.headers)
+      rows, @mois_dropped = Glossary::Mois.rows(table)
+      return rows
+    end
     map = table.headers.compact.each_with_object({}) do |h, m|
       key = CSV_HEADERS.find { |_, names| names.include?(h.to_s.strip.downcase.delete(' ')) || names.include?(h.to_s.strip) }&.first
       m[h] = key if key

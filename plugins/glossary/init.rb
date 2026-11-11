@@ -3,8 +3,8 @@
 Redmine::Plugin.register :glossary do
   name '용어사전'
   author 'kephi-hub'
-  description '프로젝트·전사 공통 용어사전 (용어·영문명·약어·데이터 타입·정의), CSV 가져오기·내보내기, 위키 매크로'
-  version '1.0.0'
+  description '프로젝트·전사 공통 용어사전 (용어·영문명·약어·데이터 타입·정의), CSV 가져오기(행안부 공통표준용어 형식 포함)·내보내기, 위키 매크로'
+  version '1.1.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
 

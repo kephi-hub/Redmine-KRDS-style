@@ -18,6 +18,7 @@ ko:
   label_glossary_updated: 덮어씀
   label_glossary_skipped: 건너뜀
   label_glossary_failed: 오류
+  label_glossary_dropped: 폐기된 용어 제외
   label_glossary_line: "%{line}번째 줄"
   label_glossary_back: 용어사전으로 돌아가기
   field_glossary_name: 용어
@@ -33,6 +34,7 @@ ko:
   text_glossary_common: 모든 프로젝트에서 함께 쓰는 용어입니다. 프로젝트 용어사전에 '공통' 으로 표시됩니다.
   text_glossary_abbr: 영문 대문자·숫자·밑줄(_)만 사용 (예 CUST_NO). DB 컬럼명 점검 기준이 됩니다.
   text_glossary_import: 엑셀에서 'CSV UTF-8' 또는 'CSV(쉼표로 분리)' 로 저장한 파일을 올리세요. 첫 줄은 아래 머리줄이어야 하며 '용어' 칸은 꼭 필요합니다. 내보내기 파일을 그대로 고쳐서 올려도 됩니다.
+  text_glossary_import_mois: "행정안전부 '공공데이터 공통표준용어' CSV(공공데이터포털)는 그대로 올리면 됩니다. 도메인(예: 명V100)은 분류·데이터 타입·길이로, 허용값·저장 형식·이음동의어·제정차수 등은 비고로 넣고, 폐기된 용어는 뺍니다. 새 차수로 갱신할 때는 덮어쓰기를 체크하세요."
   error_glossary_no_file: CSV 파일을 선택해 주세요.
   error_glossary_bad_csv: CSV 파일을 읽을 수 없거나 '용어' 머리줄이 없습니다.
   error_glossary_no_name: 용어가 비어 있습니다
