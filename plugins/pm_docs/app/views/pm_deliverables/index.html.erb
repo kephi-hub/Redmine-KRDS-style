@@ -1,0 +1,55 @@
+<%# 프로젝트 > 산출물 %>
+<% can_edit = User.current.allowed_to?(:manage_deliverables, @project) %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('add', l(:label_pm_deliv_new)), new_project_pm_deliverable_path(@project, :phase => @phase), :class => 'icon icon-add' %><% end %>
+  <%= link_to sprite_icon('download', l(:label_pm_package)), project_pm_deliverables_package_path(@project), :class => 'icon icon-download' %>
+</div>
+<h2><%= l(:label_pm_deliverables) %></h2>
+<p class="subtitle"><%= l(:text_pm_deliverables) %></p>
+<% if @kpi[:all].zero? %>
+  <div class="db_hintbox"><p><%= l(:text_pm_deliv_empty) %></p>
+    <% if can_edit %><%= button_to l(:label_pm_seed), project_pm_deliverables_seed_path(@project), :class => 'btn_line', :form_class => 'pm_seed' %><% end %></div>
+<% else %>
+<ul class="db_stats mt_kpi">
+  <li class="<%= 'on' unless @status %>"><%= link_to project_pm_deliverables_path(@project, :phase => @phase) do %><span><%= l(:label_pm_k_all) %></span><strong><%= @kpi[:all] %></strong><% end %></li>
+  <li class="<%= 'on' if @status == 'submitted' %>"><%= link_to project_pm_deliverables_path(@project, :phase => @phase, :status => 'submitted') do %><span><%= l(:label_pm_k_done) %></span><strong><%= @kpi[:submitted] %></strong><% end %></li>
+  <li class="<%= 'on' if @status == 'review' %>"><%= link_to project_pm_deliverables_path(@project, :phase => @phase, :status => 'review') do %><span><%= l(:label_pm_k_review) %></span><strong><%= @kpi[:review] %></strong><% end %></li>
+  <li class="<%= 'on' if @status == 'none' %>"><%= link_to project_pm_deliverables_path(@project, :phase => @phase, :status => 'none') do %><span><%= l(:label_pm_k_none) %></span><strong><%= @kpi[:none] %></strong><% end %></li>
+  <li class="<%= 'on' if @status == 'late' %>"><%= link_to project_pm_deliverables_path(@project, :phase => @phase, :status => 'late') do %><span><%= l(:label_pm_k_late) %></span><strong class="<%= 'qa_fail' if @kpi[:late].positive? %>"><%= @kpi[:late] %></strong><% end %></li>
+  <li><span><%= l(:label_pm_k_auto) %></span><strong><%= @kpi[:auto] %></strong></li>
+</ul>
+<div class="tabs"><ul>
+  <li><%= link_to l(:label_pm_phase_all), project_pm_deliverables_path(@project, :status => @status), :class => (@phase ? nil : 'selected') %></li>
+  <% PmDeliverable::PHASES.each do |ph| %><li><%= link_to pm_label('phase', ph), project_pm_deliverables_path(@project, :phase => ph, :status => @status), :class => (@phase == ph ? 'selected' : nil) %></li><% end %>
+</ul></div>
+<% if @deliverables.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list pm_list">
+  <thead><tr><th><%= l(:label_pm_phase) %></th><th>ID</th><th class="name"><%= l(:label_pm_deliv_name) %></th><th><%= l(:field_status) %></th><th><%= l(:label_pm_version) %></th><th><%= l(:label_pm_owner) %></th><th><%= l(:label_pm_due) %></th><th class="name"><%= l(:label_pm_latest) %></th><th></th></tr></thead>
+  <tbody>
+  <% @deliverables.group_by(&:phase).each do |ph, list| %>
+    <% list.each_with_index do |d, i| %>
+    <tr class="<%= 'pm_late' if d.late? %>">
+      <td class="phase"><% if i.zero? %><%= pm_badge(pm_label('phase', ph), 'phase') %><% end %></td>
+      <td class="code"><%= d.code %></td>
+      <td class="name"><%= link_to d.name, project_pm_deliverable_path(@project, d) %><% unless d.required %> <span class="db_dim">(<%= l(:label_pm_optional) %>)</span><% end %>
+        <% if d.auto_kind %><span class="db_dim db_pvsub"><%= l(:label_pm_auto) %>: <%= PmKit::AutoDocs::KINDS[d.auto_kind][:label] %></span><% end %></td>
+      <td><%= pm_badge(pm_label('dstatus', d.status), d.status) %><% if d.late? %> <%= pm_badge(l(:label_pm_late), 'late') %><% end %></td>
+      <td><%= d.version %></td>
+      <td><%= d.owner %></td>
+      <td class="next"><%= format_date(d.due_on) %></td>
+      <td class="name"><% if (a = d.latest_attachment) %><%= link_to a.filename, download_named_attachment_path(a, a.filename) %><span class="db_dim db_pvsub"><%= format_date(a.created_on) %> · <%= l(:label_pm_files_n, :count => d.attachments.size) %></span><% end %>
+        <% if d.auto_kind && PmKit::AutoDocs.available?(d.auto_kind, @project) %><%= link_to l(:label_pm_generate), generate_project_pm_deliverable_path(@project, d), :class => 'pm_gen' %><% end %></td>
+      <td class="buttons"><% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_pm_deliverable_path(@project, d), :class => 'icon icon-edit' %><% end %></td>
+    </tr>
+    <% end %>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<% end %>
+<% if can_edit %><p class="mt_help"><%= l(:text_pm_seed_more) %> <%= link_to l(:label_pm_seed), project_pm_deliverables_seed_path(@project), :method => :post %></p><% end %>
+<% end %>
+<% html_title l(:label_pm_deliverables) %>

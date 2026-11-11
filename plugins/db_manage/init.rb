@@ -12,6 +12,7 @@
 # - 1.6.0 : 구조 변경 이력(저장본 비교, rake 자동 저장), SQL 조회(조회 문장만·읽기 전용·시간/건수 제한·실행 기록, 운영 DB 별도 권한)
 # - 1.7.0 : MS SQL Server (tiny_tds) — 테이블·뷰·함수·프로시저·트리거·시퀀스·시노님·에이전트 작업
 # - 1.8.0 : Oracle (ruby-oci8, Instant Client) — 테이블·뷰·구체화 뷰·함수·프로시저·패키지·트리거·시퀀스·시노님·스케줄러 작업
+# - 1.10.0: 공통코드 정의서(코드 테이블 지정·읽기 전용 조회·엑셀), 테이블 정의서·개인정보 엑셀을 DbManage::Docs 로 (산출물 패키지에서도 사용)
 # - 1.9.0 : 개인정보 컬럼(분류·암호화 여부, 이름·설명·용어로 자동 후보, 암호화 누락·DB 에서 사라짐 경고, 엑셀)
 # 원격 DB 에는 읽기 전용 세션으로 접속해 메타데이터만 읽음 (데이터 조회·변경 SQL 없음)
 require_relative 'lib/db_manage/dialect_base'
@@ -24,6 +25,8 @@ require_relative 'lib/db_manage/sql_guard'
 require_relative 'lib/db_manage/tunnel'
 require_relative 'lib/db_manage/analysis'
 require_relative 'lib/db_manage/privacy'
+require_relative 'lib/db_manage/docs'
+require_relative 'lib/db_manage/codes'
 require_relative 'lib/db_manage/erd'
 require_relative 'lib/db_manage/project_settings_patch'
 
@@ -31,16 +34,16 @@ Redmine::Plugin.register :db_manage do
   name 'DB 관리'
   author 'kephi-hub'
   description 'DB 서버 접속정보 관리, 프로젝트 DB 스키마 조회·테이블 정의서·개발/운영 비교·용어 점검'
-  version '1.9.0'
+  version '1.10.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
 
   project_module :db_manage do
     permission :view_db_schema, { db_schemas: [:index, :table, :object, :export, :compare, :check, :erd, :history, :history_diff, :privacy] }, read: true
-    permission :manage_db_links, { projects: :settings, db_links: [:new, :create, :edit, :update, :destroy], db_schemas: [:save_history, :query_log, :save_privacy] }, require: :member
+    permission :manage_db_links, { projects: :settings, db_links: [:new, :create, :edit, :update, :destroy], db_schemas: [:save_history, :query_log, :save_privacy, :codes, :save_codes] }, require: :member
     # SQL 조회: 개발 DB 와 운영 DB 권한을 따로 (운영은 기본으로 아무 역할에도 주지 않음)
-    permission :run_db_query, { db_schemas: [:query] }, require: :member
-    permission :run_db_query_production, { db_schemas: [:query] }, require: :member
+    permission :run_db_query, { db_schemas: [:query, :codes] }, require: :member
+    permission :run_db_query_production, { db_schemas: [:query, :codes] }, require: :member
   end
 
   menu :project_menu, :db_schemas, { controller: 'db_schemas', action: 'index' },

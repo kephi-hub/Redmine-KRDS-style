@@ -1,0 +1,64 @@
+<% c = @cr %>
+<% can_edit = User.current.allowed_to?(:manage_change_requests, @project) %>
+<% can_decide = User.current.allowed_to?(:approve_change_requests, @project) %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_pm_change_request_path(@project, c), :class => 'icon icon-edit' %>
+    <%= link_to sprite_icon('del', l(:button_delete)), project_pm_change_request_path(@project, c), :method => :delete, :data => { :confirm => l(:text_are_you_sure) }, :class => 'icon icon-del' %><% end %>
+</div>
+<%= pm_req_section(:cr) %>
+<h2><%= link_to l(:label_pm_crs), project_pm_change_requests_path(@project) %> &#187; <%= c.code %></h2>
+<div class="qa_box">
+  <h3 class="qa_tit"><%= c.title %></h3>
+  <p class="qa_meta"><%= pm_badge(pm_label('crstatus', c.status), c.status) %> <span class="db_dim"><%= l(:label_pm_priority) %> <%= pm_label('priority', c.priority) %> · <%= c.requester %> · <%= format_date(c.requested_on) %></span></p>
+  <dl class="qa_steps">
+    <% { :label_pm_cr_desc => c.description, :label_pm_cr_reason => c.reason }.each do |k, v| %><% if v.present? %><dt><%= l(k) %></dt><dd><%= simple_format(h(v)) %></dd><% end %><% end %>
+  </dl>
+</div>
+<h3><%= l(:label_pm_impact) %></h3>
+<div class="qa_box">
+  <dl class="db_props">
+    <div><dt><%= l(:label_pm_effort) %></dt><dd><%= c.effort ? "#{number_with_precision(c.effort, :precision => 1, :strip_insignificant_zeros => true)} #{l(:label_pm_manday)}" : '-' %></dd></div>
+    <% if (reqs = c.requirements).any? %><div><dt><%= l(:label_pm_requirements) %></dt><dd><% reqs.each do |r| %><%= link_to r.code, project_qa_requirement_path(@project, r), :title => r.name %> <% end %></dd></div><% end %>
+    <% if (ms = c.menus).any? %><% index = MenuItem.where(project_id: @project.id).index_by(&:id) %><div><dt><%= l(:label_pm_menu) %></dt><dd><%= safe_join(ms.map { |m| link_to(m.path(index), project_menu_items_path(@project, :focus => m.id)) }, ', ') %></dd></div><% end %>
+    <% if (ifs = c.interfaces).any? %><div><dt><%= l(:label_pm_interfaces) %></dt><dd><% ifs.each do |i| %><%= link_to i.code, project_ops_interface_path(@project, i), :title => i.name %> <% end %></dd></div><% end %>
+    <% if c.tables.present? %><div><dt><%= l(:label_pm_tables) %></dt><dd><%= c.tables %></dd></div><% end %>
+  </dl>
+  <dl class="qa_steps">
+    <% { :label_pm_impact_desc => c.impact, :label_pm_schedule_impact => c.schedule_impact }.each do |k, v| %><% if v.present? %><dt><%= l(k) %></dt><dd><%= simple_format(h(v)) %></dd><% end %><% end %>
+  </dl>
+</div>
+<h3><%= l(:label_pm_decision) %></h3>
+<% if c.decided? %>
+  <p class="qa_meta"><%= pm_badge(pm_label('crstatus', c.status), c.status) %> <%= c.decided_by %> · <%= format_date(c.decided_on) %></p>
+  <% if c.decision_note.present? %><div class="qa_box"><%= simple_format(h(c.decision_note)) %></div><% end %>
+<% end %>
+<% if can_decide %>
+  <% if %w(received analyzing).include?(c.status) %>
+    <%= form_tag(decide_project_pm_change_request_path(@project, c), :class => 'pm_decide') do %>
+      <p><label for="pm_dnote"><%= l(:label_pm_decision_note) %></label><%= text_area_tag 'decision_note', nil, :id => 'pm_dnote', :rows => 2, :class => 'oa_wide' %></p>
+      <p class="form_btns"><%= button_tag l(:label_pm_reject), :name => 'decision', :value => 'reject', :class => 'btn_line qa_danger', :data => { :confirm => l(:text_pm_reject) } %><%= button_tag l(:label_pm_approve), :name => 'decision', :value => 'approve', :data => { :confirm => l(:text_pm_approve) } %></p>
+    <% end %>
+  <% elsif c.status == 'approved' %>
+    <%= form_tag(decide_project_pm_change_request_path(@project, c), :class => 'st_bar') do %>
+      <% if @all_closed %><span class="db_allsame pm_inline"><%= l(:text_pm_all_closed) %></span><% end %>
+      <%= button_tag l(:label_pm_done), :name => 'decision', :value => 'done' %>
+      <%= button_tag l(:label_pm_reopen), :name => 'decision', :value => 'reopen', :class => 'btn_line' %>
+    <% end %>
+  <% elsif %w(rejected done).include?(c.status) %>
+    <%= form_tag(decide_project_pm_change_request_path(@project, c), :class => 'st_bar') do %><%= button_tag l(:label_pm_reopen), :name => 'decision', :value => 'reopen', :class => 'btn_line' %><% end %>
+  <% end %>
+<% elsif !c.decided? %>
+  <p class="db_dim"><%= l(:text_pm_wait_decision) %></p>
+<% end %>
+<h3><%= l(:label_pm_cr_issues) %> <span class="db_dim"><%= @issues.count(&:closed?) %>/<%= @issues.size %></span></h3>
+<% if @issues.any? %>
+  <ul class="mt_nolist"><% @issues.each do |i| %><li class="<%= 'qa_closed' if i.closed? %>"><%= link_to "##{i.id} #{i.subject}", issue_path(i) %> <span class="db_dim"><%= i.status %></span></li><% end %></ul>
+<% else %><p class="nodata"><%= l(:label_no_data) %></p><% end %>
+<% if can_edit && c.status == 'approved' && User.current.allowed_to?(:add_issues, @project) %>
+  <%= form_tag(make_issue_project_pm_change_request_path(@project, c), :class => 'st_bar') do %>
+    <%= select_tag 'tracker_id', options_from_collection_for_select(@project.trackers, :id, :name, @project.trackers.find_by(name: '기능')&.id), :'aria-label' => l(:field_tracker) %>
+    <%= select_tag 'assigned_to_id', options_for_select([[l(:label_pm_assignee), '']] + pm_members(@project).map { |u| [u.name, u.id] }), :'aria-label' => l(:field_assigned_to) %>
+    <%= submit_tag l(:label_pm_make_issue) %>
+  <% end %>
+<% end %>
+<% html_title "#{c.code} #{c.title}" %>

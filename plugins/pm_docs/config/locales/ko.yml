@@ -1,0 +1,218 @@
+ko:
+  project_module_deliverables: 산출물
+  project_module_change_requests: 변경요청
+  project_module_programs: 프로그램 목록
+  project_module_meetings: 회의록
+  project_module_risks: 이슈·위험
+  permission_view_deliverables: 산출물 보기
+  permission_manage_deliverables: 산출물 관리
+  permission_view_change_requests: 변경요청 보기
+  permission_manage_change_requests: 변경요청 등록·분석
+  permission_approve_change_requests: 변경요청 승인·반려
+  permission_view_programs: 프로그램 목록 보기
+  permission_manage_programs: 프로그램 목록 편집
+  permission_view_meetings: 회의록 보기
+  permission_manage_meetings: 회의록 작성
+  permission_view_risks: 이슈·위험 보기
+  permission_manage_risks: 이슈·위험 편집
+  label_pm_deliverables: 산출물
+  label_pm_crs: 변경요청
+  label_pm_programs: 프로그램 목록
+  label_pm_meetings: 회의록
+  label_pm_risks: 이슈·위험
+  label_pm_filter: 찾기
+  label_pm_code: ID
+  label_pm_note: 비고
+  label_pm_owner: 담당
+  label_pm_due: 마감일
+  label_pm_none: 없음
+  label_pm_priority: 중요도
+  label_pm_requirements: 요구사항
+  label_pm_interfaces: 인터페이스
+  label_pm_menu: 메뉴
+  label_pm_issue: 일감
+  label_pm_k_all: 전체
+  label_pm_save_continue: 저장 후 계속 등록
+  label_pm_import: 엑셀 가져오기
+  label_pm_imp_created: 새로 만듦
+  label_pm_imp_updated: 값 갱신
+  label_pm_imp_errors: 오류
+  error_pm_bad_file: 파일을 읽을 수 없습니다. 엑셀(xlsx) 또는 CSV 파일인지 확인하세요.
+  error_pm_no_header: 머리줄에서 "프로그램 ID" · "프로그램명" 칸을 찾지 못했습니다.
+  notice_pm_imported: "가져오기를 마쳤습니다. 새로 만듦 %{created}개, 값 갱신 %{updated}개"
+  # 산출물
+  text_pm_deliverables: 단계별 산출물의 작성·검토·제출 상태와 파일(버전)을 관리합니다. 시스템 데이터로 만들 수 있는 산출물은 최신본을 바로 받을 수 있고, 검수용으로 한 번에 묶어 받을 수 있습니다.
+  text_pm_deliv_empty: 등록된 산출물이 없습니다. 공공 SI 표준 산출물 목록(착수 → 종료, 34종)으로 시작하면 자동 생성 연결까지 한 번에 등록됩니다.
+  label_pm_seed: 표준 목록으로 시작
+  text_pm_seed_more: 표준 목록 중 빠진 산출물만 다시 추가하려면
+  notice_pm_seeded: "표준 산출물 %{count}개를 등록했습니다."
+  label_pm_deliv_new: 새 산출물
+  label_pm_deliv_name: 산출물
+  label_pm_phase: 단계
+  label_pm_phase_all: 전체 단계
+  label_pm_k_done: 승인 · 제출
+  label_pm_k_review: 검토 중
+  label_pm_k_none: 미작성
+  label_pm_k_late: 마감 지남
+  label_pm_k_auto: 자동 생성
+  label_pm_late: 지연
+  label_pm_optional: 선택
+  label_pm_required: 필수
+  label_pm_version: 버전
+  label_pm_submitted: 제출일
+  label_pm_latest: 최신 파일
+  label_pm_latest_short: 최신
+  label_pm_files: 파일 이력
+  label_pm_files_n: "파일 %{count}개"
+  label_pm_auto: 자동 생성
+  label_pm_auto_none: (직접 작성)
+  label_pm_module_off: 모듈 꺼짐
+  text_pm_auto_kind: 시스템 데이터로 최신 엑셀을 만드는 산출물이면 고르세요. 일괄 다운로드에도 함께 들어갑니다.
+  text_pm_auto: 받을 때마다 지금 데이터로 새로 만듭니다.
+  label_pm_generate: 최신본 받기
+  error_pm_auto_unavailable: 자동 생성에 필요한 모듈이 이 프로젝트에서 꺼져 있습니다.
+  label_pm_upload: 파일 올리기
+  label_pm_upload_btn: 올리기
+  text_pm_upload: 새 파일을 올리면 이력에 쌓이고 가장 최근 파일이 최신본입니다. 버전도 함께 바꿀 수 있습니다.
+  notice_pm_attached: 파일을 올렸습니다.
+  text_pm_deliv_delete: 이 산출물과 올린 파일을 모두 지웁니다. 계속할까요?
+  label_pm_package: 검수용 일괄 다운로드
+  text_pm_package: 고른 단계의 산출물을 단계 폴더로 묶어 zip 하나로 받습니다. 산출물마다 최신 파일과 자동 생성 엑셀이 들어가고, 맨 위에 산출물 목록이 들어갑니다.
+  label_pm_required_only: 필수 산출물만
+  label_pm_include_auto: 자동 생성 포함
+  text_pm_include_auto: 테이블 정의서 · 공통코드는 DB 에 접속해 만들므로 시간이 걸릴 수 있습니다.
+  label_pm_package_make: zip 만들기
+  error_pm_package_busy: 다른 일괄 다운로드를 만드는 중입니다. 잠시 뒤 다시 시도하세요.
+  # 변경요청
+  text_pm_crs: 요구사항 변경 요청을 접수하고 영향(요구사항 · 메뉴 · 인터페이스 · 테이블 · 공수 · 일정)을 분석해 승인·반려합니다. 승인하면 연결 요구사항이 "변경"으로 바뀌고 이력에 남습니다.
+  label_pm_cr_new: 새 변경요청
+  label_pm_cr_export: 변경요청 관리대장
+  label_pm_cr_search: CR ID · 제목 · 내용으로 찾기
+  text_pm_cr_effort: "승인 · 반영된 변경의 예상 공수 합계 %{effort} 인일"
+  label_pm_cr_title: 제목
+  label_pm_requester: 요청자
+  label_pm_requested_on: 요청일
+  label_pm_effort: 예상 공수(인일)
+  label_pm_manday: 인일
+  label_pm_links: 연결
+  label_pm_link_counts: "요구사항 %{req} · 메뉴 %{menu} · 일감 %{issue}"
+  label_pm_cr_desc: 요청 내용
+  label_pm_cr_reason: 요청 사유
+  text_pm_cr_code: 비워 두면 CR-001 처럼 자동
+  label_pm_impact: 영향 분석
+  label_pm_impact_desc: 영향 분석 내용
+  label_pm_schedule_impact: 일정 영향
+  label_pm_tables: 관련 테이블
+  label_pm_issue_ids: 반영 일감 번호
+  label_pm_pick_req: 요구사항 ID · 이름으로 찾아 추가
+  label_pm_pick_menu: 메뉴 이름 · 화면 ID 로 찾아 추가
+  label_pm_decision: 결정
+  label_pm_decision_note: 결정 의견
+  label_pm_approve: 승인
+  label_pm_reject: 반려
+  label_pm_done: 반영 완료
+  label_pm_reopen: 다시 분석
+  text_pm_approve: 승인하면 연결 요구사항 상태가 "변경"으로 바뀝니다. 계속할까요?
+  text_pm_reject: 반려할까요?
+  text_pm_all_closed: 반영 일감이 모두 완료되었습니다.
+  text_pm_wait_decision: 승인 권한이 있는 사람이 결정합니다.
+  notice_pm_cr_approve: 승인했습니다.
+  notice_pm_cr_reject: 반려했습니다.
+  notice_pm_cr_done: 반영 완료로 바꿨습니다.
+  notice_pm_cr_reopen: 다시 분석 단계로 돌렸습니다.
+  label_pm_cr_issues: 반영 일감
+  label_pm_assignee: 담당자
+  label_pm_make_issue: 반영 일감 만들기
+  notice_pm_issue_created: "일감 #%{id} 을(를) 만들었습니다."
+  # 프로그램
+  text_pm_programs: 개발할 프로그램(화면 · 팝업 · 배치 · API …)과 소스 경로, 개발자, 진척을 관리합니다.
+  label_pm_prog_new: 새 프로그램
+  label_pm_prog_export: 프로그램 목록 엑셀
+  label_pm_prog_code: 프로그램 ID
+  label_pm_prog_name: 프로그램명
+  label_pm_prog_search: ID · 이름 · 소스 경로로 찾기
+  label_pm_kind: 유형
+  label_pm_kind_all: 모든 유형
+  label_pm_k_nopath: 소스 경로 없음
+  label_pm_progress: 개발 진척
+  label_pm_paths: 소스 경로
+  text_pm_paths: 저장소 경로를 한 줄에 하나씩 (프로그램 화면에서 저장소 파일로 바로 이동)
+  label_pm_developer: 개발자
+  label_pm_planned: 계획일
+  label_pm_done_on: 완료일
+  label_pm_no_dev: 개발자 없음
+  label_pm_from_menus: 메뉴 구조도에서 만들기
+  text_pm_from_menus: 메뉴 구조도의 말단 메뉴(화면) 중 프로그램이 없는 것을 한 번에 만듭니다 (ID 는 화면 ID, 없으면 PGM-001). 계속할까요?
+  notice_pm_programs_created: "프로그램 %{count}개를 만들었습니다."
+  text_pm_prog_empty: "[메뉴 구조도에서 만들기] 로 화면별 프로그램을 한 번에 만들거나, 엑셀로 가져오세요."
+  label_pm_suggest: 소스 경로 추천
+  text_pm_suggest: 저장소 커밋의 변경 파일 중 프로그램 ID · 화면 ID · 메뉴 URL 조각이 파일 이름이나 폴더에 들어간 것을 찾았습니다. 맞는 경로를 골라 반영하세요.
+  text_pm_no_repo: 이 프로젝트에 저장소가 없습니다.
+  text_pm_no_suggest: 추천할 경로가 없습니다.
+  label_pm_suggest_paths: 추천 경로
+  label_pm_apply_paths: 고른 경로 반영
+  notice_pm_paths_applied: "프로그램 %{count}개에 소스 경로를 더했습니다."
+  text_pm_import: 엑셀(xlsx) 또는 CSV 파일을 올리세요. [프로그램 목록 엑셀] 파일을 고쳐서 다시 올려도 됩니다.
+  text_pm_import_rules: "칸 이름: 프로그램 ID · 프로그램명 · 유형(화면/팝업/배치/API/공통/리포트) · 화면 ID 또는 메뉴 · 소스 경로(줄바꿈) · 개발자(이름 또는 로그인 ID) · 상태 · 계획일 · 완료일 · 비고. 프로그램 ID 가 같으면 값만 갱신합니다."
+  # 회의록
+  text_pm_meetings: 회의 내용과 결정 사항을 남기고, 후속 조치는 일감으로 바로 만듭니다.
+  label_pm_meeting_new: 새 회의록
+  label_pm_meeting_title: 회의 제목
+  label_pm_held_at: 일시
+  label_pm_place: 장소
+  label_pm_attendees: 참석자
+  label_pm_add_member: 구성원 추가
+  label_pm_agenda: 안건
+  label_pm_notes: 회의 내용
+  label_pm_writer: 작성자
+  label_pm_k_meetings: 회의
+  label_pm_k_decisions: 결정 사항
+  label_pm_k_open_actions: 진행 중 후속 조치
+  label_pm_actions: 후속 조치
+  label_pm_action_title: 할 일
+  label_pm_make_issue_col: 일감 만들기
+  label_pm_decision_ph: 결정 사항 한 줄
+  label_pm_add_row: 줄 추가
+  text_pm_actions: "\"일감 만들기\" 를 고른 할 일은 저장할 때 일감으로 만들어집니다. 일감 유형:"
+  label_pm_issue_n: "일감 %{count}"
+  notice_pm_meeting_issues: "저장했습니다. 후속 조치 일감 %{count}개를 만들었습니다."
+  label_pm_print: 인쇄
+  # 이슈·위험
+  text_pm_risks: 위험(일어날 수 있는 일)과 이슈(이미 일어난 일)를 가능성 × 영향으로 등급을 매겨 관리합니다.
+  label_pm_risk_new: 새 위험
+  label_pm_issue_new: 새 이슈
+  label_pm_risk_export: 이슈·위험 관리대장
+  label_pm_k_open: 진행 중
+  label_pm_k_high: 상 등급
+  label_pm_k_issue: 이슈
+  label_pm_matrix: 위험 매트릭스 (진행 중)
+  label_pm_prob: 가능성
+  label_pm_impact_short: 영향
+  label_pm_rkind: 구분
+  label_pm_risk_title: 제목
+  label_pm_risk_desc: 내용
+  label_pm_level: 등급
+  label_pm_plan: 대응 계획
+  label_pm_raised: 식별일
+  label_pm_closed: 종료일
+  text_pm_risk_code: 비워 두면 R-001 처럼 자동
+  text_pm_level: "등급: 가능성 × 영향이 6 이상 상 · 3~4 중 · 그 밖 하"
+  activerecord:
+    attributes:
+      pm_deliverable:
+        name: 산출물
+        phase: 단계
+      pm_change_request:
+        code: CR ID
+        title: 제목
+        effort: 예상 공수
+      pm_program:
+        code: 프로그램 ID
+        name: 프로그램명
+        menu_item_id: 메뉴
+      pm_meeting:
+        title: 회의 제목
+        held_at: 일시
+      pm_risk:
+        code: ID
+        title: 제목

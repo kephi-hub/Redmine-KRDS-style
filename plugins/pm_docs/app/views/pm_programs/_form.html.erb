@@ -1,0 +1,14 @@
+<%= error_messages_for @program %>
+<div class="box tabular">
+  <p><%= f.text_field :code, :required => true, :size => 24, :maxlength => 60, :placeholder => 'MB-CUS-001', :label => :label_pm_prog_code %></p>
+  <p><%= f.text_field :name, :required => true, :size => 50, :maxlength => 150, :label => :label_pm_prog_name %></p>
+  <p><%= f.select :kind, pm_options('pkind', PmProgram::KINDS), { :label => :label_pm_kind } %></p>
+  <% if @ordered.any? %><p><%= f.select :menu_item_id, @ordered.map { |m, d| ["#{"  " * d}#{m.name}#{" (#{m.screen_id})" if m.screen_id}", m.id] }, { :include_blank => true, :label => :label_pm_menu } %></p><% end %>
+  <p><%= f.text_area :source_paths, :rows => 4, :cols => 70, :class => 'oa_mono', :placeholder => "/src/main/java/.../CustomerController.java\n/src/main/webapp/WEB-INF/jsp/customer/list.jsp", :label => :label_pm_paths %>
+    <em class="info"><%= l(:text_pm_paths) %></em></p>
+  <p><%= f.select :developer_id, pm_members(@project).map { |u| [u.name, u.id] }, { :include_blank => true, :label => :label_pm_developer } %></p>
+  <p><%= f.select :status, pm_options('pstatus', PmProgram::STATUSES), { :label => :field_status } %></p>
+  <p><%= f.date_field :planned_on, :label => :label_pm_planned %><%= calendar_for('pm_program_planned_on') %></p>
+  <p><%= f.date_field :done_on, :label => :label_pm_done_on %><%= calendar_for('pm_program_done_on') %></p>
+  <p><%= f.text_area :note, :rows => 2, :cols => 60, :label => :label_pm_note %></p>
+</div>

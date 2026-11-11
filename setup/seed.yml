@@ -128,6 +128,17 @@ roles:
   - view_ops_logs
   - manage_ops_logs
   - view_ops_interfaces
+  - view_deliverables
+  - view_change_requests
+  - view_programs
+  - view_meetings
+  - view_risks
+  - manage_deliverables
+  - manage_change_requests
+  - approve_change_requests
+  - manage_programs
+  - manage_meetings
+  - manage_risks
   - manage_ops_interfaces
   - run_qa_tests
   - manage_qa_tests
@@ -238,6 +249,16 @@ roles:
   - view_ops_logs
   - manage_ops_logs
   - view_ops_interfaces
+  - view_deliverables
+  - view_change_requests
+  - view_programs
+  - view_meetings
+  - view_risks
+  - manage_deliverables
+  - manage_change_requests
+  - manage_programs
+  - manage_meetings
+  - manage_risks
   - manage_ops_interfaces
   - run_qa_tests
   - manage_qa_tests
@@ -308,6 +329,11 @@ roles:
   - view_ops_schedules
   - view_ops_logs
   - view_ops_interfaces
+  - view_deliverables
+  - view_change_requests
+  - view_programs
+  - view_meetings
+  - view_risks
   - run_qa_tests
   - add_issues
   - edit_issues
@@ -369,6 +395,11 @@ roles:
   - view_ops_schedules
   - view_ops_logs
   - view_ops_interfaces
+  - view_deliverables
+  - view_change_requests
+  - view_programs
+  - view_meetings
+  - view_risks
 
 # 일감 상태 — 보류는 개발자·디자이너가 쓰는 "잠시 멈춤" 이라 열린 상태
 issue_statuses:

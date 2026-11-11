@@ -1,0 +1,37 @@
+<%= error_messages_for @cr %>
+<div class="box tabular">
+  <p><%= f.text_field :code, :size => 12, :maxlength => 30, :placeholder => 'CR-001', :label => :label_pm_code %><em class="info"><%= l(:text_pm_cr_code) %></em></p>
+  <p><%= f.text_field :title, :required => true, :size => 60, :maxlength => 200, :label => :label_pm_cr_title %></p>
+  <p><%= f.text_field :requester, :size => 30, :maxlength => 120, :placeholder => '발주기관 담당자', :label => :label_pm_requester %></p>
+  <p><%= f.date_field :requested_on, :label => :label_pm_requested_on %><%= calendar_for('pm_change_request_requested_on') %></p>
+  <p><%= f.select :priority, pm_options('priority', PmChangeRequest::PRIORITIES), { :label => :label_pm_priority } %></p>
+  <% unless @cr.decided? %><p><%= f.select :status, pm_options('crstatus', %w(received analyzing)), { :label => :field_status } %></p><% end %>
+  <p><%= f.text_area :description, :rows => 5, :cols => 60, :label => :label_pm_cr_desc %></p>
+  <p><%= f.text_area :reason, :rows => 3, :cols => 60, :label => :label_pm_cr_reason %></p>
+</div>
+<h3><%= l(:label_pm_impact) %></h3>
+<div class="box tabular">
+  <% if @req_on %>
+    <p><label><%= l(:label_pm_requirements) %></label>
+      <% chosen = params[:reqs_sent] == '1' ? Array(params[:requirement_ids]).map(&:to_i) : (@cr.persisted? ? @cr.link_ids('requirement') : @cr_req_ids.to_a) %>
+      <%= render :partial => 'qa_trace/pick', :locals => { :pick_id => 'pm_req_pick', :field => 'requirement_ids[]', :sent => 'reqs_sent', :chosen => chosen, :placeholder => l(:label_pm_pick_req),
+            :items => @all_reqs.map { |r| { :id => r.id, :chip => r.code, :label => r.name, :sub => r.code, :q => "#{r.code} #{r.name}" } } } %></p>
+  <% end %>
+  <% if @menu_on %>
+    <% index = @ordered.to_h { |m, _| [m.id, m] } %>
+    <p><label><%= l(:label_pm_menu) %></label>
+      <% chosen = params[:menus_sent] == '1' ? Array(params[:menu_item_ids]).map(&:to_i) : @cr.link_ids('menu') %>
+      <%= render :partial => 'qa_trace/pick', :locals => { :pick_id => 'pm_menu_pick', :field => 'menu_item_ids[]', :sent => 'menus_sent', :chosen => chosen, :placeholder => l(:label_pm_pick_menu),
+            :items => @ordered.map { |m, d| { :id => m.id, :chip => m.path(index), :label => m.name, :sub => m.screen_id, :q => "#{m.path(index)} #{m.screen_id}", :depth => d } } } %></p>
+  <% end %>
+  <% if @if_on && @all_ifs.any? %>
+    <p><label><%= l(:label_pm_interfaces) %></label>
+      <%= hidden_field_tag 'ifs_sent', '1', :id => nil %>
+      <span class="oa_projects"><% @all_ifs.each do |i| %><label class="inline"><%= check_box_tag 'interface_ids[]', i.id, @cr.link_ids('interface').include?(i.id), :id => nil %> <%= i.code %> <%= i.name %></label><% end %></span></p>
+  <% end %>
+  <p><%= f.text_area :tables, :rows => 2, :cols => 60, :placeholder => 'TB_MEMBER, TB_ORDER', :label => :label_pm_tables %></p>
+  <p><%= f.number_field :effort, :step => 0.5, :min => 0, :label => :label_pm_effort %></p>
+  <p><%= f.text_area :impact, :rows => 4, :cols => 60, :label => :label_pm_impact_desc %></p>
+  <p><%= f.text_area :schedule_impact, :rows => 2, :cols => 60, :label => :label_pm_schedule_impact %></p>
+  <p><label for="pm_issue_ids"><%= l(:label_pm_issue_ids) %></label><%= text_field_tag 'issue_ids', params.key?(:issue_ids) ? params[:issue_ids] : @cr.link_ids('issue').map { |i| "##{i}" }.join(', '), :id => 'pm_issue_ids', :size => 40 %></p>
+</div>

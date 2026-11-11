@@ -1,0 +1,23 @@
+<% p = @program %>
+<% can_edit = User.current.allowed_to?(:manage_programs, @project) %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_pm_program_path(@project, p), :class => 'icon icon-edit' %>
+    <%= link_to sprite_icon('del', l(:button_delete)), project_pm_program_path(@project, p), :method => :delete, :data => { :confirm => l(:text_are_you_sure) }, :class => 'icon icon-del' %><% end %>
+</div>
+<h2><%= link_to l(:label_pm_programs), project_pm_programs_path(@project) %> &#187; <%= p.code %></h2>
+<div class="qa_box">
+  <h3 class="qa_tit"><%= p.name %></h3>
+  <p class="qa_meta"><%= pm_badge(pm_label('pstatus', p.status), p.status) %> <span class="db_dim"><%= pm_label('pkind', p.kind) %></span></p>
+  <dl class="db_props">
+    <% if (m = @index[p.menu_item_id]) %><div><dt><%= l(:label_pm_menu) %></dt><dd><%= link_to m.path(@index), project_menu_items_path(@project, :focus => m.id) %><% if m.screen_id %> <code><%= m.screen_id %></code><% end %><% if m.url %> <span class="db_dim"><%= m.url %></span><% end %></dd></div><% end %>
+    <div><dt><%= l(:label_pm_developer) %></dt><dd><%= p.developer || '-' %></dd></div>
+    <div><dt><%= l(:label_pm_planned) %></dt><dd><%= format_date(p.planned_on) || '-' %></dd></div>
+    <div><dt><%= l(:label_pm_done_on) %></dt><dd><%= format_date(p.done_on) || '-' %></dd></div>
+  </dl>
+  <dl class="qa_steps">
+    <dt><%= l(:label_pm_paths) %></dt>
+    <dd><% if p.paths.any? %><ul class="mt_nolist"><% repo = @project.repository %><% p.paths.each do |path| %><li><% if repo %><%= link_to path, { :controller => 'repositories', :action => 'entry', :id => @project, :repository_id => repo.identifier_param, :path => path.sub(%r{\A/}, '').split('/') } rescue path %><% else %><code><%= path %></code><% end %></li><% end %></ul><% else %>-<% end %></dd>
+    <% if p.note.present? %><dt><%= l(:label_pm_note) %></dt><dd><%= simple_format(h(p.note)) %></dd><% end %>
+  </dl>
+</div>
+<% html_title "#{p.code} #{p.name}" %>

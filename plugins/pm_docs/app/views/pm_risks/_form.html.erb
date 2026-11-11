@@ -1,0 +1,16 @@
+<%= error_messages_for @risk %>
+<div class="box tabular">
+  <p><%= f.select :kind, pm_options('rkind', PmRisk::KINDS), { :label => :label_pm_rkind } %></p>
+  <p><%= f.text_field :code, :size => 10, :maxlength => 30, :placeholder => 'R-001', :label => :label_pm_code %><em class="info"><%= l(:text_pm_risk_code) %></em></p>
+  <p><%= f.text_field :title, :required => true, :size => 60, :maxlength => 200, :label => :label_pm_risk_title %></p>
+  <p><%= f.text_area :description, :rows => 4, :cols => 60, :label => :label_pm_risk_desc %></p>
+  <p><%= f.select :probability, [3, 2, 1].map { |v| [pm_label('phl', v), v] }, { :label => :label_pm_prob } %></p>
+  <p><%= f.select :impact, [3, 2, 1].map { |v| [pm_label('phl', v), v] }, { :label => :label_pm_impact_short } %><em class="info"><%= l(:text_pm_level) %></em></p>
+  <p><%= f.select :status, pm_options('rstatus', PmRisk::STATUSES), { :label => :field_status } %></p>
+  <p><%= f.select :owner_id, @members.map { |u| [u.name, u.id] }, { :include_blank => true, :label => :label_pm_owner } %></p>
+  <p><%= f.text_area :plan, :rows => 4, :cols => 60, :label => :label_pm_plan %></p>
+  <p><%= f.date_field :due_on, :label => :label_pm_due %><%= calendar_for('pm_risk_due_on') %></p>
+  <p><%= f.date_field :raised_on, :label => :label_pm_raised %><%= calendar_for('pm_risk_raised_on') %></p>
+  <p><%= f.date_field :closed_on, :label => :label_pm_closed %><%= calendar_for('pm_risk_closed_on') %></p>
+  <p><%= f.text_field :issue_id, :size => 10, :placeholder => '#123', :label => :label_pm_issue %></p>
+</div>

@@ -41,6 +41,11 @@ ko:
   label_access_area_schedules: 스케줄러
   label_access_area_opslogs: 점검·장애
   label_access_area_interfaces: 인터페이스
+  label_access_area_deliverables: 산출물
+  label_access_area_changes: 변경요청
+  label_access_area_programs: 프로그램 목록
+  label_access_area_meetings: 회의록
+  label_access_area_risks: 이슈·위험
   label_access_area_project: 프로젝트 설정·구성원
   label_access_area_issues: 일감
   label_access_area_time: 소요시간

@@ -1,0 +1,19 @@
+<%# 산출물 > 검수용 일괄 다운로드 %>
+<h2><%= link_to l(:label_pm_deliverables), project_pm_deliverables_path(@project) %> &#187; <%= l(:label_pm_package) %></h2>
+<p class="subtitle"><%= l(:text_pm_package) %></p>
+<% counts = @all.group_by(&:phase).transform_values(&:size) %>
+<%= form_tag(project_pm_deliverables_package_path(@project)) do %>
+  <div class="box tabular">
+    <p><label><%= l(:label_pm_phase) %></label>
+      <span class="oa_projects"><% PmDeliverable::PHASES.each do |ph| %><label class="inline"><%= check_box_tag 'phases[]', ph, counts[ph].to_i.positive?, :id => nil, :disabled => counts[ph].to_i.zero? %> <%= pm_label('phase', ph) %> <span class="db_dim">(<%= counts[ph].to_i %>)</span></label><% end %></span></p>
+    <p><label for="pm_req_only"><%= l(:label_pm_required_only) %></label><%= check_box_tag 'required_only', '1', false, :id => 'pm_req_only' %></p>
+    <p><label for="pm_auto"><%= l(:label_pm_include_auto) %></label><%= check_box_tag 'auto', '1', true, :id => 'pm_auto' %>
+      <em class="info"><%= l(:text_pm_include_auto) %></em></p>
+  </div>
+  <pre class="db_sql pm_tree"><code>산출물_<%= @project.identifier %>_날짜.zip
+├─ 산출물목록.xlsx
+<% PmDeliverable::PHASES.each_with_index do |ph, i| %><% next if counts[ph].to_i.zero? %>├─ <%= format('%02d', i + 1) %>_<%= pm_label('phase', ph) %>/  (<%= counts[ph] %>)
+<% end %></code></pre>
+  <p class="form_btns"><%= link_to l(:button_cancel), project_pm_deliverables_path(@project), :class => 'btn_line' %><%= submit_tag l(:label_pm_package_make), :data => { :disable_with => false } %></p>
+<% end %>
+<% html_title l(:label_pm_package) %>

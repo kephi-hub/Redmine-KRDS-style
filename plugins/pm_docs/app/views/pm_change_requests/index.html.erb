@@ -1,0 +1,46 @@
+<%# 프로젝트 > 요구사항 > 변경요청 %>
+<% can_edit = User.current.allowed_to?(:manage_change_requests, @project) %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('add', l(:label_pm_cr_new)), new_project_pm_change_request_path(@project), :class => 'icon icon-add' %><% end %>
+  <%= link_to sprite_icon('download', l(:label_pm_cr_export)), project_pm_change_requests_export_path(@project), :class => 'icon icon-download' %>
+</div>
+<%= pm_req_section(:cr) %>
+<h2><%= l(:label_pm_crs) %></h2>
+<p class="subtitle"><%= l(:text_pm_crs) %></p>
+<ul class="db_stats mt_kpi">
+  <li class="<%= 'on' unless @status %>"><%= link_to project_pm_change_requests_path(@project) do %><span><%= l(:label_pm_k_all) %></span><strong><%= @kpi['all'] %></strong><% end %></li>
+  <% %w(received analyzing approved rejected done).each do |s| %>
+    <li class="<%= 'on' if @status == s %>"><%= link_to project_pm_change_requests_path(@project, :status => s) do %><span><%= pm_label('crstatus', s) %></span><strong><%= @kpi[s] %></strong><% end %></li>
+  <% end %>
+</ul>
+<p class="db_info"><%= l(:text_pm_cr_effort, :effort => number_with_precision(@effort, :precision => 1, :strip_insignificant_zeros => true)) %></p>
+<%= form_tag(project_pm_change_requests_path(@project), :method => :get, :class => 'qa_filter') do %>
+  <%= hidden_field_tag 'status', @status if @status %>
+  <%= search_field_tag 'q', @q, :placeholder => l(:label_pm_cr_search), :'aria-label' => l(:label_pm_cr_search) %>
+  <%= submit_tag l(:label_pm_filter), :name => nil %>
+<% end %>
+<% if @crs.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list pm_list">
+  <thead><tr><th>ID</th><th class="name"><%= l(:label_pm_cr_title) %></th><th><%= l(:label_pm_priority) %></th><th><%= l(:field_status) %></th><th><%= l(:label_pm_requester) %></th><th><%= l(:label_pm_requested_on) %></th><th><%= l(:label_pm_effort) %></th><th><%= l(:label_pm_links) %></th><th></th></tr></thead>
+  <tbody>
+  <% @crs.each do |c| %>
+    <tr>
+      <td class="code"><%= link_to c.code, project_pm_change_request_path(@project, c) %></td>
+      <td class="name"><%= link_to c.title, project_pm_change_request_path(@project, c) %></td>
+      <td><%= pm_label('priority', c.priority) %></td>
+      <td><%= pm_badge(pm_label('crstatus', c.status), c.status) %></td>
+      <td><%= c.requester %></td>
+      <td class="next"><%= format_date(c.requested_on) %></td>
+      <td><%= c.effort ? number_with_precision(c.effort, :precision => 1, :strip_insignificant_zeros => true) : '-' %></td>
+      <td><span class="db_dim"><%= l(:label_pm_link_counts, :req => c.link_ids('requirement').size, :menu => c.link_ids('menu').size, :issue => c.link_ids('issue').size) %></span></td>
+      <td class="buttons"><% if can_edit && !c.decided? %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_pm_change_request_path(@project, c), :class => 'icon icon-edit' %><% end %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<% end %>
+<% html_title l(:label_pm_crs) %>

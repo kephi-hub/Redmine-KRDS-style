@@ -46,6 +46,12 @@
 <% else %><p class="nodata"><%= l(:label_qa_none) %></p><% end %>
 <% end %>
 
+<% if defined?(PmChangeRequest) && @project.module_enabled?(:change_requests) && User.current.allowed_to?(:view_change_requests, @project) %>
+<% crs = PmChangeRequest.where(id: PmCrLink.where(target_type: 'requirement', target_id: @req.id).select(:pm_change_request_id)).order(:code).to_a %>
+<h3><%= l(:label_pm_crs) %> <span class="mt_dim">(<%= crs.size %>)</span></h3>
+<% if crs.any? %><ul class="mt_nolist"><% crs.each do |c| %><li><%= link_to c.code, project_pm_change_request_path(@project, c) %> <%= c.title %> <span class="mt_dim"><%= PmKit::Sheet::LABEL['crstatus'][c.status] %></span></li><% end %></ul><% else %><p class="nodata"><%= l(:label_qa_none) %></p><% end %>
+<% if User.current.allowed_to?(:manage_change_requests, @project) %><p><%= link_to l(:label_pm_cr_new), new_project_pm_change_request_path(@project, :requirement_id => @req.id) %></p><% end %>
+<% end %>
 <% if @children.any? %>
 <h3><%= l(:label_qa_children) %></h3>
 <ul class="mt_nolist"><% @children.each do |c| %><li><%= link_to c.code, project_qa_requirement_path(@project, c) %> <%= c.name %> <%= qa_status_badge(c.status) %></li><% end %></ul>

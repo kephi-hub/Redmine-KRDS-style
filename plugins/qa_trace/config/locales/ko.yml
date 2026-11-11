@@ -76,6 +76,7 @@ ko:
   label_qa_field_category: 분류
   label_qa_field_name: 요구사항명
   label_qa_field_source: 출처
+  label_qa_field_cr: 변경요청 승인
   text_qa_import_req: 엑셀(xlsx) 또는 CSV 파일을 올리세요. 머리줄에서 칸 이름을 찾습니다. [엑셀 내보내기] 파일을 고쳐서 다시 올려도 됩니다.
   text_qa_import_req_rules: "칸 이름: 요구사항 ID(고유번호) · 분류(SFR 또는 기능) · 요구사항명 · 상세 내용 · 출처 · 중요도(상/중/하) · 상태(접수/확정/변경/삭제) · 상위 ID · 메뉴(화면 ID 또는 경로, 여러 개는 줄바꿈). ID 가 같은 요구사항은 값만 갱신되고 변경 이력이 남습니다. ID 가 비어 있으면 새로 만들고 번호를 자동으로 붙입니다."
   text_qa_import_case: 엑셀(xlsx) 또는 CSV 파일을 올리세요. 머리줄에서 칸 이름을 찾습니다. [엑셀 내보내기] 파일을 고쳐서 다시 올려도 됩니다.

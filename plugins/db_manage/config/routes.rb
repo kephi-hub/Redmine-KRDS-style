@@ -14,6 +14,8 @@ resources :projects, only: [] do
   get 'db/:link_id/query/log', to: 'db_schemas#query_log', as: 'db_query_log'
   get 'db/:link_id/check', to: 'db_schemas#check', as: 'db_check'
   get 'db/:link_id/privacy', to: 'db_schemas#privacy', as: 'db_privacy'
+  get 'db/:link_id/codes', to: 'db_schemas#codes', as: 'db_codes'
+  post 'db/:link_id/codes', to: 'db_schemas#save_codes'
   post 'db/:link_id/privacy', to: 'db_schemas#save_privacy'
   get 'db/:link_id/erd', to: 'db_schemas#erd', as: 'db_erd', format: false
   get 'db/:link_id/export', to: 'db_schemas#export', as: 'db_export'

@@ -1,0 +1,22 @@
+<%# 프로그램 > 소스 경로 추천 %>
+<h2><%= link_to l(:label_pm_programs), project_pm_programs_path(@project) %> &#187; <%= l(:label_pm_suggest) %></h2>
+<p class="subtitle"><%= l(:text_pm_suggest) %></p>
+<% if @project.repositories.empty? %>
+  <p class="db_hintbox"><%= l(:text_pm_no_repo) %></p>
+<% elsif @suggestions.empty? %>
+  <p class="nodata"><%= l(:text_pm_no_suggest) %></p>
+<% else %>
+<%= form_tag(project_pm_programs_suggest_path(@project)) do %>
+  <div class="autoscroll"><table class="list pm_list">
+    <thead><tr><th><%= l(:label_pm_prog_code) %></th><th class="name"><%= l(:label_pm_prog_name) %></th><th class="name"><%= l(:label_pm_suggest_paths) %></th></tr></thead>
+    <tbody>
+    <% @suggestions.each do |s| %>
+      <tr><td class="code"><%= s[:program].code %><span class="db_dim db_pvsub"><%= s[:tokens].join(', ') %></span></td><td class="name"><%= s[:program].name %></td>
+        <td class="name"><% s[:paths].each do |path| %><label class="pm_path"><%= check_box_tag "paths[#{s[:program].id}][]", path, false, :id => nil %> <code><%= path %></code></label><% end %></td></tr>
+    <% end %>
+    </tbody>
+  </table></div>
+  <p class="form_btns"><%= link_to l(:button_cancel), project_pm_programs_path(@project), :class => 'btn_line' %><%= submit_tag l(:label_pm_apply_paths) %></p>
+<% end %>
+<% end %>
+<% html_title l(:label_pm_suggest) %>

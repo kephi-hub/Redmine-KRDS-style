@@ -8,7 +8,7 @@ class DbSchemasController < ApplicationController
   before_action :find_project_by_project_id
   before_action :authorize
   before_action :load_links
-  before_action :find_link, only: [:table, :object, :export, :check, :erd, :history, :save_history, :history_diff, :query, :query_log, :privacy, :save_privacy]
+  before_action :find_link, only: [:table, :object, :export, :check, :erd, :history, :save_history, :history_diff, :query, :query_log, :privacy, :save_privacy, :codes, :save_codes]
 
   def index
     @link = @links.find { |l| l.id.to_s == params[:link].to_s } || @links.first
@@ -45,45 +45,9 @@ class DbSchemasController < ApplicationController
   def export
     snap = snapshot(@link, objects: true)
     return redirect_to(project_db_schemas_path(@project, link: @link.id)) unless snap
-    terms = DbManage::Analysis.term_map(@project)
-    tables = snap[:tables].each_with_index.map do |t, i|
-      [i + 1, t[:name], t[:view] ? '뷰' : '테이블', t[:comment], (snap[:columns][t[:name]] || []).size, t[:view] ? nil : t[:rows]]
-    end
-    columns = []
-    snap[:tables].each do |t|
-      (snap[:columns][t[:name]] || []).each do |c|
-        term = terms && DbManage::Analysis.term_status(c, terms).last
-        columns << [t[:name], t[:comment], c[:position], c[:name], c[:type], c[:nullable] ? 'Y' : 'N', c[:default], c[:keys].join(', '), c[:ref], c[:comment], term&.name]
-      end
-    end
-    sheets = [
-      { name: '테이블 목록', header: %w(No 테이블명 구분 설명 컬럼\ 수 행\ 수(추정)), rows: tables, widths: [6, 30, 8, 40, 10, 14] },
-      { name: '컬럼 정의', header: %w(테이블명 테이블\ 설명 No 컬럼명 데이터\ 타입 Null 기본값 키 참조 설명 용어), rows: columns,
-        widths: [26, 24, 6, 26, 20, 6, 18, 10, 24, 36, 18] }
-    ]
-    idx_rows = []
-    snap[:tables].each do |t|
-      (snap[:indexes].to_h[t[:name]] || []).each do |i|
-        idx_rows << [t[:name], i[:name], i[:primary] ? 'PK' : (i[:unique] ? 'UNIQUE' : 'INDEX'), i[:columns].join(', '), i[:method]]
-      end
-    end
-    sheets << { name: '인덱스', header: %w(테이블명 인덱스명 구분 컬럼(순서) 방식), rows: idx_rows, widths: [26, 30, 10, 50, 10] } if idx_rows.any?
-    # 시트 3: 뷰 정의·함수·프로시저·트리거·DB 잡·시퀀스 (엑셀 칸 최대 글자 수 때문에 정의는 3만 자까지)
-    objects = []
-    (snap[:kinds] - ['table']).each do |kind|
-      snap.dig(:objects, kind).to_a.each do |o|
-        detail = o[:args] || o[:table] || o[:schedule] || (o[:start] && "#{o[:start]} 부터 #{o[:increment]}씩")
-        extra = o[:returns] || o[:timing] || o[:type]
-        objects << [l("label_db_kind_#{kind}"), o[:name], detail, extra, o[:status], o[:comment], o[:definition].to_s[0, 30_000]]
-      end
-    end
-    if objects.any?
-      sheets << { name: '뷰·함수·트리거·잡', header: %w(종류 이름 인자·대상·일정 반환·시점·타입 상태 설명 정의), rows: objects,
-                  widths: [12, 28, 30, 22, 10, 30, 60] }
-    end
+    data = DbManage::Docs.table_definition(snap, DbManage::Analysis.term_map(@project))
     name = "테이블정의서_#{@project.identifier}_#{@link.name}_#{User.current.today.strftime('%Y%m%d')}.xlsx"
-    send_data KrdsUi::Xlsx.build(sheets), filename: name,
-              type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    send_data data, filename: name, type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   end
 
   # ERD (Mermaid) — 화면 보기, download=md|mmd 내려받기 (SVG·PNG 는 화면에서 그림을 그대로 저장)
@@ -249,15 +213,8 @@ class DbSchemasController < ApplicationController
     snap = snapshot(@link)
     @terms = DbManage::Analysis.term_map(@project)
     records = DbPrivacyColumn.where(db_link_id: @link.id).includes(:user).to_a
-    cols = {}
-    snap&.dig(:tables)&.reject { |t| t[:view] }&.each do |t|
-      (snap[:columns][t[:name]] || []).each { |c| cols["#{t[:name]}.#{c[:name]}"] = [t, c] }
-    end
+    @rows = DbManage::Privacy.rows(records, snap)
     order = DbPrivacyColumn::CATEGORIES
-    @rows = records.map do |r|
-      t, c = cols[r.key]
-      { rec: r, table: r.table_name, column: r.column_name, col: c, table_comment: t&.dig(:comment), gone: snap && c.nil?, judge: r.judge }
-    end.sort_by { |x| [order.index(x[:rec].category), x[:table], x[:column]] }
     @candidates = snap ? DbManage::Privacy.candidates(snap, @terms, records.map(&:key).to_set) : []
     @candidates.sort_by! { |x| [order.index(x[:category]), x[:table], x[:column]] }
     personal = @rows.select { |x| x[:rec].personal? }
@@ -315,27 +272,40 @@ class DbSchemasController < ApplicationController
     redirect_to project_db_privacy_path(@project, @link, tab: params[:tab].presence)
   end
 
+  # 공통코드 정의서: 지정한 코드 테이블을 읽어 그룹별 목록·엑셀(download=xlsx). 보기는 SQL 조회 권한, 지정은 DB 연결 관리
+  def codes
+    @can_config = User.current.allowed_to?(:manage_db_links, @project)
+    @can_read = User.current.allowed_to?(@link.production? ? :run_db_query_production : :run_db_query, @project)
+    return deny_access unless @can_config || @can_read
+    @snapshot = snapshot(@link)
+    @config = DbManage::Codes.config(@link)
+    return unless @snapshot && DbManage::Codes.configured?(@link) && @can_read
+    @result = DbManage::Codes.fetch(@link, @snapshot)
+    if params[:download] == 'xlsx'
+      send_data DbManage::Codes.xlsx(@result), filename: "공통코드정의서_#{@project.identifier}_#{@link.name}_#{User.current.today.strftime('%Y%m%d')}.xlsx",
+                                               type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    end
+  rescue DbManage::Error => e
+    @code_error = e.message
+  end
+
+  def save_codes
+    snap = snapshot(@link)
+    cfg = params.permit(*DbManage::Codes::KEYS).to_h.transform_values { |v| v.to_s.strip }.reject { |_, v| v.empty? }
+    DbManage::Codes.validate(cfg, snap) if snap && cfg.any?
+    @link.update_column(:code_config, cfg.any? ? cfg.to_json : nil)
+    flash[:notice] = l(:notice_successful_update)
+  rescue DbManage::Error => e
+    flash[:error] = e.message
+  ensure
+    redirect_to project_db_codes_path(@project, @link) unless performed?
+  end
+
   private
 
   def privacy_xlsx(personal)
-    lb = ->(k, v) { l("label_db_pv_#{k}_#{v}") }
-    rows = personal.map do |x|
-      r = x[:rec]; c = x[:col] || {}
-      judge = x[:gone] ? l(:label_db_pv_gone) : l("label_db_pv_judge_#{x[:judge]}")
-      [r.table_name, x[:table_comment], r.column_name, c[:type], c[:comment], lb.('cat', r.category), lb.('enc', r.encryption), judge, r.note, r.user&.name,
-       r.updated_at && format_time(r.updated_at)]
-    end
-    summary = DbPrivacyColumn::CATEGORIES.reject { |k| k == 'none' }.map do |k|
-      list = personal.select { |x| x[:rec].category == k }
-      [lb.('cat', k), list.size, list.count { |x| x[:judge] == :warn }, list.count { |x| x[:judge] == :check }]
-    end
-    data = KrdsUi::Xlsx.build([
-      { name: '개인정보 컬럼', header: %w(테이블명 테이블\ 설명 컬럼명 데이터\ 타입 컬럼\ 설명 분류 암호화 판정 비고 확인자 확인일시), rows: rows,
-        widths: [26, 24, 24, 18, 30, 16, 12, 14, 30, 12, 18] },
-      { name: '분류별 요약', header: %w(분류 컬럼\ 수 경고 확인\ 필요), rows: summary, widths: [18, 10, 10, 10] }
-    ])
-    send_data data, filename: "개인정보컬럼_#{@project.identifier}_#{@link.name}_#{User.current.today.strftime('%Y%m%d')}.xlsx",
-                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    send_data DbManage::Docs.privacy(personal), filename: "개인정보컬럼_#{@project.identifier}_#{@link.name}_#{User.current.today.strftime('%Y%m%d')}.xlsx",
+                                                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   end
 
   def log_query(status, rows: nil, ms: nil, message: nil)

@@ -1,0 +1,53 @@
+<%= error_messages_for @meeting %>
+<% dt = @meeting.held_at && @meeting.held_at.in_time_zone(ActiveSupport::TimeZone['Asia/Seoul']).strftime('%Y-%m-%dT%H:%M') %>
+<div class="box tabular">
+  <p><%= f.text_field :title, :required => true, :size => 60, :maxlength => 200, :placeholder => '주간 업무 회의', :label => :label_pm_meeting_title %></p>
+  <p><label for="pm_held"><%= l(:label_pm_held_at) %> <span class="required">*</span></label><%= datetime_local_field_tag 'pm_meeting[held_at]', dt, :id => 'pm_held' %></p>
+  <p><%= f.text_field :place, :size => 30, :maxlength => 120, :label => :label_pm_place %></p>
+  <p><%= f.text_area :attendees, :rows => 2, :cols => 60, :label => :label_pm_attendees, :id => 'pm_attendees' %>
+    <select id="pm_add_member" aria-label="<%= l(:label_pm_add_member) %>"><option value=""><%= l(:label_pm_add_member) %></option><% @members.each do |u| %><option><%= u.name %></option><% end %></select></p>
+  <p><%= f.text_area :agenda, :rows => 3, :cols => 60, :label => :label_pm_agenda %></p>
+  <p><%= f.text_area :notes, :rows => 10, :cols => 60, :class => 'wiki-edit', :label => :label_pm_notes %></p>
+</div>
+<h3><%= l(:label_pm_k_decisions) %></h3>
+<div class="pm_rows" id="pm_decisions">
+  <% (@meeting.decision_list + ['']).each do |d| %><p class="pm_row"><%= text_field_tag 'decisions[]', d, :id => nil, :class => 'oa_wide', :placeholder => l(:label_pm_decision_ph), :'aria-label' => l(:label_pm_k_decisions) %></p><% end %>
+</div>
+<p><button type="button" class="btn_line pm_more" data-target="#pm_decisions"><%= l(:label_pm_add_row) %></button></p>
+<h3><%= l(:label_pm_actions) %></h3>
+<p class="mt_help"><%= l(:text_pm_actions) %> <%= select_tag 'tracker_id', options_from_collection_for_select(@trackers, :id, :name, @trackers.find { |t| t.name == '작업' }&.id), :'aria-label' => l(:field_tracker) %></p>
+<div class="autoscroll">
+<table class="list pm_list" id="pm_actions">
+  <thead><tr><th class="name"><%= l(:label_pm_action_title) %></th><th><%= l(:field_assigned_to) %></th><th><%= l(:field_due_date) %></th><th><%= l(:label_pm_make_issue_col) %></th></tr></thead>
+  <tbody>
+  <% (@meeting.action_list + [{}]).each_with_index do |a, i| %>
+    <tr class="pm_row">
+      <td class="name"><%= text_field_tag "actions[#{i}][title]", a['title'], :id => nil, :class => 'oa_wide', :'aria-label' => l(:label_pm_action_title) %><%= hidden_field_tag "actions[#{i}][issue_id]", a['issue_id'], :id => nil %></td>
+      <td><%= select_tag "actions[#{i}][assignee_id]", options_for_select([['', '']] + @members.map { |u| [u.name, u.id] }, a['assignee_id']), :id => nil, :'aria-label' => l(:field_assigned_to) %></td>
+      <td><%= date_field_tag "actions[#{i}][due_on]", a['due_on'], :id => nil, :'aria-label' => l(:field_due_date) %></td>
+      <td><% if a['issue_id'] %><%= link_to "##{a['issue_id']}", issue_path(a['issue_id']) %><% else %><%= check_box_tag "actions[#{i}][make]", '1', false, :id => nil, :'aria-label' => l(:label_pm_make_issue_col) %><% end %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<p><button type="button" class="btn_line pm_more" data-target="#pm_actions tbody"><%= l(:label_pm_add_row) %></button></p>
+<%= javascript_tag do %>
+$(function() {
+  $('#pm_add_member').on('change', function() {
+    if (!this.value) return; var $a = $('#pm_attendees'), v = $a.val().trim();
+    if ((', ' + v + ',').indexOf(', ' + this.value + ',') < 0) $a.val(v ? v + ', ' + this.value : this.value);
+    this.value = '';
+  });
+  $('.pm_more').on('click', function() {
+    var $box = $($(this).data('target')), $last = $box.children('.pm_row').last(), $row = $last.clone();
+    var n = $box.children('.pm_row').length;
+    $row.find('input, select').each(function() {
+      this.name = this.name.replace(/\[\d+\]/, '[' + n + ']');
+      if (this.type === 'checkbox') this.checked = false; else $(this).val('');
+    });
+    $row.find('a').closest('td').html('<input type="checkbox" name="actions[' + n + '][make]" value="1">');
+    $box.append($row); $row.find('input').first().trigger('focus');
+  });
+});
+<% end %>

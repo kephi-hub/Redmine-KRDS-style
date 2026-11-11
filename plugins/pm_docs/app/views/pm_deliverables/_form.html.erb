@@ -1,0 +1,16 @@
+<%= error_messages_for @deliverable %>
+<div class="box tabular">
+  <p><%= f.select :phase, pm_options('phase', PmDeliverable::PHASES), { :label => :label_pm_phase } %></p>
+  <p><%= f.text_field :code, :size => 10, :maxlength => 30, :placeholder => 'D-01', :label => :label_pm_code %></p>
+  <p><%= f.text_field :name, :required => true, :size => 50, :maxlength => 150, :label => :label_pm_deliv_name %></p>
+  <p><%= f.check_box :required, :label => :label_pm_required %></p>
+  <p><%= f.select :status, pm_options('dstatus', PmDeliverable::STATUSES), { :label => :field_status } %></p>
+  <p><%= f.text_field :version, :size => 10, :maxlength => 20, :label => :label_pm_version %></p>
+  <p><%= f.select :owner_id, pm_members(@project).map { |u| [u.name, u.id] }, { :include_blank => true, :label => :label_pm_owner } %></p>
+  <p><%= f.date_field :due_on, :label => :label_pm_due %><%= calendar_for('pm_deliverable_due_on') %></p>
+  <p><%= f.date_field :submitted_on, :label => :label_pm_submitted %><%= calendar_for('pm_deliverable_submitted_on') %></p>
+  <p><%= f.select :auto_kind, PmKit::AutoDocs::KINDS.map { |k, v| [v[:label] + (PmKit::AutoDocs.available?(k, @project) ? '' : " (#{l(:label_pm_module_off)})"), k] }, { :include_blank => l(:label_pm_auto_none), :label => :label_pm_auto } %>
+    <em class="info"><%= l(:text_pm_auto_kind) %></em></p>
+  <p><%= f.text_area :note, :rows => 3, :cols => 60, :label => :label_pm_note %></p>
+  <% if @deliverable.new_record? %><p><label><%= l(:label_pm_upload) %></label><%= render :partial => 'attachments/form', :locals => { :container => @deliverable } %></p><% end %>
+</div>

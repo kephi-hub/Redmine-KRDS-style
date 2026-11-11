@@ -1,0 +1,72 @@
+<%# 프로젝트 > DB > 공통코드 정의서 %>
+<% if @result %><div class="contextual"><%= link_to sprite_icon('download', l(:label_db_pv_export)), project_db_codes_path(@project, @link, :download => 'xlsx'), :class => 'icon icon-download' %></div><% end %>
+<h2><%= link_to l(:label_db_manage), project_db_schemas_path(@project, :link => @link.id) %> &#187; <%= @link.name %> &#187; <%= l(:label_db_codes) %></h2>
+<p class="subtitle"><%= l(:text_db_codes) %></p>
+<%= render :partial => 'error' %>
+<% if @code_error %><p class="db_hintbox"><%= @code_error %></p><% end %>
+<% if @can_config && @snapshot %>
+  <% tables = @snapshot[:tables].map { |t| t[:name] } %>
+  <% tcols = @config['table'] ? (@snapshot[:columns][@config['table']] || []).map { |c| [c[:comment].present? ? "#{c[:name]} (#{c[:comment]})" : c[:name], c[:name]] } : [] %>
+  <details class="db_codecfg" <%= 'open' unless DbManage::Codes.configured?(@link) %>>
+    <summary><%= l(:label_db_code_config) %></summary>
+    <%= form_tag(project_db_codes_path(@project, @link), :id => 'db_code_form') do %>
+      <div class="box tabular">
+        <p><label for="db_code_table"><%= l(:label_db_code_table) %> <span class="required">*</span></label>
+          <%= select_tag 'table', options_for_select([['', '']] + tables, @config['table']), :id => 'db_code_table' %>
+          <em class="info"><%= l(:text_db_code_table) %></em></p>
+        <% [['group', true], ['code', true], ['name', true], ['group_name', false], ['order', false], ['use', false]].each do |k, req| %>
+          <p><label for="db_code_<%= k %>"><%= l("label_db_code_#{k}") %><% if req %> <span class="required">*</span><% end %></label>
+            <%= select_tag k, options_for_select([['', '']] + tcols, @config[k]), :id => "db_code_#{k}", :class => 'db_codecol' %></p>
+        <% end %>
+      </div>
+      <p class="form_btns"><%= submit_tag l(:button_save) %></p>
+    <% end %>
+    <%= javascript_tag do %>
+    $(function() {
+      var cols = <%= raw @snapshot[:tables].to_h { |t| [t[:name], (@snapshot[:columns][t[:name]] || []).map { |c| [c[:comment].present? ? "#{c[:name]} (#{c[:comment]})" : c[:name], c[:name]] }] }.to_json %>;
+      $('#db_code_table').on('change', function() {
+        var list = cols[this.value] || [];
+        $('.db_codecol').each(function() {
+          var $s = $(this).empty().append($('<option>').val('').text(''));
+          list.forEach(function(c) { $s.append($('<option>').val(c[1]).text(c[0])); });
+        });
+      });
+    });
+    <% end %>
+  </details>
+<% end %>
+<% if !@can_read %>
+  <p class="db_info"><%= l(:text_db_code_need_query) %></p>
+<% elsif !DbManage::Codes.configured?(@link) %>
+  <p class="nodata"><%= l(:text_db_code_not_set) %></p>
+<% elsif @result %>
+  <ul class="db_stats mt_kpi">
+    <li><span><%= l(:label_db_code_groups) %></span><strong><%= @result[:groups].size %></strong></li>
+    <li><span><%= l(:label_db_code_values) %></span><strong><%= @result[:rows].size %><%= '+' if @result[:truncated] %></strong></li>
+  </ul>
+  <%= form_tag(project_db_codes_path(@project, @link), :method => :get, :class => 'qa_filter') do %>
+    <%= search_field_tag 'q', params[:q], :placeholder => l(:label_db_code_search), :'aria-label' => l(:label_db_code_search), :id => 'db_code_q' %>
+  <% end %>
+  <div class="autoscroll">
+  <table class="list db_cols db_codes" id="db_codes">
+    <thead><tr><th class="name"><%= l(:label_db_code_group) %></th><th><%= l(:label_db_code_code) %></th><th class="name"><%= l(:label_db_code_name) %></th><th><%= l(:label_db_code_order) %></th><th><%= l(:label_db_code_use) %></th></tr></thead>
+    <tbody>
+    <% @result[:rows].group_by(&:first).each do |g, list| %>
+      <tr class="db_codegrp" data-q="<%= "#{g} #{list.first[3]}".downcase %>"><th colspan="5"><code><%= g %></code> <%= list.first[3] %> <span class="db_dim"><%= list.size %></span></th></tr>
+      <% list.each do |r| %>
+        <tr class="db_col" data-q="<%= "#{g} #{list.first[3]} #{r[1]} #{r[2]}".downcase %>" data-g="<%= g %>"><td class="name"></td><td><code><%= r[1] %></code></td><td class="name"><%= r[2] %></td><td><%= r[4] %></td><td><%= r[5] %></td></tr>
+      <% end %>
+    <% end %>
+    </tbody>
+  </table>
+  </div>
+  <%= javascript_tag do %>
+  $(function() {
+    $('#db_code_q').on('input', function() {
+      var q = this.value.toLowerCase().trim();
+      $('#db_codes tbody tr').each(function() { $(this).toggle(!q || String($(this).data('q')).indexOf(q) >= 0); });
+    }).closest('form').on('submit', function(e) { e.preventDefault(); });
+  });
+  <% end %>
+<% end %>
+<% html_title "#{l(:label_db_codes)} - #{l(:label_db_manage)}" %>

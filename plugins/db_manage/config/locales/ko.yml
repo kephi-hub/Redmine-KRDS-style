@@ -206,6 +206,25 @@ ko:
   text_db_erd_drawio: draw.io(diagrams.net)에서 열어 위치·선을 직접 고칠 수 있는 파일
   label_db_history: 변경 이력
   label_db_privacy: 개인정보
+  label_db_codes: 공통코드
+  text_db_codes: 코드 테이블(예 TB_CODE)을 지정하면 그룹별 코드 값을 읽기 전용으로 읽어 공통코드 정의서를 만듭니다. 데이터를 읽으므로 SQL 조회 권한이 있어야 볼 수 있습니다.
+  label_db_code_config: 코드 테이블 지정
+  label_db_code_table: 코드 테이블
+  text_db_code_table: 그룹 코드와 코드 값이 한 테이블에 있는 형식 (그룹명이 다른 테이블이면 비워 두세요)
+  label_db_code_group: 그룹 코드 컬럼
+  label_db_code_code: 코드 컬럼
+  label_db_code_name: 코드명 컬럼
+  label_db_code_group_name: 그룹명 컬럼
+  label_db_code_order: 정렬 순서 컬럼
+  label_db_code_use: 사용 여부 컬럼
+  label_db_code_groups: 코드 그룹
+  label_db_code_values: 코드 값
+  label_db_code_search: 그룹 · 코드 · 코드명으로 찾기
+  text_db_code_not_set: 코드 테이블이 지정되지 않았습니다. DB 연결 관리 권한이 있는 사람이 위에서 지정하세요.
+  text_db_code_need_query: 코드 값을 보려면 SQL 조회 권한이 필요합니다 (운영 DB 는 운영 SQL 조회 권한).
+  error_db_code_table: 코드 테이블을 지금 DB 에서 찾을 수 없습니다.
+  error_db_code_column: "컬럼 %{name} 을(를) 코드 테이블에서 찾을 수 없습니다."
+  error_db_code_required: 그룹 코드 · 코드 · 코드명 컬럼은 꼭 지정해야 합니다.
   text_db_privacy: 컬럼마다 개인정보 분류와 암호화 여부를 기록합니다. 이름 · 설명 · 용어사전으로 후보를 찾아 주며, 사람이 확정한 것만 저장됩니다.
   label_db_pv_k_personal: 개인정보 컬럼
   label_db_pv_k_required: 암호화 필수 대상

@@ -1,0 +1,28 @@
+<% m = @meeting %>
+<% can_edit = User.current.allowed_to?(:manage_meetings, @project) %>
+<div class="contextual">
+  <a href="#" class="icon icon-file" onclick="window.print(); return false;"><%= sprite_icon('file', l(:label_pm_print)) %></a>
+  <% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_pm_meeting_path(@project, m), :class => 'icon icon-edit' %>
+    <%= link_to sprite_icon('del', l(:button_delete)), project_pm_meeting_path(@project, m), :method => :delete, :data => { :confirm => l(:text_are_you_sure) }, :class => 'icon icon-del' %><% end %>
+</div>
+<h2><%= link_to l(:label_pm_meetings), project_pm_meetings_path(@project) %> &#187; <%= m.title %></h2>
+<div class="qa_box pm_minutes">
+  <h3 class="qa_tit"><%= m.title %></h3>
+  <dl class="db_props">
+    <div><dt><%= l(:label_pm_held_at) %></dt><dd><%= pm_time(m.held_at) %></dd></div>
+    <div><dt><%= l(:label_pm_place) %></dt><dd><%= m.place.presence || '-' %></dd></div>
+    <div><dt><%= l(:label_pm_attendees) %></dt><dd><%= m.attendees.presence || '-' %></dd></div>
+    <div><dt><%= l(:label_pm_writer) %></dt><dd><%= m.author %></dd></div>
+  </dl>
+  <dl class="qa_steps">
+    <% if m.agenda.present? %><dt><%= l(:label_pm_agenda) %></dt><dd><%= simple_format(h(m.agenda)) %></dd><% end %>
+    <% if m.notes.present? %><dt><%= l(:label_pm_notes) %></dt><dd class="wiki"><%= textilizable(m.notes, :project => @project) %></dd><% end %>
+    <dt><%= l(:label_pm_k_decisions) %></dt><dd><% if m.decision_list.any? %><ol class="pm_ol"><% m.decision_list.each do |d| %><li><%= d %></li><% end %></ol><% else %>-<% end %></dd>
+    <dt><%= l(:label_pm_actions) %></dt>
+    <dd><% if m.action_list.any? %><table class="list pm_list"><thead><tr><th class="name"><%= l(:label_pm_action_title) %></th><th><%= l(:field_assigned_to) %></th><th><%= l(:field_due_date) %></th><th><%= l(:label_pm_issue) %></th></tr></thead>
+      <tbody><% m.action_list.each do |a| %><% i = @issues[a['issue_id']] %><tr><td class="name"><%= a['title'] %></td><td><%= User.find_by(id: a['assignee_id']) %></td><td><%= a['due_on'] %></td>
+        <td><% if i %><%= link_to "##{i.id}", issue_path(i) %> <span class="db_dim"><%= i.status %></span><% elsif a['issue_id'] %>#<%= a['issue_id'] %><% end %></td></tr><% end %></tbody></table>
+      <% else %>-<% end %></dd>
+  </dl>
+</div>
+<% html_title m.title %>

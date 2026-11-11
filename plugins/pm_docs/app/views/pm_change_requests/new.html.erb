@@ -1,0 +1,7 @@
+<%= pm_req_section(:cr) %>
+<h2><%= link_to l(:label_pm_crs), project_pm_change_requests_path(@project) %> &#187; <%= l(:label_pm_cr_new) %></h2>
+<%= labelled_form_for @cr, :url => project_pm_change_requests_path(@project) do |f| %>
+  <%= render :partial => 'pm_change_requests/form', :locals => { :f => f } %>
+  <p class="form_btns"><%= link_to l(:button_cancel), project_pm_change_requests_path(@project), :class => 'btn_line' %><%= submit_tag l(:button_create) %></p>
+<% end %>
+<% html_title l(:label_pm_cr_new) %>

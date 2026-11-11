@@ -14,6 +14,7 @@
     <% if User.current.allowed_to?(@link.production? ? :run_db_query_production : :run_db_query, @project) %><%= link_to sprite_icon('search', l(:label_db_query)), project_db_query_path(@project, @link), :class => 'btn_line' %><% end %>
     <% if @terms %><%= link_to sprite_icon('checked', l(:label_db_check)), project_db_check_path(@project, @link), :class => 'btn_line' %><% end %>
     <%= link_to sprite_icon('lock', l(:label_db_privacy)), project_db_privacy_path(@project, @link), :class => 'btn_line' %>
+    <% if User.current.allowed_to?(:manage_db_links, @project) || User.current.allowed_to?(@link.production? ? :run_db_query_production : :run_db_query, @project) %><%= link_to sprite_icon('list', l(:label_db_codes)), project_db_codes_path(@project, @link), :class => 'btn_line' %><% end %>
     <%= link_to sprite_icon('download', l(:label_db_export)), project_db_export_path(@project, @link), :class => 'btn_line' %>
   </p>
 </div>

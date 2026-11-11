@@ -1,0 +1,27 @@
+<%# 프로젝트 > 회의록 %>
+<% can_edit = User.current.allowed_to?(:manage_meetings, @project) %>
+<div class="contextual"><% if can_edit %><%= link_to sprite_icon('add', l(:label_pm_meeting_new)), new_project_pm_meeting_path(@project), :class => 'icon icon-add' %><% end %></div>
+<h2><%= l(:label_pm_meetings) %></h2>
+<p class="subtitle"><%= l(:text_pm_meetings) %></p>
+<ul class="db_stats mt_kpi">
+  <li><span><%= l(:label_pm_k_meetings) %></span><strong><%= @meetings.size %></strong></li>
+  <li><span><%= l(:label_pm_k_decisions) %></span><strong><%= @meetings.sum { |m| m.decision_list.size } %></strong></li>
+  <li><span><%= l(:label_pm_k_open_actions) %></span><strong><%= @open_actions %></strong></li>
+</ul>
+<% if @meetings.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list pm_list">
+  <thead><tr><th><%= l(:label_pm_held_at) %></th><th class="name"><%= l(:label_pm_meeting_title) %></th><th><%= l(:label_pm_place) %></th><th><%= l(:label_pm_k_decisions) %></th><th><%= l(:label_pm_actions) %></th><th></th></tr></thead>
+  <tbody>
+  <% @meetings.each do |m| %>
+    <tr><td class="next"><%= pm_time(m.held_at) %></td><td class="name"><%= link_to m.title, project_pm_meeting_path(@project, m) %><% if m.attendees.present? %><span class="db_dim db_pvsub"><%= m.attendees.truncate(60) %></span><% end %></td>
+      <td><%= m.place %></td><td><%= m.decision_list.size %></td><td><%= m.action_list.size %> <span class="db_dim">(<%= l(:label_pm_issue_n, :count => m.action_list.count { |a| a['issue_id'] }) %>)</span></td>
+      <td class="buttons"><% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_pm_meeting_path(@project, m), :class => 'icon icon-edit' %><% end %></td></tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<% end %>
+<% html_title l(:label_pm_meetings) %>

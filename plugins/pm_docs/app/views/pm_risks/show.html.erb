@@ -1,0 +1,23 @@
+<% r = @risk %>
+<% can_edit = User.current.allowed_to?(:manage_risks, @project) %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_pm_risk_path(@project, r), :class => 'icon icon-edit' %>
+    <%= link_to sprite_icon('del', l(:button_delete)), project_pm_risk_path(@project, r), :method => :delete, :data => { :confirm => l(:text_are_you_sure) }, :class => 'icon icon-del' %><% end %>
+</div>
+<h2><%= link_to l(:label_pm_risks), project_pm_risks_path(@project) %> &#187; <%= r.code %></h2>
+<div class="qa_box">
+  <h3 class="qa_tit"><%= r.title %></h3>
+  <p class="qa_meta"><%= pm_badge(pm_label('rkind', r.kind), 'phase') %> <%= pm_badge(pm_label('level', r.level), r.level) %> <%= pm_badge(pm_label('rstatus', r.status), "r#{r.status}") %>
+    <span class="db_dim"><%= l(:label_pm_prob) %> <%= pm_label('phl', r.probability) %> · <%= l(:label_pm_impact_short) %> <%= pm_label('phl', r.impact) %></span></p>
+  <dl class="db_props">
+    <div><dt><%= l(:label_pm_owner) %></dt><dd><%= r.owner || '-' %></dd></div>
+    <div><dt><%= l(:label_pm_due) %></dt><dd><%= format_date(r.due_on) || '-' %></dd></div>
+    <div><dt><%= l(:label_pm_raised) %></dt><dd><%= format_date(r.raised_on) || '-' %></dd></div>
+    <div><dt><%= l(:label_pm_closed) %></dt><dd><%= format_date(r.closed_on) || '-' %></dd></div>
+    <% if r.issue %><div><dt><%= l(:label_pm_issue) %></dt><dd><%= link_to "##{r.issue_id} #{r.issue.subject}", issue_path(r.issue) %></dd></div><% end %>
+  </dl>
+  <dl class="qa_steps">
+    <% { :label_pm_risk_desc => r.description, :label_pm_plan => r.plan }.each do |k, v| %><dt><%= l(k) %></dt><dd><%= v.present? ? simple_format(h(v)) : '-' %></dd><% end %>
+  </dl>
+</div>
+<% html_title "#{r.code} #{r.title}" %>

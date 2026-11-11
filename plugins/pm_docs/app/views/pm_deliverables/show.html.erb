@@ -1,0 +1,46 @@
+<% can_edit = User.current.allowed_to?(:manage_deliverables, @project) %>
+<% d = @deliverable %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_pm_deliverable_path(@project, d), :class => 'icon icon-edit' %>
+    <%= link_to sprite_icon('del', l(:button_delete)), project_pm_deliverable_path(@project, d), :method => :delete, :data => { :confirm => l(:text_pm_deliv_delete) }, :class => 'icon icon-del' %><% end %>
+</div>
+<h2><%= link_to l(:label_pm_deliverables), project_pm_deliverables_path(@project) %> &#187; <%= d.name %></h2>
+<div class="qa_box">
+  <p class="qa_meta"><%= pm_badge(pm_label('phase', d.phase), 'phase') %> <%= pm_badge(pm_label('dstatus', d.status), d.status) %><% if d.late? %> <%= pm_badge(l(:label_pm_late), 'late') %><% end %>
+    <% if d.code %><code><%= d.code %></code><% end %> <span class="db_dim"><%= d.required ? l(:label_pm_required) : l(:label_pm_optional) %></span></p>
+  <dl class="db_props">
+    <div><dt><%= l(:label_pm_version) %></dt><dd><%= d.version.presence || '-' %></dd></div>
+    <div><dt><%= l(:label_pm_owner) %></dt><dd><%= d.owner || '-' %></dd></div>
+    <div><dt><%= l(:label_pm_due) %></dt><dd><%= format_date(d.due_on) || '-' %></dd></div>
+    <div><dt><%= l(:label_pm_submitted) %></dt><dd><%= format_date(d.submitted_on) || '-' %></dd></div>
+  </dl>
+  <% if d.note.present? %><div class="qa_desc"><%= simple_format(h(d.note)) %></div><% end %>
+</div>
+<% if d.auto_kind %>
+  <h3><%= l(:label_pm_auto) %></h3>
+  <p class="db_info"><%= PmKit::AutoDocs::KINDS[d.auto_kind][:label] %> — <%= l(:text_pm_auto) %></p>
+  <% if PmKit::AutoDocs.available?(d.auto_kind, @project) %><p class="db_btns"><%= link_to sprite_icon('download', l(:label_pm_generate)), generate_project_pm_deliverable_path(@project, d), :class => 'btn_line' %></p>
+  <% else %><p class="db_hintbox"><%= l(:error_pm_auto_unavailable) %></p><% end %>
+<% end %>
+<h3><%= l(:label_pm_files) %> <span class="db_dim"><%= d.attachments.size %></span></h3>
+<% files = d.attachments.sort_by { |a| [a.created_on, a.id] }.reverse %>
+<% if files.any? %>
+<div class="autoscroll"><table class="list pm_list">
+  <thead><tr><th class="name"><%= l(:label_attachment) %></th><th><%= l(:field_filesize) %></th><th><%= l(:field_author) %></th><th><%= l(:label_date) %></th><th class="name"><%= l(:field_description) %></th><th></th></tr></thead>
+  <tbody><% files.each_with_index do |a, i| %><tr>
+    <td class="name"><%= link_to a.filename, download_named_attachment_path(a, a.filename) %><% if i.zero? %> <%= pm_badge(l(:label_pm_latest_short), 'approved') %><% end %></td>
+    <td><%= number_to_human_size(a.filesize) %></td><td><%= a.author %></td><td class="next"><%= format_time(a.created_on) %></td><td class="name"><%= a.description %></td>
+    <td class="buttons"><% if can_edit %><%= link_to sprite_icon('del', l(:button_delete)), attachment_path(a), :method => :delete, :data => { :confirm => l(:text_are_you_sure) }, :class => 'icon icon-del' %><% end %></td></tr><% end %></tbody>
+</table></div>
+<% else %><p class="nodata"><%= l(:label_no_data) %></p><% end %>
+<% if can_edit %>
+  <%= form_tag(attach_project_pm_deliverable_path(@project, d), :multipart => true, :id => 'pm_attach') do %>
+    <div class="box tabular">
+      <p><label><%= l(:label_pm_upload) %></label><%= render :partial => 'attachments/form', :locals => { :container => d } %></p>
+      <p><label for="pm_version"><%= l(:label_pm_version) %></label><%= text_field_tag 'version', d.version, :id => 'pm_version', :size => 10, :maxlength => 20, :placeholder => 'v1.0' %>
+        <em class="info"><%= l(:text_pm_upload) %></em></p>
+    </div>
+    <p class="form_btns"><%= submit_tag l(:label_pm_upload_btn) %></p>
+  <% end %>
+<% end %>
+<% html_title d.name %>

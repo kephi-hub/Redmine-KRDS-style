@@ -33,6 +33,19 @@ module DbManage
       nil
     end
 
+    # 저장된 표시 + 지금 DB 의 컬럼 정보 (gone: DB 에서 사라짐)
+    def rows(records, snap)
+      cols = {}
+      snap&.dig(:tables)&.reject { |t| t[:view] }&.each do |t|
+        (snap[:columns][t[:name]] || []).each { |c| cols["#{t[:name]}.#{c[:name]}"] = [t, c] }
+      end
+      order = DbPrivacyColumn::CATEGORIES
+      records.map do |r|
+        t, c = cols[r.key]
+        { rec: r, table: r.table_name, column: r.column_name, col: c, table_comment: t&.dig(:comment), gone: snap && c.nil?, judge: r.judge }
+      end.sort_by { |x| [order.index(x[:rec].category), x[:table], x[:column]] }
+    end
+
     # 스냅샷 전체에서 후보: [{ table:, column:, category:, reason:, col: }] (뷰 제외, 이미 저장된 컬럼 제외)
     def candidates(snap, terms, saved_keys)
       snap[:tables].reject { |t| t[:view] }.flat_map do |t|

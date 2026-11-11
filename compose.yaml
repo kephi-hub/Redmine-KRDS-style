@@ -48,6 +48,7 @@ services:
       - ./plugins/qa_trace:/usr/src/redmine/plugins/qa_trace:z   # 요구사항 추적·테스트 (DB 테이블은 시작 때 자동 생성)
       - ./plugins/site_tools:/usr/src/redmine/plugins/site_tools:z   # 관리 도구 (메일 서버 SMTP 설정, 저장소 커미터 자동 연결)
       - ./plugins/ops_asset:/usr/src/redmine/plugins/ops_asset:z   # 운영 관리 (자산·스케줄러·점검·장애·인터페이스, DB 테이블은 시작 때 자동 생성)
+      - ./plugins/pm_docs:/usr/src/redmine/plugins/pm_docs:z   # 산출물 관리 (산출물·변경요청·프로그램 목록·회의록·이슈·위험, DB 테이블은 시작 때 자동 생성)
       - ./setup:/usr/src/redmine/setup:z   # 기준 설정 스크립트 (apply_settings.rb)
 
 volumes:
