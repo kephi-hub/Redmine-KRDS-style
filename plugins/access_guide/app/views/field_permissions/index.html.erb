@@ -1,7 +1,7 @@
 <%# 관리 > 항목 편집 권한 설정 — 칸을 누를 때마다 편집 → 읽기 전용 → 필수 순서로 바뀜 %>
 <div class="contextual">
   <%= link_to sprite_icon('workflows', l(:label_simple_workflows)), simple_workflows_path(:role_id => @role&.id), :class => 'icon icon-workflows' %>
-  <%= link_to sprite_icon('roles', l(:label_access_overview)), access_overview_path, :class => 'icon icon-roles' %>
+  <%= link_to sprite_icon('roles', l(:label_ag_perm_tab)), permissions_roles_path, :class => 'icon icon-roles' %>
 </div>
 
 <h2><%= l(:label_field_permissions) %></h2>

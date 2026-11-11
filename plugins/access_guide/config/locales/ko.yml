@@ -1,4 +1,21 @@
 ko:
+  label_ag_perm_tab: 권한 설정
+  text_ag_perm: 역할마다 영역별로 할 수 있는 일을 관리/작성/보기/없음으로 요약했습니다. 영역을 누르면 실제 권한이 펼쳐지고, 체크를 바꾸면 요약이 바로 바뀝니다. 다 고친 뒤 아래 [저장]을 누르세요.
+  label_ag_roles_shown: 표시할 역할
+  label_ag_search: 권한 이름으로 찾기
+  button_ag_expand_all: 모두 펼치기
+  button_ag_collapse_all: 모두 접기
+  button_ag_toggle: 전체
+  text_ag_coltoggle: "%{role} 권한 모두 켜기/끄기 (펼친 영역이 있으면 그 영역만)"
+  text_ag_rowtoggle: 눌러서 이 권한을 모든 역할에 켜기/끄기
+  label_ag_perm_count: "권한 %{count}개"
+  label_ag_role_opts: 역할 설정 요약
+  label_ag_nochange: 바뀐 내용 없음
+  label_ag_changed: "%{count}개 바뀜 — 저장해야 반영됩니다"
+  button_ag_reset: 되돌리기
+  label_access_area_other: 기타
+  permission_delete_project: 프로젝트 삭제
+  permission_select_project_publicity: 프로젝트 공개 여부 설정
   label_access_overview: 권한 한눈에 보기
   label_simple_workflows: 업무흐름 설정
   label_field_permissions: 항목 편집 권한 설정

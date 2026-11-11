@@ -1,4 +1,19 @@
 en:
+  label_ag_perm_tab: Permissions
+  text_ag_perm: Each area is summarised per role as manage/write/view/none. Click an area to show its permissions; the summary updates as you change checkboxes. Click Save when done.
+  label_ag_roles_shown: Roles shown
+  label_ag_search: Find permission
+  button_ag_expand_all: Expand all
+  button_ag_collapse_all: Collapse all
+  button_ag_toggle: All
+  text_ag_coltoggle: "Toggle all permissions of %{role} (only open areas if any)"
+  text_ag_rowtoggle: Click to toggle this permission for all roles
+  label_ag_perm_count: "%{count} permissions"
+  label_ag_role_opts: Role settings
+  label_ag_nochange: No changes
+  label_ag_changed: "%{count} changes — not saved yet"
+  button_ag_reset: Reset
+  label_access_area_other: Other
   label_access_overview: "Access overview"
   label_simple_workflows: "Workflow settings"
   label_field_permissions: "Field permission settings"

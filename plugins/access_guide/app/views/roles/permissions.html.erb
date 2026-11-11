@@ -1,101 +1,241 @@
-<%# 원본: Redmine 6.1.6 app/views/roles/permissions.html.erb — 제목 대신 역할 및 권한 탭 (access_guide) %>
+<%# 관리 > 역할 및 권한 > 권한 설정 — 원본(Redmine 6.1.6 roles/permissions: 권한별 체크·저장·역할 필터·CSV)과
+    권한 한눈에 보기(영역별 관리/작성/보기/없음 요약, 업무흐름·담당·일감 보임, 사용자 × 프로젝트 역할)를 한 화면으로 (access_guide 1.3.0)
+    - 영역 줄: 역할별 요약 배지(체크를 바꾸면 바로 다시 계산) · 펼치면 실제 권한 체크박스
+    - 저장은 원본과 같은 주소(POST /roles/permissions), 저장 후 이 화면으로 돌아옴 (AccessGuide::RolesPatch) %>
+<% filtered = params[:ids].present? %>
+<% roles = filtered ? @roles : @roles.select { |r| @givable_roles.include?(r) } %>
+<% groups = AccessGuide::Areas.groups(@permissions) %>
+
+<div class="contextual">
+  <%= link_to sprite_icon('workflows', l(:label_simple_workflows)), simple_workflows_path, :class => 'icon icon-workflows' %>
+  <%= link_to sprite_icon('edit', l(:label_field_permissions)), field_permissions_path, :class => 'icon icon-edit' %>
+  <%= link_to sprite_icon('download', 'CSV'), permissions_roles_path(:format => 'csv', :ids => roles.map(&:id)), :class => 'icon icon-download' %>
+</div>
+
 <h2><%= l(:label_role_and_permissions) %></h2>
 <%= render :partial => 'roles/ag_tabs', :locals => { :current => :permissions } %>
-<% html_title l(:label_permissions_report) %>
+<p class="subtitle"><%= l(:text_ag_perm) %></p>
 
-<div class="hide-when-print">
-  <fieldset id="filters" class="collapsible collapsed">
-    <legend onclick="toggleFieldset(this);" class="icon icon-collapsed">
-      <%= sprite_icon("angle-right", rtl: true) %>
-      <%= l(:label_filter_plural) %>
-    </legend>
-    <div style="display: none;">
-      <%= form_tag({}, :method => :get) do %>
-        <fieldset>
-          <legend><%= toggle_checkboxes_link('#filters input[type=checkbox]:enabled') %></legend>
-          <% Role.sorted.to_a.each do |role| %>
-            <label>
-              <%= check_box_tag "ids[]", role.id, @roles.include?(role) %>
-              <%= role.name %>
-            </label>
-          <% end %>
-        </fieldset>
-        <p>
-          <%= submit_tag l(:button_apply), :name => nil %>
-          <%= link_to l(:button_clear), permissions_roles_path, :class => 'icon icon-reload' %>
-        </p>
-      <% end %>
-    </div>
-  </fieldset>
-</div>
+<%= form_tag permissions_roles_path, :method => :get, :class => 'ag_filter' do %>
+  <span class="ag_flabel"><%= l(:label_ag_roles_shown) %></span>
+  <% Role.sorted.each do |role| %>
+    <label class="ag_chip"><%= check_box_tag 'ids[]', role.id, roles.include?(role), :id => nil %><span><%= role.name %></span></label>
+  <% end %>
+  <%= submit_tag l(:button_apply), :name => nil, :class => 'ag_fbtn' %>
+<% end %>
+
+<ul class="ag_legend">
+  <li><%= access_level_tag('manage') %> <%= l(:text_access_level_manage) %></li>
+  <li><%= access_level_tag('write') %> <%= l(:text_access_level_write) %></li>
+  <li><%= access_level_tag('view') %> <%= l(:text_access_level_view) %></li>
+  <li><%= access_level_tag('none') %> <%= l(:text_access_level_none) %></li>
+</ul>
 
 <%= form_tag(permissions_roles_path, :id => 'permissions_form') do %>
-<% @roles.each do |role| %>
+  <% roles.each do |role| %>
     <%= hidden_field_tag "permissions[#{role.id}][]", '', :id => nil %>
-<% end %>
-<div class="autoscroll">
-<table class="list permissions">
-<thead>
-    <tr>
-    <th><%=l(:label_permissions)%></th>
-    <% @roles.each do |role| %>
-    <th>
-        <%= toggle_checkboxes_link("input.role-#{role.id}") %>
-        <%= content_tag(role.builtin? ? 'em' : 'span', role.name) %>
-    </th>
-    <% end %>
-    </tr>
-</thead>
-<tbody>
-<% perms_by_module = @permissions.group_by {|p| p.project_module.to_s} %>
-<% perms_by_module.keys.sort.each do |mod| %>
-    <% unless mod.blank? %>
-        <tr class="group open">
-          <td>
-            <span class="expander icon icon-expanded" onclick="toggleRowGroup(this);"><%= sprite_icon("angle-down") %></span>
-            <%= l_or_humanize(mod, :prefix => 'project_module_') %>
+    <% if filtered %><%= hidden_field_tag 'ids[]', role.id, :id => nil %><% end %>
+  <% end %>
+
+  <div class="ag_tools">
+    <span class="list_field"><input type="search" id="ag_q" placeholder="<%= l(:label_ag_search) %>" aria-label="<%= l(:label_ag_search) %>"></span>
+    <button type="button" class="btn_line" id="ag_open_all"><%= l(:button_ag_expand_all) %></button>
+    <button type="button" class="btn_line" id="ag_close_all"><%= l(:button_ag_collapse_all) %></button>
+  </div>
+
+  <div class="autoscroll ag_scroll">
+  <table class="list ag_tbl ag_perm">
+    <thead><tr>
+      <th class="area"><%= l(:label_access_area) %> · <%= l(:label_permissions) %></th>
+      <% roles.each do |role| %>
+      <th class="role">
+        <%= link_to role.name, edit_role_path(role), :class => (role.builtin? ? 'ag_builtin' : nil) %>
+        <button type="button" class="ag_coltog" data-role="<%= role.id %>" title="<%= l(:text_ag_coltoggle, :role => role.name) %>"><%= l(:button_ag_toggle) %></button>
+      </th>
+      <% end %>
+    </tr></thead>
+    <% groups.each do |group| %>
+    <tbody class="ag_grp" data-group="<%= group[:key] %>">
+      <tr class="ag_ghead">
+        <th class="area">
+          <button type="button" class="ag_exp" aria-expanded="false"><%= sprite_icon('angle-right') %><span class="name"><%= l("label_access_area_#{group[:key]}") %></span><span class="ag_cnt"><%= l(:label_ag_perm_count, :count => group[:items].size) %></span></button>
+        </th>
+        <% roles.each do |role| %>
+          <% setable = group[:items].count { |p, _| role.setable_permissions.include?(p) } %>
+          <td class="ag_sum" data-role="<%= role.id %>">
+            <% if setable.zero? %><span class="ag_dim">—</span><% else %>
+              <%= access_level_tag(AccessGuide::Areas.group_level(role, group), access_perm_names(group[:items].map { |p, _| p.name } & role.permissions)) %>
+              <span class="ag_frac"><b><%= group[:items].count { |p, _| role.permissions.include?(p.name) } %></b>/<%= setable %></span>
+              <% if group[:key] == 'keys' %><span class="ag_note ag_wl"<%= raw(' hidden') unless role.permissions.include?(:whitelist_keys) %>><%= l(:label_access_whitelist_only) %></span><% end %>
+            <% end %>
           </td>
-          <% @roles.each do |role| %>
-          <td class="role"><%= role.name %></td>
-          <% end %>
-        </tr>
-    <% end %>
-    <% perms_by_module[mod].each do |permission| %>
-        <% humanized_perm_name = l_or_humanize(permission.name, :prefix => 'permission_') %>
-        <tr class="permission-<%= permission.name %>">
-        <td class="name">
-            <%= toggle_checkboxes_link(".permission-#{permission.name} input") %>
-            <%= humanized_perm_name %>
-        </td>
-        <% @roles.each do |role| %>
-          <% if role.setable_permissions.include? permission %>
-            <td title="<%= "#{humanized_perm_name} (#{role.name})" %>">
-              <%= check_box_tag "permissions[#{role.id}][]", permission.name, (role.permissions.include? permission.name), :id => nil, :class => "role-#{role.id}" %>
-            </td>
-          <% else %>
-            <td></td>
-          <% end %>
         <% end %>
+      </tr>
+      <% group[:items].each do |permission, tier| %>
+        <% name = l_or_humanize(permission.name, :prefix => 'permission_') %>
+        <tr class="ag_prow" data-name="<%= name.downcase %> <%= permission.name %>">
+          <th class="area">
+            <button type="button" class="ag_rowtog" title="<%= l(:text_ag_rowtoggle) %>"><%= access_level_tag(tier) %><span><%= name %></span></button>
+          </th>
+          <% roles.each do |role| %>
+            <% if role.setable_permissions.include?(permission) %>
+            <td class="ag_ck"><label><%= check_box_tag "permissions[#{role.id}][]", permission.name, role.permissions.include?(permission.name), :id => nil, :class => "role-#{role.id}", :data => { :tier => tier }, :title => "#{name} (#{role.name})" %></label></td>
+            <% else %>
+            <td class="ag_na"><span class="ag_dim">—</span></td>
+            <% end %>
+          <% end %>
         </tr>
+      <% end %>
+    </tbody>
     <% end %>
+    <tbody class="ag_opts">
+      <tr class="ag_ghead ag_static"><th class="area"><span class="name"><%= l(:label_ag_role_opts) %></span></th><% roles.each do %><td></td><% end %></tr>
+      <tr>
+        <th class="area"><%= l(:label_access_area_workflow) %></th>
+        <% roles.each do |role| %>
+          <td>
+          <% if role.builtin? %><span class="ag_dim">—</span><% else %>
+            <% level = AccessGuide::Areas.workflow_level(role, @closed_ids) %>
+            <%= content_tag(:span, l("label_access_wf_#{level}"), :class => "ag_lv lv_#{level}") %>
+            <% if (missing = @missing[role.id].to_a).any? && level != 'none' %><span class="ag_warn" title="<%= missing.map(&:name).join(', ') %>"><%= l(:label_access_wf_missing, :count => missing.size) %></span><% end %>
+            <%= link_to l(:button_edit), simple_workflows_path(:role_id => role.id), :class => 'ag_edit' %>
+          <% end %>
+          </td>
+        <% end %>
+      </tr>
+      <tr>
+        <th class="area"><%= l(:field_assignable) %></th>
+        <% roles.each do |role| %><td><%= role.builtin? ? content_tag(:span, '—', :class => 'ag_dim') : (role.assignable? ? l(:general_text_Yes) : l(:general_text_No)) %></td><% end %>
+      </tr>
+      <tr>
+        <th class="area"><%= l(:field_issues_visibility) %></th>
+        <% roles.each do |role| %><td><%= l(Role::ISSUES_VISIBILITY_OPTIONS.to_h[role.issues_visibility] || :label_none) %></td><% end %>
+      </tr>
+      <tr>
+        <th class="area"><%= l(:label_access_perm_count) %></th>
+        <% roles.each do |role| %><td class="ag_total" data-role="<%= role.id %>"><%= l(:label_access_perm_count_value, :count => role.permissions.size) %></td><% end %>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="ag_tip"><%= l(:text_access_tip) %></p>
+
+  <div class="ag_savebar">
+    <span class="ag_chg" id="ag_chg"><%= l(:label_ag_nochange) %></span>
+    <button type="button" class="btn_line" id="ag_reset" disabled><%= l(:button_ag_reset) %></button>
+    <%= submit_tag l(:button_save), :name => nil, :id => 'ag_save', :disabled => true %>
+  </div>
 <% end %>
-</tbody>
+
+<h3 class="ag_sec"><%= l(:label_access_by_user) %></h3>
+<div class="autoscroll">
+<table class="list ag_tbl ag_users">
+  <thead><tr>
+    <th class="area"><%= l(:label_user) %></th>
+    <% @projects.each do |project| %><th><%= link_to project.name, settings_project_path(project, :tab => 'members') %></th><% end %>
+  </tr></thead>
+  <tbody>
+  <% @users.each do |user| %>
+    <% by_project = (@memberships[user.id] || []).index_by(&:project_id) %>
+    <tr>
+      <th class="area"><%= link_to user.name, edit_user_path(user) %><% if user.admin? %> <span class="ag_admin"><%= l(:field_admin) %></span><% end %></th>
+      <% @projects.each do |project| %>
+        <td>
+          <% if (m = by_project[project.id]) %>
+            <% m.roles.sort.each do |role| %><span class="ag_role"><%= role.name %></span><% end %>
+          <% elsif user.admin? %>
+            <span class="ag_dim"><%= l(:label_access_admin_all) %></span>
+          <% else %>
+            <span class="ag_dim">-</span>
+          <% end %>
+        </td>
+      <% end %>
+    </tr>
+  <% end %>
+  </tbody>
 </table>
 </div>
-<p><%= check_all_links 'permissions_form' %></p>
-<p><%= submit_tag l(:button_save) %></p>
+<p class="ag_tip"><%= l(:text_access_user_tip) %></p>
+
+<%= javascript_tag do %>
+$(function() {
+  var $f = $('#permissions_form');
+  var labels = <%= raw({ 'manage' => l(:label_access_level_manage), 'write' => l(:label_access_level_write), 'view' => l(:label_access_level_view), 'none' => l(:label_access_level_none) }.to_json) %>;
+  var countText = <%= raw l(:label_access_perm_count_value, :count => '__N__').to_json %>;
+  var chgText = <%= raw l(:label_ag_changed, :count => '__N__').to_json %>, noChg = <%= raw l(:label_ag_nochange).to_json %>;
+  var key = 'ag_open_groups';
+
+  function setOpen($g, open) {
+    $g.toggleClass('on', open).find('.ag_exp').attr('aria-expanded', open ? 'true' : 'false');
+  }
+  function saveOpen() {
+    try { sessionStorage.setItem(key, JSON.stringify($('.ag_grp.on').map(function() { return $(this).data('group'); }).get())); } catch (e) {}
+  }
+  try { (JSON.parse(sessionStorage.getItem(key) || '[]') || []).forEach(function(g) { setOpen($('.ag_grp[data-group="' + g + '"]'), true); }); } catch (e) {}
+
+  // 영역 요약 다시 계산 (가장 높은 등급, 체크 수)
+  function refresh($g, role) {
+    var $c = $g.find('input.role-' + role), tiers = $c.filter(':checked').map(function() { return $(this).data('tier'); }).get();
+    var lv = ['manage', 'write', 'view'].filter(function(t) { return tiers.indexOf(t) >= 0; })[0] || 'none';
+    var $s = $g.find('.ag_sum[data-role="' + role + '"]');
+    $s.find('.ag_lv').attr('class', 'ag_lv lv_' + lv).text(labels[lv]).removeAttr('title');
+    $s.find('.ag_frac b').text(tiers.length);
+    if ($g.data('group') === 'keys') $s.find('.ag_wl').prop('hidden', !$g.find('input.role-' + role + '[value="whitelist_keys"]').is(':checked'));
+  }
+  function update() {
+    var n = 0;
+    $f.find('.ag_ck input').each(function() {
+      var changed = this.checked !== this.defaultChecked; if (changed) n++;
+      $(this).closest('td').toggleClass('ag_mod', changed);
+    });
+    $('.ag_total').each(function() {
+      var c = $f.find('input.role-' + $(this).data('role') + ':checked').length;
+      $(this).text(countText.replace('__N__', c));
+    });
+    $('#ag_chg').text(n ? chgText.replace('__N__', n) : noChg).toggleClass('on', n > 0);
+    $('#ag_save, #ag_reset').prop('disabled', n === 0);
+  }
+  function changed($inputs) {
+    var seen = {};
+    $inputs.each(function() {
+      var $g = $(this).closest('.ag_grp'), role = (this.className.match(/role-(\d+)/) || [])[1], k = $g.data('group') + ':' + role;
+      if (!seen[k]) { seen[k] = 1; refresh($g, role); }
+    });
+    update();
+  }
+  function toggleAll($inputs) {
+    var on = $inputs.filter(':checked').length < $inputs.length;
+    $inputs.prop('checked', on); changed($inputs);
+  }
+
+  $f.on('click', '.ag_exp', function() { var $g = $(this).closest('.ag_grp'); setOpen($g, !$g.hasClass('on')); saveOpen(); });
+  $('#ag_open_all').on('click', function() { setOpen($('.ag_grp'), true); saveOpen(); });
+  $('#ag_close_all').on('click', function() { setOpen($('.ag_grp'), false); saveOpen(); });
+  $f.on('change', '.ag_ck input', function() { changed($(this)); });
+  $f.on('click', '.ag_rowtog', function() { toggleAll($(this).closest('tr').find('.ag_ck input')); });
+  // 열 전체: 펼친 영역이 있으면 그 영역만, 없으면 전체
+  $f.on('click', '.ag_coltog', function() {
+    var role = $(this).data('role'), $scope = $('.ag_grp.on').length ? $('.ag_grp.on') : $('.ag_grp');
+    toggleAll($scope.find('input.role-' + role));
+  });
+  $('#ag_reset').on('click', function() {
+    var $all = $f.find('.ag_ck input');
+    $all.each(function() { this.checked = this.defaultChecked; }); changed($all);
+  });
+  // 권한 이름으로 찾기: 맞는 권한이 있는 영역만 펼쳐 보여 줌
+  $('#ag_q').on('input', function() {
+    var q = $(this).val().toLowerCase().trim();
+    $('.ag_grp').each(function() {
+      var $g = $(this), hit = 0;
+      $g.find('.ag_prow').each(function() { var on = !q || String($(this).data('name')).indexOf(q) >= 0; $(this).toggleClass('ag_hide', !on); if (on) hit++; });
+      $g.toggleClass('ag_hide', !!q && hit === 0).toggleClass('ag_search', !!q);
+    });
+  });
+  // 저장하지 않고 떠나면 확인
+  $(window).on('beforeunload', function() { if (!$('#ag_save').prop('disabled')) return true; });
+  $f.on('submit', function() { $(window).off('beforeunload'); });
+  update();
+});
 <% end %>
-<% other_formats_links do |f| %>
-  <%= f.link_to_with_query_parameters 'CSV', {}, :onclick => "showModal('csv-export-options', '330px'); return false;" %>
-<% end %>
-<div id="csv-export-options" style="display: none;">
-  <h3 class="title"><%= l(:label_export_options, :export_format => 'CSV') %></h3>
-  <%= form_tag(permissions_roles_path(:format => 'csv'), :method => :get, :id => 'csv-export-form') do %>
-  <%= export_csv_encoding_select_tag %>
-  <%= export_csv_separator_select_tag %>
-  <p class="buttons">
-    <%= submit_tag l(:button_export), :name => nil, :onclick => 'hideModal(this);', :data => {:disable_with => false} %>
-    <%= link_to_function l(:button_cancel), 'hideModal(this);' %>
-  </p>
-  <% end %>
-</div>
+
+<% html_title l(:label_ag_perm_tab) %>
