@@ -1,0 +1,63 @@
+<%# 용어사전 목록 — 프로젝트 화면은 프로젝트 용어 + 공통 용어, 관리 화면은 공통 용어 %>
+<div class="contextual">
+  <% if glossary_can_manage? %>
+    <%= link_to sprite_icon('add', l(:label_glossary_new)), glossary_path_for(:new), :class => 'icon icon-add' %>
+    <%= link_to sprite_icon('import', l(:button_import)), glossary_path_for(:import), :class => 'icon icon-import' %>
+  <% end %>
+  <%= link_to sprite_icon('download', l(:label_glossary_export)), glossary_path_for(:export), :class => 'icon icon-download' %>
+</div>
+
+<h2><%= @project ? l(:label_glossary) : l(:label_glossary_common) %></h2>
+<p class="subtitle"><%= @project ? l(:text_glossary_project) : l(:text_glossary_common) %></p>
+
+<div class="list_bar">
+  <p class="list_total">총 <strong><%= @term_count %></strong>건</p>
+  <%= form_tag(glossary_path_for(:index), :method => :get, :class => 'list_search') do %>
+    <% if @project %>
+      <label for="gl_scope"><%= l(:label_glossary_scope) %></label>
+      <%= select_tag 'scope', options_for_select([[l(:label_glossary_scope_project), 'project'], [l(:label_glossary_scope_common), 'common']], @scope_filter), :id => 'gl_scope', :include_blank => l(:label_all) %>
+    <% end %>
+    <% if @categories.any? %>
+      <label for="gl_category"><%= l(:field_glossary_category) %></label>
+      <%= select_tag 'category', options_for_select(@categories, @category), :id => 'gl_category', :include_blank => l(:label_all) %>
+    <% end %>
+    <%= render :partial => 'krds/title_search', :locals => { :placeholder => l(:label_glossary_search), :clear_url => (glossary_path_for(:index) if @q || @category || @scope_filter) } %>
+  <% end %>
+</div>
+
+<% if @terms.empty? %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list gl_list">
+  <thead><tr>
+    <th class="name"><%= l(:field_glossary_name) %></th>
+    <th><%= l(:field_glossary_name_en) %></th>
+    <th><%= l(:field_glossary_abbr) %></th>
+    <th><%= l(:field_glossary_type) %></th>
+    <th><%= l(:field_glossary_category) %></th>
+    <th class="definition"><%= l(:field_glossary_definition) %></th>
+    <th></th>
+  </tr></thead>
+  <tbody>
+  <% @terms.each do |term| %>
+    <tr class="gl_row" id="term-<%= term.id %>">
+      <td class="name">
+        <% if @project && term.common? %><span class="gl_common"><%= l(:label_glossary_scope_common) %></span><% end %>
+        <strong><%= term.name %></strong>
+      </td>
+      <td class="name_en"><%= term.name_en %></td>
+      <td class="abbr"><% if term.abbr.present? %><code><%= term.abbr %></code><% end %></td>
+      <td class="type"><%= term.type_label %></td>
+      <td class="category"><%= term.category %></td>
+      <td class="definition"><%= term.definition %><% if term.note.present? %><span class="gl_note"><%= term.note %></span><% end %></td>
+      <td class="buttons"><% if glossary_editable?(term) %><%= link_to sprite_icon('edit', l(:button_edit)), glossary_path_for(:edit, term), :class => 'icon icon-edit' %> <%= link_to sprite_icon('del', l(:button_delete)), glossary_path_for(:member, term), :method => :delete, :data => { :confirm => l(:text_are_you_sure) }, :class => 'icon icon-del' %><% end %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<span class="pagination"><%= pagination_links_full @term_pages, @term_count %></span>
+<% end %>
+
+<% html_title(@project ? l(:label_glossary) : l(:label_glossary_common)) %>

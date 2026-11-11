@@ -1,0 +1,5 @@
+<h2><%= link_to (@project ? l(:label_glossary) : l(:label_glossary_common)), glossary_path_for(:index) %> &#187; <%= l(:label_glossary_new) %></h2>
+<%= labelled_form_for @term, :url => glossary_path_for(:index), :html => { :method => :post } do |f| %>
+  <%= render :partial => 'form', :locals => { :f => f } %>
+<% end %>
+<% html_title l(:label_glossary_new) %>

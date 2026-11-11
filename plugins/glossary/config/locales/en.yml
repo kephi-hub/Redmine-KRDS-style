@@ -1,0 +1,39 @@
+en:
+  project_module_glossary: Glossary
+  permission_view_glossary: View glossary
+  permission_manage_glossary: Manage glossary
+  label_glossary: Glossary
+  label_glossary_common: Common glossary
+  label_glossary_new: New term
+  label_glossary_export: Export
+  label_glossary_import: Import terms
+  label_glossary_import_result: Import result
+  label_glossary_search: Search term, English name, abbreviation, definition
+  label_glossary_scope: Scope
+  label_glossary_scope_project: Project
+  label_glossary_scope_common: Common
+  label_glossary_missing: Not in the glossary
+  label_glossary_overwrite: Overwrite existing terms with the same name
+  label_glossary_created: Created
+  label_glossary_updated: Overwritten
+  label_glossary_skipped: Skipped
+  label_glossary_failed: Errors
+  label_glossary_line: "Line %{line}"
+  label_glossary_back: Back to glossary
+  field_glossary_name: Term
+  field_glossary_name_en: English name
+  field_glossary_abbr: Abbreviation (column)
+  field_glossary_category: Category
+  field_glossary_type: Data type
+  field_glossary_data_type: Data type
+  field_glossary_data_length: Length
+  field_glossary_definition: Definition
+  field_glossary_note: Note
+  text_glossary_project: Project terms and common terms. Use {{term(name)}} in wiki or issue text to link a term.
+  text_glossary_common: Terms shared by all projects. Shown as 'Common' in project glossaries.
+  text_glossary_abbr: Uppercase letters, digits and underscore only (e.g. CUST_NO). Used to check DB column names.
+  text_glossary_import: Upload a CSV saved from Excel. The first line must contain the headers below; 'Term' is required.
+  error_glossary_no_file: Choose a CSV file.
+  error_glossary_bad_csv: Cannot read the CSV file or the 'Term' header is missing.
+  error_glossary_no_name: Term is empty
+  notice_glossary_imported: "Import finished. Created %{created}, overwritten %{updated}, skipped %{skipped}"

@@ -1,0 +1,18 @@
+<%= error_messages_for @term %>
+<div class="box tabular">
+  <p><%= f.text_field :name, :required => true, :size => 40, :maxlength => 100, :placeholder => '고객번호', :label => :field_glossary_name %></p>
+  <p><%= f.text_field :name_en, :size => 60, :maxlength => 200, :placeholder => 'Customer Number', :label => :field_glossary_name_en %></p>
+  <p><%= f.text_field :abbr, :size => 30, :maxlength => 100, :placeholder => 'CUST_NO', :label => :field_glossary_abbr %>
+    <em class="info"><%= l(:text_glossary_abbr) %></em></p>
+  <p><%= f.text_field :category, :size => 30, :maxlength => 60, :list => 'gl_categories', :label => :field_glossary_category %>
+    <datalist id="gl_categories"><% GlossaryTerm.where(project_id: [nil, @project&.id].uniq).where.not(category: [nil, '']).distinct.pluck(:category).sort.each do |c| %><option value="<%= c %>"><% end %></datalist></p>
+  <p><%= f.text_field :data_type, :size => 20, :maxlength => 60, :placeholder => 'VARCHAR', :list => 'gl_types', :label => :field_glossary_data_type %>
+    <datalist id="gl_types"><% %w(VARCHAR CHAR NUMBER DECIMAL INT BIGINT DATE DATETIME TIMESTAMP TEXT CLOB BLOB).each do |t| %><option value="<%= t %>"><% end %></datalist></p>
+  <p><%= f.text_field :data_length, :size => 10, :maxlength => 30, :placeholder => '20', :label => :field_glossary_data_length %></p>
+  <p><%= f.text_area :definition, :rows => 4, :cols => 60, :label => :field_glossary_definition %></p>
+  <p><%= f.text_area :note, :rows => 2, :cols => 60, :label => :field_glossary_note %></p>
+</div>
+<p class="form_btns">
+  <%= link_to l(:button_cancel), glossary_path_for(:index), :class => 'btn_line' %>
+  <%= submit_tag l(@term.new_record? ? :button_create : :button_save) %>
+</p>

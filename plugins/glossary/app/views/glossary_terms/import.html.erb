@@ -1,0 +1,30 @@
+<h2><%= link_to (@project ? l(:label_glossary) : l(:label_glossary_common)), glossary_path_for(:index) %> &#187; <%= l(:label_glossary_import) %></h2>
+
+<%= form_tag glossary_path_for(:import), :multipart => true do %>
+  <div class="box">
+    <p><%= l(:text_glossary_import) %></p>
+    <p class="gl_cols"><code>용어</code> <code>영문명</code> <code>약어</code> <code>분류</code> <code>데이터타입</code> <code>길이</code> <code>정의</code> <code>비고</code></p>
+    <p><%= file_field_tag 'file', :accept => '.csv,text/csv' %></p>
+    <p><label class="inline"><%= check_box_tag 'overwrite', '1', false %> <%= l(:label_glossary_overwrite) %></label></p>
+  </div>
+  <p class="form_btns">
+    <%= link_to l(:button_cancel), glossary_path_for(:index), :class => 'btn_line' %>
+    <%= submit_tag l(:button_import) %>
+  </p>
+<% end %>
+
+<% if @result %>
+  <h3 class="ag_sec"><%= l(:label_glossary_import_result) %></h3>
+  <ul class="ag_legend">
+    <li><%= l(:label_glossary_created) %> <strong><%= @result[:created] %></strong></li>
+    <li><%= l(:label_glossary_updated) %> <strong><%= @result[:updated] %></strong></li>
+    <li><%= l(:label_glossary_skipped) %> <strong><%= @result[:skipped] %></strong></li>
+    <li><%= l(:label_glossary_failed) %> <strong><%= @result[:errors].size %></strong></li>
+  </ul>
+  <% if @result[:errors].any? %>
+    <ul class="gl_errors"><% @result[:errors].each do |line, msg| %><li><%= l(:label_glossary_line, :line => line) %> — <%= msg %></li><% end %></ul>
+  <% end %>
+  <p><%= link_to l(:label_glossary_back), glossary_path_for(:index) %></p>
+<% end %>
+
+<% html_title l(:label_glossary_import) %>

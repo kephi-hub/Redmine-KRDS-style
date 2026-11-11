@@ -358,15 +358,15 @@ td.row_btns{text-align:right;white-space:nowrap;}
 /* 관리 목록: 이름 칸·첫 머리글 왼쪽 정렬, 이름은 굵게 */
 body:has(#admin-menu) #content table.list td.name{text-align:left;}
 body:has(#admin-menu) #content table.list td.name>a{font-weight:500;}
-body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl)>thead th:first-child{text-align:left;}
+body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl):not(.gl_list)>thead th:first-child{text-align:left;}
 /* 관리 목록 모바일: 카드형 (이름 한 줄 → 정보 → 작업 버튼 오른쪽), 데스크톱은 파일 끝 min-width:900px 에서 표로 되돌림 */
-body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl){display:block;}
-body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl)>thead{display:none;}
-body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl)>tbody{display:block;}
-body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl)>tbody>tr{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;padding:12px 4px;border-bottom:1px solid var(--gray_20);}
-body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl)>tbody>tr>td{display:block;padding:0;border:0;font-size:0.875rem;}
-body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl)>tbody>tr>td.name{flex:1 0 100%;font-size:1rem;}
-body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl)>tbody>tr>td.buttons{flex:1 0 100%;}
+body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl):not(.gl_list){display:block;}
+body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl):not(.gl_list)>thead{display:none;}
+body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl):not(.gl_list)>tbody{display:block;}
+body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl):not(.gl_list)>tbody>tr{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;padding:12px 4px;border-bottom:1px solid var(--gray_20);}
+body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl):not(.gl_list)>tbody>tr>td{display:block;padding:0;border:0;font-size:0.875rem;}
+body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl):not(.gl_list)>tbody>tr>td.name{flex:1 0 100%;font-size:1rem;}
+body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl):not(.gl_list)>tbody>tr>td.buttons{flex:1 0 100%;}
 /* 접속정보 유형 (vault_types 플러그인) — 관리 > 접속정보(Vault) 카드, 유형 목록 */
 .vt_card{padding:20px;margin:0 0 30px;border:1px solid var(--gray_20);border-radius:var(--radius_l);background:var(--gray_0);}
 #content .vt_card h3{padding:0;margin:0 0 8px;font-size:1.0625rem;color:var(--gray_95);}
@@ -727,6 +727,7 @@ body.controller-news.action-show #content>h3{padding-top:20px;margin-top:28px;bo
 #admin-index #admin-menu a.simple-workflows::after{content:"역할마다 상태 변경 규칙을 한 번에 설정";}
 #admin-index #admin-menu a.field-permissions::after{content:"상태별 수정 금지 · 필수 항목";}
 #admin-index #admin-menu a.jenkins-servers::after{content:"배포 연동 Jenkins 주소 · 토큰";}
+#admin-index #admin-menu a.glossary-common::after{content:"모든 프로젝트가 함께 쓰는 용어 · 약어";}
 /* Vault 메뉴는 아이콘 없이 글자만 있어 자물쇠 상자를 붙임 (responsive.css 의 !important 덮어씀) */
 #admin-index #admin-menu a.vault{padding:18px 20px !important;background-image:none;}
 #admin-index #admin-menu a.vault::before{content:"";grid-row:span 2;width:44px;height:44px;border-radius:var(--radius_m,8px);background:var(--pri_5) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23256ef4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2'/%3E%3Cpath d='M8 11V7a4 4 0 0 1 8 0v4'/%3E%3C/svg%3E") center/22px no-repeat;}
@@ -813,6 +814,26 @@ div#activity dd.grouped{margin-left:32px;}
 #query_form_with_buttons>p.buttons select,#query_form_with_buttons>p.buttons input{flex:none;}
 #query_form_with_buttons>p.contextual,#query_form_with_buttons>span.contextual{flex-wrap:wrap;height:auto;margin:12px 0 0;}
 
+/* 용어사전 (glossary 플러그인) — 모바일 카드형 (용어 → 영문명·약어·타입 → 정의 → 버튼), 데스크톱은 표 */
+table.list.gl_list{display:block;}
+table.list.gl_list>thead{display:none;}
+table.list.gl_list>tbody{display:block;}
+table.list.gl_list tr.gl_row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;padding:14px 4px;border-bottom:1px solid var(--gray_20);}
+table.list.gl_list tr.gl_row>td{display:block;padding:0;border:0;font-size:0.875rem;text-align:left;color:var(--gray_70);}
+table.list.gl_list tr.gl_row>td.name{flex:1 0 100%;font-size:1rem;color:var(--gray_95);}
+table.list.gl_list tr.gl_row>td.definition{flex:1 0 100%;color:var(--gray_80);white-space:pre-line;}
+table.list.gl_list tr.gl_row>td.buttons{flex:1 0 100%;}
+table.list.gl_list tr.gl_row>td:empty{display:none;}
+table.list.gl_list td.abbr code{padding:2px 6px;border-radius:var(--radius_s);background:var(--pri_5);font-size:0.8125rem;color:var(--pri_60);}
+.gl_common{display:inline-flex;align-items:center;height:22px;padding:0 8px;margin:0 6px 0 0;border:1px solid var(--gray_30);border-radius:11px;background:var(--gray_5);font-size:0.75rem;font-weight:500;color:var(--gray_70);vertical-align:middle;}
+.gl_note{display:block;margin:4px 0 0;font-size:0.8125rem;color:var(--gray_50);}
+.gl_cols{display:flex;flex-wrap:wrap;gap:6px;}
+.gl_cols code{padding:2px 8px;border:1px solid var(--gray_20);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.8125rem;color:var(--gray_80);}
+.gl_errors{padding:12px 16px 12px 32px;margin:0 0 20px;border:1px solid var(--dan_10);border-radius:var(--radius_m);background:var(--dan_5);font-size:0.875rem;color:var(--dan_60);}
+a.gl_term{border-bottom:1px dashed var(--pri_50);text-decoration:none;}
+a.gl_term:hover{border-bottom-style:solid;text-decoration:none;}
+.gl_missing{border-bottom:1px dashed var(--dan_50);color:var(--dan_60);}
+
 /* 이전·다음 버튼: Redmine 은 600px 미만에서 너비 32% 로 고정해 글자가 잘림 → 글자 너비대로 */
 #wrapper .pagination ul.pages li.current,#wrapper .pagination ul.pages li.previous,#wrapper .pagination ul.pages li.next{width:auto;overflow:visible;}
 
@@ -880,11 +901,11 @@ table.list.dep_runs tr.dep_row>td.changes{width:45%;text-align:left;white-space:
 table.list.dep_runs th.changes{text-align:left;}
 table.list.dep_runs tr.dep_row.on>td.duration{text-align:left;}
 table.list.dep_runs tr.dep_row.on>td.duration .dep_prog{width:120px;}
-body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl){display:table;}
-body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl)>thead{display:table-header-group;}
-body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl)>tbody{display:table-row-group;}
-body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl)>tbody>tr{display:table-row;padding:0;border:0;}
-body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl)>tbody>tr>td,body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl)>tbody>tr>td.name,body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl)>tbody>tr>td.buttons{display:table-cell;padding:8px 10px 8px 2px;border-top:1px solid var(--gray_10);font-size:0.8125rem;}
+body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl):not(.gl_list){display:table;}
+body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl):not(.gl_list)>thead{display:table-header-group;}
+body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl):not(.gl_list)>tbody{display:table-row-group;}
+body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl):not(.gl_list)>tbody>tr{display:table-row;padding:0;border:0;}
+body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl):not(.gl_list)>tbody>tr>td,body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl):not(.gl_list)>tbody>tr>td.name,body:has(#admin-menu) #content table.list:not(.users):not(.projects):not(.ag_tbl):not(.gl_list)>tbody>tr>td.buttons{display:table-cell;padding:8px 10px 8px 2px;border-top:1px solid var(--gray_10);font-size:0.8125rem;}
 table.list.messages{display:table;}
 table.list.messages thead{display:table-header-group;}
 table.list.messages tbody{display:table-row-group;}
@@ -900,6 +921,15 @@ table.list.files tr.file>td{display:table-cell;padding:8px 10px 8px 0;border-top
 table.list.files tr.file>td.filename{font-size:inherit;font-weight:500;}
 table.list.files tr.file>td.digest{display:table-cell;width:30%;font-size:0.75rem;color:var(--gray_50);word-break:break-all;}
 table.list.files tr.file>td.downloads::before{content:none;}
+table.list.gl_list{display:table;}
+table.list.gl_list>thead{display:table-header-group;}
+table.list.gl_list>tbody{display:table-row-group;}
+table.list.gl_list>thead th{text-align:left;}
+table.list.gl_list tr.gl_row{display:table-row;padding:0;border:0;}
+table.list.gl_list tr.gl_row>td,table.list.gl_list tr.gl_row>td.name,table.list.gl_list tr.gl_row>td.definition,table.list.gl_list tr.gl_row>td.buttons{display:table-cell;padding:10px 10px 10px 4px;border-top:1px solid var(--gray_10);font-size:0.875rem;vertical-align:top;}
+table.list.gl_list tr.gl_row>td:empty{display:table-cell;}
+table.list.gl_list tr.gl_row>td.name{white-space:nowrap;}
+table.list.gl_list tr.gl_row>td.definition{width:40%;}
 #admin-index #admin-menu ul{grid-template-columns:repeat(3,1fr);}
 }
 

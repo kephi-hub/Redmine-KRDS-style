@@ -1,0 +1,50 @@
+ko:
+  project_module_glossary: 용어사전
+  permission_view_glossary: 용어사전 보기
+  permission_manage_glossary: 용어사전 관리
+  label_glossary: 용어사전
+  label_glossary_common: 공통 용어사전
+  label_glossary_new: 새 용어
+  label_glossary_export: 내보내기
+  label_glossary_import: 용어 가져오기
+  label_glossary_import_result: 가져오기 결과
+  label_glossary_search: 용어·영문명·약어·정의로 검색
+  label_glossary_scope: 구분
+  label_glossary_scope_project: 프로젝트
+  label_glossary_scope_common: 공통
+  label_glossary_missing: 용어사전에 없는 용어입니다
+  label_glossary_overwrite: 같은 용어가 있으면 새 내용으로 덮어쓰기
+  label_glossary_created: 추가
+  label_glossary_updated: 덮어씀
+  label_glossary_skipped: 건너뜀
+  label_glossary_failed: 오류
+  label_glossary_line: "%{line}번째 줄"
+  label_glossary_back: 용어사전으로 돌아가기
+  field_glossary_name: 용어
+  field_glossary_name_en: 영문명
+  field_glossary_abbr: 약어(컬럼명)
+  field_glossary_category: 분류
+  field_glossary_type: 데이터 타입
+  field_glossary_data_type: 데이터 타입
+  field_glossary_data_length: 길이
+  field_glossary_definition: 정의
+  field_glossary_note: 비고
+  text_glossary_project: 이 프로젝트에서 쓰는 용어와 전사 공통 용어를 함께 보여줍니다. 위키·일감 본문에 {{term(용어)}} 로 적으면 용어사전과 연결됩니다.
+  text_glossary_common: 모든 프로젝트에서 함께 쓰는 용어입니다. 프로젝트 용어사전에 '공통' 으로 표시됩니다.
+  text_glossary_abbr: 영문 대문자·숫자·밑줄(_)만 사용 (예 CUST_NO). DB 컬럼명 점검 기준이 됩니다.
+  text_glossary_import: 엑셀에서 'CSV UTF-8' 또는 'CSV(쉼표로 분리)' 로 저장한 파일을 올리세요. 첫 줄은 아래 머리줄이어야 하며 '용어' 칸은 꼭 필요합니다. 내보내기 파일을 그대로 고쳐서 올려도 됩니다.
+  error_glossary_no_file: CSV 파일을 선택해 주세요.
+  error_glossary_bad_csv: CSV 파일을 읽을 수 없거나 '용어' 머리줄이 없습니다.
+  error_glossary_no_name: 용어가 비어 있습니다
+  notice_glossary_imported: "가져오기를 마쳤습니다. 추가 %{created}건, 덮어씀 %{updated}건, 건너뜀 %{skipped}건"
+  activerecord:
+    attributes:
+      glossary_term:
+        name: 용어
+        name_en: 영문명
+        abbr: 약어
+        category: 분류
+        data_type: 데이터 타입
+        data_length: 길이
+        definition: 정의
+        note: 비고
