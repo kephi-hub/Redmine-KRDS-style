@@ -8,6 +8,7 @@
 # - krds/_title_search.html.erb : 문서·뉴스·파일 공통 검색칸 (새 파일, 원본 없음)
 # - documents/_form.html.erb : 편집 화면에도 첨부 추가·삭제 표시 (저장 처리: DocumentAttachmentsPatch)
 # - activities/_activities.html.erb : 작업내역 시간을 오전/오후 12시간제로 표시
+# - projects/_form.html.erb : 프로젝트 정보(새 프로젝트·설정)의 모듈 선택을 대분류 카드로 (krds/_project_modules, 원본 6.1.6 기준)
 # config/locales/ko.yml : core 한국어 번역 누락분 보충
 # lib/krds_ui/xlsx.rb · xlsx_reader.rb : 엑셀 쓰기·읽기 공통 (rubyzip·nokogiri, 추가 gem 없음)
 # assets/javascripts/mermaid*.js : Mermaid 11.4.1(MIT) 포함 — 본문 ```mermaid 그림, DB ERD·메뉴 구조도 공통 (KrdsUi::MermaidHook)

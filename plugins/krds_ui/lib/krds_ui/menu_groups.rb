@@ -17,6 +17,15 @@ module KrdsUi
       [:collab, %i(wiki boards news)]
     ].freeze
     FIXED = %i(new_object settings).freeze
+    # 프로젝트 모듈 선택 화면의 대분류 (메뉴와 같은 묶음, 목록에 없는 모듈은 "기타")
+    MODULE_GROUPS = [
+      [:work, %w(issue_tracking time_tracking gantt calendar)],
+      [:design, %w(qa_requirements change_requests menu_tree sys_roles glossary)],
+      [:dev, %w(repository programs db_manage qa_tests jenkins_deploy)],
+      [:ops, %w(ops_assets ops_schedules ops_logs ops_interfaces keys)],
+      [:docs, %w(deliverables meetings risks documents files)],
+      [:collab, %w(wiki boards news)]
+    ].freeze
   end
 
   module MenuHelperPatch

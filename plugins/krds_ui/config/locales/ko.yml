@@ -96,4 +96,36 @@ ko:
   label_nav_desc_wiki: 함께 쓰는 문서
   label_nav_desc_boards: 게시판 · 토론
   label_nav_desc_news: 공지 · 소식
+  text_pmod_help: 쓸 기능을 켜면 프로젝트 메뉴에 나타납니다. 메뉴와 같은 대분류로 묶었습니다.
+  label_pmod_count: "%{on} / %{all}개 사용"
+  label_pmod_all: 모두 켜기
+  label_pmod_none: 모두 끄기
+  label_pmod_toggle: "%{group} 모두 켜기·끄기"
+  label_pmod_desc_issue_tracking: 일감 등록 · 검색 · 업무흐름
+  label_pmod_desc_time_tracking: 작업 시간 기록 · 집계
+  label_pmod_desc_gantt: 일정 막대 그래프
+  label_pmod_desc_calendar: 달력으로 보는 일감
+  label_pmod_desc_qa_requirements: 요구사항 정의 · 추적표
+  label_pmod_desc_change_requests: 요구사항 변경 접수 · 영향 분석 · 승인
+  label_pmod_desc_menu_tree: 화면 메뉴 트리 · 일감 연결
+  label_pmod_desc_sys_roles: 개발 대상 시스템의 권한 등급 · 메뉴 권한 (메뉴 구조도와 함께)
+  label_pmod_desc_glossary: 표준 용어 · 약어
+  label_pmod_desc_repository: SVN · Git 커밋 이력 · 소스 다운로드
+  label_pmod_desc_programs: 프로그램 ID · 소스 경로 · 개발 진척
+  label_pmod_desc_db_manage: 테이블 · ERD · 변경 이력 · 공통코드 · 개인정보
+  label_pmod_desc_qa_tests: 테스트 케이스 · 회차 · 결함
+  label_pmod_desc_jenkins_deploy: Jenkins 배포 실행 · 이력
+  label_pmod_desc_ops_assets: 서버 · 도메인 · 인증서 · 만료일
+  label_pmod_desc_ops_schedules: 배치 일정 · 타임라인
+  label_pmod_desc_ops_logs: 장애 · 정기점검 · 월간 보고서
+  label_pmod_desc_ops_interfaces: 연계 정의 · 구성도
+  label_pmod_desc_keys: 서버 · 계정 접속정보 (Vault)
+  label_pmod_desc_deliverables: 단계별 산출물 · 자동 생성 · 일괄 다운로드
+  label_pmod_desc_meetings: 회의록 · 후속 조치 일감
+  label_pmod_desc_risks: 이슈 · 위험 관리대장
+  label_pmod_desc_documents: 문서 보관함
+  label_pmod_desc_files: 배포 파일 · 첨부
+  label_pmod_desc_wiki: 함께 쓰는 문서
+  label_pmod_desc_boards: 게시판 · 토론
+  label_pmod_desc_news: 공지 · 소식
 

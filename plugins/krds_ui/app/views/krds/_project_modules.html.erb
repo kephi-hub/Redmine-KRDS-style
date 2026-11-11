@@ -1,0 +1,54 @@
+<%# 프로젝트 정보(새 프로젝트·설정) — 모듈을 메뉴와 같은 대분류(일감·설계·개발·운영·산출물·협업)로 묶어 카드로, 모듈마다 한 줄 설명, 대분류별 모두 켜기·끄기 %>
+<% mods = Redmine::AccessControl.available_project_modules.map(&:to_s) %>
+<% groups = KrdsUi::MenuGroups::MODULE_GROUPS.map { |key, names| [key, names.select { |n| mods.include?(n) }] } %>
+<% etc = mods - KrdsUi::MenuGroups::MODULE_GROUPS.flat_map(&:last) %>
+<% groups << [:etc, etc] %>
+<fieldset class="box pmod_box" id="project_modules">
+  <legend><%= l(:label_module_plural) %> <span class="pmod_count" id="pmod_count"></span></legend>
+  <p class="pmod_help"><%= l(:text_pmod_help) %></p>
+  <div class="pmod_grid">
+    <% groups.each do |key, list| %>
+      <% next if list.empty? %>
+      <section class="pmod_grp" aria-labelledby="pmod_t_<%= key %>">
+        <div class="pmod_head">
+          <h3 class="pmod_tit" id="pmod_t_<%= key %>"><%= l("label_nav_#{key}") %> <span class="pmod_n"></span></h3>
+          <button type="button" class="pmod_all" aria-label="<%= l(:label_pmod_toggle, :group => l("label_nav_#{key}")) %>"><%= l(:label_pmod_all) %></button>
+        </div>
+        <ul class="pmod_list">
+          <% list.each do |m| %>
+            <li>
+              <label class="pmod_item" for="project_enabled_module_names_<%= m %>">
+                <%= check_box_tag 'project[enabled_module_names][]', m, @project.module_enabled?(m), :id => "project_enabled_module_names_#{m}" %>
+                <span class="pmod_txt"><strong><%= l_or_humanize(m, :prefix => 'project_module_') %></strong>
+                  <% if (d = l("label_pmod_desc_#{m}", :default => '')).present? %><span class="pmod_desc"><%= d %></span><% end %></span>
+              </label>
+            </li>
+          <% end %>
+        </ul>
+      </section>
+    <% end %>
+  </div>
+  <%= hidden_field_tag 'project[enabled_module_names][]', '' %>
+</fieldset>
+<%= javascript_tag do %>
+$(function() {
+  var $box = $('#project_modules'), tpl = <%= raw l(:label_pmod_count, :on => '__ON__', :all => '__ALL__').to_json %>;
+  function refresh() {
+    var $all = $box.find('.pmod_list input[type=checkbox]');
+    $('#pmod_count').text(tpl.replace('__ON__', $all.filter(':checked').length).replace('__ALL__', $all.length));
+    $box.find('.pmod_grp').each(function() {
+      var $c = $(this).find('input[type=checkbox]'), on = $c.filter(':checked').length;
+      $(this).find('.pmod_n').text(on + '/' + $c.length);
+      $(this).toggleClass('on', on > 0);
+      $(this).find('.pmod_all').text(on === $c.length ? <%= raw l(:label_pmod_none).to_json %> : <%= raw l(:label_pmod_all).to_json %>);
+      $(this).find('.pmod_item').each(function() { $(this).toggleClass('on', $(this).find('input').prop('checked')); });
+    });
+  }
+  $box.on('change', 'input[type=checkbox]', refresh);
+  $box.on('click', '.pmod_all', function() {
+    var $c = $(this).closest('.pmod_grp').find('input[type=checkbox]'), all = $c.filter(':checked').length === $c.length;
+    $c.prop('checked', !all); refresh();
+  });
+  refresh();
+});
+<% end %>
