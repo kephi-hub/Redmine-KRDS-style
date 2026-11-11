@@ -1309,8 +1309,8 @@ table.list.oa_list td.next,table.list.oa_list td.exp,table.list.oa_list td.code{
 .gnb_close::before{content:"\00d7";font-size:1.625rem;line-height:36px;color:var(--gray_60);}
 .gnb_close:hover{background:var(--gray_10);}
 .gnb_sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
-.nav_sec{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px;}
-.nav_sec a{display:inline-flex;align-items:center;height:32px;padding:0 14px;border:1px solid var(--gray_30);border-radius:16px;background:var(--gray_0);font-size:0.8125rem;font-weight:500;color:var(--gray_70);text-decoration:none;}
+.nav_sec{display:flex;clear:both;flex-wrap:wrap;gap:6px;margin:0 0 12px;}
+.nav_sec a{display:inline-flex;align-items:center;height:32px;padding:0 14px;border:1px solid var(--gray_30);border-radius:16px;background:var(--gray_0);font-size:0.8125rem;font-weight:500;white-space:nowrap;color:var(--gray_70);text-decoration:none;}
 .nav_sec a:hover{border-color:var(--pri_50);color:var(--pri_60);text-decoration:none;}
 .nav_sec a.on{border-color:var(--pri_50);background:var(--pri_50);color:var(--gray_0);}
 
