@@ -55,6 +55,8 @@ end
 ProjectsHelper.prepend(DbManage::ProjectSettingsPatch) unless ProjectsHelper.ancestors.include?(DbManage::ProjectSettingsPatch)
 Project.has_many :db_links, dependent: :destroy unless Project.reflect_on_association(:db_links)
 DbLink.has_many :db_snapshots, dependent: :delete_all unless DbLink.reflect_on_association(:db_snapshots)
+# 연결을 지우면 SQL 조회 실행 기록도 함께 지움
+DbLink.has_many :db_query_logs, dependent: :delete_all unless DbLink.reflect_on_association(:db_query_logs)
 
 # 비밀번호가 로그에 남지 않게
 Rails.application.config.filter_parameters += [:password, :ssh_password, :ssh_private_key, :ssh_passphrase]
