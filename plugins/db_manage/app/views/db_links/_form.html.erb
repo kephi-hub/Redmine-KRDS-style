@@ -1,13 +1,19 @@
 <%= error_messages_for @link %>
 <div class="box tabular">
   <p><%= f.text_field :name, :required => true, :size => 30, :maxlength => 60, :placeholder => '개발DB', :label => :field_name %></p>
-  <p><%= f.select :db_server_id, DbServer.sorted.map { |s| ["#{s.name} (#{s.adapter_label} · #{s.address})", s.id] }, { :required => true, :label => :label_db_server } %></p>
+  <p><%= f.select :db_server_id, DbServer.sorted.map { |s| ["[#{s.env_label}] #{s.name} (#{s.adapter_label} · #{s.address})", s.id, { 'data-production' => s.production? ? 1 : 0 }] }, { :required => true, :label => :label_db_server }, { :id => 'db_link_server' } %></p>
   <p><%= f.text_field :schema_name, :size => 30, :maxlength => 128, :label => :field_db_schema %>
     <em class="info"><%= l(:text_db_schema_info) %></em></p>
-  <p><%= f.check_box :production, :label => :label_db_production %>
+  <p><%= f.check_box :production, :label => :label_db_production, :id => 'db_link_prod' %>
     <em class="info"><%= l(:text_db_production_info) %></em></p>
 </div>
 <p class="form_btns">
   <%= link_to l(:button_cancel), settings_project_path(@project, :tab => 'db_links'), :class => 'btn_line' %>
   <%= submit_tag l(@link.new_record? ? :button_create : :button_save) %>
 </p>
+<%= javascript_tag do %>
+// DB 서버를 바꾸면 그 서버의 개발/운영 구분을 운영 표시 기본값으로
+$(function() {
+  $('#db_link_server').on('change', function() { $('#db_link_prod').prop('checked', $(this).find('option:selected').data('production') === 1); });
+});
+<% end %>

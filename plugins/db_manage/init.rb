@@ -2,6 +2,7 @@
 # - 관리 > DB 서버 : DB 종류(MariaDB·MySQL, PostgreSQL / MS SQL·Oracle 준비 중)·주소·계정·비밀번호(암호화 저장), 연결 시험
 # - 프로젝트 > 설정 > DB : 개발DB·운영DB 등 이 프로젝트에서 쓸 DB 서버·스키마 지정
 # - 프로젝트 > DB : 테이블·컬럼·키 조회, 테이블 정의서(엑셀), 개발/운영 비교, 용어사전 점검
+# - 1.1.0 : DB 서버 개발/운영 구분(프로젝트 연결 기본값), 등록·편집 화면에서 저장 전 연결 시험
 # 원격 DB 에는 읽기 전용 세션으로 접속해 메타데이터만 읽음 (데이터 조회·변경 SQL 없음)
 require_relative 'lib/db_manage/connector'
 require_relative 'lib/db_manage/xlsx'
@@ -12,7 +13,7 @@ Redmine::Plugin.register :db_manage do
   name 'DB 관리'
   author 'kephi-hub'
   description 'DB 서버 접속정보 관리, 프로젝트 DB 스키마 조회·테이블 정의서·개발/운영 비교·용어 점검'
-  version '1.0.0'
+  version '1.1.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
 

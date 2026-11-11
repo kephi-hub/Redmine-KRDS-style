@@ -14,6 +14,8 @@ ko:
   text_access_level_write: 등록·수정
   text_access_level_view: 보기만
   text_access_level_none: 메뉴 안 보임
+  label_access_area_glossary: 용어사전
+  label_access_area_db: DB
   label_access_area_project: 프로젝트 설정·구성원
   label_access_area_issues: 일감
   label_access_area_time: 소요시간

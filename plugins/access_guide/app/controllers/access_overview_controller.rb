@@ -1,8 +1,8 @@
-# 관리 > 권한 한눈에 보기 (관리자 전용, 조회만)
+# 관리 > 역할 및 권한 > 권한 한눈에 보기 탭 (관리자 전용, 조회만)
 class AccessOverviewController < ApplicationController
   layout 'admin'
   self.main_menu = false
-  menu_item :access_overview
+  menu_item :roles
   helper :access_overview
   before_action :require_admin
 

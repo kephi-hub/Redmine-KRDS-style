@@ -1,0 +1,8 @@
+<%# 관리 > 역할 및 권한 탭 — 역할 목록 · 권한 보고서 · 권한 한눈에 보기 %>
+<div class="tabs ag_tabs">
+  <ul>
+    <li><%= link_to l(:label_role_plural), roles_path, :class => (current == :roles ? 'selected' : nil) %></li>
+    <li><%= link_to l(:label_permissions_report), permissions_roles_path, :class => (current == :permissions ? 'selected' : nil) %></li>
+    <li><%= link_to l(:label_access_overview), access_overview_path, :class => (current == :overview ? 'selected' : nil) %></li>
+  </ul>
+</div>

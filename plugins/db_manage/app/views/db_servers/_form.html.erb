@@ -1,6 +1,12 @@
 <%= error_messages_for @server %>
 <div class="box tabular">
   <p><%= f.text_field :name, :required => true, :size => 40, :maxlength => 60, :placeholder => '메인비즈 개발DB', :label => :field_name %></p>
+  <p><label><%= l(:field_db_env) %></label>
+    <span class="db_env_pick">
+      <label class="inline"><%= f.radio_button :production, false %> <span class="db_env db_dev"><%= l(:label_db_dev) %></span></label>
+      <label class="inline"><%= f.radio_button :production, true %> <span class="db_env db_prod"><%= l(:label_db_production) %></span></label>
+    </span>
+    <em class="info"><%= l(:text_db_env_info) %></em></p>
   <p><%= f.select :adapter, DbServer.adapter_options, { :required => true, :label => :field_db_adapter }, { :id => 'db_adapter' } %>
     <em class="info"><%= l(:text_db_adapter_info) %></em></p>
   <p><%= f.text_field :host, :required => true, :size => 40, :maxlength => 255, :placeholder => '192.168.10.10', :label => :field_db_host %></p>
@@ -13,6 +19,10 @@
     <% if @server.password_set? %><em class="info"><%= l(:label_db_password_keep) %></em><% end %></p>
   <p><%= f.number_field :timeout, :min => 1, :max => 60, :label => :field_db_timeout %></p>
   <p><%= f.text_field :note, :size => 60, :maxlength => 255, :label => :field_db_note %></p>
+  <p class="db_test_row"><label></label>
+    <button type="button" class="btn_line" id="db_test_btn" data-url="<%= test_connection_db_servers_path %>" data-id="<%= @server.id %>"><%= sprite_icon('reload', l(:label_db_test)) %></button>
+    <span id="db_test_result" class="db_test_result" role="status" aria-live="polite"></span>
+    <em class="info"><%= l(:text_db_test_info) %></em></p>
 </div>
 <p class="form_btns">
   <%= link_to l(:button_cancel), db_servers_path, :class => 'btn_line' %>
@@ -25,6 +35,17 @@ $(function() {
   $('#db_adapter').on('change', function() {
     var $p = $('#db_port'), v = $p.val();
     if (!v || defaults.indexOf(v) >= 0) $p.val($(this).find('option:selected').data('port'));
+  });
+  // 저장 전 연결 시험: 지금 입력한 값으로 접속 (_method 는 빼고 보냄)
+  $('#db_test_btn').on('click', function() {
+    var $b = $(this), $r = $('#db_test_result');
+    var data = $b.closest('form').serializeArray().filter(function(x) { return x.name !== '_method'; });
+    if ($b.data('id')) data.push({ name: 'id', value: $b.data('id') });
+    $b.prop('disabled', true); $r.removeClass('on db_fail').text('<%= j l(:label_db_testing) %>');
+    $.ajax({ url: $b.data('url'), method: 'POST', data: $.param(data), dataType: 'json' })
+      .done(function(res) { $r.toggleClass('on', res.ok).toggleClass('db_fail', !res.ok).text(res.message); })
+      .fail(function() { $r.addClass('db_fail').text('<%= j l(:label_db_test_error) %>'); })
+      .always(function() { $b.prop('disabled', false); });
   });
 });
 <% end %>

@@ -77,6 +77,12 @@ en:
   text_db_check_csv: Download unregistered columns in glossary import format.
   notice_db_connected: "%{name} connected — %{version}"
   error_db_server_in_use: This DB server is used by a project.
+  field_db_env: Environment
+  label_db_dev: Development
+  label_db_testing: Connecting…
+  label_db_test_error: Connection test request failed.
+  text_db_env_info: Used as the default production flag when linking to a project.
+  text_db_test_info: Tests the values entered now without saving. While editing, a blank password uses the saved one.
   activerecord:
     attributes:
       db_server:
@@ -88,6 +94,7 @@ en:
         username: Account
         password_encrypted: Password
         timeout: Timeout
+        production: Environment
         note: Note
       db_link:
         name: Name

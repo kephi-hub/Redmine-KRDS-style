@@ -56,6 +56,20 @@ class DbServersController < ApplicationController
     redirect_to db_servers_path unless performed?
   end
 
+  # 아직 저장하지 않은 폼 값으로 연결 시험 (편집 중 비밀번호를 비워 두면 저장된 비밀번호 사용)
+  def test_connection
+    stored = DbServer.find_by(id: params[:id]) if params[:id].present?
+    server = DbServer.new(server_params.except(:name, :note))
+    server.password_encrypted = stored.password_encrypted if params.dig(:db_server, :password).blank? && stored
+    server.valid?
+    keys = %i(adapter host port database_name username timeout password_encrypted)
+    errors = server.errors.select { |e| keys.include?(e.attribute) }
+    return render json: { ok: false, message: errors.map(&:full_message).uniq.join(', ') } if errors.any?
+    render json: { ok: true, message: l(:notice_db_connected, name: server.host, version: server.connector.version) }
+  rescue DbManage::Error => e
+    render json: { ok: false, message: e.message }
+  end
+
   private
 
   def find_server
@@ -65,6 +79,6 @@ class DbServersController < ApplicationController
   end
 
   def server_params
-    params.require(:db_server).permit(:name, :adapter, :host, :port, :database_name, :username, :password, :timeout, :note)
+    params.require(:db_server).permit(:name, :production, :adapter, :host, :port, :database_name, :username, :password, :timeout, :note)
   end
 end

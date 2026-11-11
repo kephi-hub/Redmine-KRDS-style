@@ -1,10 +1,10 @@
-<%# 관리 > 권한 한눈에 보기 — 역할 × 영역 요약, 사용자 × 프로젝트 역할 (조회만, 바꾸려면 역할 편집·업무흐름 간편 설정) %>
+<%# 관리 > 역할 및 권한 > 권한 한눈에 보기 탭 — 역할 × 영역 요약, 사용자 × 프로젝트 역할 (조회만, 바꾸려면 역할 편집·업무흐름 설정) %>
 <div class="contextual">
   <%= link_to sprite_icon('workflows', l(:label_simple_workflows)), simple_workflows_path, :class => 'icon icon-workflows' %>
-  <%= link_to sprite_icon('roles', l(:label_role_plural)), roles_path, :class => 'icon icon-roles' %>
 </div>
 
-<h2><%= l(:label_access_overview) %></h2>
+<h2><%= l(:label_role_and_permissions) %></h2>
+<%= render :partial => 'roles/ag_tabs', :locals => { :current => :overview } %>
 <p class="subtitle"><%= l(:text_access_overview) %></p>
 
 <ul class="ag_legend">

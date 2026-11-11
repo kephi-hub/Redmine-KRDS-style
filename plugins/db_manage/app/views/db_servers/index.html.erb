@@ -21,7 +21,7 @@
   <tbody>
   <% @servers.each do |server| %>
     <tr>
-      <td class="name"><%= link_to server.name, edit_db_server_path(server) %><% if server.note.present? %><span class="db_note"><%= server.note %></span><% end %></td>
+      <td class="name"><%= link_to server.name, edit_db_server_path(server) %> <span class="db_env <%= server.production? ? 'db_prod' : 'db_dev' %>"><%= server.env_label %></span><% if server.note.present? %><span class="db_note"><%= server.note %></span><% end %></td>
       <td class="adapter"><span class="db_adapter db_<%= server.adapter %>"><%= server.adapter_label %></span></td>
       <td class="address"><code><%= server.address %></code></td>
       <td class="username"><%= server.username %></td>

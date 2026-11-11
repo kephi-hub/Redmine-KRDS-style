@@ -723,7 +723,6 @@ body.controller-news.action-show #content>h3{padding-top:20px;margin-top:28px;bo
 #admin-index #admin-menu a.vault::after{content:"접속정보 암호화 · 권한 설정";}
 #admin-index #admin-menu a.plugins::after{content:"설치된 플러그인 목록";}
 #admin-index #admin-menu a.info::after{content:"버전 · 실행 환경 점검";}
-#admin-index #admin-menu a.access-overview::after{content:"역할별로 할 수 있는 일 한눈에 보기";}
 #admin-index #admin-menu a.simple-workflows::after{content:"역할마다 상태 변경 규칙을 한 번에 설정";}
 #admin-index #admin-menu a.field-permissions::after{content:"상태별 수정 금지 · 필수 항목";}
 #admin-index #admin-menu a.jenkins-servers::after{content:"배포 연동 Jenkins 주소 · 토큰";}
@@ -838,6 +837,16 @@ a.gl_term:hover{border-bottom-style:solid;text-decoration:none;}
 /* DB 관리 (db_manage 플러그인) — 서버 목록, 프로젝트 DB 탭·테이블·컬럼·비교·용어 점검. 모바일은 카드형 */
 .db_note{display:block;margin:2px 0 0;font-size:0.8125rem;font-weight:400;color:var(--gray_50);}
 .db_adapter{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:12px;background:var(--gray_10);font-size:0.75rem;font-weight:500;color:var(--gray_80);white-space:nowrap;}
+.db_env{display:inline-flex;align-items:center;height:22px;padding:0 6px;border:1px solid var(--pri_10);border-radius:var(--radius_s);background:var(--pri_5);font-size:0.75rem;font-weight:700;color:var(--pri_60);vertical-align:middle;white-space:nowrap;}
+.db_env.db_prod{border-color:var(--dan_10);background:var(--dan_5);color:var(--dan_60);}
+.db_env_pick{display:inline-flex;flex-wrap:wrap;gap:16px;}
+.db_env_pick label.inline{display:inline-flex;align-items:center;gap:6px;}
+#content .db_test_row .btn_line{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.875rem;font-weight:500;color:var(--pri_60);cursor:pointer;vertical-align:middle;}
+#content .db_test_row .btn_line:hover{background:var(--pri_5);}
+#content .db_test_row .btn_line:disabled{opacity:0.6;cursor:wait;}
+.db_test_result{display:inline-block;margin:0 0 0 10px;font-size:0.875rem;color:var(--gray_60);vertical-align:middle;word-break:break-all;}
+.db_test_result.on{font-weight:500;color:var(--suc_60);}
+.db_test_result.db_fail{font-weight:500;color:var(--dan_60);}
 .db_adapter.db_mariadb{background:var(--suc_10);color:var(--suc_60);}
 .db_adapter.db_postgresql{background:var(--pri_10);color:var(--pri_60);}
 .db_head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin:0 0 16px;}

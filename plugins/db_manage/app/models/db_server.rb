@@ -26,6 +26,10 @@ class DbServer < ApplicationRecord
     ADAPTERS.map { |k, (label, _, ok)| [ok ? label : "#{label} (준비 중)", k, { disabled: !ok, 'data-port' => ADAPTERS[k][1] }] }
   end
 
+  def env_label
+    ::I18n.t(production? ? :label_db_production : :label_db_dev)
+  end
+
   def adapter_label
     ADAPTERS.dig(adapter, 0) || adapter
   end

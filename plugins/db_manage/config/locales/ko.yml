@@ -77,6 +77,12 @@ ko:
   text_db_check_csv: 미등록 컬럼을 용어사전 가져오기 양식(CSV)으로 받아 정리한 뒤 용어사전에 올릴 수 있습니다.
   notice_db_connected: "%{name} 연결 성공 — %{version}"
   error_db_server_in_use: 프로젝트에서 사용 중인 DB 서버는 삭제할 수 없습니다. 프로젝트 설정 > DB 에서 먼저 연결을 지우세요.
+  field_db_env: 구분
+  label_db_dev: 개발
+  label_db_testing: 연결하는 중…
+  label_db_test_error: 연결 시험 요청에 실패했습니다.
+  text_db_env_info: 프로젝트에 연결할 때 '운영' 표시의 기본값이 됩니다.
+  text_db_test_info: 저장하지 않고 지금 입력한 값으로 접속해 봅니다. 편집 중 비밀번호를 비워 두면 저장된 비밀번호를 씁니다.
   activerecord:
     attributes:
       db_server:
@@ -88,6 +94,7 @@ ko:
         username: 계정
         password_encrypted: 비밀번호
         timeout: 응답 대기(초)
+        production: 구분
         note: 메모
       db_link:
         name: 이름

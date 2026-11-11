@@ -1,6 +1,7 @@
 # DB 관리 경로
 resources :db_servers, except: [:show] do
   member { post :test }
+  collection { post :test_connection }
 end
 resources :projects, only: [] do
   resources :db_links, only: [:new, :create, :edit, :update, :destroy]

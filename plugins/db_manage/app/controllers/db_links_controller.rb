@@ -7,7 +7,9 @@ class DbLinksController < ApplicationController
   before_action :find_link, only: [:edit, :update, :destroy]
 
   def new
-    @link = @project.db_links.build(name: @project.db_links.empty? ? '개발DB' : '운영DB', production: @project.db_links.any?)
+    # 처음 고른 DB 서버의 개발/운영 구분을 기본값으로
+    server = DbServer.sorted.first
+    @link = @project.db_links.build(name: @project.db_links.empty? ? '개발DB' : '운영DB', db_server: server, production: server&.production? || false)
   end
 
   def create

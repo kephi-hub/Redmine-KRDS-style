@@ -20,6 +20,8 @@ module AccessGuide
     { key: 'repository', view: %i[view_changesets browse_repository], write: %i[commit_access manage_related_issues], manage: %i[manage_repository] },
     { key: 'keys', view: %i[view_keys download_keys keys_all], write: %i[edit_keys], manage: %i[manage_whitelist_keys export_keys] },
     { key: 'deploys', view: %i[view_deploys], write: %i[run_deploys], manage: %i[run_production_deploys manage_deploy_targets] },
+    { key: 'glossary', view: %i[view_glossary], write: %i[manage_glossary], manage: %i[] },
+    { key: 'db', view: %i[view_db_schema], write: %i[], manage: %i[manage_db_links] },
     { key: 'calendar', view: %i[view_calendar view_gantt], write: %i[], manage: %i[] },
   ].freeze
 
