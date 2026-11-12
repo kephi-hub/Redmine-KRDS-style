@@ -24,6 +24,17 @@ class MenuCapture < ApplicationRecord
     status == 'ok'
   end
 
+  # 웹 접근성 위반 목록 (점검 안 했으면 nil) — MenuTree::A11y.check 결과
+  def a11y_list
+    return nil if a11y.nil?
+    JSON.parse(a11y) rescue []
+  end
+
+  # 위반 요소 수 합계
+  def a11y_nodes
+    (a11y_list || []).sum { |v| v['n'].to_i }
+  end
+
   # 파일도 함께 지움
   after_destroy do
     [path, thumb_path].compact.each { |pa| File.delete(pa) if File.file?(pa) }

@@ -31,6 +31,7 @@
     <h3 class="ag_sec"><%= l(:label_menu_capture_options) %></h3>
     <p><%= f.number_field :width, :min => 320, :max => 2560, :label => :field_menu_capture_width %> px</p>
     <p><%= f.check_box :mobile, :label => :field_menu_capture_mobile %><em class="info"><%= l(:text_menu_capture_mobile) %></em></p>
+    <p><%= f.check_box :a11y, :label => :field_menu_capture_a11y %><em class="info"><%= l(:text_menu_capture_a11y) %></em></p>
     <p><%= f.number_field :wait_ms, :min => 0, :max => 30000, :step => 500, :label => :field_menu_capture_wait %> ms<em class="info"><%= l(:text_menu_capture_wait) %></em></p>
     <p><%= f.number_field :max_height, :min => 1000, :max => 30000, :step => 1000, :label => :field_menu_capture_max_height %> px</p>
     <p><%= f.number_field :keep, :min => 1, :max => 100, :label => :field_menu_capture_keep %><em class="info"><%= l(:text_menu_capture_keep) %></em></p>

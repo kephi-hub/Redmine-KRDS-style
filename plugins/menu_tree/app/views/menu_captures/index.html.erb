@@ -2,6 +2,7 @@
 <% can_run = User.current.allowed_to?(:manage_menu_captures, @project) %>
 <div class="contextual">
   <% if @screens.any? %><%= link_to sprite_icon('download', l(:label_menu_capture_doc)), project_menu_captures_document_path(@project, :site => @site&.id), :class => 'icon icon-download' %><% end %>
+  <% if @latest.values.any? { |c| c.a11y_count } %><%= link_to sprite_icon('download', l(:label_menu_a11y_sheet)), project_menu_captures_a11y_path(@project, :site => @site&.id), :class => 'icon icon-download' %><% end %>
   <% if can_run %>
     <%= link_to sprite_icon('settings', l(:label_menu_capture_settings)), project_menu_captures_settings_path(@project, :site => @site&.id), :class => 'icon icon-settings' %>
     <% if @cfg && @busy %>
@@ -39,8 +40,9 @@
 <ul class="mt_kpi db_stats">
   <% [[nil, :label_menu_capture_k_screens, @screens.size], ['changed', :label_menu_capture_k_changed, @screens.count { |m| latest[m.id]&.changed_from_prev }],
       ['error', :label_menu_capture_k_error, @screens.count { |m| latest[m.id] && !latest[m.id].ok? }], ['none', :label_menu_capture_k_none, @screens.count { |m| m.url.present? && !latest[m.id] }],
-      ['nourl', :label_menu_capture_k_nourl, @screens.count { |m| m.url.blank? }]].each do |f, label, n| %>
-    <li class="<%= 'on' if @filter == f %>"><%= link_to project_menu_captures_path(@project, :site => @site&.id, :filter => f) do %><span><%= l(label) %></span><strong class="<%= 'qa_fail' if f == 'error' && n.positive? %>"><%= n %></strong><% end %></li>
+      ['nourl', :label_menu_capture_k_nourl, @screens.count { |m| m.url.blank? }],
+      ['a11y', :label_menu_a11y_k, @screens.count { |m| latest[m.id]&.a11y_count.to_i.positive? }]].each do |f, label, n| %>
+    <li class="<%= 'on' if @filter == f %>"><%= link_to project_menu_captures_path(@project, :site => @site&.id, :filter => f) do %><span><%= l(label) %></span><strong class="<%= 'qa_fail' if %w(error a11y).include?(f) && n.positive? %>"><%= n %></strong><% end %></li>
   <% end %>
 </ul>
 <% if @list.empty? %>
@@ -59,6 +61,7 @@
         <span class="mc_path"><%= m.path(@index, site: false) %></span>
         <span class="mc_sub">
           <% if c %><%= format_time(c.captured_at) %><% if c.changed_from_prev %> <span class="st_tag mc_chg"><%= l(:label_menu_capture_changed) %></span><% end %>
+            <% if c.a11y_count %><span class="st_tag mc_a11y<%= ' on' if c.a11y_count.positive? %>"><%= c.a11y_count.positive? ? l(:label_menu_a11y_bad, :count => c.a11y_count) : l(:label_menu_a11y_ok) %></span><% end %>
             <% unless c.ok? %><br><span class="mc_err"><%= c.error %></span><% end %>
           <% elsif m.url.present? %><code class="mc_url"><%= m.url %></code><% end %>
         </span>

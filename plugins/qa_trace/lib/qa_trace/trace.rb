@@ -14,6 +14,11 @@ module QaTrace
       defined?(PmProgram) && project.module_enabled?(:programs)
     end
 
+    # 화면 캡처(menu_tree 1.3) 를 쓰는지
+    def captures_on?(project)
+      menus_on?(project) && defined?(MenuCapture) && User.current.allowed_to?(:view_menu_captures, project)
+    end
+
     def menus_on?(project)
       project.module_enabled?(:menu_tree)
     end
@@ -33,6 +38,7 @@ module QaTrace
       by_menu = cases.group_by(&:menu_item_id)
       direct = pairs(QaCaseRequirement.where(qa_requirement_id: ids).pluck(:qa_requirement_id, :qa_test_case_id))
       latest ||= latest_results(project)
+      caps = captures_on?(project) ? MenuCapture.where(project_id: project.id, kind: 'pc', status: 'ok').order(:captured_at).to_a.index_by(&:menu_item_id) : nil
       progs = programs_on?(project) ? PmProgram.where(project_id: project.id).where.not(menu_item_id: nil).to_a.group_by(&:menu_item_id) : nil
       reqs.to_h do |r|
         mids = (req_menus[r.id] || []).select { |m| index[m] }
@@ -44,6 +50,14 @@ module QaTrace
         info = { menus: mids.map { |m| index[m] }, menu_index: index, issues: is, issues_closed: is.count(&:closed?), cases: cs,
                  results: results, pass: res.count('pass'), fail: res.count('fail'), untested: res.count('none'),
                  skip: res.count('skip') }
+        # 결함: 케이스 최근 결과에 연결된 일감 (불합격 → 결함 일감)
+        info[:defects] = results.values.filter_map { |x| x&.issue }.uniq.sort_by(&:id)
+        # 화면 캡처(menu_tree): 요구사항 메뉴(하위 포함) 중 화면인 것과 그 최근 캡처
+        if caps
+          scr = all_mids.map { |m| index[m] }.select { |m| m.screen?(by_parent.key?(m.id)) }
+          info[:screens] = scr
+          info[:captures] = scr.filter_map { |m| caps[m.id] }
+        end
         if progs
           ps = all_mids.flat_map { |m| progs[m] || [] }.uniq.sort_by(&:code)
           info[:programs] = ps

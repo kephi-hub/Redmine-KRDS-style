@@ -444,6 +444,36 @@ roles:
   - view_risks
   - view_audits
   - view_pm_reports
+# 발주처(고객) — 진척·산출물·보고서·요구사항·테스트 결과·감리 보기 + SR 등록·댓글만
+# 내부 정보(투입 인력·접속 정보·DB·배포·운영 로그·소요 시간·비공개 댓글)는 주지 않음
+- name: 발주처
+  builtin: 0
+  assignable: false
+  issues_visibility: default
+  time_entries_visibility: own
+  permissions:
+  - view_issues
+  - add_issues
+  - add_issue_notes
+  - view_news
+  - view_documents
+  - view_files
+  - view_calendar
+  - view_gantt
+  - view_glossary
+  - view_menu_tree
+  - view_menu_captures
+  - view_qa_requirements
+  - view_qa_tests
+  - view_deliverables
+  - view_change_requests
+  - view_programs
+  - view_meetings
+  - view_audits
+  - view_pm_reports
+  # 일감 등록은 SR 유형만 (유형별 권한)
+  tracker_permissions:
+    add_issues: [SR]
 
 # 일감 상태 — 보류는 개발자·디자이너가 쓰는 "잠시 멈춤" 이라 열린 상태
 issue_statuses:

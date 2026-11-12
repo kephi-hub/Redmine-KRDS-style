@@ -26,6 +26,28 @@
     <% mob = @captures.find { |c| c.kind == 'mobile' && c.ok? } %>
     <% if mob %><figure class="mc_mobile"><figcaption><%= l(:label_menu_capture_mobile) %> · <%= format_time(mob.captured_at) %></figcaption><%= image_tag project_menu_capture_image_path(@project, mob), :alt => "#{m.name} mobile" %></figure><% end %>
   </div>
+  <% ac = @captures.find { |c| c.kind == 'pc' && !c.a11y_count.nil? } %>
+  <% if ac %>
+  <h3 class="ag_sec"><%= l(:label_menu_a11y) %> <span class="mc_sub"><%= format_time(ac.captured_at) %></span></h3>
+  <% list = ac.a11y_list %>
+  <% if list.empty? %>
+    <p class="mc_a11y_ok"><%= l(:text_menu_a11y_clean) %></p>
+  <% else %>
+    <% if User.current.allowed_to?(:manage_menu_captures, @project) && User.current.allowed_to?(:add_issues, @project) %>
+      <p><%= link_to sprite_icon('add', l(:button_menu_a11y_issue)), project_menu_capture_a11y_issue_path(@project, m), :method => :post, :class => 'icon icon-add btn_main', :data => { :confirm => l(:text_menu_a11y_issue_confirm, :count => list.size) } %></p>
+    <% end %>
+    <div class="autoscroll"><table class="list pm_list mc_a11y_list">
+      <thead><tr><th><%= l(:label_menu_a11y_impact) %></th><th><%= l(:label_menu_a11y_item) %></th><th class="name"><%= l(:label_menu_a11y_help) %></th><th><%= l(:label_menu_a11y_nodes) %></th><th class="name"><%= l(:label_menu_a11y_where) %></th></tr></thead>
+      <tbody><% list.each do |v| %><tr>
+        <td><span class="st_tag mc_imp" data-k="<%= v['impact'] %>"><%= MenuTree::A11y::IMPACT_NAMES[v['impact']] || v['impact'] %></span></td>
+        <td><%= MenuTree::A11y.item_name(v['kwcag']) %></td>
+        <td class="name"><%= v['help'] %> <%= link_to "(#{v['id']})", v['url'], :target => '_blank', :rel => 'noopener noreferrer', :class => 'db_dim' if v['url'].to_s.start_with?('https://') %></td>
+        <td><%= v['n'] %></td>
+        <td class="name"><% Array(v['targets']).each do |t| %><code><%= t %></code><br><% end %></td></tr><% end %></tbody>
+    </table></div>
+  <% end %>
+  <p class="db_hintbox"><%= l(:text_menu_a11y_note) %></p>
+  <% end %>
   <h3 class="ag_sec"><%= l(:label_menu_capture_history) %></h3>
   <div class="autoscroll"><table class="list pm_list">
     <thead><tr><th><%= l(:label_menu_capture_at) %></th><th><%= l(:label_menu_capture_kind) %></th><th><%= l(:field_status) %></th><th>HTTP</th><th class="name"><%= l(:label_menu_capture_final) %></th><th></th></tr></thead>

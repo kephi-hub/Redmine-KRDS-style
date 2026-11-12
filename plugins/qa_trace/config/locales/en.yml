@@ -1,4 +1,7 @@
 en:
+  label_qa_screens: "Screens"
+  label_qa_defects: "Defects"
+  label_qa_cap_done: "%{done}/%{total} captured"
   label_qa_risk_no_prog: "No program"
   label_qa_programs: "Programs"
   label_qa_prog_done: "%{done}/%{total} done"

@@ -1,4 +1,7 @@
 ko:
+  label_qa_screens: "화면 캡처"
+  label_qa_defects: "결함"
+  label_qa_cap_done: "%{done}/%{total} 캡처"
   label_qa_risk_no_prog: 프로그램 없음
   label_qa_programs: 프로그램
   label_qa_prog_done: "완료 %{done}/%{total}"

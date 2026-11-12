@@ -272,6 +272,16 @@ module MenuTree
         thumb = b.screenshot(encoding: :binary, format: 'jpeg', quality: 70, scale: 0.3)
         File.binwrite(dir.join("#{stamp}_s.jpg"), thumb)
         rec.thumb = "#{cfg.project_id}/#{menu.id}/#{stamp}_s.jpg"
+        # 웹 접근성 자동 점검 (PC 화면만, 실패해도 캡처는 그대로)
+        if kind == 'pc' && cfg.a11y && rec.http_status.to_i < 400 && A11y.available?
+          begin
+            list = A11y.check(b)
+            rec.a11y = list.to_json
+            rec.a11y_count = list.size
+          rescue StandardError => e
+            Rails.logger.warn("[menu_capture] a11y #{menu.id}: #{e.class} #{e.message.to_s.truncate(200)}")
+          end
+        end
         prev = MenuCapture.ok.where(menu_item_id: menu.id, kind: kind).order(captured_at: :desc).first
         rec.changed_from_prev = prev.present? && prev.digest != rec.digest
         rec.status = rec.http_status.to_i >= 400 ? 'error' : 'ok'

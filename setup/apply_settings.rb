@@ -55,6 +55,13 @@ ActiveRecord::Base.transaction do
     log "#{tracker.name}#{' (새로 만듦, 업무흐름 복사)' if created}"
   end
 
+  # 역할의 유형별 권한 — tracker_permissions: { 권한 => [일감 유형 이름] } 이면 그 유형에만 허용 (유형을 만든 뒤에)
+  SEED['roles'].select { |r| r['tracker_permissions'] }.each do |r|
+    role = Role.find_by(name: r['name'], builtin: 0) or next
+    r['tracker_permissions'].each { |perm, names| role.set_permission_trackers(perm, Tracker.where(name: Array(names)).pluck(:id)) }
+    role.save!; log "#{role.name}: 유형별 권한 #{r['tracker_permissions'].map { |k, v| "#{k}=#{Array(v).join('/')}" }.join(', ')}"
+  end
+
   puts '[일감 사용자 정의 항목]'
   (SEED['issue_custom_fields'] || []).each do |c|
     cf = IssueCustomField.find_by(name: c['name'])

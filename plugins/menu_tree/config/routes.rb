@@ -11,11 +11,13 @@ resources :projects, only: [] do
   get 'menus/captures', to: 'menu_captures#index', as: 'menu_captures'
   get 'menus/captures/settings', to: 'menu_captures#settings', as: 'menu_captures_settings'
   get 'menus/captures/document', to: 'menu_captures#document', as: 'menu_captures_document'
+  get 'menus/captures/a11y', to: 'menu_captures#a11y', as: 'menu_captures_a11y'
   post 'menus/captures/settings', to: 'menu_captures#save_settings'
   post 'menus/captures/test', to: 'menu_captures#test_login', as: 'menu_captures_test'
   post 'menus/captures/run', to: 'menu_captures#run', as: 'menu_captures_run'
   get 'menus/captures/image/:id', to: 'menu_captures#image', as: 'menu_capture_image', constraints: { id: /\d+|login/ }
   get 'menus/captures/:id', to: 'menu_captures#show', as: 'menu_capture', constraints: { id: /\d+/ }
+  post 'menus/captures/:id/a11y_issue', to: 'menu_captures#a11y_issue', as: 'menu_capture_a11y_issue', constraints: { id: /\d+/ }
   match 'menus/import', to: 'menu_items#import', via: [:get, :post], as: 'menu_items_import'
   post 'menus/issues', to: 'menu_items#issues', as: 'menu_items_issues'
   patch 'menus/:id', to: 'menu_items#update', as: 'menu_item', constraints: { id: /\d+/ }

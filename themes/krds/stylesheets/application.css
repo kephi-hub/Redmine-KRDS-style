@@ -1236,6 +1236,13 @@ a.mc_thumb img{width:100%;height:auto;}
 .mc_sub{color:var(--gray_50);}
 .mc_url{word-break:break-all;}
 .st_tag.mc_chg{background:var(--war_5);color:var(--war_60);}
+.st_tag.mc_a11y{margin-left:4px;background:var(--suc_5);color:var(--suc_60);}
+.st_tag.mc_a11y.on{background:var(--dan_5);color:var(--dan_60);}
+.st_tag.mc_imp[data-k=critical]{background:var(--dan_60);color:#fff;}
+.st_tag.mc_imp[data-k=serious]{background:var(--dan_5);color:var(--dan_60);}
+.st_tag.mc_imp[data-k=moderate]{background:var(--war_5);color:var(--war_60);}
+.mc_a11y_ok{padding:8px 12px;border-radius:var(--radius_s);background:var(--suc_5);color:var(--suc_60);}
+.mc_a11y_list code{word-break:break-all;font-size:0.75rem;}
 .mc_adv{margin:8px 0;}
 .mc_adv summary{cursor:pointer;font-weight:700;color:var(--sec_80);}
 .mc_login img{max-width:100%;border:1px solid var(--gray_20);}

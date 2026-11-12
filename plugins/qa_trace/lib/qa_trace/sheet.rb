@@ -182,18 +182,21 @@ module QaTrace
          i[:menus].map { |m| m.screen_id || m.path(i[:menu_index]) }.join("\n")]
       end
       progs = info.values.any? { |i| i[:programs] }
-      trace_head = ['요구사항 ID', '요구사항명', '상태', '메뉴'] + (progs ? ['프로그램', '프로그램 완료'] : []) + ['일감', '일감 완료', '테스트 케이스', '합격', '불합격', '미수행', '위험']
+      caps = info.values.any? { |i| i[:screens] }
+      trace_head = ['요구사항 ID', '요구사항명', '상태', '메뉴'] + (caps ? ['화면', '화면 캡처'] : []) + (progs ? ['프로그램', '프로그램 완료'] : []) + ['일감', '일감 완료', '테스트 케이스', '합격', '불합격', '미수행', '결함', '결함 미조치', '위험']
       trace = reqs.map do |r|
         i = info[r.id]
         [r.code, r.name, LABEL['status'][r.status], i[:menus].map { |m| m.path(i[:menu_index]) }.join("\n")] +
+        (caps ? [(i[:screens] || []).map { |m| m.screen_id.presence || m.name }.join("\n"), (i[:screens] || []).any? ? "#{i[:captures].size}/#{i[:screens].size}" : nil] : []) +
         (progs ? [(i[:programs] || []).map(&:code).join("\n"), (i[:programs] || []).any? ? "#{i[:programs_done]}/#{i[:programs].size}" : nil] : []) + [
          i[:issues].map { |x| "##{x.id}" }.join(', '), i[:issues].any? ? "#{i[:issues_closed]}/#{i[:issues].size}" : nil,
-         i[:cases].map(&:code).join(', '), i[:pass], i[:fail], i[:untested], i[:risks].map { |k| RISK[k] }.join(', ')]
+         i[:cases].map(&:code).join(', '), i[:pass], i[:fail], i[:untested],
+         i[:defects].map { |x| "##{x.id}" }.join(', '), i[:defects].count { |x| !x.closed? }, i[:risks].map { |k| RISK[k] }.join(', ')]
       end
       cats = QaRequirement::CATEGORIES.map { |c| [c, QaRequirement::CATEGORY_NAMES[c], reqs.count { |r| r.category == c && !r.deleted? }] }
       KrdsUi::Xlsx.build([
         { name: '요구사항 정의서', header: head, rows: rows, widths: [12, 14, 36, 60, 24, 8, 8, 12, 30] },
-        { name: '요구사항 추적표', header: trace_head, rows: trace, widths: [12, 36, 8, 40] + (progs ? [20, 10] : []) + [20, 10, 30, 8, 8, 8, 24] },
+        { name: '요구사항 추적표', header: trace_head, rows: trace, widths: [12, 36, 8, 40] + (caps ? [24, 10] : []) + (progs ? [20, 10] : []) + [20, 10, 30, 8, 8, 8, 16, 10, 24] },
         { name: '분류', header: %w(코드 분류 건수), rows: cats, widths: [8, 16, 8] }
       ])
     end
