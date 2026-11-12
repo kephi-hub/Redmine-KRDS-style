@@ -7,7 +7,8 @@
 <h2><%= link_to l(:label_pm_programs), project_pm_programs_path(@project) %> &#187; <%= p.code %></h2>
 <div class="qa_box">
   <h3 class="qa_tit"><%= p.name %></h3>
-  <p class="qa_meta"><%= pm_badge(pm_label('pstatus', p.status), p.status) %> <span class="db_dim"><%= pm_label('pkind', p.kind) %></span></p>
+  <p class="qa_meta"><%= pm_badge(pm_label('pstatus', p.status), p.status) %> <span class="db_dim"><%= pm_label('pkind', p.kind) %></span>
+    <% p.action_list.each do |a| %><span class="pm_act"><%= pm_label('paction', a) %></span><% end %></p>
   <dl class="db_props">
     <% if (m = @index[p.menu_item_id]) %><div><dt><%= l(:label_pm_menu) %></dt><dd><%= link_to m.path(@index), project_menu_items_path(@project, :focus => m.id) %><% if m.screen_id %> <code><%= m.screen_id %></code><% end %><% if m.url %> <span class="db_dim"><%= m.url %></span><% end %></dd></div><% end %>
     <div><dt><%= l(:label_pm_developer) %></dt><dd><%= p.developer || '-' %></dd></div>
@@ -20,4 +21,14 @@
     <% if p.note.present? %><dt><%= l(:label_pm_note) %></dt><dd><%= simple_format(h(p.note)) %></dd><% end %>
   </dl>
 </div>
+<% if @cases.any? %>
+<h3><%= l(:label_pm_cases) %></h3>
+<div class="autoscroll"><table class="list qa_mini">
+  <thead><tr><th><%= l(:label_qa_case_code) %></th><th class="name"><%= l(:label_qa_case_name) %></th><th><%= l(:label_qa_kind) %></th><th><%= l(:label_pm_last_result) %></th></tr></thead>
+  <tbody><% @cases.each do |c| %><tr>
+    <td class="code"><%= link_to c.code, project_qa_test_case_path(@project, c) %></td><td class="name"><%= c.name %></td><td><%= qa_kind_label(c.kind) %></td>
+    <td><% if (r = @latest[c.id]) %><%= qa_result_badge(r.result, r.retest?) %><% else %>-<% end %></td>
+  </tr><% end %></tbody>
+</table></div>
+<% end %>
 <% html_title "#{p.code} #{p.name}" %>

@@ -1139,6 +1139,9 @@ table.list.db_difftbl tr.db_missing_row td{background:var(--war_5);}
 #content table.mt_grid code{font-size:0.75rem;}
 .mt_yn{display:inline-flex;align-items:center;height:20px;padding:0 6px;border-radius:var(--radius_s);background:var(--gray_10);font-size:0.6875rem;font-weight:700;color:var(--gray_60);}
 .mt_yn.on{background:var(--suc_10);color:var(--suc_60);}
+.mt_vis{display:inline-flex;align-items:center;height:20px;padding:0 6px;border:1px dashed var(--gray_30);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.6875rem;font-weight:700;color:var(--gray_50);}
+.mt_vis.on{border:1px solid var(--sec_10);background:var(--sec_5);color:var(--sec_80);}
+#content td.mt_name.mt_inmenu .mt_txt{font-weight:700;}
 .mt_check{font-weight:700;color:var(--suc_60);}
 .mt_role{display:inline-flex;align-items:center;gap:3px;height:20px;padding:0 6px;margin:1px 3px 1px 0;border:1px solid var(--gray_20);border-radius:10px;font-size:0.6875rem;color:var(--gray_70);}
 .mt_role b{color:var(--pri_60);}
@@ -1175,6 +1178,7 @@ table.list.mt_cols textarea{width:100%;}
 .mt_lg_prog{background:#ecf2fe;border-color:#256ef4;}
 .mt_lg_todo{background:#ffffff;}
 .mt_lg_off{background:#f4f5f6;border-style:dashed;}
+.mt_lg_scr{border-radius:8px;}
 table.list.mt_st td{text-align:center;}
 table.list.mt_st td.name{text-align:left;font-weight:500;}
 table.list.mt_st td.bar{text-align:left;white-space:nowrap;}
@@ -1360,6 +1364,12 @@ table.list.oa_list td.next,table.list.oa_list td.exp,table.list.oa_list td.code{
 
 
 /* 산출물 관리 (pm_docs) · 공통코드 — 배지 색은 data-k */
+.pm_act{display:inline-flex;align-items:center;height:20px;padding:0 6px;margin:1px 2px 1px 0;border:1px solid var(--sec_10);border-radius:var(--radius_s);background:var(--sec_5);font-size:0.6875rem;font-weight:700;white-space:nowrap;color:var(--sec_80);}
+.pm_acts{display:inline-flex;flex-wrap:wrap;gap:6px;}
+.pm_mk{font-weight:700;}
+#content table.pm_list tr.pm_grp th{padding:10px 12px;background:var(--sec_5);font-weight:700;text-align:left;color:var(--sec_80);}
+#content table.pm_list tr.pm_grp code{font-weight:400;}
+.pm_gcnt{margin-left:8px;font-size:0.8125rem;font-weight:400;color:var(--gray_60);}
 .pm_badge{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:10px;background:var(--gray_10);font-size:0.6875rem;font-weight:700;white-space:nowrap;color:var(--gray_70);}
 .pm_badge[data-k=phase],.pm_badge[data-k=review],.pm_badge[data-k=received],.pm_badge[data-k=ropen]{background:var(--pri_10);color:var(--pri_70);}
 .pm_badge[data-k=writing],.pm_badge[data-k=analyzing],.pm_badge[data-k=dev],.pm_badge[data-k=mid],.pm_badge[data-k=raction],.pm_badge[data-k=rwatch]{background:var(--war_5);color:var(--war_60);}

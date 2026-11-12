@@ -3,7 +3,7 @@
 <%= form_tag project_menu_items_import_path(@project), :multipart => true do %>
   <div class="box">
     <p><%= l(:text_menu_import) %></p>
-    <p class="gl_cols"><code>(사이트)</code> <code>1뎁스</code> <code>2뎁스</code> <code>3뎁스</code> <code>…</code> <code>화면 ID</code> <code>URL</code> <code>화면 유형</code> <code>채널</code> <code>사용</code> <code>비고</code> <code>(추가 칼럼)</code></p>
+    <p class="gl_cols"><code>(사이트)</code> <code>1뎁스</code> <code>2뎁스</code> <code>3뎁스</code> <code>…</code> <code>화면 ID</code> <code>URL</code> <code>화면 유형</code> <code>채널</code> <code>메뉴 노출</code> <code>사용</code> <code>비고</code> <code>(추가 칼럼)</code></p>
     <p class="mt_dim"><%= l(:text_menu_import_rules) %></p>
     <% if @sites.any? %>
     <p class="mt_dim"><%= l(:text_menu_import_site) %></p>

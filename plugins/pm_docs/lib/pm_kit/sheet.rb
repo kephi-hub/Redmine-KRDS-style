@@ -9,6 +9,7 @@ module PmKit
       'dstatus' => { 'none' => '미작성', 'writing' => '작성 중', 'review' => '검토', 'approved' => '승인', 'submitted' => '제출' },
       'crstatus' => { 'received' => '접수', 'analyzing' => '영향 분석', 'approved' => '승인', 'rejected' => '반려', 'done' => '반영 완료' },
       'priority' => { 'high' => '상', 'normal' => '중', 'low' => '하' },
+      'paction' => { 'select' => '조회', 'insert' => '등록', 'update' => '수정', 'delete' => '삭제', 'download' => '다운로드', 'upload' => '업로드', 'print' => '출력', 'approve' => '승인', 'etc' => '기타' },
       'pkind' => { 'screen' => '화면', 'popup' => '팝업', 'batch' => '배치', 'api' => 'API', 'common' => '공통', 'report' => '리포트' },
       'pstatus' => { 'todo' => '미착수', 'dev' => '개발 중', 'done' => '개발 완료', 'tested' => '단위테스트 완료' },
       'rkind' => { 'risk' => '위험', 'issue' => '이슈' },
@@ -34,11 +35,11 @@ module PmKit
     def programs(list, index = {})
       rows = list.map do |p|
         m = index[p.menu_item_id]
-        [p.code, p.name, LABEL['pkind'][p.kind], m&.screen_id, m && m.path(index), p.paths.join("\n"), p.developer&.name, LABEL['pstatus'][p.status],
+        [p.code, p.name, LABEL['pkind'][p.kind], p.action_list.map { |a| LABEL['paction'][a] }.join(', '), m&.screen_id, m && m.path(index), p.paths.join("\n"), p.developer&.name, LABEL['pstatus'][p.status],
          p.planned_on&.to_s, p.done_on&.to_s, p.note]
       end
-      KrdsUi::Xlsx.build([{ name: '프로그램 목록', header: %w(프로그램\ ID 프로그램명 유형 화면\ ID 메뉴 소스\ 경로 개발자 상태 계획일 완료일 비고), rows: rows,
-                            widths: [18, 30, 8, 14, 30, 50, 10, 14, 12, 12, 24] }])
+      KrdsUi::Xlsx.build([{ name: '프로그램 목록', header: %w(프로그램\ ID 프로그램명 유형 처리\ 구분 화면\ ID 메뉴 소스\ 경로 개발자 상태 계획일 완료일 비고), rows: rows,
+                            widths: [18, 30, 8, 16, 14, 30, 50, 10, 14, 12, 12, 24] }])
     end
 
     def risks(list)

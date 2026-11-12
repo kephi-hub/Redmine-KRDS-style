@@ -1,4 +1,6 @@
 en:
+  label_qa_program: "Program"
+  text_qa_program: "Program (function) from the program list. The menu defaults to the program's screen."
   project_module_qa_requirements: Requirements
   project_module_qa_tests: Tests
   permission_view_qa_requirements: View requirements

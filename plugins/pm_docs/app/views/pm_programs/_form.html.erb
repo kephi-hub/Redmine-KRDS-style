@@ -3,6 +3,10 @@
   <p><%= f.text_field :code, :required => true, :size => 24, :maxlength => 60, :placeholder => 'MB-CUS-001', :label => :label_pm_prog_code %></p>
   <p><%= f.text_field :name, :required => true, :size => 50, :maxlength => 150, :label => :label_pm_prog_name %></p>
   <p><%= f.select :kind, pm_options('pkind', PmProgram::KINDS), { :label => :label_pm_kind } %></p>
+  <p><label><%= l(:label_pm_actions) %></label>
+    <%= hidden_field_tag 'pm_program[action_list][]', '', :id => nil %>
+    <span class="pm_acts"><% PmProgram::ACTIONS.each do |a| %><label class="ag_chip"><%= check_box_tag 'pm_program[action_list][]', a, @program.action_list.include?(a), :id => "pm_act_#{a}" %><span><%= pm_label('paction', a) %></span></label><% end %></span>
+    <em class="info"><%= l(:text_pm_actions) %></em></p>
   <% if @ordered.any? %><p><%= f.select :menu_item_id, @ordered.map { |m, d| ["#{"  " * d}#{m.pick_label(d)}#{" (#{m.screen_id})" if m.screen_id}", m.id] }, { :include_blank => true, :label => :label_pm_menu } %></p><% end %>
   <p><%= f.text_area :source_paths, :rows => 4, :cols => 70, :class => 'oa_mono', :placeholder => "/src/main/java/.../CustomerController.java\n/src/main/webapp/WEB-INF/jsp/customer/list.jsp", :label => :label_pm_paths %>
     <em class="info"><%= l(:text_pm_paths) %></em></p>

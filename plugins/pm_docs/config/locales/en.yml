@@ -6,6 +6,16 @@ en:
   project_module_risks: Issues & risks
   label_pm_deliverables: Deliverables
   label_pm_crs: Change requests
+  label_pm_actions: "Actions"
+  label_pm_by_screen: "[per screen]"
+  label_pm_by_func: "[per function]"
+  label_pm_no_menu: "No menu"
+  label_pm_func_count: "%{count} programs"
+  label_pm_func_done: "%{count} done"
+  label_pm_cases: "Test cases"
+  label_pm_last_result: "Last result"
+  text_pm_actions: "Only server-side functions (select, insert, update, delete, download, upload, print, approve)."
+  text_pm_from_menus_func: "Create function-level programs from each screen by screen type. Existing IDs are skipped. Continue?"
   label_pm_programs: Programs
   label_pm_meetings: Meetings
   label_pm_risks: Issues & risks

@@ -44,6 +44,7 @@
     cols.push({ key: 'url', edit: 'text', label: t('url') });
     cols.push({ key: 'screen_type', edit: 'select', options: C.types, label: t('type') });
     cols.push({ key: 'channel', edit: 'select', options: C.channels, label: t('channel') });
+    cols.push({ key: 'in_menu', edit: 'bool', label: t('in_menu') });
     if (rows.length && rows[0].roles !== null) cols.push({ key: 'roles', label: t('roles') });
     cols.push({ key: 'active', edit: 'bool', label: t('active') });
     C.columns.forEach(function(c) {
@@ -86,7 +87,7 @@
       if (c.depth < r.depth) return '<td class="mt_gap"></td>';
       if (c.depth > r.depth) return '<td class="mt_after"></td>';
       var tog = r.has_children ? '<button type="button" class="mt_tog" aria-expanded="' + (!collapsed[r.id]) + '" aria-label="' + esc(collapsed[r.id] ? t('expand') : t('collapse')) + '">' + (collapsed[r.id] ? '▸' : '▾') + '</button>' : '<span class="mt_leaf"></span>';
-      return '<td class="mt_name' + (C.canEdit ? ' mt_ed' : '') + (r.active ? '' : ' mt_off') + '" data-key="name" tabindex="0" colspan="' + (maxDepth - r.depth) + '">' + tog + '<span class="mt_txt">' + esc(r.name) + '</span></td>';
+      return '<td class="mt_name' + (C.canEdit ? ' mt_ed' : '') + (r.active ? '' : ' mt_off') + (r.in_menu ? ' mt_inmenu' : '') + '" data-key="name" tabindex="0" colspan="' + (maxDepth - r.depth) + '">' + tog + '<span class="mt_txt">' + esc(r.name) + '</span></td>';
     }
     if (c.key === 'issues') {
       var o = r.own, tr = r.tree, link = C.urls.issueList.replace('__ID__', r.id);
@@ -107,7 +108,9 @@
     }
     if (c.edit === 'bool') {
       var on = c.key === 'active' ? !!v : !!v;
-      inner = c.key === 'active' ? '<span class="mt_yn ' + (on ? 'on' : '') + '">' + (on ? t('yes') : t('no')) + '</span>' : (on ? '<span class="mt_check">✓</span>' : '');
+      if (c.key === 'active') inner = '<span class="mt_yn ' + (on ? 'on' : '') + '">' + (on ? t('yes') : t('no')) + '</span>';
+      else if (c.key === 'in_menu') inner = '<span class="mt_vis' + (on ? ' on' : '') + '">' + esc(on ? t('in_menu_y') : t('in_menu_n')) + '</span>';
+      else inner = on ? '<span class="mt_check">✓</span>' : '';
     } else if (c.edit === 'select' && c.options) {
       inner = v ? esc(c.options[v] || v) : '';
     } else {
@@ -145,8 +148,9 @@
   }
 
   function kpi() {
+    // 화면 = 화면 유형·화면 ID 가 있거나 말단 (목록 아래에 상세·등록을 둬도 목록은 화면)
     var parents = {}; rows.forEach(function(r) { if (r.parent_id) parents[r.parent_id] = true; });
-    var leaves = rows.filter(function(r) { return !parents[r.id]; });
+    var leaves = rows.filter(function(r) { return !parents[r.id] || r.screen_type || r.screen_id; });
     var linked = leaves.filter(function(r) { return r.own && r.own.total; });
     var done = linked.filter(function(r) { return r.own.closed === r.own.total; });
     var issues = rows.reduce(function(n, r) { return n + ((r.own && r.own.total) || 0); }, 0);

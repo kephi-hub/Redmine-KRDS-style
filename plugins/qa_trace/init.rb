@@ -12,7 +12,7 @@ Redmine::Plugin.register :qa_trace do
   name '요구사항 · 테스트'
   author 'kephi-hub'
   description '요구사항 추적표(메뉴·일감·테스트 연결)와 테스트 케이스·회차·결함 관리'
-  version '1.0.0'
+  version '1.1.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
 
@@ -47,6 +47,10 @@ Issue.has_many :qa_test_results, dependent: :nullify unless Issue.reflect_on_ass
 if Redmine::Plugin.installed?(:menu_tree)
   MenuItem.has_many :qa_requirement_menus, dependent: :delete_all unless MenuItem.reflect_on_association(:qa_requirement_menus)
   MenuItem.has_many :qa_test_cases, dependent: :nullify unless MenuItem.reflect_on_association(:qa_test_cases)
+end
+# 프로그램을 지우면 케이스의 프로그램은 비움
+if Redmine::Plugin.installed?(:pm_docs)
+  PmProgram.has_many :qa_test_cases, dependent: :nullify unless PmProgram.reflect_on_association(:qa_test_cases)
 end
 # 일감 상세의 연결 표시(배지)에 쓰는 도우미
 IssuesController.helper(QaTraceHelper)

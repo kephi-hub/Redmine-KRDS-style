@@ -4,6 +4,8 @@ class QaTestCase < ApplicationRecord
 
   belongs_to :project
   belongs_to :menu_item, optional: true
+  # 프로그램 목록(pm_docs)의 프로그램(기능) — 단위테스트를 프로그램 ID 기준으로
+  belongs_to :pm_program, optional: true
   has_many :qa_case_requirements, dependent: :delete_all
   has_many :qa_requirements, through: :qa_case_requirements
   has_many :qa_test_results, dependent: :delete_all
@@ -15,6 +17,9 @@ class QaTestCase < ApplicationRecord
   validate :menu_in_project
 
   before_validation :fill_code
+  # 프로그램을 고르고 메뉴를 비워 두면 프로그램의 메뉴(화면)
+  before_validation { self.menu_item_id ||= pm_program.menu_item_id if pm_program }
+  validate { errors.add(:pm_program_id, :invalid) if pm_program && pm_program.project_id != project_id }
 
   scope :sorted, -> { order(:code) }
   scope :active, -> { where(active: true) }

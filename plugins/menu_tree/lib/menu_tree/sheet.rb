@@ -1,5 +1,5 @@
 # 메뉴 구조도 ↔ 엑셀 표 (가져오기·내보내기 같은 양식)
-# 머리줄: (사이트) | 1뎁스 2뎁스 … | 화면 ID | URL | 화면 유형 | 채널 | 사용 | (추가 칼럼…) | 비고  (+ 내보내기 전용: 대상 권한·일감 수·완료·진행률)
+# 머리줄: (사이트) | 1뎁스 2뎁스 … | 화면 ID | URL | 화면 유형 | 채널 | 메뉴 노출 | 사용 | (추가 칼럼…) | 비고  (+ 내보내기 전용: 대상 권한·일감 수·완료·진행률)
 # 가져오기: 위 칸이 비어 있으면 바로 윗줄 값을 이어받음(엑셀 셀 병합·생략 모두 가능), 같은 경로의 메뉴는 합침
 module MenuTree
   module Sheet
@@ -13,6 +13,7 @@ module MenuTree
       'url' => %w(url 경로 주소 링크 uri),
       'screen_type' => %w(화면유형 유형 화면구분 type),
       'channel' => %w(채널 기기 pc/모바일 대상기기 channel),
+      'in_menu' => %w(메뉴노출 메뉴표시 노출 메뉴여부 메뉴노출여부 inmenu),
       'active' => %w(사용 사용여부 사용유무 active),
       'note' => %w(비고 설명 메모 note 참고)
     }.freeze
@@ -143,10 +144,13 @@ module MenuTree
               attrs[:screen_type] = type_code(row[field_cols['screen_type']]) if field_cols['screen_type']
               attrs[:channel] = channel_code(row[field_cols['channel']]) if field_cols['channel']
               attrs[:active] = active_value(row[field_cols['active']]) if field_cols['active']
+              # 메뉴 노출: 빈칸이면 화면 유형 기본값(상세·등록·팝업·탭은 N)
+              attrs[:in_menu] = active_value(row[field_cols['in_menu']]) if field_cols['in_menu'] && row[field_cols['in_menu']].to_s.strip.present?
               attrs[:note] = row[field_cols['note']] if field_cols['note']
               extra = node.extra.dup
               extra_cols.each { |cid, (i, col)| v = col.cast(row[i]); v ? extra[cid] = v : extra.delete(cid) }
               node.assign_attributes(attrs.merge(extra: extra))
+              node.keep_in_menu = attrs.key?(:in_menu)
               if node.changed?
                 if node.save
                   result[:updated] += 1 unless created_now
@@ -170,12 +174,12 @@ module MenuTree
     def export(project, ordered, columns, stats, roles)
       max = (ordered.map(&:last).max || 0) + 1
       sites = MenuSite.names_for(project.id)
-      header = (sites.any? ? ['사이트'] : []) + (1..max).map { |d| "#{d}뎁스" } + %w(화면\ ID URL 화면\ 유형 채널 사용) + columns.map(&:name) +
+      header = (sites.any? ? ['사이트'] : []) + (1..max).map { |d| "#{d}뎁스" } + %w(화면\ ID URL 화면\ 유형 채널 메뉴\ 노출 사용) + columns.map(&:name) +
                (roles ? ['대상 권한'] : []) + %w(일감\ 수 완료 진행률 비고)
       rows = ordered.map do |m, depth|
         s = stats[m.id] || {}
         (sites.any? ? [sites[m.menu_site_id]] : []) + Array.new(depth) + [m.name] + Array.new(max - depth - 1) +
-          [m.screen_id, m.url, TYPE_LABELS[m.screen_type], CHANNEL_LABELS[m.channel], m.active? ? 'Y' : 'N'] +
+          [m.screen_id, m.url, TYPE_LABELS[m.screen_type], CHANNEL_LABELS[m.channel], m.in_menu? ? 'Y' : 'N', m.active? ? 'Y' : 'N'] +
           columns.map { |c| v = m.extra[c.id.to_s]; c.kind == 'bool' ? (v ? 'Y' : nil) : v } +
           (roles ? [(roles[m.id] || []).map { |n, code| "#{n}(#{code})" }.join(', ')] : []) +
           [s[:total].to_i.positive? ? s[:total] : nil, s[:total].to_i.positive? ? s[:closed] : nil, s[:total].to_i.positive? ? "#{s[:ratio]}%" : nil, m.note]

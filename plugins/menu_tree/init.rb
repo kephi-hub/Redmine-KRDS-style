@@ -15,7 +15,7 @@ Redmine::Plugin.register :menu_tree do
   name '메뉴 구조도'
   author 'kephi-hub'
   description '메뉴 구조도(사이트별 · 엑셀형 편집·일감 연결·구조도·현황)와 시스템 권한 매트릭스'
-  version '1.1.0'
+  version '1.2.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
 

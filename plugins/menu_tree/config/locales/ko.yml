@@ -40,6 +40,11 @@ ko:
   error_menu_site_not_empty: "메뉴가 %{count}개 남아 있어 삭제할 수 없습니다. 메뉴를 다른 사이트로 옮기거나 삭제한 뒤 지워 주세요."
   text_sys_site: "비워 두면 모든 사이트에 쓰는 등급입니다. 관리자 페이지 전용 등급은 그 사이트를 고르세요."
   text_sys_not_site: 이 사이트에 쓰지 않는 등급
+  label_menu_g_in_menu: 메뉴 노출
+  label_menu_g_in_menu_y: 메뉴
+  label_menu_g_in_menu_n: 화면만
+  label_menu_dg_menus_only: 메뉴만 보기
+  label_menu_lg_screen: "둥근 사각형: 화면만(메뉴 노출 N)"
   label_menu_columns: 칼럼 관리
   label_menu_make_issues: 고른 메뉴로 일감 만들기
   text_menu_keys: "칸을 누르면 바로 고칩니다 — Enter 저장 후 아래로, Tab 다음 칸, Esc 취소. 메뉴명 칸에서 Tab 들여쓰기 · Shift+Tab 내어쓰기, ⋮⋮ 를 끌어 옮기기(위·아래 가장자리는 앞·뒤, 가운데는 하위로)."
@@ -93,7 +98,7 @@ ko:
   label_menu_g_done: 완료
   label_menu_g_subtotal: 하위 메뉴 일감 합계
   label_menu_g_k_menus: 전체 메뉴
-  label_menu_g_k_screens: 화면 (말단 메뉴)
+  label_menu_g_k_screens: 화면
   label_menu_g_k_linked: 일감 연결 화면
   label_menu_g_k_done: 완료 화면
   label_menu_g_k_issues: 연결 일감
@@ -130,7 +135,7 @@ ko:
   label_menu_st_all_linked: 모든 화면에 일감이 연결되어 있습니다.
   label_menu_st_more: "외 %{count}개"
   text_menu_import: 엑셀(xlsx) 또는 CSV 파일을 올리세요. 첫 줄(머리줄)에 뎁스 칸이 있어야 합니다. [엑셀 내보내기] 파일을 고쳐서 다시 올려도 됩니다.
-  text_menu_import_rules: "뎁스 칸 이름: 1뎁스·2뎁스… / 1 Depth / Level 1 / 대메뉴·중메뉴·소메뉴. 윗 뎁스 칸이 비어 있으면 바로 윗줄 값을 이어받습니다(셀 병합 가능). 같은 경로의 메뉴는 합쳐집니다. 화면 유형: 목록·상세·등록·수정·팝업·탭·링크, 채널: 공통·PC·모바일, 사용: Y/N."
+  text_menu_import_rules: "뎁스 칸 이름: 1뎁스·2뎁스… / 1 Depth / Level 1 / 대메뉴·중메뉴·소메뉴. 윗 뎁스 칸이 비어 있으면 바로 윗줄 값을 이어받습니다(셀 병합 가능). 같은 경로의 메뉴는 합쳐집니다. 화면 유형: 목록·상세·등록·수정·팝업·탭·링크, 채널: 공통·PC·모바일, 메뉴 노출: Y/N(비우면 상세·등록·수정·팝업·탭은 N), 사용: Y/N."
   label_menu_import_merge: 기존 메뉴에 합치기 (같은 경로는 값만 갱신)
   label_menu_import_replace: 기존 메뉴를 모두 지우고 새로 만들기 (일감 연결·권한 설정도 지워짐)
   label_menu_import_new_cols: 머리줄에 모르는 칼럼이 있으면 추가 칼럼으로 만들기

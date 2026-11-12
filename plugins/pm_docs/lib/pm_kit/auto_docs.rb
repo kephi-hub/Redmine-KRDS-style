@@ -25,7 +25,7 @@ module PmKit
                          ordered = MenuItem.ordered(p)
                          columns = MenuColumn.where(project_id: p.id).sorted.to_a
                          header, rows, depth, has_site = MenuTree::Sheet.export(p, ordered, columns, MenuTree::Stats.build(ordered)[:own], nil)
-                         widths = (has_site ? [16] : []) + Array.new(depth, 18) + [16, 30, 10, 8, 6] + columns.map { 14 } + [8, 6, 8, 30]
+                         widths = (has_site ? [16] : []) + Array.new(depth, 18) + [16, 30, 10, 8, 8, 6] + columns.map { 14 } + [8, 6, 8, 30]
                          [["메뉴구조도_#{today}.xlsx", KrdsUi::Xlsx.build([{ name: '메뉴 구조도', header: header, rows: rows, widths: widths }])]]
                        } },
       'sys_roles' => { label: '시스템 권한(메뉴 권한 매트릭스)', available: ->(p) { defined?(SysRole) && mod?(p, :sys_roles) },

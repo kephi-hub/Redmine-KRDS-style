@@ -2,6 +2,8 @@
 class MenuItem < ApplicationRecord
   SCREEN_TYPES = %w(list detail form popup tab link).freeze
   CHANNELS = %w(both pc mobile).freeze
+  # 메뉴에는 보이지 않고 화면만 있는 유형 (메뉴 노출 기본값 N)
+  SCREEN_ONLY = %w(detail form popup tab).freeze
 
   belongs_to :project
   belongs_to :parent, class_name: 'MenuItem', optional: true
@@ -22,6 +24,9 @@ class MenuItem < ApplicationRecord
   validate :site_in_same_project
 
   before_validation { self.name = name.to_s.strip; self.screen_id = screen_id.to_s.strip.presence; self.url = url.to_s.strip.presence }
+  # 화면 유형을 바꾸면 메뉴 노출 기본값도 따라감 (같이 바꾸거나 keep_in_menu 로 직접 정한 경우는 그 값)
+  attr_accessor :keep_in_menu
+  before_validation { self.in_menu = !SCREEN_ONLY.include?(screen_type) if will_save_change_to_screen_type? && !will_save_change_to_in_menu? && !keep_in_menu }
   # 하위 메뉴는 1뎁스 메뉴와 같은 사이트
   before_validation { self.menu_site_id = parent.menu_site_id if parent }
   after_save :spread_site, if: :saved_change_to_menu_site_id?
@@ -65,6 +70,17 @@ class MenuItem < ApplicationRecord
   def site_label
     names = MenuSite.names_for(project_id)
     names.size > 1 ? names[menu_site_id] : nil
+  end
+
+  # 화면인지 — 화면 유형·화면 ID 가 있거나 하위가 없는 말단 (목록 아래에 상세·등록을 둬도 목록은 화면)
+  def screen?(has_children)
+    !has_children || screen_type.present? || screen_id.present?
+  end
+
+  # ordered([메뉴, 뎁스]) 중 화면만
+  def self.screens(ordered)
+    parents = ordered.map { |m, _| m.parent_id }.compact.to_set
+    ordered.map(&:first).select { |m| m.screen?(parents.include?(m.id)) }
   end
 
   # 메뉴 고르기 목록의 이름 — 사이트가 둘 이상이면 1뎁스 앞에 [사이트]

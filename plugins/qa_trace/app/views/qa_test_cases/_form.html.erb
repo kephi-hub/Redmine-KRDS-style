@@ -4,6 +4,10 @@
   <p><%= f.text_field :code, :size => 16, :maxlength => 30, :placeholder => 'TC-001', :label => :label_qa_case_code %>
     <em class="info"><%= l(:text_qa_case_code) %></em></p>
   <p><%= f.text_field :name, :required => true, :size => 60, :maxlength => 200, :label => :label_qa_case_name %></p>
+  <% if @programs.any? %>
+    <p><%= f.select :pm_program_id, @programs.map { |x| ["#{x.code} #{x.name}", x.id] }, { :include_blank => true, :label => :label_qa_program } %>
+      <em class="info"><%= l(:text_qa_program) %></em></p>
+  <% end %>
   <% if @menus_on %>
     <p><%= f.select :menu_item_id, qa_menu_options(@ordered), { :include_blank => true, :label => :label_qa_menus } %></p>
   <% end %>

@@ -9,6 +9,11 @@ module QaTrace
                   .includes(:issue).to_a.sort_by { |r| [r.tested_at || Time.at(0), r.id] }.index_by(&:qa_test_case_id)
     end
 
+    # 프로그램 목록(pm_docs) 모듈이 켜져 있는지
+    def programs_on?(project)
+      defined?(PmProgram) && project.module_enabled?(:programs)
+    end
+
     def menus_on?(project)
       project.module_enabled?(:menu_tree)
     end

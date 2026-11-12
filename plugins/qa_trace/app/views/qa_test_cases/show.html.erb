@@ -12,6 +12,7 @@
   <h3 class="qa_tit"><%= @case.name %></h3>
   <p class="qa_meta"><span class="qa_badge"><%= qa_kind_label(@case.kind) %></span> <span class="mt_yn <%= 'on' if @case.active? %>"><%= @case.active? ? l(:general_text_Yes) : l(:general_text_No) %></span>
     <% if (m = @index[@case.menu_item_id]) %><span class="mt_dim"><%= m.path(@index) %><% if m.screen_id %> (<%= m.screen_id %>)<% end %></span><% end %></p>
+  <% if @case.pm_program && QaTrace::Trace.programs_on?(@project) %><p class="qa_meta"><%= l(:label_qa_program) %>: <%= link_to "#{@case.pm_program.code} #{@case.pm_program.name}", project_pm_program_path(@project, @case.pm_program) %></p><% end %>
   <% reqs = @case.qa_requirements.sorted.to_a %>
   <% if reqs.any? %><p class="qa_meta"><%= l(:label_qa_requirements) %>: <% reqs.each do |r| %><%= link_to r.code, project_qa_requirement_path(@project, r), :title => r.name %> <% end %></p><% end %>
   <dl class="qa_steps">

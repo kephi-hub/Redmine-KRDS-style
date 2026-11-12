@@ -17,6 +17,7 @@
     <% end %>
     <label class="ag_chip"><%= check_box_tag 'show_id', '1', @show_id, :id => nil %><span><%= l(:label_menu_dg_show_id) %></span></label>
     <label class="ag_chip"><%= check_box_tag 'hide_unused', '1', @hide_unused, :id => nil %><span><%= l(:label_menu_dg_hide_unused) %></span></label>
+    <label class="ag_chip"><%= check_box_tag 'menus_only', '1', @menus_only, :id => nil %><span><%= l(:label_menu_dg_menus_only) %></span></label>
     <%= submit_tag l(:button_apply), :name => nil %>
   </div>
 <% end %>
@@ -26,6 +27,7 @@
     <span class="mt_lg mt_lg_prog"></span><%= l(:label_menu_lg_prog) %>
     <span class="mt_lg mt_lg_todo"></span><%= l(:label_menu_lg_todo) %>
     <span class="mt_lg mt_lg_off"></span><%= l(:label_menu_lg_off) %>
+    <span class="mt_lg mt_lg_scr"></span><%= l(:label_menu_lg_screen) %>
   </p>
   <p class="erd_zoom">
     <button type="button" class="btn_line" data-zoom="-1" aria-label="<%= l(:label_menu_zoom_out) %>">−</button>

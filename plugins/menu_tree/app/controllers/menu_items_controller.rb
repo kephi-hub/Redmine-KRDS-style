@@ -13,7 +13,7 @@ class MenuItemsController < ApplicationController
   before_action -> { load_sites }, only: [:index, :data, :create, :import]
   before_action -> { load_sites(allow_all: true) }, only: [:diagram, :status]
 
-  FIELDS = %w(name screen_id url screen_type channel active note).freeze
+  FIELDS = %w(name screen_id url screen_type channel in_menu active note).freeze
 
   def index
     @columns = MenuColumn.where(project_id: @project.id).sorted.to_a
@@ -57,7 +57,7 @@ class MenuItemsController < ApplicationController
       (v = col.cast(value)) ? extra[cid] = v : extra.delete(cid)
       @menu.extra = extra
     elsif FIELDS.include?(field)
-      value = value.to_s == '1' || value.to_s == 'true' if field == 'active'
+      value = value.to_s == '1' || value.to_s == 'true' if %w(active in_menu).include?(field)
       @menu.send("#{field}=", value)
     else
       return render(json: { ok: false, message: l(:error_menu_bad_field) }, status: 422)
@@ -128,8 +128,9 @@ class MenuItemsController < ApplicationController
     @depth = params[:depth].to_i.positive? ? params[:depth].to_i : nil
     @show_id = params.key?(:applied) ? params[:show_id] == '1' : true
     @hide_unused = params[:hide_unused] == '1'
+    @menus_only = params[:menus_only] == '1'
     @stats = MenuTree::Stats.build(@ordered)
-    @mermaid = helpers.menu_mermaid(@ordered, @stats, root: @root, dir: @dir, depth: @depth, show_id: @show_id, hide_unused: @hide_unused,
+    @mermaid = helpers.menu_mermaid(@ordered, @stats, root: @root, dir: @dir, depth: @depth, show_id: @show_id, hide_unused: @hide_unused, menus_only: @menus_only,
                                     sites: (@site_all && @sites.size > 1 ? @sites : nil), site: @site)
     base = "메뉴구조도_#{@project.identifier}#{"_#{@site.name}" if @site && @sites.size > 1}_#{User.current.today.strftime('%Y%m%d')}"
     case params[:download]
@@ -144,8 +145,7 @@ class MenuItemsController < ApplicationController
   def status
     @ordered = MenuItem.ordered(@project, site: site_filter)
     @stats = MenuTree::Stats.build(@ordered)
-    by_parent = @ordered.map(&:first).group_by(&:parent_id)
-    @leaves = @ordered.reject { |m, _| by_parent[m.id] }.map(&:first)
+    @leaves = MenuItem.screens(@ordered)
     @root_of = {}
     @ordered.each { |m, d| @root_of[m.id] = d.zero? ? m : @root_of[m.parent_id] }
     @index = @ordered.to_h { |m, _| [m.id, m] }
@@ -157,7 +157,7 @@ class MenuItemsController < ApplicationController
     stats = MenuTree::Stats.build(ordered)[:own]
     roles = role_summary(ordered.map { |m, _| m.id })
     header, rows, depth, has_site = MenuTree::Sheet.export(@project, ordered, columns, stats, roles)
-    widths = (has_site ? [16] : []) + Array.new(depth, 18) + [16, 30, 10, 8, 6] + columns.map { 14 } + (roles ? [28] : []) + [8, 6, 8, 30]
+    widths = (has_site ? [16] : []) + Array.new(depth, 18) + [16, 30, 10, 8, 8, 6] + columns.map { 14 } + (roles ? [28] : []) + [8, 6, 8, 30]
     data = KrdsUi::Xlsx.build([{ name: '메뉴 구조도', header: header, rows: rows, widths: widths }])
     send_data data, filename: "메뉴구조도_#{@project.identifier}_#{User.current.today.strftime('%Y%m%d')}.xlsx",
                     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -282,7 +282,7 @@ class MenuItemsController < ApplicationController
         own = stats[:own][m.id]
         tree = stats[:tree][m.id]
         { id: m.id, parent_id: m.parent_id, depth: d, name: m.name, screen_id: m.screen_id, url: m.url, screen_type: m.screen_type,
-          channel: m.channel, active: m.active, note: m.note, extra: m.extra, has_children: parents.include?(m.id),
+          channel: m.channel, in_menu: m.in_menu, active: m.active, note: m.note, extra: m.extra, has_children: parents.include?(m.id),
           own: own && own.slice(:total, :closed, :ratio, :users), tree: tree && tree[:total].positive? ? tree.slice(:total, :closed, :ratio) : nil,
           roles: roles ? (roles[m.id] || []) : nil }
       end,

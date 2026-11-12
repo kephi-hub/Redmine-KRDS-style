@@ -33,6 +33,8 @@ ko:
   label_qa_source: 출처
   label_qa_priority: 중요도
   label_qa_parent: 상위 요구사항
+  label_qa_program: 프로그램
+  text_qa_program: 프로그램 목록의 프로그램(기능) — 단위테스트는 프로그램 ID 기준으로 연결하세요. 메뉴를 비워 두면 프로그램의 화면이 들어갑니다.
   label_qa_menus: 메뉴
   label_qa_issues: 일감
   label_qa_cases: 테스트 케이스

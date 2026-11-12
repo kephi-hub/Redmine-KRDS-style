@@ -26,7 +26,7 @@ module MenuItemsHelper
       # 다른 사이트로 옮기기 (지금 사이트 제외)
       sites: (@sites || []).reject { |x| x.id == @site&.id }.map { |x| { id: x.id, name: x.name } },
       t: %w(depth screen_id url type channel roles active issues progress note add_child add_below indent outdent up down
-            delete delete_confirm issues_view issue_new saved error none yes no new_name expand collapse no_rows
+            in_menu in_menu_y in_menu_n delete delete_confirm issues_view issue_new saved error none yes no new_name expand collapse no_rows
             drag select_all done subtotal k_menus k_screens k_linked k_done k_issues k_ratio move_site).to_h { |k| [k, l("label_menu_g_#{k}")] }
     }
   end
@@ -34,11 +34,18 @@ module MenuItemsHelper
   # 구조도 (Mermaid flowchart) — 완료(초록)·진행(파랑)·일감 없음(흰색)·미사용(회색 점선)
   # (classDef 이름은 Mermaid 내부 클래스(.root 등)와 겹치지 않게 mt_ 를 붙임)
   # sites: "전체" 사이트 보기일 때 사이트 목록 → 프로젝트 → 사이트 → 1뎁스 메뉴로 묶음 / site: 고른 사이트(맨 위 이름에 표시)
-  def menu_mermaid(ordered, stats, root: nil, dir: 'LR', depth: nil, show_id: true, hide_unused: false, sites: nil, site: nil)
+  # menus_only: 메뉴 노출 N(상세·등록·팝업 등 화면만)과 그 아래는 빼고 사이트 메뉴판처럼
+  # 그림: 메뉴 노출 Y 는 사각형, 화면만 있는 것은 둥근 사각형
+  def menu_mermaid(ordered, stats, root: nil, dir: 'LR', depth: nil, show_id: true, hide_unused: false, sites: nil, site: nil, menus_only: false)
     index = ordered.to_h { |m, _| [m.id, m] }
+    hidden = {}
     keep = ordered.select do |m, d|
       next false if depth && d >= depth
       next false if hide_unused && !m.active?
+      if menus_only && (!m.in_menu? || hidden[m.parent_id])
+        hidden[m.id] = true
+        next false
+      end
       next true unless root
       node = m
       node = index[node.parent_id] while node && node.parent_id && node.id != root.id
@@ -59,7 +66,7 @@ module MenuItemsHelper
             elsif t[:closed] == t[:total] then 'mt_done'
             else 'mt_prog'
             end
-      out << %(  M#{m.id}["#{label}"]:::#{cls}\n)
+      out << (m.in_menu? ? %(  M#{m.id}["#{label}"]:::#{cls}\n) : %(  M#{m.id}("#{label}"):::#{cls}\n))
     end
     keep.each do |m, _|
       if m.parent_id && ids.include?(m.parent_id)

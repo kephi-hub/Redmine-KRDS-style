@@ -14,7 +14,7 @@ Redmine::Plugin.register :pm_docs do
   name '산출물 관리'
   author 'kephi-hub'
   description '산출물(단계별·자동 생성·일괄 다운로드), 변경요청, 프로그램 목록, 회의록, 이슈·위험 관리대장'
-  version '1.1.0'
+  version '1.2.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
 

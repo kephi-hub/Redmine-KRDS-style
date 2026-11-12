@@ -42,8 +42,8 @@ class QaTestCasesController < ApplicationController
     end
     @req_counts = QaRequirementMenu.joins(:qa_requirement).where(menu_item_id: @ordered.map { |m, _| m.id })
                                    .where.not(qa_requirements: { status: 'deleted' }).group(:menu_item_id).count
-    leaves = @ordered.reject { |m, _| @ordered.any? { |x, _| x.parent_id == m.id } }
-    @kpi = { screens: leaves.size, covered: leaves.count { |m, _| @stats[m.id] }, cases: cases.size,
+    leaves = MenuItem.screens(@ordered)
+    @kpi = { screens: leaves.size, covered: leaves.count { |m| @stats[m.id] }, cases: cases.size,
              pass: @stats.values.sum { |s| s[:pass] }, fail: @stats.values.sum { |s| s[:fail] } }
   end
 
@@ -120,8 +120,9 @@ class QaTestCasesController < ApplicationController
   end
 
   def case_params
-    p = params.require(:qa_test_case).permit(:code, :kind, :menu_item_id, :name, :precondition, :steps, :expected, :active)
+    p = params.require(:qa_test_case).permit(:code, :kind, :menu_item_id, :pm_program_id, :name, :precondition, :steps, :expected, :active)
     p[:menu_item_id] = nil unless QaTrace::Trace.menus_on?(@project) && MenuItem.exists?(id: p[:menu_item_id], project_id: @project.id)
+    p[:pm_program_id] = nil unless QaTrace::Trace.programs_on?(@project) && PmProgram.exists?(id: p[:pm_program_id], project_id: @project.id)
     p
   end
 
@@ -134,6 +135,7 @@ class QaTestCasesController < ApplicationController
     @menus_on = QaTrace::Trace.menus_on?(@project)
     @ordered = @menus_on ? MenuItem.ordered(@project) : []
     @reqs_on = @project.module_enabled?(:qa_requirements)
+    @programs = QaTrace::Trace.programs_on?(@project) ? PmProgram.where(project_id: @project.id).sorted.to_a : []
     @all_reqs = @reqs_on ? QaRequirement.where(project_id: @project.id).alive.to_a.sort_by { |r| [QaRequirement.category_order(r.category), r.code] } : []
   end
 

@@ -4,7 +4,7 @@ module PmKit
     module_function
 
     FIELDS = {
-      'code' => %w(프로그램id 프로그램아이디 프로그램번호 id), 'name' => %w(프로그램명 이름 프로그램이름), 'kind' => %w(유형 구분 종류),
+      'code' => %w(프로그램id 프로그램아이디 프로그램번호 id), 'name' => %w(프로그램명 이름 프로그램이름), 'kind' => %w(유형 구분 종류), 'actions' => %w(처리구분 처리 기능구분 기능 crud),
       'menu' => %w(화면id 메뉴 화면 메뉴경로), 'paths' => %w(소스경로 소스 경로 파일), 'developer' => %w(개발자 담당 담당자),
       'status' => %w(상태 진척), 'planned_on' => %w(계획일 완료예정일), 'done_on' => %w(완료일), 'note' => %w(비고)
     }.freeze
@@ -15,6 +15,13 @@ module PmKit
 
     def invert(group)
       PmKit::Sheet::LABEL[group].to_h { |k, v| [key(v), k] }
+    end
+
+    # "조회, 등록" · "S/I/U/D" · "select" 모두 받음
+    def action_codes(text)
+      labels = invert('paction')
+      letters = PmProgram::SUFFIX.invert
+      text.to_s.split(%r{[,·/\s]+}).filter_map { |t| labels[key(t)] || letters[t.upcase] || PmProgram::ACTIONS.find { |a| a == t.downcase } }.uniq
     end
 
     def programs(project, rows)
@@ -42,6 +49,7 @@ module PmKit
         p.name = val.call('name') if val.call('name').present?
         p.kind = kinds[key(val.call('kind'))] || PmProgram::KINDS.find { |k| k == val.call('kind') } || p.kind if cols['kind']
         p.status = statuses[key(val.call('status'))] || p.status if cols['status']
+        p.action_list = action_codes(val.call('actions')) if cols['actions']
         if cols['menu'] && val.call('menu').present?
           t = val.call('menu')
           m = by_sid[t.downcase] || by_path[key(t)]

@@ -247,22 +247,30 @@ module QaTrace
       index = project.module_enabled?(:menu_tree) ? MenuItem.where(project_id: project.id).index_by(&:id) : {}
       reqs = QaCaseRequirement.where(qa_test_case_id: cases.map(&:id)).joins(:qa_requirement).pluck(:qa_test_case_id, 'qa_requirements.code')
                               .group_by(&:first).transform_values { |l| l.map(&:last).sort }
-      head = ['케이스 ID', '종류', '화면 ID', '메뉴', '요구사항 ID', '케이스명', '사전조건', '절차', '기대결과', '사용', '최근 결과']
+      progs = program_codes(project, cases)
+      head = ['케이스 ID', '종류', '화면 ID', '메뉴', '프로그램 ID', '요구사항 ID', '케이스명', '사전조건', '절차', '기대결과', '사용', '최근 결과']
       rows = cases.map do |c|
         m = index[c.menu_item_id]
-        [c.code, LABEL['kind'][c.kind], m&.screen_id, m&.path(index), (reqs[c.id] || []).join(', '), c.name, c.precondition, c.steps,
+        [c.code, LABEL['kind'][c.kind], m&.screen_id, m&.path(index), progs[c.pm_program_id], (reqs[c.id] || []).join(', '), c.name, c.precondition, c.steps,
          c.expected, c.active? ? 'Y' : 'N', LABEL['result'][latest[c.id]&.result || 'none']]
       end
-      KrdsUi::Xlsx.build([{ name: '테스트 시나리오', header: head, rows: rows, widths: [12, 8, 14, 30, 16, 36, 30, 50, 40, 6, 10] }])
+      KrdsUi::Xlsx.build([{ name: '테스트 시나리오', header: head, rows: rows, widths: [12, 8, 14, 30, 16, 16, 36, 30, 50, 40, 6, 10] }])
+    end
+
+    # { 프로그램 id => 프로그램 ID } (프로그램 목록 모듈이 꺼져 있으면 빈 값)
+    def program_codes(project, cases)
+      return {} unless QaTrace::Trace.programs_on?(project)
+      PmProgram.where(id: cases.map(&:pm_program_id).compact.uniq).pluck(:id, :code).to_h
     end
 
     # 테스트 결과서 (회차)
     def export_run(project, run, results)
       index = project.module_enabled?(:menu_tree) ? MenuItem.where(project_id: project.id).index_by(&:id) : {}
-      head = ['케이스 ID', '종류', '메뉴', '케이스명', '사전조건', '절차', '기대결과', '결과', '수행자', '수행일시', '비고', '결함 일감']
+      progs = program_codes(project, results.map(&:qa_test_case))
+      head = ['케이스 ID', '종류', '메뉴', '프로그램 ID', '케이스명', '사전조건', '절차', '기대결과', '결과', '수행자', '수행일시', '비고', '결함 일감']
       rows = results.map do |r|
         c = r.qa_test_case
-        [c.code, LABEL['kind'][c.kind], index[c.menu_item_id]&.path(index), c.name, c.precondition, c.steps, c.expected,
+        [c.code, LABEL['kind'][c.kind], index[c.menu_item_id]&.path(index), progs[c.pm_program_id], c.name, c.precondition, c.steps, c.expected,
          LABEL['result'][r.retest? ? 'fail' : r.result] + (r.retest? ? ' (재테스트 필요)' : ''), r.user&.name,
          r.tested_at && r.tested_at.in_time_zone(User.current.time_zone || Time.zone).strftime('%Y-%m-%d %H:%M'), r.note,
          r.issue_id ? "##{r.issue_id} #{r.issue&.status&.name}" : nil]
@@ -274,7 +282,7 @@ module QaTrace
                 [['진행률', "#{run.done_ratio}%"], ['결함 일감', results.count(&:issue_id)], ['비고', run.note]]
       KrdsUi::Xlsx.build([
         { name: '결과 요약', header: %w(항목 값), rows: summary, widths: [14, 50] },
-        { name: '테스트 결과', header: head, rows: rows, widths: [12, 8, 30, 36, 30, 50, 40, 10, 10, 16, 30, 16] }
+        { name: '테스트 결과', header: head, rows: rows, widths: [12, 8, 30, 16, 36, 30, 50, 40, 10, 10, 16, 30, 16] }
       ])
     end
   end

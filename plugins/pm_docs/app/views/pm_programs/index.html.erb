@@ -16,7 +16,10 @@
   <li class="<%= 'on' if @status == 'nopath' %>"><%= link_to project_pm_programs_path(@project, :status => 'nopath') do %><span><%= l(:label_pm_k_nopath) %></span><strong><%= @kpi['nopath'] %></strong><% end %></li>
 </ul>
 <p class="db_info"><%= l(:label_pm_progress) %> <%= pm_bar(done, @kpi['all']) %>
-  <% if can_edit %> · <%= link_to l(:label_pm_from_menus), project_pm_programs_from_menus_path(@project), :method => :post, :data => { :confirm => l(:text_pm_from_menus) } %>
+  <% if can_edit && defined?(MenuItem) && @project.module_enabled?(:menu_tree) %> · <%= l(:label_pm_from_menus) %>
+    <%= link_to l(:label_pm_by_screen), project_pm_programs_from_menus_path(@project, :mode => 'screen'), :method => :post, :class => 'pm_mk', :data => { :confirm => l(:text_pm_from_menus) } %>
+    <%= link_to l(:label_pm_by_func), project_pm_programs_from_menus_path(@project, :mode => 'function'), :method => :post, :class => 'pm_mk', :data => { :confirm => l(:text_pm_from_menus_func) } %><% end %>
+  <% if can_edit %>
     · <%= link_to l(:label_pm_suggest), project_pm_programs_suggest_path(@project) %><% end %></p>
 <% if @by_dev.size > 1 %>
   <ul class="db_tags"><% @by_dev.each do |u, n, d| %><li><%= link_to (u ? u.name : l(:label_pm_no_dev)), project_pm_programs_path(@project, :developer_id => u&.id) %> <span><%= d %>/<%= n %></span></li><% end %></ul>
@@ -33,14 +36,20 @@
 <% else %>
 <div class="autoscroll">
 <table class="list pm_list">
-  <thead><tr><th><%= l(:label_pm_prog_code) %></th><th class="name"><%= l(:label_pm_prog_name) %></th><th><%= l(:label_pm_kind) %></th><th class="name"><%= l(:label_pm_menu) %></th><th><%= l(:label_pm_paths) %></th><th><%= l(:label_pm_developer) %></th><th><%= l(:field_status) %></th><th><%= l(:label_pm_planned) %></th><th></th></tr></thead>
+  <thead><tr><th><%= l(:label_pm_prog_code) %></th><th class="name"><%= l(:label_pm_prog_name) %></th><th><%= l(:label_pm_kind) %></th><th><%= l(:label_pm_actions) %></th><th class="name"><%= l(:label_pm_menu) %></th><th><%= l(:label_pm_paths) %></th><th><%= l(:label_pm_developer) %></th><th><%= l(:field_status) %></th><th><%= l(:label_pm_planned) %></th><th></th></tr></thead>
   <tbody>
+  <% groups = @grouped ? @programs.group_by(&:menu_item_id) : {} %>
   <% @programs.each do |p| %>
     <% m = @index[p.menu_item_id] %>
+    <% if @grouped && p.menu_item_id != @prev_menu %><% @prev_menu = p.menu_item_id; g = groups[p.menu_item_id]; gd = g.count { |x| %w(done tested).include?(x.status) } %>
+      <tr class="pm_grp"><th colspan="10"><%= m ? m.path(@index) : l(:label_pm_no_menu) %><% if m&.screen_id %> <code><%= m.screen_id %></code><% end %>
+        <span class="pm_gcnt"><%= l(:label_pm_func_count, :count => g.size) %> · <%= l(:label_pm_func_done, :count => gd) %></span></th></tr>
+    <% end %>
     <tr>
       <td class="code"><%= link_to p.code, project_pm_program_path(@project, p) %></td>
       <td class="name"><%= p.name %></td>
       <td><%= pm_label('pkind', p.kind) %></td>
+      <td class="acts"><% p.action_list.each do |a| %><span class="pm_act"><%= pm_label('paction', a) %></span><% end %></td>
       <td class="name"><% if m %><%= m.path(@index) %><% if m.screen_id %> <code><%= m.screen_id %></code><% end %><% end %></td>
       <td><%= p.paths.size.positive? ? p.paths.size : pm_badge(l(:label_pm_none), 'none') %></td>
       <td><%= p.developer %></td>
