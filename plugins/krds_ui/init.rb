@@ -97,6 +97,7 @@ NewsController.prepend(KrdsUi::NewsSearchPatch) unless NewsController.ancestors.
 
 require_relative 'lib/krds_ui/xlsx'
 require_relative 'lib/krds_ui/xlsx_reader'
+require_relative 'lib/krds_ui/pptx'
 require_relative 'lib/krds_ui/menu_groups'
 # 메인 메뉴: KRDS 메인 메뉴 2뎁스 형태(PC 펼침 패널 · 모바일 세로 탭), 프로젝트 메뉴는 대분류 아래 2뎁스
 Redmine::MenuManager::MenuHelper.prepend(KrdsUi::MenuHelperPatch) unless Redmine::MenuManager::MenuHelper.ancestors.include?(KrdsUi::MenuHelperPatch)

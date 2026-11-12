@@ -1,6 +1,7 @@
 <%# 프로젝트 > 메뉴 구조도 > 화면 캡처 — 화면별 최신 캡처 %>
 <% can_run = User.current.allowed_to?(:manage_menu_captures, @project) %>
 <div class="contextual">
+  <% if @screens.any? %><%= link_to sprite_icon('download', l(:label_menu_capture_doc)), project_menu_captures_document_path(@project, :site => @site&.id), :class => 'icon icon-download' %><% end %>
   <% if can_run %>
     <%= link_to sprite_icon('settings', l(:label_menu_capture_settings)), project_menu_captures_settings_path(@project, :site => @site&.id), :class => 'icon icon-settings' %>
     <% if @cfg %>

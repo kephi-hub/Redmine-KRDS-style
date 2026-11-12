@@ -56,6 +56,13 @@ class MenuCapturesController < ApplicationController
                     filename: "#{cap.menu_item.screen_id || cap.menu_item_id}_#{cap.kind}_#{cap.captured_at.strftime('%Y%m%d%H%M')}#{File.extname(path)}"
   end
 
+  # 화면 설계서 (PowerPoint) — 지금 고른 사이트의 화면 (사이트가 없으면 프로젝트 전체)
+  def document
+    data = MenuTree::ScreenDoc.build(@project, site: @site)
+    name = ['화면설계서', @project.identifier, @site&.name, User.current.today.strftime('%Y%m%d')].compact.join('_').gsub(%r{[\\/:*?"<>|\s]+}, '_')
+    send_data data, filename: "#{name}.pptx", type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+  end
+
   def settings
     @cfg = capture_config || MenuCaptureConfig.new(project: @project, menu_site: @site, base_url: @site&.url)
   end

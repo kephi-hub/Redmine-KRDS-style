@@ -1,4 +1,5 @@
 en:
+  label_menu_capture_doc: "Screen design (PPT)"
   permission_view_menu_captures: "Menu captures"
   permission_manage_menu_captures: "Menu captures"
   button_menu_capture_now: "Now"

@@ -10,6 +10,7 @@ resources :projects, only: [] do
   # 화면 캡처 (고정 주소를 :id 보다 먼저)
   get 'menus/captures', to: 'menu_captures#index', as: 'menu_captures'
   get 'menus/captures/settings', to: 'menu_captures#settings', as: 'menu_captures_settings'
+  get 'menus/captures/document', to: 'menu_captures#document', as: 'menu_captures_document'
   post 'menus/captures/settings', to: 'menu_captures#save_settings'
   post 'menus/captures/test', to: 'menu_captures#test_login', as: 'menu_captures_test'
   post 'menus/captures/run', to: 'menu_captures#run', as: 'menu_captures_run'

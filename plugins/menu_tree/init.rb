@@ -12,6 +12,7 @@ require_relative 'lib/menu_tree/hooks'
 require_relative 'lib/menu_tree/issue_query_patch'
 require_relative 'lib/menu_tree/capture'
 require_relative 'lib/menu_tree/capture_job'
+require_relative 'lib/menu_tree/screen_doc'
 
 Redmine::Plugin.register :menu_tree do
   name '메뉴 구조도'
@@ -26,7 +27,7 @@ Redmine::Plugin.register :menu_tree do
     permission :manage_menu_tree, { menu_items: [:create, :update, :move, :destroy, :import, :issues],
                                     menu_columns: [:create, :update, :destroy], menu_sites: [:create, :update, :destroy] }, require: :member
     # 화면 캡처: 보기는 메뉴 구조도 보기, 설정·실행(로그인 정보 포함)은 따로
-    permission :view_menu_captures, { menu_captures: [:index, :show, :image] }, read: true
+    permission :view_menu_captures, { menu_captures: [:index, :show, :image, :document] }, read: true
     permission :manage_menu_captures, { menu_captures: [:settings, :save_settings, :test_login, :run] }, require: :member
   end
   project_module :sys_roles do

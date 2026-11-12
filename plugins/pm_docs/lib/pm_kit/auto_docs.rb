@@ -156,9 +156,20 @@ module PmKit
                    generate: ->(p) { [["이슈위험관리대장_#{today}.xlsx", PmKit::Sheet.risks(PmRisk.where(project_id: p.id).includes(:owner).order(:code).to_a)]] } },
       'meetings' => { label: '회의록 모음', available: ->(p) { mod?(p, :meetings) },
                       generate: ->(p) { [["회의록모음_#{today}.xlsx", PmKit::Sheet.meetings(PmMeeting.where(project_id: p.id).order(:held_at).to_a)]] } },
-      'screen_captures' => { label: '화면 설계서 (운영 화면 캡처)',
-                             available: ->(p) { defined?(MenuCapture) && mod?(p, :menu_tree) && MenuCapture.where(project_id: p.id).exists? },
-                             generate: ->(p) { PmKit::AutoDocs.screen_captures(p) } },
+      'screen_captures' => { label: '화면 설계서 (PPT — 운영 화면 캡처)',
+                             available: ->(p) { defined?(MenuTree::ScreenDoc) && mod?(p, :menu_tree) },
+                             generate: lambda { |p|
+                               sites = MenuSite.where(project_id: p.id).sorted.to_a
+                               clean = ->(t) { t.to_s.gsub(%r{[\\/:*?"<>|\s]+}, '_') }
+                               if sites.size > 1
+                                 sites.map { |st| ["화면설계서_#{clean.(st.name)}_#{today}.pptx", MenuTree::ScreenDoc.build(p, site: st)] }
+                               else
+                                 [["화면설계서_#{today}.pptx", MenuTree::ScreenDoc.build(p, site: sites.first)]]
+                               end
+                             } },
+      'screen_captures_png' => { label: '화면 캡처 원본 (PNG + 화면 목록)',
+                                 available: ->(p) { defined?(MenuCapture) && mod?(p, :menu_tree) && MenuCapture.where(project_id: p.id).exists? },
+                                 generate: ->(p) { PmKit::AutoDocs.screen_captures(p) } },
       'audits' => { label: '감리 시정조치 계획·결과', available: ->(p) { mod?(p, :audits) },
                     generate: ->(p) { [["감리시정조치_#{today}.xlsx", PmKit::Sheet.audits(PmAudit.where(project_id: p.id).includes(:owner, :pm_audit_round, :pm_deliverable).sorted.to_a)]] } },
       'staff' => { label: '투입인력 현황', available: ->(p) { mod?(p, :staff) },
