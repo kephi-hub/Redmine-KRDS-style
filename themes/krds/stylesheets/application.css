@@ -1422,6 +1422,13 @@ a.pf_name{font-weight:700;}
 .pf_bar i{position:absolute;top:-4px;width:2px;height:16px;background:var(--dan_50);}
 .pf_pct{font-size:0.75rem;color:var(--gray_60);white-space:nowrap;}
 .pf_pct b{color:var(--gray_90);}
+/* 모바일: 프로젝트마다 카드 (칸 이름은 data-l), 900px 이상은 표 */
+#wrapper #content table.pf_table,#wrapper #content table.pf_table tbody{display:block;}
+#wrapper #content table.pf_table thead{display:none;}
+#wrapper #content table.pf_table tr{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;padding:14px 4px;border-bottom:1px solid var(--gray_20);}
+#wrapper #content table.pf_table td{display:block;padding:0;border:0;}
+#wrapper #content table.pf_table td.name,#wrapper #content table.pf_table td.pf_prog{grid-column:1/-1;}
+#wrapper #content table.pf_table td[data-l]::before{content:attr(data-l);display:block;margin:0 0 2px;font-size:0.6875rem;font-weight:700;color:var(--gray_50);}
 
 /* 프로젝트 개요 종합 대시보드 (pm_docs) */
 .pm_dash{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:0 0 24px;}
@@ -1566,6 +1573,12 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 
 /* ===== 데스크톱 (900px 이상) ===== */
 @media (min-width:900px){
+#wrapper #content table.pf_table{display:table;}
+#wrapper #content table.pf_table thead{display:table-header-group;}
+#wrapper #content table.pf_table tbody{display:table-row-group;}
+#wrapper #content table.pf_table tr{display:table-row;padding:0;border-bottom:0;}
+#wrapper #content table.pf_table td{display:table-cell;padding:8px 6px;border-bottom:1px solid var(--gray_10);}
+#wrapper #content table.pf_table td[data-l]::before{content:none;}
 #content table.pf_table td.pf_prog{width:14%;}
 .mc_grid{grid-template-columns:repeat(3,1fr);}
 .mc_compare{grid-template-columns:repeat(2,1fr);}

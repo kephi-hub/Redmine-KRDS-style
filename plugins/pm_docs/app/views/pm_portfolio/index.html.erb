@@ -45,21 +45,21 @@
     <tr>
       <td class="name"><span class="pf_sig" data-k="<%= m[:signal] %>"><%= PmKit::Portfolio::SIGNAL[m[:signal]] %></span> <%= link_to p.name, project_path(p), :class => 'pf_name' %>
         <% if m[:reasons].any? %><span class="pf_why"><%= m[:reasons].join(' · ') %></span><% end %></td>
-      <td class="pf_period"><% if m[:start_on] %><%= format_date(m[:start_on]) %><br>~ <%= format_date(m[:end_on]) %><% else %><%= dash %><% end %></td>
-      <td class="pf_prog"><% if m[:progress] %>
+      <td class="pf_period" data-l="<%= l(:label_pm_pf_period) %>"><% if m[:start_on] %><%= format_date(m[:start_on]) %><br>~ <%= format_date(m[:end_on]) %><% else %><%= dash %><% end %></td>
+      <td class="pf_prog" data-l="<%= l(:label_pm_pf_progress) %>"><% if m[:progress] %>
         <span class="pf_bar" title="<%= l(:label_pm_pf_bar_title, :p => m[:progress], :e => m[:elapsed] || '-') %>"><span style="width:<%= m[:progress] %>%"></span><% if m[:elapsed] %><i style="left:<%= m[:elapsed] %>%"></i><% end %></span>
         <span class="pf_pct"><b><%= m[:progress] %>%</b><% if m[:elapsed] %> / <%= l(:label_pm_pf_elapsed) %> <%= m[:elapsed] %>%<% end %></span>
         <% else %><%= dash %><% end %></td>
-      <td><% if m.key?(:overdue) %><%= link_to project_issues_path(p, :set_filter => 1, :sort => 'due_date') do %><%= l(:label_pm_pf_overdue_short) %> <%= num.(m[:overdue], true) %><% end %><br><span class="mt_dim"><%= l(:label_pm_pf_week) %> <%= m[:due_week] %></span><% else %><%= dash %><% end %></td>
-      <% if shown.(:req_total) %><td><% if m[:req_total] %><%= link_to "#{m[:req_ok]}/#{m[:req_total]}", project_qa_requirements_path(p) %><% else %><%= dash %><% end %></td><% end %>
-      <% if shown.(:prog_total) %><td><% if m[:prog_total] %><%= link_to "#{m[:prog_done]}/#{m[:prog_total]}", project_pm_programs_path(p) %><% else %><%= dash %><% end %></td><% end %>
-      <% if shown.(:test_rate) || shown.(:defects) %><td><% if m.key?(:defects) %><%= m[:test_rate] ? "#{m[:test_rate]}%" : '-' %><br><span class="mt_dim"><%= l(:label_pm_pf_defects) %></span> <%= num.(m[:defects], true) %><% else %><%= dash %><% end %></td><% end %>
-      <% if shown.(:risk_open) %><td><% if m[:risk_open] %><%= link_to m[:risk_open], project_pm_risks_path(p) %><br><span class="mt_dim"><%= l(:label_pm_pf_high) %></span> <%= num.(m[:risk_high], true) %><% else %><%= dash %><% end %></td><% end %>
-      <% if shown.(:deliv_req) %><td><% if m[:deliv_req] %><%= link_to "#{m[:deliv_sub]}/#{m[:deliv_req]}", project_pm_deliverables_path(p) %><br><span class="mt_dim"><%= l(:label_pm_pf_late) %></span> <%= num.(m[:deliv_late], true) %><% else %><%= dash %><% end %></td><% end %>
-      <% if shown.(:cr_wait) %><td><% if m[:cr_wait] %><%= link_to m[:cr_wait], project_pm_change_requests_path(p) %><% else %><%= dash %><% end %></td><% end %>
-      <% if shown.(:sr_open) %><td><% if m[:sr_open] %><%= m[:sr_open] %> <span class="mt_dim"><%= l(:label_pm_pf_sr_open) %></span><br><span class="mt_dim"><%= l(:label_pm_pf_late) %></span> <%= num.(m[:sr_over], true) %><% if m[:sr_rate] %> · <%= m[:sr_rate] %>%<% end %><% else %><%= dash %><% end %></td><% end %>
-      <% if shown.(:audit_open) %><td><% if m[:audit_open] %><%= link_to m[:audit_open], project_pm_audits_path(p) %><% if m[:audit_late].to_i.positive? %><br><span class="qa_fail"><%= l(:label_pm_pf_late) %> <%= m[:audit_late] %></span><% end %><% else %><%= dash %><% end %></td><% end %>
-      <% if shown.(:staff_now) %><td><% if m[:staff_now] %><%= m[:staff_now] %><%= l(:label_pm_pf_people) %><br><span class="mt_dim"><%= m[:mm_month] %> M/M</span><% else %><%= dash %><% end %></td><% end %>
+      <td data-l="<%= l(:label_pm_pf_issues) %>"><% if m.key?(:overdue) %><%= link_to project_issues_path(p, :set_filter => 1, :sort => 'due_date') do %><%= l(:label_pm_pf_overdue_short) %> <%= num.(m[:overdue], true) %><% end %><br><span class="mt_dim"><%= l(:label_pm_pf_week) %> <%= m[:due_week] %></span><% else %><%= dash %><% end %></td>
+      <% if shown.(:req_total) %><td data-l="<%= l(:label_pm_pf_req) %>"><% if m[:req_total] %><%= link_to "#{m[:req_ok]}/#{m[:req_total]}", project_qa_requirements_path(p) %><% else %><%= dash %><% end %></td><% end %>
+      <% if shown.(:prog_total) %><td data-l="<%= l(:label_pm_programs) %>"><% if m[:prog_total] %><%= link_to "#{m[:prog_done]}/#{m[:prog_total]}", project_pm_programs_path(p) %><% else %><%= dash %><% end %></td><% end %>
+      <% if shown.(:test_rate) || shown.(:defects) %><td data-l="<%= l(:label_pm_pf_test) %>"><% if m.key?(:defects) %><%= m[:test_rate] ? "#{m[:test_rate]}%" : '-' %><br><span class="mt_dim"><%= l(:label_pm_pf_defects) %></span> <%= num.(m[:defects], true) %><% else %><%= dash %><% end %></td><% end %>
+      <% if shown.(:risk_open) %><td data-l="<%= l(:label_pm_risks) %>"><% if m[:risk_open] %><%= link_to m[:risk_open], project_pm_risks_path(p) %><br><span class="mt_dim"><%= l(:label_pm_pf_high) %></span> <%= num.(m[:risk_high], true) %><% else %><%= dash %><% end %></td><% end %>
+      <% if shown.(:deliv_req) %><td data-l="<%= l(:label_pm_deliverables) %>"><% if m[:deliv_req] %><%= link_to "#{m[:deliv_sub]}/#{m[:deliv_req]}", project_pm_deliverables_path(p) %><br><span class="mt_dim"><%= l(:label_pm_pf_late) %></span> <%= num.(m[:deliv_late], true) %><% else %><%= dash %><% end %></td><% end %>
+      <% if shown.(:cr_wait) %><td data-l="<%= l(:label_pm_crs) %>"><% if m[:cr_wait] %><%= link_to m[:cr_wait], project_pm_change_requests_path(p) %><% else %><%= dash %><% end %></td><% end %>
+      <% if shown.(:sr_open) %><td data-l="SR"><% if m[:sr_open] %><%= m[:sr_open] %> <span class="mt_dim"><%= l(:label_pm_pf_sr_open) %></span><br><span class="mt_dim"><%= l(:label_pm_pf_late) %></span> <%= num.(m[:sr_over], true) %><% if m[:sr_rate] %> · <%= m[:sr_rate] %>%<% end %><% else %><%= dash %><% end %></td><% end %>
+      <% if shown.(:audit_open) %><td data-l="<%= l(:label_pm_audits) %>"><% if m[:audit_open] %><%= link_to m[:audit_open], project_pm_audits_path(p) %><% if m[:audit_late].to_i.positive? %><br><span class="qa_fail"><%= l(:label_pm_pf_late) %> <%= m[:audit_late] %></span><% end %><% else %><%= dash %><% end %></td><% end %>
+      <% if shown.(:staff_now) %><td data-l="<%= l(:label_pm_pf_staff) %>"><% if m[:staff_now] %><%= m[:staff_now] %><%= l(:label_pm_pf_people) %><br><span class="mt_dim"><%= m[:mm_month] %> M/M</span><% else %><%= dash %><% end %></td><% end %>
     </tr>
   <% end %>
   </tbody>
