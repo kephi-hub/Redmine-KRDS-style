@@ -1,0 +1,18 @@
+<%= error_messages_for @staff %>
+<div class="box tabular">
+  <p><%= f.select :user_id, @members.map { |u| [u.name, u.id] }, { :include_blank => l(:label_pm_external), :label => :label_pm_user } %><em class="info"><%= l(:text_pm_staff_user) %></em></p>
+  <p><%= f.text_field :name, :size => 20, :maxlength => 60, :label => :field_name %><em class="info"><%= l(:text_pm_staff_name) %></em></p>
+  <p><%= f.text_field :company, :size => 30, :maxlength => 100, :label => :label_pm_company %></p>
+  <p><%= f.select :role, pm_options('srole', PmStaff::ROLES), { :label => :label_pm_srole } %></p>
+  <p><%= f.select :grade, pm_options('sgrade', PmStaff::GRADES), { :include_blank => true, :label => :label_pm_sgrade } %></p>
+  <p><%= f.date_field :start_on, :label => :label_pm_start %><%= calendar_for('pm_staff_start_on') %></p>
+  <p><%= f.date_field :end_on, :label => :label_pm_end %><%= calendar_for('pm_staff_end_on') %></p>
+  <p><%= f.number_field :rate, :min => 1, :max => 100, :label => :label_pm_rate %><em class="info"><%= l(:text_pm_rate) %></em></p>
+  <p><%= f.date_field :pledge_on, :label => :label_pm_pledge %><%= calendar_for('pm_staff_pledge_on') %></p>
+  <p><%= f.text_area :accounts, :rows => 3, :cols => 60, :placeholder => "VPN · 개발 서버 SSH · 개발 DB · SVN", :label => :label_pm_accounts %><em class="info"><%= l(:text_pm_accounts) %></em></p>
+  <p><%= f.date_field :revoked_on, :label => :label_pm_revoked_on %><%= calendar_for('pm_staff_revoked_on') %></p>
+  <p><%= f.select :replace_of_id, @others.map { |o| [o.name, o.id] }, { :include_blank => true, :label => :label_pm_replace_of } %></p>
+  <p><%= f.text_field :replace_reason, :size => 50, :maxlength => 200, :label => :label_pm_replace_reason %></p>
+  <p><%= f.date_field :replace_approved_on, :label => :label_pm_replace_approved %><%= calendar_for('pm_staff_replace_approved_on') %></p>
+  <p><%= f.text_area :note, :rows => 2, :cols => 60, :label => :label_pm_note %></p>
+</div>

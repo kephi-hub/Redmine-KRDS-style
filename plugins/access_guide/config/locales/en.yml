@@ -43,6 +43,10 @@ en:
   label_access_area_changes: Change requests
   label_access_area_programs: Programs
   label_access_area_meetings: Meetings
+  label_access_area_audits: Audits
+  label_access_area_staff: Staff
+  label_access_area_secscans: Security scans
+  label_access_area_reports: Reports
   label_access_area_risks: Issues & risks
   label_access_area_project: "Project settings and members"
   label_access_area_issues: "Issues"

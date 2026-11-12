@@ -45,6 +45,10 @@ ko:
   label_access_area_changes: 변경요청
   label_access_area_programs: 프로그램 목록
   label_access_area_meetings: 회의록
+  label_access_area_audits: 감리
+  label_access_area_staff: 투입 인력
+  label_access_area_secscans: 보안약점
+  label_access_area_reports: 보고서
   label_access_area_risks: 이슈·위험
   label_access_area_project: 프로젝트 설정·구성원
   label_access_area_issues: 일감

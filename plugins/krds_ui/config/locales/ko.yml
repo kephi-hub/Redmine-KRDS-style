@@ -122,6 +122,10 @@ ko:
   label_pmod_desc_keys: 서버 · 계정 접속정보 (Vault)
   label_pmod_desc_deliverables: 단계별 산출물 · 자동 생성 · 일괄 다운로드
   label_pmod_desc_meetings: 회의록 · 후속 조치 일감
+  label_pmod_desc_audits: 감리 회차별 지적사항 · 시정조치
+  label_pmod_desc_staff: 투입 인력 · M/M · 보안서약서
+  label_pmod_desc_sec_scans: 보안약점 진단 결과 · 조치
+  label_pmod_desc_pm_reports: 주간 · 월간 보고서 엑셀
   label_pmod_desc_risks: 이슈 · 위험 관리대장
   label_pmod_desc_documents: 문서 보관함
   label_pmod_desc_files: 배포 파일 · 첨부

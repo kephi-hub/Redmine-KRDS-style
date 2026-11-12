@@ -1,0 +1,9 @@
+<%= error_messages_for @scan %>
+<div class="box tabular">
+  <p><%= f.text_field :name, :required => true, :size => 40, :maxlength => 100, :placeholder => '1차 보안약점 진단', :label => :label_pm_scan %></p>
+  <p><%= f.text_field :tool, :size => 30, :maxlength => 60, :label => :label_pm_tool %></p>
+  <p><%= f.date_field :scanned_on, :label => :label_pm_scanned_on %><%= calendar_for('pm_sec_scan_scanned_on') %></p>
+  <p><%= f.text_field :revision, :size => 20, :maxlength => 40, :label => :label_pm_revision %></p>
+  <p><%= f.text_field :scanner, :size => 20, :maxlength => 60, :label => :label_pm_scanner %></p>
+  <p><%= f.text_area :note, :rows => 2, :cols => 60, :label => :label_pm_note %></p>
+</div>

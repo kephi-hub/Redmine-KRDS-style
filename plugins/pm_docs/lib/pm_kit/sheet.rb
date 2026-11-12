@@ -9,6 +9,15 @@ module PmKit
       'dstatus' => { 'none' => '미작성', 'writing' => '작성 중', 'review' => '검토', 'approved' => '승인', 'submitted' => '제출' },
       'crstatus' => { 'received' => '접수', 'analyzing' => '영향 분석', 'approved' => '승인', 'rejected' => '반려', 'done' => '반영 완료' },
       'priority' => { 'high' => '상', 'normal' => '중', 'low' => '하' },
+      'aphase' => { 'analysis' => '요구정의 단계', 'design' => '설계 단계', 'close' => '종료 단계', 'etc' => '기타' },
+      'aarea' => { 'pm' => '사업관리', 'app' => '응용시스템', 'db' => '데이터베이스', 'arch' => '시스템 구조', 'sec' => '보안', 'test' => '테스트', 'etc' => '기타' },
+      'akind' => { 'correct' => '시정', 'advise' => '권고', 'note' => '참고' },
+      'astatus' => { 'received' => '접수', 'planned' => '조치 계획', 'acting' => '조치 중', 'done' => '조치 완료', 'verified' => '확인 완료' },
+      'srole' => { 'pm' => 'PM', 'pl' => 'PL', 'dev' => '개발', 'design' => '디자인', 'pub' => '퍼블리싱', 'dba' => 'DBA', 'qa' => 'QA·테스트', 'etc' => '기타' },
+      'sgrade' => { 'special' => '특급', 'high' => '고급', 'mid' => '중급', 'low' => '초급' },
+      'seclevel' => { 'high' => '상', 'mid' => '중', 'low' => '하' },
+      'secstatus' => { 'open' => '미조치', 'fixed' => '조치 완료', 'except' => '예외' },
+      'recheck' => { 'pass' => '재진단 통과', 'fail' => '재진단 남음' },
       'paction' => { 'select' => '조회', 'insert' => '등록', 'update' => '수정', 'delete' => '삭제', 'download' => '다운로드', 'upload' => '업로드', 'print' => '출력', 'approve' => '승인', 'etc' => '기타' },
       'pkind' => { 'screen' => '화면', 'popup' => '팝업', 'batch' => '배치', 'api' => 'API', 'common' => '공통', 'report' => '리포트' },
       'pstatus' => { 'todo' => '미착수', 'dev' => '개발 중', 'done' => '개발 완료', 'tested' => '단위테스트 완료' },
@@ -40,6 +49,81 @@ module PmKit
       end
       KrdsUi::Xlsx.build([{ name: '프로그램 목록', header: %w(프로그램\ ID 프로그램명 유형 처리\ 구분 화면\ ID 메뉴 소스\ 경로 개발자 상태 계획일 완료일 비고), rows: rows,
                             widths: [18, 30, 8, 16, 14, 30, 50, 10, 14, 12, 12, 24] }])
+    end
+
+    # 주간·월간 보고서 (PmKit::Report.build 결과) — notes: 화면에서 적은 주요 이슈·건의
+    def report(project, data, notes = nil)
+      ih = %w(번호 유형 제목 상태 담당 진척 시작일 완료\ 기한)
+      sheets = [{ name: '요약', header: %w(항목 값), rows: [['프로젝트', project.name]] + data[:summary] + (notes.present? ? [['주요 이슈·건의', notes]] : []), widths: [20, 80] }]
+      sheets << { name: '버전 진척', header: %w(버전 완료\ 예정일 진척률 일감\ 수), rows: data[:versions], widths: [24, 14, 10, 10] } if data[:versions]
+      sheets << { name: '기간 실적', header: ih + %w(구분), rows: data[:done], widths: [8, 10, 50, 10, 12, 8, 12, 12, 8] }
+      sheets << { name: '다음 기간 계획', header: ih, rows: data[:plan], widths: [8, 10, 50, 10, 12, 8, 12, 12] }
+      sheets << { name: '기한 지남', header: ih, rows: data[:late], widths: [8, 10, 50, 10, 12, 8, 12, 12] }
+      sheets << { name: '이슈·위험', header: %w(ID 구분 제목 등급 상태 담당 기한 대응\ 계획), rows: data[:risks], widths: [8, 8, 40, 8, 10, 12, 12, 50] } if data[:risks]
+      sheets << { name: '변경요청', header: %w(ID 제목 상태 요청일 결정일 공수(인일) 일정\ 영향), rows: data[:crs], widths: [10, 40, 10, 12, 12, 10, 30] } if data[:crs]
+      sheets << { name: '산출물', header: %w(ID 산출물 상태 담당 마감일 제출일 구분), rows: data[:deliverables], widths: [8, 36, 10, 12, 12, 12, 14] } if data[:deliverables]
+      sheets << { name: '테스트·결함', header: %w(항목 값), rows: data[:tests], widths: [20, 10] } if data[:tests]
+      if data[:sr]
+        sheets << { name: 'SR·SLA', header: %w(항목 값), rows: data[:sr][:summary], widths: [20, 12] }
+        sheets << { name: 'SR 목록', header: ih + %w(긴급도 SLA), rows: data[:sr][:rows], widths: [8, 8, 50, 10, 12, 8, 12, 12, 8, 8] }
+      end
+      sheets << { name: '투입 인력', header: %w(이름 역할 소속 계획\ M/M 실적\ M/M), rows: data[:staff], widths: [12, 10, 16, 10, 10] } if data[:staff]
+      sheets << { name: '감리 지적', header: %w(ID 회차 지적사항 상태 담당 기한 비고), rows: data[:audits], widths: [8, 24, 40, 10, 12, 12, 10] } if data[:audits]
+      KrdsUi::Xlsx.build(sheets)
+    end
+
+    # 감리 시정조치 계획서 · 결과 보고서
+    def audits(list)
+      d = ->(x) { x&.to_s }
+      plan = list.map { |a| [a.code, a.pm_audit_round&.name, LABEL['aarea'][a.area], LABEL['akind'][a.kind], a.title, a.content, a.basis, a.plan, a.owner&.name, d.(a.due_on), LABEL['astatus'][a.status]] }
+      result = list.map { |a| [a.code, a.pm_audit_round&.name, LABEL['akind'][a.kind], a.title, a.plan, a.result, LABEL['astatus'][a.status], d.(a.done_on), d.(a.verified_on), a.issue_id ? "##{a.issue_id}" : nil, a.pm_deliverable&.code] }
+      by = list.group_by(&:pm_audit_round).map do |r, l|
+        [r&.name || '회차 없음', r ? LABEL['aphase'][r.phase] : nil, l.size, l.count { |a| a.status == 'verified' }, l.count { |a| a.status == 'done' }, l.count(&:open?), l.count(&:late?)]
+      end
+      KrdsUi::Xlsx.build([
+        { name: '요약', header: %w(회차 단계 지적 확인\ 완료 조치\ 완료 미확인 기한\ 지남), rows: by, widths: [30, 14, 8, 10, 10, 8, 10] },
+        { name: '시정조치 계획', header: %w(ID 회차 영역 구분 지적사항 내용 근거 조치\ 계획 담당 기한 상태), rows: plan, widths: [10, 24, 12, 8, 36, 50, 20, 50, 10, 12, 10] },
+        { name: '시정조치 결과', header: %w(ID 회차 구분 지적사항 조치\ 계획 조치\ 결과 상태 조치일 확인일 일감 산출물), rows: result, widths: [10, 24, 8, 36, 40, 50, 10, 12, 12, 10, 10] }
+      ])
+    end
+
+    # 투입인력 현황 — 인력 목록 + 월별 계획·실적 M/M
+    def staff(list, from, to)
+      months = []
+      m = from.beginning_of_month
+      while m <= to
+        months << m
+        m = m.next_month
+      end
+      people = list.map do |x|
+        [x.name, x.company, LABEL['srole'][x.role], LABEL['sgrade'][x.grade], x.start_on&.to_s, x.end_on&.to_s, x.rate, x.plan_mm(from, to), x.actual_mm(from, to),
+         x.pledge_on&.to_s, x.accounts, x.revoked_on&.to_s, x.replace_of&.name, x.replace_reason, x.replace_approved_on&.to_s, x.note]
+      end
+      plan = list.map { |x| [x.name, LABEL['srole'][x.role]] + months.map { |mm| x.plan_mm(mm, mm.end_of_month) } + [x.plan_mm(from, to)] }
+      act = list.select(&:user_id).map { |x| [x.name, LABEL['srole'][x.role]] + months.map { |mm| x.actual_mm(mm, mm.end_of_month) } + [x.actual_mm(from, to)] }
+      mh = months.map { |mm| mm.strftime('%Y-%m') }
+      KrdsUi::Xlsx.build([
+        { name: '투입 인력', header: %w(이름 소속 역할 등급 투입\ 시작 투입\ 종료 투입률(%) 계획\ M/M 실적\ M/M 보안서약서 계정\ 발급 회수일 교체\ 전 교체\ 사유 교체\ 승인일 비고),
+          rows: people, widths: [12, 16, 10, 8, 12, 12, 10, 10, 10, 12, 30, 12, 12, 24, 12, 24] },
+        { name: '월별 계획 MM', header: %w(이름 역할) + mh + %w(합계), rows: plan, widths: [12, 10] + months.map { 9 } + [9] },
+        { name: '월별 실적 MM', header: %w(이름 역할) + mh + %w(합계), rows: act, widths: [12, 10] + months.map { 9 } + [9] }
+      ])
+    end
+
+    # 보안약점 진단 결과 · 조치 내역 (회차)
+    def sec_scan(scan, items)
+      rows = items.map do |i|
+        [i.kind, LABEL['seclevel'][i.level], i.file_path, i.line, i.description, LABEL['secstatus'][i.status], i.reason, i.fixer&.name, i.fixed_on&.to_s,
+         i.recheck.present? ? LABEL['recheck'][i.recheck] : nil, i.pm_program&.code]
+      end
+      by = items.group_by(&:kind).map { |k, l| [k, l.size, l.count { |i| i.level == 'high' }, l.count { |i| i.status == 'fixed' }, l.count { |i| i.status == 'except' }, l.count { |i| i.status == 'open' }] }
+      info = [['회차', scan.name], ['도구', scan.tool], ['진단일', scan.scanned_on&.to_s], ['대상 리비전', scan.revision], ['진단자', scan.scanner],
+              ['전체', items.size], ['미조치', items.count { |i| i.status == 'open' }], ['조치 완료', items.count { |i| i.status == 'fixed' }], ['예외', items.count { |i| i.status == 'except' }]]
+      KrdsUi::Xlsx.build([
+        { name: '요약', header: %w(항목 값), rows: info, widths: [14, 40] },
+        { name: '유형별', header: %w(보안약점\ 유형 전체 위험도\ 상 조치\ 완료 예외 미조치), rows: by, widths: [36, 8, 10, 10, 8, 8] },
+        { name: '진단 항목', header: %w(보안약점\ 유형 위험도 파일 라인 설명 상태 예외·조치\ 사유 조치자 조치일 재진단 프로그램), rows: rows, widths: [30, 8, 50, 8, 50, 10, 36, 10, 12, 12, 16] }
+      ])
     end
 
     def risks(list)

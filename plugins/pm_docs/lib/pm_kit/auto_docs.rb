@@ -128,7 +128,32 @@ module PmKit
       'risks' => { label: '이슈·위험 관리대장', available: ->(p) { mod?(p, :risks) },
                    generate: ->(p) { [["이슈위험관리대장_#{today}.xlsx", PmKit::Sheet.risks(PmRisk.where(project_id: p.id).includes(:owner).order(:code).to_a)]] } },
       'meetings' => { label: '회의록 모음', available: ->(p) { mod?(p, :meetings) },
-                      generate: ->(p) { [["회의록모음_#{today}.xlsx", PmKit::Sheet.meetings(PmMeeting.where(project_id: p.id).order(:held_at).to_a)]] } }
+                      generate: ->(p) { [["회의록모음_#{today}.xlsx", PmKit::Sheet.meetings(PmMeeting.where(project_id: p.id).order(:held_at).to_a)]] } },
+      'audits' => { label: '감리 시정조치 계획·결과', available: ->(p) { mod?(p, :audits) },
+                    generate: ->(p) { [["감리시정조치_#{today}.xlsx", PmKit::Sheet.audits(PmAudit.where(project_id: p.id).includes(:owner, :pm_audit_round, :pm_deliverable).sorted.to_a)]] } },
+      'staff' => { label: '투입인력 현황', available: ->(p) { mod?(p, :staff) },
+                   generate: lambda { |p|
+                     list = PmStaff.where(project_id: p.id).includes(:user, :replace_of).sorted.to_a
+                     from = list.map(&:start_on).compact.min || User.current.today.beginning_of_year
+                     to = [list.map(&:end_on).compact.max, User.current.today].compact.max
+                     [["투입인력현황_#{today}.xlsx", PmKit::Sheet.staff(list, from, to)]]
+                   } },
+      'sec_scans' => { label: '보안약점 진단 결과 (회차별)', available: ->(p) { mod?(p, :sec_scans) },
+                       generate: lambda { |p|
+                         PmSecScan.where(project_id: p.id).sorted.map do |s|
+                           ["보안약점진단_#{s.name.gsub(%r{[\\/:*?"<>|\s]+}, '_')}.xlsx", PmKit::Sheet.sec_scan(s, s.pm_sec_items.includes(:fixer, :pm_program).order(:kind, :file_path, :line).to_a)]
+                         end
+                       } },
+      'weekly_report' => { label: '주간 보고서 (지난주)', available: ->(p) { mod?(p, :pm_reports) },
+                           generate: lambda { |p|
+                             from, to = PmKit::Report.period('last_week')
+                             [["주간보고서_#{from.strftime('%Y%m%d')}.xlsx", PmKit::Sheet.report(p, PmKit::Report.build(p, from, to))]]
+                           } },
+      'monthly_report' => { label: '월간 보고서 (지난달)', available: ->(p) { mod?(p, :pm_reports) },
+                            generate: lambda { |p|
+                              from, to = PmKit::Report.period('last_month')
+                              [["월간보고서_#{from.strftime('%Y%m')}.xlsx", PmKit::Sheet.report(p, PmKit::Report.build(p, from, to))]]
+                            } }
     }.freeze
 
     # 테스트 결과서 — 회차 종류별 (종류 없는 회차는 "테스트 결과서(전체)" 쪽)

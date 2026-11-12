@@ -1,0 +1,43 @@
+<%# 프로젝트 > 보고서 — 주간·월간 보고서 (미리보기 + 엑셀) %>
+<h2><%= l(:label_pm_reports) %></h2>
+<p class="subtitle"><%= l(:text_pm_reports) %></p>
+<%= form_tag project_pm_reports_path(@project), :method => :get, :class => 'pm_rform', :id => 'pm_rform' do %>
+  <div class="qa_filter">
+    <% %w(week last_week month last_month custom).each do |k| %>
+      <label class="ag_chip"><%= radio_button_tag 'kind', k, @kind == k, :id => "pm_rk_#{k}" %><span><%= l("label_pm_rk_#{k}") %></span></label>
+    <% end %>
+    <span class="pm_rdates"><%= date_field_tag 'from', @from, :'aria-label' => l(:label_pm_from) %> ~ <%= date_field_tag 'to', @to, :'aria-label' => l(:label_pm_to) %></span>
+    <%= submit_tag l(:button_apply), :name => nil %>
+  </div>
+  <p><label for="pm_notes" class="pm_rlabel"><%= l(:label_pm_rnotes) %></label>
+    <%= text_area_tag 'notes', params[:notes], :rows => 3, :id => 'pm_notes', :placeholder => l(:text_pm_notes) %></p>
+  <p class="form_btns"><button type="submit" formaction="<%= project_pm_reports_export_path(@project) %>" class="st_now"><%= sprite_icon('download', l(:label_pm_report_export)) %></button></p>
+<% end %>
+<%= javascript_tag do %>
+$(function() { $('#pm_rform input[name=kind]').on('change', function() { if (this.value !== 'custom') $('#pm_rform').trigger('submit'); });
+  $('#pm_rform input[type=date]').on('change', function() { $('#pm_rk_custom').prop('checked', true); }); });
+<% end %>
+<% d = @data %>
+<ul class="db_stats mt_kpi">
+  <% d[:summary].drop(1).each do |k, v| %><li><span><%= k %></span><strong><%= v %></strong></li><% end %>
+</ul>
+<% sections = [[:label_pm_rs_done, d[:done], %w(번호 유형 제목 상태 담당 진척 시작일 완료\ 기한 구분)], [:label_pm_rs_plan, d[:plan], %w(번호 유형 제목 상태 담당 진척 시작일 완료\ 기한)],
+               [:label_pm_rs_late, d[:late], %w(번호 유형 제목 상태 담당 진척 시작일 완료\ 기한)]] %>
+<% sections << [:label_pm_risks, d[:risks], %w(ID 구분 제목 등급 상태 담당 기한 대응\ 계획)] if d[:risks] %>
+<% sections << [:label_pm_crs, d[:crs], %w(ID 제목 상태 요청일 결정일 공수 일정\ 영향)] if d[:crs] %>
+<% sections << [:label_pm_deliverables, d[:deliverables], %w(ID 산출물 상태 담당 마감일 제출일 구분)] if d[:deliverables] %>
+<% sections << [:label_pm_staffs, d[:staff], %w(이름 역할 소속 계획\ M/M 실적\ M/M)] if d[:staff] %>
+<% sections << [:label_pm_audits, d[:audits], %w(ID 회차 지적사항 상태 담당 기한 비고)] if d[:audits] %>
+<% if d[:tests] %><h3 class="ag_sec"><%= l(:label_pm_rs_tests) %></h3><ul class="db_tags"><% d[:tests].each do |k, v| %><li><%= k %> <span><%= v %></span></li><% end %></ul><% end %>
+<% if d[:sr] %><h3 class="ag_sec"><%= l(:label_pm_rs_sr) %></h3><ul class="db_tags"><% d[:sr][:summary].each do |k, v| %><li><%= k %> <span><%= v %></span></li><% end %></ul><% end %>
+<% sections.each do |label, rows, head| %>
+  <h3 class="ag_sec"><%= l(label) %> <span class="mt_dim"><%= rows.size %></span></h3>
+  <% if rows.empty? %><p class="mt_dim"><%= l(:label_no_data) %></p><% else %>
+  <div class="autoscroll"><table class="list pm_list pm_rtable">
+    <thead><tr><% head.each do |h| %><th><%= h %></th><% end %></tr></thead>
+    <tbody><% rows.first(50).each do |row| %><tr><% row.each_with_index do |v, i| %><td class="<%= 'name' if i == 2 %>"><% if i.zero? && v.to_s.start_with?('#') %><%= link_to v, issue_path(v.to_s.delete('#')) %><% else %><%= v %><% end %></td><% end %></tr><% end %></tbody>
+  </table></div>
+  <% if rows.size > 50 %><p class="mt_dim"><%= l(:label_pm_more_in_excel, :count => rows.size - 50) %></p><% end %>
+  <% end %>
+<% end %>
+<% html_title l(:label_pm_reports) %>

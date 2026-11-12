@@ -1,0 +1,44 @@
+<%# 프로젝트 > 투입 인력 — 역할·등급·투입 기간·투입률, 계획·실적 M/M, 보안서약서·계정·회수, 교체 이력 %>
+<% can_edit = User.current.allowed_to?(:manage_staff, @project) %>
+<% today = User.current.today %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('add', l(:label_pm_staff_new)), new_project_pm_staff_path(@project), :class => 'icon icon-add' %><% end %>
+  <%= link_to sprite_icon('download', l(:label_pm_staff_export)), project_pm_staffs_export_path(@project), :class => 'icon icon-download' %>
+</div>
+<h2><%= l(:label_pm_staffs) %></h2>
+<p class="subtitle"><%= l(:text_pm_staffs) %></p>
+<ul class="db_stats mt_kpi">
+  <li><span><%= l(:label_pm_sk_active) %></span><strong><%= @kpi[:active] %></strong></li>
+  <li><span><%= l(:label_pm_sk_month) %></span><strong><%= @kpi[:month] %></strong></li>
+  <li><span><%= l(:label_pm_sk_plan, :from => format_date(@from), :to => format_date(@to)) %></span><strong><%= @kpi[:plan] %></strong></li>
+  <li><span><%= l(:label_pm_sk_actual) %></span><strong><%= @kpi[:actual] %></strong></li>
+  <li><span><%= l(:label_pm_sk_nopledge) %></span><strong class="<%= 'qa_fail' if @kpi[:nopledge].positive? %>"><%= @kpi[:nopledge] %></strong></li>
+  <li><span><%= l(:label_pm_sk_unrevoked) %></span><strong class="<%= 'qa_fail' if @kpi[:unrevoked].positive? %>"><%= @kpi[:unrevoked] %></strong></li>
+</ul>
+<% if @staffs.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list pm_list">
+  <thead><tr><th class="name"><%= l(:field_name) %></th><th><%= l(:label_pm_company) %></th><th><%= l(:label_pm_srole) %></th><th><%= l(:label_pm_sgrade) %></th><th><%= l(:label_pm_period) %></th><th><%= l(:label_pm_rate) %></th>
+    <th><%= l(:label_pm_plan_mm) %></th><th><%= l(:label_pm_actual_mm) %></th><th><%= l(:label_pm_pledge) %></th><th><%= l(:label_pm_accounts) %></th><th></th></tr></thead>
+  <tbody>
+  <% @staffs.each do |s| %>
+    <tr class="<%= 'pm_off' unless s.active?(today) %>">
+      <td class="name"><strong><%= s.name %></strong><% if s.user %> <span class="db_dim"><%= s.user.login %></span><% end %>
+        <% if s.replace_of %><br><span class="db_dim"><%= l(:label_pm_replace_of_short, :name => s.replace_of.name) %><%= " · #{s.replace_reason}" if s.replace_reason.present? %></span><% end %></td>
+      <td><%= s.company %></td><td><%= pm_label('srole', s.role) %></td><td><%= s.grade ? pm_label('sgrade', s.grade) : '' %></td>
+      <td class="next"><%= format_date(s.start_on) %> ~ <%= format_date(s.end_on) %></td><td><%= s.rate %>%</td>
+      <td><%= s.plan_mm(@from, @to) %></td><td><%= s.actual_mm(@from, @to) || '-' %></td>
+      <td class="<%= 'qa_fail' if s.active?(today) && s.pledge_on.nil? %>"><%= s.pledge_on ? format_date(s.pledge_on) : l(:label_pm_none) %></td>
+      <td class="name"><% if s.accounts.present? %><span class="pm_acc"><%= s.accounts.truncate(60) %></span><% if s.revoked_on %> <%= pm_badge(l(:label_pm_revoked, :date => format_date(s.revoked_on)), 'done') %><% elsif s.end_on && s.end_on < today %> <%= pm_badge(l(:label_pm_not_revoked), 'late') %><% end %><% end %></td>
+      <td class="buttons"><% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_pm_staff_path(@project, s), :class => 'icon icon-edit' %>
+        <%= link_to sprite_icon('del', l(:button_delete)), project_pm_staff_path(@project, s), :method => :delete, :data => { :confirm => l(:text_are_you_sure) }, :class => 'icon icon-del' %><% end %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<p class="mt_dim"><%= l(:text_pm_mm_rule) %></p>
+<% end %>
+<% html_title l(:label_pm_staffs) %>

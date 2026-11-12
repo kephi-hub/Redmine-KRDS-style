@@ -11,9 +11,9 @@ module KrdsUi
       [:overview, %i(overview activity)],
       [:work, %i(issues new_issue gantt calendar roadmap time_entries)],
       [:design, %i(qa_requirements change_requests menu_items sys_roles glossary)],
-      [:dev, %i(repository programs db_schemas qa_tests deploys)],
+      [:dev, %i(repository programs db_schemas qa_tests sec_scans deploys)],
       [:ops, %i(ops_assets ops_schedules ops_incidents ops_interfaces keys)],
-      [:docs, %i(deliverables meetings risks documents files)],
+      [:docs, %i(deliverables pm_reports meetings risks audits staff documents files)],
       [:collab, %i(wiki boards news)]
     ].freeze
     FIXED = %i(new_object settings).freeze
@@ -25,6 +25,7 @@ module KrdsUi
       repository: 'changeset', programs: 'apps', db_schemas: 'table-multiple', qa_tests: 'shield-check', deploys: 'arrow-narrow-right',
       ops_assets: 'server-authentication', ops_schedules: 'hourglass', ops_incidents: 'alert-circle', ops_interfaces: 'link', keys: 'key',
       deliverables: 'folder-open', meetings: 'comments', risks: 'warning', documents: 'document', files: 'file',
+      pm_reports: 'summary', audits: 'message-report', staff: 'group', sec_scans: 'lock',
       wiki: 'wiki-page', boards: 'message', news: 'news', settings: 'settings'
     }.freeze
     FALLBACK_ICON = 'arrow-right'
@@ -38,9 +39,9 @@ module KrdsUi
     MODULE_GROUPS = [
       [:work, %w(issue_tracking time_tracking gantt calendar)],
       [:design, %w(qa_requirements change_requests menu_tree sys_roles glossary)],
-      [:dev, %w(repository programs db_manage qa_tests jenkins_deploy)],
+      [:dev, %w(repository programs db_manage qa_tests sec_scans jenkins_deploy)],
       [:ops, %w(ops_assets ops_schedules ops_logs ops_interfaces keys)],
-      [:docs, %w(deliverables meetings risks documents files)],
+      [:docs, %w(deliverables pm_reports meetings risks audits staff documents files)],
       [:collab, %w(wiki boards news)]
     ].freeze
   end

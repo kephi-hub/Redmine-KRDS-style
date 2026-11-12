@@ -1408,6 +1408,25 @@ table.list.pm_list tr.pm_late td.next{font-weight:700;color:var(--dan_60);}
 .pm_ol{padding:0 0 0 20px;margin:0;}
 .pm_rows .pm_row{margin:0 0 6px;}
 .pm_path{display:block;margin:0 0 4px;word-break:break-all;}
+/* 감리 · 투입 인력 · 보안약점 · 보고서 (pm_docs) */
+.pm_badge[data-k=areceived],.pm_badge[data-k=aplanned],.pm_badge[data-k=sopen],.pm_badge[data-k=rfail]{background:var(--pri_10);color:var(--pri_70);}
+.pm_badge[data-k=aacting],.pm_badge[data-k=aadvise]{background:var(--war_5);color:var(--war_60);}
+.pm_badge[data-k=adone],.pm_badge[data-k=averified],.pm_badge[data-k=sfixed],.pm_badge[data-k=rpass]{background:var(--suc_10);color:var(--suc_60);}
+.pm_badge[data-k=acorrect]{background:var(--dan_5);color:var(--dan_60);}
+.pm_badge[data-k=sexcept],.pm_badge[data-k=anote],.pm_badge[data-k=low]{background:var(--gray_10);color:var(--gray_70);}
+.pm_rounds{display:grid;grid-template-columns:1fr;gap:8px;padding:0;margin:0 0 16px;list-style:none;}
+.pm_rounds li{display:flex;position:relative;align-items:stretch;}
+.pm_rounds li>a{display:flex;flex:1 1 auto;flex-direction:column;gap:2px;padding:12px 40px 12px 14px;border:1px solid var(--gray_20);border-radius:var(--radius_l);background:var(--gray_0);font-size:0.8125rem;color:var(--gray_60);text-decoration:none;}
+.pm_rounds li>a strong{font-size:0.9375rem;color:var(--gray_90);}
+.pm_rounds li>a:hover{border-color:var(--sec_70);background:var(--sec_5);text-decoration:none;}
+.pm_rounds li.on>a{border:2px solid var(--sec_70);background:var(--sec_5);}
+.pm_redit{position:absolute;top:10px;right:10px;}
+.pm_bulk{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;margin:0 0 12px;border:1px solid var(--gray_20);border-radius:var(--radius_m);background:var(--gray_5);}
+#content table.pm_list tr.pm_off td{color:var(--gray_50);}
+.pm_acc{white-space:pre-line;font-size:0.8125rem;}
+.pm_rdates{display:inline-flex;align-items:center;gap:6px;}
+.pm_rlabel{display:block;margin:0 0 4px;font-weight:700;}
+.pm_rform textarea{width:100%;}
 .pm_decide{display:block;padding:16px;margin:0 0 16px;border:1px solid var(--gray_20);border-radius:var(--radius_m);}
 .pm_decide label{display:block;margin:0 0 6px;font-weight:700;}
 .pm_flow{display:flex;flex-wrap:wrap;gap:6px;padding:0;margin:0 0 12px;list-style:none;}
@@ -1497,6 +1516,7 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 
 /* ===== 데스크톱 (900px 이상) ===== */
 @media (min-width:900px){
+.pm_rounds{grid-template-columns:repeat(3,1fr);}
 .pm_dash{grid-template-columns:repeat(4,1fr);}
 .kd_title{padding:56px 40px 0;font-size:1.5rem;}
 .kd_body{padding:16px 40px 8px;}

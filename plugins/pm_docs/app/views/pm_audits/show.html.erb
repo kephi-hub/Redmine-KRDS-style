@@ -1,0 +1,25 @@
+<% a = @audit %>
+<% can_edit = User.current.allowed_to?(:manage_audits, @project) %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_pm_audit_path(@project, a), :class => 'icon icon-edit' %>
+    <%= link_to sprite_icon('del', l(:button_delete)), project_pm_audit_path(@project, a), :method => :delete, :data => { :confirm => l(:text_are_you_sure) }, :class => 'icon icon-del' %><% end %>
+</div>
+<h2><%= link_to l(:label_pm_audits), project_pm_audits_path(@project) %> &#187; <%= a.code %></h2>
+<div class="qa_box">
+  <h3 class="qa_tit"><%= a.title %></h3>
+  <p class="qa_meta"><%= pm_badge(pm_label('akind', a.kind), "a#{a.kind}") %> <%= pm_badge(pm_label('astatus', a.status), "a#{a.status}") %>
+    <span class="db_dim"><%= pm_label('aarea', a.area) %><% if a.pm_audit_round %> · <%= a.pm_audit_round.name %><% end %></span></p>
+  <dl class="db_props">
+    <div><dt><%= l(:label_pm_owner) %></dt><dd><%= a.owner || '-' %></dd></div>
+    <div><dt><%= l(:label_pm_due) %></dt><dd class="<%= 'qa_fail' if a.late? %>"><%= format_date(a.due_on) || '-' %></dd></div>
+    <div><dt><%= l(:label_pm_done_on) %></dt><dd><%= format_date(a.done_on) || '-' %></dd></div>
+    <div><dt><%= l(:label_pm_verified_on) %></dt><dd><%= format_date(a.verified_on) || '-' %></dd></div>
+    <% if a.basis.present? %><div><dt><%= l(:label_pm_basis) %></dt><dd><%= a.basis %></dd></div><% end %>
+    <% if a.pm_deliverable %><div><dt><%= l(:label_pm_deliverable) %></dt><dd><%= link_to "#{a.pm_deliverable.code} #{a.pm_deliverable.name}", project_pm_deliverable_path(@project, a.pm_deliverable) %></dd></div><% end %>
+    <% if a.issue %><div><dt><%= l(:label_pm_issue) %></dt><dd><%= link_to "##{a.issue_id} #{a.issue.subject}", issue_path(a.issue) %></dd></div><% end %>
+  </dl>
+  <dl class="qa_steps">
+    <% { :label_pm_audit_content => a.content, :label_pm_audit_plan => a.plan, :label_pm_audit_result => a.result }.each do |k, v| %><dt><%= l(k) %></dt><dd><%= v.present? ? simple_format(h(v)) : '-' %></dd><% end %>
+  </dl>
+</div>
+<% html_title "#{a.code} #{a.title}" %>

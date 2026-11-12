@@ -1,0 +1,16 @@
+<h2><%= link_to l(:label_pm_audits), project_pm_audits_path(@project) %> &#187; <%= l(:label_pm_import) %></h2>
+<%= form_tag project_pm_audits_import_path(@project), :multipart => true do %>
+  <div class="box">
+    <p><%= l(:text_pm_audit_import) %></p>
+    <p class="gl_cols"><code>지적사항</code> <code>내용</code> <code>영역</code> <code>구분</code> <code>근거</code> <code>조치 계획</code> <code>기한</code> <code>조치 결과</code> <code>상태</code> <code>ID</code></p>
+    <p><label for="round_id"><%= l(:label_pm_round) %></label> <%= select_tag 'round_id', content_tag(:option, '') + options_from_collection_for_select(@rounds, :id, :name, params[:round_id] || @rounds.first&.id) %></p>
+    <p><%= file_field_tag 'file', :accept => '.xlsx,.csv' %></p>
+  </div>
+  <p class="form_btns"><%= link_to l(:button_cancel), project_pm_audits_path(@project), :class => 'btn_line' %><%= submit_tag l(:button_import) %></p>
+<% end %>
+<% if @result %>
+  <ul class="ag_legend"><li><%= l(:label_pm_created) %> <strong><%= @result[:created] %></strong></li><li><%= l(:label_pm_updated) %> <strong><%= @result[:updated] %></strong></li><li><%= l(:label_pm_failed) %> <strong><%= @result[:errors].size %></strong></li></ul>
+  <% if @result[:errors].any? %><ul class="gl_errors"><% @result[:errors].first(50).each do |line, msg| %><li><%= line %>번째 줄 — <%= msg %></li><% end %></ul><% end %>
+  <p><%= link_to l(:label_pm_audits), project_pm_audits_path(@project) %></p>
+<% end %>
+<% html_title l(:label_pm_import) %>

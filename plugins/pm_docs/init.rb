@@ -13,12 +13,13 @@ require_relative 'lib/pm_kit/dashboard'
 require_relative 'lib/pm_kit/status_suggest'
 require_relative 'lib/pm_kit/hooks'
 require_relative 'lib/pm_kit/sla'
+require_relative 'lib/pm_kit/report'
 
 Redmine::Plugin.register :pm_docs do
   name '산출물 관리'
   author 'kephi-hub'
-  description '산출물(단계별·자동 생성·일괄 다운로드), 변경요청, 프로그램 목록, 회의록, 이슈·위험 관리대장'
-  version '1.2.0'
+  description '산출물(단계별·자동 생성·일괄 다운로드), 변경요청, 프로그램 목록, 회의록, 이슈·위험, 감리 지적사항, 투입 인력, 보안약점 진단, 주간·월간 보고서'
+  version '1.3.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
 
@@ -45,12 +46,32 @@ Redmine::Plugin.register :pm_docs do
     permission :view_risks, { pm_risks: [:index, :show, :export] }, read: true
     permission :manage_risks, { pm_risks: [:new, :create, :edit, :update, :destroy] }, require: :member
   end
+  project_module :audits do
+    permission :view_audits, { pm_audits: [:index, :show, :export] }, read: true
+    permission :manage_audits, { pm_audits: [:new, :create, :edit, :update, :destroy, :import], pm_audit_rounds: [:new, :create, :edit, :update, :destroy] }, require: :member
+  end
+  # 투입 인력은 계정·소속 등 개인 정보가 있어 보기 권한도 따로
+  project_module :staff do
+    permission :view_staff, { pm_staffs: [:index, :export] }, read: true
+    permission :manage_staff, { pm_staffs: [:new, :create, :edit, :update, :destroy] }, require: :member
+  end
+  project_module :sec_scans do
+    permission :view_sec_scans, { pm_sec_scans: [:index, :show, :export] }, read: true
+    permission :manage_sec_scans, { pm_sec_scans: [:new, :create, :edit, :update, :destroy, :bulk] }, require: :member
+  end
+  project_module :pm_reports do
+    permission :view_pm_reports, { pm_reports: [:index, :export] }, read: true
+  end
 
   menu :project_menu, :deliverables, { controller: 'pm_deliverables', action: 'index' }, caption: :label_pm_deliverables, param: :project_id
   menu :project_menu, :change_requests, { controller: 'pm_change_requests', action: 'index' }, caption: :label_pm_crs, param: :project_id
   menu :project_menu, :programs, { controller: 'pm_programs', action: 'index' }, caption: :label_pm_programs, param: :project_id
   menu :project_menu, :meetings, { controller: 'pm_meetings', action: 'index' }, caption: :label_pm_meetings, param: :project_id
   menu :project_menu, :risks, { controller: 'pm_risks', action: 'index' }, caption: :label_pm_risks, param: :project_id
+  menu :project_menu, :audits, { controller: 'pm_audits', action: 'index' }, caption: :label_pm_audits, param: :project_id
+  menu :project_menu, :staff, { controller: 'pm_staffs', action: 'index' }, caption: :label_pm_staffs, param: :project_id
+  menu :project_menu, :sec_scans, { controller: 'pm_sec_scans', action: 'index' }, caption: :label_pm_sec_scans, param: :project_id
+  menu :project_menu, :pm_reports, { controller: 'pm_reports', action: 'index' }, caption: :label_pm_reports, param: :project_id
 end
 
 unless Project.reflect_on_association(:pm_deliverables)
@@ -58,10 +79,18 @@ unless Project.reflect_on_association(:pm_deliverables)
   Project.has_many :pm_change_requests, dependent: :destroy
   Project.has_many :pm_programs, dependent: :delete_all
   Project.has_many :pm_meetings, dependent: :delete_all
+  Project.has_many :pm_audits, dependent: :delete_all
+  Project.has_many :pm_audit_rounds, dependent: :delete_all
+  Project.has_many :pm_staffs, dependent: :delete_all
+  Project.has_many :pm_sec_items, dependent: :delete_all
+  Project.has_many :pm_sec_scans, dependent: :delete_all
   Project.has_many :pm_risks, dependent: :delete_all
 end
 # 일감을 지우면 위험의 일감 번호를 비우고 변경요청의 일감 연결을 지움
 Issue.has_many :pm_risks, dependent: :nullify unless Issue.reflect_on_association(:pm_risks)
+Issue.has_many :pm_audits, dependent: :nullify unless Issue.reflect_on_association(:pm_audits)
+PmDeliverable.has_many :pm_audits, dependent: :nullify unless PmDeliverable.reflect_on_association(:pm_audits)
+PmProgram.has_many :pm_sec_items, dependent: :nullify unless PmProgram.reflect_on_association(:pm_sec_items)
 # SR 일감: 완료 기한을 비워 두면 긴급도로 자동 (PmKit::Sla)
 unless Issue.instance_variable_get(:@pm_sla_hooked)
   Issue.before_validation { PmKit::Sla.fill_due(self) }

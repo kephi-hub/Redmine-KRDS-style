@@ -1,0 +1,66 @@
+<%# 프로젝트 > 보안약점 > 진단 회차 — 항목 목록, 골라서 조치 완료 · 예외(사유) · 미조치 %>
+<% can_edit = User.current.allowed_to?(:manage_sec_scans, @project) %>
+<div class="contextual">
+  <%= link_to sprite_icon('download', l(:label_pm_excel)), project_pm_sec_scan_export_path(@project, @scan), :class => 'icon icon-download' %>
+  <% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_pm_sec_scan_path(@project, @scan), :class => 'icon icon-edit' %>
+    <%= link_to sprite_icon('del', l(:button_delete)), project_pm_sec_scan_path(@project, @scan), :method => :delete, :data => { :confirm => l(:text_pm_scan_delete) }, :class => 'icon icon-del' %><% end %>
+</div>
+<h2><%= link_to l(:label_pm_sec_scans), project_pm_sec_scans_path(@project) %> &#187; <%= @scan.name %></h2>
+<p class="subtitle"><%= [@scan.tool, format_date(@scan.scanned_on), (@scan.revision.present? ? "r#{@scan.revision}" : nil), @scan.scanner].compact.join(' · ') %></p>
+<ul class="db_stats mt_kpi">
+  <% [[nil, :label_pm_k_all, :all], ['open', nil, :open], [nil, :label_pm_sec_high_open, :high], ['fixed', nil, :fixed], ['except', nil, :except]].each do |st, label, k| %>
+    <li class="<%= 'on' if (st && @status == st) || (k == :high && @level == 'high') || (k == :all && !@status && !@level) %>"><%= link_to project_pm_sec_scan_path(@project, @scan, :status => (k == :high ? 'open' : st), :level => (k == :high ? 'high' : nil)) do %>
+      <span><%= label ? l(label) : pm_label('secstatus', st) %></span><strong class="<%= 'qa_fail' if %i(open high).include?(k) && @kpi[k].positive? %>"><%= @kpi[k] %></strong><% end %></li>
+  <% end %>
+</ul>
+<% if @kinds.any? %><ul class="db_tags"><% @kinds.first(12).each do |k, n| %><li><%= link_to k, project_pm_sec_scan_path(@project, @scan, :q => k) %> <span><%= n %></span></li><% end %></ul><% end %>
+<%= form_tag project_pm_sec_scan_path(@project, @scan), :method => :get, :class => 'qa_filter' do %>
+  <%= hidden_field_tag 'status', @status if @status %><%= hidden_field_tag 'level', @level if @level %>
+  <%= search_field_tag 'q', @q, :placeholder => l(:label_pm_sec_search), :'aria-label' => l(:label_pm_sec_search) %>
+  <%= submit_tag l(:label_pm_filter), :name => nil %>
+<% end %>
+<% if @items.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<%= form_tag project_pm_sec_scan_bulk_path(@project, @scan), :id => 'pm_sec_form' do %>
+  <%= hidden_field_tag 'back_status', @status %>
+  <% if can_edit %>
+  <div class="pm_bulk">
+    <%= select_tag 'status', options_for_select(PmSecItem::STATUSES.map { |s| [pm_label('secstatus', s), s] }, 'fixed'), :'aria-label' => l(:field_status) %>
+    <%= text_field_tag 'reason', '', :placeholder => l(:label_pm_sec_reason), :'aria-label' => l(:label_pm_sec_reason), :size => 30 %>
+    <%= select_tag 'fixer_id', content_tag(:option, l(:label_pm_fixer), :value => '') + options_from_collection_for_select(@members, :id, :name), :'aria-label' => l(:label_pm_fixer) %>
+    <%= submit_tag l(:label_pm_sec_apply), :name => nil, :id => 'pm_sec_apply', :disabled => true %>
+    <span class="mt_dim" id="pm_sec_cnt"></span>
+  </div>
+  <% end %>
+  <div class="autoscroll">
+  <table class="list pm_list">
+    <thead><tr><% if can_edit %><th><input type="checkbox" id="pm_sec_all" aria-label="<%= l(:label_menu_g_select_all) rescue '' %>"></th><% end %><th class="name"><%= l(:label_pm_sec_kind) %></th><th><%= l(:label_pm_sec_level) %></th><th class="name"><%= l(:label_pm_sec_file) %></th>
+      <th><%= l(:field_status) %></th><th><%= l(:label_pm_fixer) %></th><th><%= l(:label_pm_program) %></th></tr></thead>
+    <tbody>
+    <% @items.each do |i| %>
+      <tr><% if can_edit %><td><%= check_box_tag 'ids[]', i.id, false, :id => nil, :class => 'pm_sec_ck', :'aria-label' => i.kind %></td><% end %>
+        <td class="name"><strong><%= i.kind %></strong><% if i.description.present? %><br><span class="db_dim"><%= i.description.truncate(120) %></span><% end %></td>
+        <td><%= pm_badge(pm_label('seclevel', i.level), i.level) %></td>
+        <td class="name"><code><%= i.location %></code></td>
+        <td><%= pm_badge(pm_label('secstatus', i.status), "s#{i.status}") %><% if i.recheck.present? %> <%= pm_badge(pm_label('recheck', i.recheck), "r#{i.recheck}") %><% end %>
+          <% if i.status == 'except' && i.reason.present? %><br><span class="db_dim"><%= i.reason.truncate(60) %></span><% end %></td>
+        <td><%= i.fixer %><% if i.fixed_on %><br><span class="db_dim"><%= format_date(i.fixed_on) %></span><% end %></td>
+        <td><%= i.pm_program ? link_to(i.pm_program.code, project_pm_program_path(@project, i.pm_program)) : '' %></td></tr>
+    <% end %>
+    </tbody>
+  </table>
+  </div>
+<% end %>
+<% if can_edit %>
+<%= javascript_tag do %>
+$(function() {
+  var $f = $('#pm_sec_form');
+  function cnt() { var n = $f.find('.pm_sec_ck:checked').length; $('#pm_sec_apply').prop('disabled', !n); $('#pm_sec_cnt').text(n ? n + <%= raw l(:label_pm_selected).to_json %> : ''); }
+  $f.on('change', '.pm_sec_ck', cnt);
+  $('#pm_sec_all').on('change', function() { $f.find('.pm_sec_ck').prop('checked', this.checked); cnt(); });
+});
+<% end %>
+<% end %>
+<% end %>
+<% html_title @scan.name %>

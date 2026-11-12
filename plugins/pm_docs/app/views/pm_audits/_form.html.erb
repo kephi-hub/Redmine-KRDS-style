@@ -1,0 +1,19 @@
+<%= error_messages_for @audit %>
+<div class="box tabular">
+  <p><%= f.select :pm_audit_round_id, @rounds.map { |r| [r.name, r.id] }, { :include_blank => true, :label => :label_pm_round } %></p>
+  <p><%= f.text_field :code, :size => 10, :maxlength => 30, :placeholder => 'AU-001', :label => :label_pm_code %><em class="info"><%= l(:text_pm_audit_code) %></em></p>
+  <p><%= f.select :area, pm_options('aarea', PmAudit::AREAS), { :label => :label_pm_area } %></p>
+  <p><%= f.select :kind, pm_options('akind', PmAudit::KINDS), { :label => :label_pm_akind } %></p>
+  <p><%= f.text_field :title, :required => true, :size => 60, :maxlength => 200, :label => :label_pm_audit_title %></p>
+  <p><%= f.text_area :content, :rows => 4, :cols => 60, :label => :label_pm_audit_content %></p>
+  <p><%= f.text_field :basis, :size => 40, :maxlength => 200, :placeholder => '요구사항 정의서 v1.1', :label => :label_pm_basis %></p>
+  <% if @deliverables.any? %><p><%= f.select :pm_deliverable_id, @deliverables.map { |d| ["#{d.code} #{d.name}", d.id] }, { :include_blank => true, :label => :label_pm_deliverable } %></p><% end %>
+  <p><%= f.text_area :plan, :rows => 3, :cols => 60, :label => :label_pm_audit_plan %></p>
+  <p><%= f.select :owner_id, @members.map { |u| [u.name, u.id] }, { :include_blank => true, :label => :label_pm_owner } %></p>
+  <p><%= f.date_field :due_on, :label => :label_pm_due %><%= calendar_for('pm_audit_due_on') %></p>
+  <p><%= f.text_area :result, :rows => 3, :cols => 60, :label => :label_pm_audit_result %></p>
+  <p><%= f.select :status, pm_options('astatus', PmAudit::STATUSES), { :label => :field_status } %><em class="info"><%= l(:text_pm_audit_status) %></em></p>
+  <p><%= f.date_field :done_on, :label => :label_pm_done_on %><%= calendar_for('pm_audit_done_on') %></p>
+  <p><%= f.date_field :verified_on, :label => :label_pm_verified_on %><%= calendar_for('pm_audit_verified_on') %></p>
+  <p><%= f.text_field :issue_id, :size => 10, :placeholder => '#123', :label => :label_pm_issue %></p>
+</div>

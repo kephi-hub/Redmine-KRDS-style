@@ -1,0 +1,49 @@
+<%# 프로젝트 > 감리 — 회차별 지적사항, 조치 진척 %>
+<% can_edit = User.current.allowed_to?(:manage_audits, @project) %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('add', l(:label_pm_audit_new)), new_project_pm_audit_path(@project, :round => @round&.id), :class => 'icon icon-add' %>
+    <%= link_to sprite_icon('add', l(:label_pm_round_new)), new_project_pm_audit_round_path(@project), :class => 'icon icon-add' %>
+    <%= link_to sprite_icon('import', l(:label_pm_import)), project_pm_audits_import_path(@project), :class => 'icon icon-import' %><% end %>
+  <%= link_to sprite_icon('download', l(:label_pm_audit_export)), project_pm_audits_export_path(@project), :class => 'icon icon-download' %>
+</div>
+<h2><%= l(:label_pm_audits) %></h2>
+<p class="subtitle"><%= l(:text_pm_audits) %></p>
+<% if @rounds.any? %>
+<ul class="pm_rounds">
+  <li class="<%= 'on' unless @round %>"><%= link_to l(:label_pm_round_all), project_pm_audits_path(@project, :status => @status) %></li>
+  <% @rounds.each do |r| %>
+    <% l2 = @by_round[r.id] || [] %>
+    <li class="<%= 'on' if @round == r %>"><%= link_to project_pm_audits_path(@project, :round => r.id, :status => @status) do %><strong><%= r.name %></strong>
+      <span><%= pm_label('aphase', r.phase) %><% if r.start_on %> · <%= format_date(r.start_on) %><% end %><% if r.auditor.present? %> · <%= r.auditor %><% end %></span>
+      <span><%= l(:label_pm_round_count, :total => l2.size, :done => l2.count { |a| a.status == 'verified' }) %></span><% end %>
+      <% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_pm_audit_round_path(@project, r), :class => 'icon-only icon-edit pm_redit', :title => l(:button_edit) %><% end %></li>
+  <% end %>
+</ul>
+<% elsif can_edit %>
+  <p class="db_hintbox"><%= l(:text_pm_round_first) %></p>
+<% end %>
+<ul class="db_stats mt_kpi">
+  <% [[nil, :label_pm_k_all, :all], ['open', :label_pm_ak_open, :open], ['done', :label_pm_ak_done, :done], ['verified', :label_pm_ak_verified, :verified], ['late', :label_pm_k_late, :late]].each do |st, label, k| %>
+    <li class="<%= 'on' if @status == st %>"><%= link_to project_pm_audits_path(@project, :round => @round&.id, :status => st) do %><span><%= l(label) %></span><strong class="<%= 'qa_fail' if k == :late && @kpi[k].positive? %>"><%= @kpi[k] %></strong><% end %></li>
+  <% end %>
+</ul>
+<% if @audits.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list pm_list">
+  <thead><tr><th>ID</th><th><%= l(:label_pm_round) %></th><th><%= l(:label_pm_area) %></th><th><%= l(:label_pm_akind) %></th><th class="name"><%= l(:label_pm_audit_title) %></th><th><%= l(:field_status) %></th><th><%= l(:label_pm_owner) %></th><th><%= l(:label_pm_due) %></th><th></th></tr></thead>
+  <tbody>
+  <% @audits.each do |a| %>
+    <tr><td class="code"><%= link_to a.code, project_pm_audit_path(@project, a) %></td><td><%= a.pm_audit_round&.name %></td><td><%= pm_label('aarea', a.area) %></td>
+      <td><%= pm_badge(pm_label('akind', a.kind), "a#{a.kind}") %></td>
+      <td class="name"><%= link_to a.title, project_pm_audit_path(@project, a) %></td>
+      <td><%= pm_badge(pm_label('astatus', a.status), "a#{a.status}") %></td><td><%= a.owner %></td>
+      <td class="next <%= 'qa_fail' if a.late? %>"><%= format_date(a.due_on) %></td>
+      <td class="buttons"><% if can_edit %><%= link_to sprite_icon('edit', l(:button_edit)), edit_project_pm_audit_path(@project, a), :class => 'icon icon-edit' %><% end %></td></tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<% end %>
+<% html_title l(:label_pm_audits) %>

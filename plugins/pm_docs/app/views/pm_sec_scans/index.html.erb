@@ -1,0 +1,27 @@
+<%# 프로젝트 > 보안약점 — 진단 회차 목록 %>
+<% can_edit = User.current.allowed_to?(:manage_sec_scans, @project) %>
+<div class="contextual">
+  <% if can_edit %><%= link_to sprite_icon('add', l(:label_pm_scan_new)), new_project_pm_sec_scan_path(@project), :class => 'icon icon-add' %><% end %>
+</div>
+<h2><%= l(:label_pm_sec_scans) %></h2>
+<p class="subtitle"><%= l(:text_pm_sec_scans) %></p>
+<% if @scans.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+  <% if can_edit %><p class="db_hintbox"><%= l(:text_pm_scan_first) %></p><% end %>
+<% else %>
+<div class="autoscroll">
+<table class="list pm_list">
+  <thead><tr><th class="name"><%= l(:label_pm_scan) %></th><th><%= l(:label_pm_tool) %></th><th><%= l(:label_pm_scanned_on) %></th><th><%= l(:label_pm_revision) %></th><th><%= l(:label_pm_k_all) %></th>
+    <th><%= pm_label('secstatus', 'open') %></th><th><%= l(:label_pm_sec_high_open) %></th><th><%= pm_label('secstatus', 'fixed') %></th><th><%= pm_label('secstatus', 'except') %></th><th></th></tr></thead>
+  <tbody>
+  <% @scans.each_with_index do |s, i| %>
+    <% c = @counts[s.id] %>
+    <tr><td class="name"><%= link_to s.name, project_pm_sec_scan_path(@project, s) %><% if i.zero? %> <span class="st_tag"><%= l(:label_pm_backup_latest_short) %></span><% end %></td><td><%= s.tool %></td><td><%= format_date(s.scanned_on) %></td><td><%= s.revision %></td>
+      <td><%= c.values.sum %></td><td class="<%= 'qa_fail' if c['open'].positive? %>"><%= c['open'] %></td><td class="<%= 'qa_fail' if @high[s.id].to_i.positive? %>"><%= @high[s.id].to_i %></td><td><%= c['fixed'] %></td><td><%= c['except'] %></td>
+      <td class="buttons"><%= link_to sprite_icon('download', l(:label_pm_excel)), project_pm_sec_scan_export_path(@project, s), :class => 'icon icon-download' %></td></tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<% end %>
+<% html_title l(:label_pm_sec_scans) %>

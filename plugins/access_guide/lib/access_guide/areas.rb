@@ -35,6 +35,10 @@ module AccessGuide
     { key: 'programs', view: %i[view_programs], write: %i[manage_programs], manage: %i[] },
     { key: 'meetings', view: %i[view_meetings], write: %i[manage_meetings], manage: %i[] },
     { key: 'risks', view: %i[view_risks], write: %i[manage_risks], manage: %i[] },
+    { key: 'audits', view: %i[view_audits], write: %i[manage_audits], manage: %i[] },
+    { key: 'staff', view: %i[view_staff], write: %i[], manage: %i[manage_staff] },
+    { key: 'secscans', view: %i[view_sec_scans], write: %i[manage_sec_scans], manage: %i[] },
+    { key: 'reports', view: %i[view_pm_reports], write: %i[], manage: %i[] },
     { key: 'calendar', view: %i[view_calendar view_gantt], write: %i[], manage: %i[] },
   ].freeze
 

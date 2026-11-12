@@ -1,0 +1,9 @@
+<%= error_messages_for @round %>
+<div class="box tabular">
+  <p><%= f.text_field :name, :required => true, :size => 40, :maxlength => 100, :placeholder => '요구정의 단계 감리', :label => :field_name %></p>
+  <p><%= f.select :phase, pm_options('aphase', PmAuditRound::PHASES), { :label => :label_pm_aphase } %></p>
+  <p><%= f.date_field :start_on, :label => :label_pm_from %><%= calendar_for('pm_audit_round_start_on') %></p>
+  <p><%= f.date_field :end_on, :label => :label_pm_to %><%= calendar_for('pm_audit_round_end_on') %></p>
+  <p><%= f.text_field :auditor, :size => 40, :maxlength => 100, :label => :label_pm_auditor %></p>
+  <p><%= f.text_area :note, :rows => 2, :cols => 60, :label => :label_pm_note %></p>
+</div>

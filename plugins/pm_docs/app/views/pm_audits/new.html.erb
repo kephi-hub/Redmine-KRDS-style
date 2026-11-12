@@ -1,0 +1,6 @@
+<h2><%= link_to l(:label_pm_audits), project_pm_audits_path(@project) %> &#187; <%= l(:label_pm_audit_new) %></h2>
+<%= labelled_form_for @audit, :url => project_pm_audits_path(@project) do |f| %>
+  <%= render :partial => 'pm_audits/form', :locals => { :f => f } %>
+  <p class="form_btns"><%= link_to l(:button_cancel), project_pm_audits_path(@project), :class => 'btn_line' %><%= submit_tag l(:button_create_and_continue), :name => 'continue', :class => 'btn_line' %><%= submit_tag l(:button_create) %></p>
+<% end %>
+<% html_title l(:label_pm_audit_new) %>

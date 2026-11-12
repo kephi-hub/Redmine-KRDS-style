@@ -25,4 +25,16 @@ resources :projects, only: [] do
   resources :pm_meetings, path: 'meetings'
   get 'risks/export', to: 'pm_risks#export', as: 'pm_risks_export'
   resources :pm_risks, path: 'risks'
+  # 감리 · 투입 인력 · 보안약점 · 보고서
+  get 'audits/export', to: 'pm_audits#export', as: 'pm_audits_export'
+  match 'audits/import', to: 'pm_audits#import', via: [:get, :post], as: 'pm_audits_import'
+  resources :pm_audit_rounds, path: 'audit_rounds', only: [:new, :create, :edit, :update, :destroy]
+  resources :pm_audits, path: 'audits'
+  get 'staff/export', to: 'pm_staffs#export', as: 'pm_staffs_export'
+  resources :pm_staffs, path: 'staff', except: [:show]
+  get 'sec_scans/:id/export', to: 'pm_sec_scans#export', as: 'pm_sec_scan_export', constraints: { id: /\d+/ }
+  post 'sec_scans/:id/bulk', to: 'pm_sec_scans#bulk', as: 'pm_sec_scan_bulk', constraints: { id: /\d+/ }
+  resources :pm_sec_scans, path: 'sec_scans'
+  get 'reports', to: 'pm_reports#index', as: 'pm_reports'
+  get 'reports/export', to: 'pm_reports#export', as: 'pm_reports_export'
 end
