@@ -18,6 +18,8 @@
       <%= password_field_tag 'menu_capture_config[password]', '', :id => 'menu_capture_config_password', :size => 30, :autocomplete => 'new-password', :placeholder => (@cfg.password_enc.present? ? l(:label_menu_capture_pw_saved) : '') %>
       <% if @cfg.password_enc.present? %><label class="inline"><%= check_box_tag 'clear_password', '1', false %> <%= l(:label_menu_capture_pw_clear) %></label><% end %>
       <em class="info"><%= l(:text_menu_capture_password) %></em></p>
+    <p><%= f.text_field :logout_url, :size => 60, :placeholder => '/member/logout.do', :label => :field_menu_capture_logout_url %>
+      <em class="info"><%= l(:text_menu_capture_logout_url) %></em></p>
     <details class="mc_adv" <%= 'open' if @cfg.user_selector.present? || @cfg.pass_selector.present? || @cfg.submit_selector.present? || @cfg.check_selector.present? %>>
       <summary><%= l(:label_menu_capture_selectors) %></summary>
       <p><%= f.text_field :user_selector, :size => 50, :placeholder => '#userId', :label => :field_menu_capture_user_sel %></p>

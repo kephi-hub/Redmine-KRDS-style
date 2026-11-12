@@ -21,7 +21,7 @@
 <% else %>
   <div class="mc_info">
     <span><b><%= l(:field_menu_capture_base) %></b> <code><%= @cfg.base_url %></code></span>
-    <span><b><%= l(:label_menu_capture_login) %></b> <%= @cfg.login? ? l(:label_menu_capture_login_on, :user => @cfg.username) : l(:label_menu_capture_login_off) %></span>
+    <span><b><%= l(:label_menu_capture_login) %></b> <%= @cfg.login? ? l(:label_menu_capture_login_on, :user => @cfg.username) : l(:label_menu_capture_login_off) %><% if @cfg.login? && @cfg.logout_url.present? %> · <%= l(:label_menu_capture_check_by_logout) %> <code><%= @cfg.logout_url %></code><% end %></span>
     <span><b><%= l(:field_menu_capture_schedule) %></b> <%= l("label_menu_capture_sch_#{@cfg.schedule}") %></span>
     <span><b><%= l(:field_menu_capture_width) %></b> <%= @cfg.width %>px<%= " + #{l(:label_menu_capture_mobile)}" if @cfg.mobile %></span>
   </div>

@@ -13,6 +13,8 @@ class MenuCaptureConfig < ApplicationRecord
   validates :base_url, :login_url, format: { with: %r{\Ahttps?://[^\s]+\z}i }, allow_blank: true, length: { maximum: 300 }
   validates :base_url, presence: true
   validates :username, length: { maximum: 100 }
+  validates :logout_url, length: { maximum: 300 }
+  validates :logout_url, format: { with: %r{\A(https?://|/)[^\s]*\z}i }, allow_blank: true
   validates :user_selector, :pass_selector, :submit_selector, :check_selector, length: { maximum: 200 }
   validates :width, numericality: { only_integer: true, greater_than_or_equal_to: 320, less_than_or_equal_to: 2560 }
   validates :wait_ms, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 30_000 }
@@ -24,6 +26,7 @@ class MenuCaptureConfig < ApplicationRecord
     self.base_url = base_url.to_s.strip.sub(%r{/+\z}, '').presence
     self.login_url = login_url.to_s.strip.presence
     self.username = username.to_s.strip.presence
+    self.logout_url = logout_url.to_s.strip.presence
   end
 
   def password

@@ -1,4 +1,7 @@
 en:
+  field_menu_capture_logout_url: "Logout URL"
+  label_menu_capture_check_by_logout: "check"
+  text_menu_capture_logout_url: "Logged in when the page has a link or form to this logout URL."
   label_menu_capture_doc: "Screen design (PPT)"
   permission_view_menu_captures: "Menu captures"
   permission_manage_menu_captures: "Menu captures"

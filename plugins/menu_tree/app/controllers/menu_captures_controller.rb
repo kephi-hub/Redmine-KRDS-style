@@ -70,7 +70,7 @@ class MenuCapturesController < ApplicationController
   def save_settings
     @cfg = capture_config || MenuCaptureConfig.new(project: @project, menu_site: @site)
     @cfg.assign_attributes(params.require(:menu_capture_config).permit(:base_url, :login_url, :username, :user_selector, :pass_selector, :submit_selector,
-                                                                         :check_selector, :width, :mobile, :wait_ms, :max_height, :keep, :schedule, :only_active))
+                                                                         :check_selector, :logout_url, :width, :mobile, :wait_ms, :max_height, :keep, :schedule, :only_active))
     @cfg.password = params[:menu_capture_config][:password] if params[:menu_capture_config][:password].present?
     @cfg.password_enc = nil if params[:clear_password] == '1'
     if @cfg.save

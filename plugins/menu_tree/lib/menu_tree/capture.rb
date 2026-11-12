@@ -76,14 +76,50 @@ module MenuTree
       btn ? btn.click : pass.type(:Enter)
       sleep 0.5
       settle(b, cfg)
-      ok = if cfg.check_selector.present?
-             first_node(b, cfg.check_selector).present?
-           else
-             b.css('input[type=password]').none? { |n| n.evaluate('this.offsetParent !== null') rescue true }
-           end
-      return true if ok
+      return true if logged_in?(b, cfg)
       save_png(b, debug_path, cfg, full: false) if debug_path
-      raise LoginError, "로그인하지 못했습니다 (로그인 후에도 #{cfg.check_selector.present? ? '확인용 요소가 없음' : '비밀번호 입력칸이 남아 있음'}) — 아이디·비밀번호·입력칸 선택자를 확인하세요"
+      why = if cfg.logout_url.present? then "로그아웃 주소(#{cfg.logout_url})로 가는 링크가 없음"
+            elsif cfg.check_selector.present? then '로그인 확인 요소가 없음'
+            else '비밀번호 입력칸이 남아 있음'
+            end
+      raise LoginError, "로그인하지 못했습니다 (로그인 후 화면에 #{why}) — 아이디·비밀번호·입력칸 선택자·로그아웃 주소를 확인하세요"
+    end
+
+    # 로그인 여부: 로그아웃 주소 → 로그인 확인 요소 → 비밀번호 칸이 사라짐 순서로 판단
+    def logged_in?(b, cfg)
+      if cfg.logout_url.present?
+        logout_link?(b, cfg.resolve(cfg.logout_url) || cfg.logout_url)
+      elsif cfg.check_selector.present?
+        first_node(b, cfg.check_selector).present?
+      else
+        b.css('input[type=password]').none? { |n| n.evaluate('this.offsetParent !== null') rescue true }
+      end
+    end
+
+    # 화면에 로그아웃 주소로 가는 링크·폼·버튼이 있는지 — href · action · data-href · data-url 을 절대 주소로 바꿔 경로(+쿼리)로 비교,
+    # onclick(location.href='…') 이나 화면 소스 안의 주소도 인정 (버튼이 아니라 글자 링크·스크립트 이동인 사이트)
+    LOGOUT_JS = <<~'JS'.freeze
+      (function(target) {
+        var t; try { t = new URL(target, location.href); } catch (e) { return false; }
+        var path = t.pathname.replace(/\/+$/, '') || '/';
+        var same = function(u) { return u.host === t.host && (u.pathname.replace(/\/+$/, '') || '/') === path && (!t.search || u.search === t.search); };
+        var els = document.querySelectorAll('a[href], area[href], form[action], [data-href], [data-url], [onclick]');
+        for (var i = 0; i < els.length; i++) {
+          var e = els[i], vals = [e.getAttribute('href'), e.getAttribute('action'), e.getAttribute('data-href'), e.getAttribute('data-url')];
+          for (var j = 0; j < vals.length; j++) {
+            var v = vals[j]; if (!v || /^\s*(javascript:|#)/i.test(v)) continue;
+            try { if (same(new URL(v, location.href))) return true; } catch (e2) {}
+          }
+          var oc = e.getAttribute('onclick'); if (oc && path.length > 1 && oc.indexOf(path) >= 0) return true;
+        }
+        return path.length > 1 && document.documentElement.innerHTML.indexOf(path) >= 0;
+      })
+    JS
+
+    def logout_link?(b, url)
+      b.evaluate("#{LOGOUT_JS.strip}(#{url.to_json})") ? true : false
+    rescue StandardError
+      false
     end
 
     # 로그인 시험: { ok:, message:, image: 경로 }

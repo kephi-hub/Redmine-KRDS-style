@@ -1,4 +1,12 @@
 ko:
+  field_logout_url: "로그아웃 주소"
+  field_base_url: "기본 주소"
+  field_login_url: "로그인 주소"
+  field_max_height: "최대 높이"
+  field_wait_ms: "화면마다 기다림"
+  field_menu_capture_logout_url: "로그아웃 주소"
+  label_menu_capture_check_by_logout: "확인"
+  text_menu_capture_logout_url: "로그인 후 화면에 이 주소로 가는 링크·버튼·폼(글자 링크·스크립트 이동 포함)이 있으면 로그인 성공으로 봅니다. 예) /member/logout.do 또는 https://…/logout. 비워 두면 아래 \"로그인 확인 요소\" → 비밀번호 입력칸이 사라졌는지로 판단합니다."
   label_menu_capture_doc: "화면 설계서(PPT)"
   permission_view_menu_captures: "화면 캡처 보기"
   permission_manage_menu_captures: "화면 캡처 설정·실행"
@@ -67,7 +75,7 @@ ko:
   text_menu_capture_password: "Redmine 암호화 키로 암호화해 저장하고 화면에 다시 보여 주지 않습니다. 운영 계정 대신 조회 권한만 있는 테스트 계정을 쓰세요."
   text_menu_capture_privacy: "※ 캡처에는 화면에 보이는 정보가 그대로 담깁니다. 개인정보가 보이는 화면은 테스트 계정·테스트 데이터로 캡처하세요. 캡처 파일은 PMS 서버(첨부 폴더)에 저장되고 PMS 백업에 포함됩니다."
   text_menu_capture_schedule: "서버 cron(setup/cron.example 의 화면 캡처 줄)이 있어야 자동으로 돕니다."
-  text_menu_capture_selectors: "CSS 선택자. 비워 두면 흔한 이름(userId·username·loginId·type=password·submit 버튼 등)으로 찾습니다. 로그인 확인 요소를 적으면 로그인 뒤 그 요소가 있어야 성공으로 봅니다(예: 로그아웃 버튼)."
+  text_menu_capture_selectors: "CSS 선택자. 비워 두면 흔한 이름(userId·username·loginId·type=password·submit 버튼 등)으로 찾습니다. 로그인 확인 요소를 적으면 로그인 뒤 그 요소가 있어야 성공으로 봅니다 (로그아웃 주소를 적었으면 그쪽이 우선)."
   text_menu_capture_settings: "서버의 헤드리스 크롬이 이 사이트에 로그인한 뒤 메뉴 구조도의 화면 URL 을 차례로 열어 캡처합니다. PMS 서버에서 이 주소로 접속할 수 있어야 합니다."
   text_menu_capture_wait: "화면이 다 그려진 뒤 더 기다릴 시간 (차트·애니메이션이 있는 화면은 늘리세요)"
   project_module_menu_tree: 메뉴 구조도
