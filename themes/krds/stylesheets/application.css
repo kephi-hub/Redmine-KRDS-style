@@ -753,6 +753,12 @@ body.controller-keys .pwd-select-text{font-size:0.9375rem;}
 #content>div.contextual>a.icon-add:hover,#content>div.contextual>a.icon-time-add:hover{border-color:var(--pri_60);background:var(--pri_60);color:var(--gray_0);}
 #content>div.contextual>a.icon-add .icon-svg,#content>div.contextual>a.icon-time-add .icon-svg{color:var(--gray_0);}
 #content>div.contextual>a.icon-fav .icon-svg{color:var(--war_60);}
+/* 화면의 주요 동작 버튼 (지금 캡처 · 지금 백업 등) — 파란 버튼, 모바일에서도 글자 표시. 진행 중이면 is_off */
+#content>div.contextual>a.btn_main{border-color:var(--pri_50);background:var(--pri_50);color:var(--gray_0);}
+#content>div.contextual>a.btn_main:hover{border-color:var(--pri_60);background:var(--pri_60);color:var(--gray_0);}
+#content>div.contextual>a.btn_main .icon-svg{color:var(--gray_0);}
+#content>div.contextual>span.btn_main{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 14px;border:1px solid var(--pri_10);border-radius:var(--radius_s);background:var(--pri_5);font-weight:500;color:var(--pri_60);cursor:default;}
+#content>div.contextual>span.btn_main .icon-svg{width:16px;height:16px;stroke:currentColor;color:var(--pri_60);}
 #content>div.contextual>form{margin:0;}
 
 /* … 더보기 버튼 */
@@ -892,8 +898,8 @@ body.controller-enumerations table.enumerations td.name a{font-weight:500;color:
 #content>div.contextual{margin-bottom:12px;}
 #content>div.contextual>.drdn{padding:0;margin:0;border:0;}
 #content>div.contextual>.drdn>.drdn-content{left:auto;}
-#content>div.contextual>a.icon:not(.icon-add):not(.icon-edit):not(.icon-time-add) .icon-label,body:not(.controller-timelog) #content>div.contextual>a.icon-time-add .icon-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
-#content>div.contextual>a.icon:not(.icon-add):not(.icon-edit):not(.icon-time-add),body:not(.controller-timelog) #content>div.contextual>a.icon-time-add{justify-content:center;width:36px;padding:0;}
+#content>div.contextual>a.icon:not(.icon-add):not(.icon-edit):not(.icon-time-add):not(.btn_main) .icon-label,body:not(.controller-timelog) #content>div.contextual>a.icon-time-add .icon-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+#content>div.contextual>a.icon:not(.icon-add):not(.icon-edit):not(.icon-time-add):not(.btn_main),body:not(.controller-timelog) #content>div.contextual>a.icon-time-add{justify-content:center;width:36px;padding:0;}
 
 /* 일감 목록: 카드형 (1줄: 번호·유형·상태·… / 2줄: 제목 / 3줄: 우선순위·담당자·변경일) */
 table.list.issues thead{display:none;}
@@ -1587,8 +1593,8 @@ table.list.issues td{padding-top:12px;padding-bottom:12px;}
 div#activity dd{padding:0 12px 16px 76px;}
 #wrapper #header:not(:has(#project-jump))>h1{padding:2px 10px 1px 0;font-size:1.5rem;line-height:inherit;}
 #content>div.contextual{margin-bottom:8px;}
-#content>div.contextual>a.icon:not(.icon-add):not(.icon-edit):not(.icon-time-add) .icon-label,body:not(.controller-timelog) #content>div.contextual>a.icon-time-add .icon-label{position:static;width:auto;height:auto;overflow:visible;clip:auto;white-space:normal;}
-#content>div.contextual>a.icon:not(.icon-add):not(.icon-edit):not(.icon-time-add),body:not(.controller-timelog) #content>div.contextual>a.icon-time-add{width:auto;padding:0 14px;}
+#content>div.contextual>a.icon:not(.icon-add):not(.icon-edit):not(.icon-time-add):not(.btn_main) .icon-label,body:not(.controller-timelog) #content>div.contextual>a.icon-time-add .icon-label{position:static;width:auto;height:auto;overflow:visible;clip:auto;white-space:normal;}
+#content>div.contextual>a.icon:not(.icon-add):not(.icon-edit):not(.icon-time-add):not(.btn_main),body:not(.controller-timelog) #content>div.contextual>a.icon-time-add{width:auto;padding:0 14px;}
 table.list.issues{display:table;}
 table.list.issues thead{display:table-header-group;}
 table.list.issues tbody{display:table-row-group;}

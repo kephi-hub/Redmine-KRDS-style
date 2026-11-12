@@ -4,10 +4,11 @@
   <% if @screens.any? %><%= link_to sprite_icon('download', l(:label_menu_capture_doc)), project_menu_captures_document_path(@project, :site => @site&.id), :class => 'icon icon-download' %><% end %>
   <% if can_run %>
     <%= link_to sprite_icon('settings', l(:label_menu_capture_settings)), project_menu_captures_settings_path(@project, :site => @site&.id), :class => 'icon icon-settings' %>
-    <% if @cfg %>
-      <%= form_tag project_menu_captures_run_path(@project, :site => @site&.id), :class => 'st_inline' do %>
-        <%= content_tag(:button, sprite_icon('reload', l(:button_menu_capture_now)), :type => 'submit', :class => 'st_now', :disabled => @busy.present?, :data => { :confirm => l(:text_menu_capture_confirm, :count => @screens.count { |m| m.url.present? }) }) %>
-      <% end %>
+    <% if @cfg && @busy %>
+      <span class="icon btn_main is_off"><%= sprite_icon('reload', l(:label_menu_capture_run_running)) %></span>
+    <% elsif @cfg %>
+      <%= link_to sprite_icon('reload', l(:button_menu_capture_now)), project_menu_captures_run_path(@project, :site => @site&.id), :method => :post, :class => 'icon icon-reload btn_main',
+            :data => { :confirm => l(:text_menu_capture_confirm, :count => @screens.count { |m| m.url.present? }) } %>
     <% end %>
   <% end %>
 </div>

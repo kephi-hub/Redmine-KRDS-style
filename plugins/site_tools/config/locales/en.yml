@@ -1,4 +1,5 @@
 en:
+  label_pms_backup_running_short: "Backing up…"
   label_pms_backups: "Backups"
   text_pms_backups: "Daily server-side backups of the PMS database, attachments and Vault key files."
   text_pms_backup_not_mounted: "The backup status folder is not mounted. Check ./backup/ctl in compose.yaml and the backup cron."

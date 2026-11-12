@@ -1,4 +1,5 @@
 ko:
+  label_pms_backup_running_short: "백업 중…"
   label_pms_backups: 백업
   text_pms_backups: PMS 의 DB · 첨부파일 · 접속정보 키 파일을 서버 안에 매일 날짜별로 백업합니다. 바뀌지 않은 첨부파일은 앞 백업과 공유해 용량이 늘지 않습니다.
   text_pms_backup_not_mounted: "백업 상태 폴더가 연결되지 않았습니다. 서버에서 compose.yaml 의 ./backup/ctl 마운트와 cron(setup/cron.example 의 백업 줄)을 확인하세요."
