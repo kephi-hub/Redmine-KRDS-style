@@ -38,3 +38,6 @@ resources :projects, only: [] do
   get 'reports', to: 'pm_reports#index', as: 'pm_reports'
   get 'reports/export', to: 'pm_reports#export', as: 'pm_reports_export'
 end
+# 전체 프로젝트 현황 (PMO)
+get 'pmo', to: 'pm_portfolio#index', as: 'pm_portfolio'
+get 'pmo/export', to: 'pm_portfolio#export', as: 'pm_portfolio_export'

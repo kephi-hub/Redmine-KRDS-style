@@ -1407,6 +1407,22 @@ table.list.oa_list td.next,table.list.oa_list td.exp,table.list.oa_list td.code{
 
 
 /* 산출물 관리 (pm_docs) · 공통코드 — 배지 색은 data-k */
+/* 전체 프로젝트 현황 PMO (pm_docs) — 신호등 · 진척(막대)과 경과(세로선) */
+.pf_dot{display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:50%;background:var(--gray_30);vertical-align:middle;}
+.pf_dot[data-k=red],.pf_sig[data-k=red]{background:var(--dan_50);}
+.pf_dot[data-k=yellow],.pf_sig[data-k=yellow]{background:var(--war_60);}
+.pf_dot[data-k=green],.pf_sig[data-k=green]{background:var(--suc_60);}
+.pf_sig{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:11px;font-size:0.75rem;font-weight:700;color:var(--gray_0);vertical-align:middle;}
+a.pf_name{font-weight:700;}
+.pf_why{display:block;margin:4px 0 0;font-size:0.75rem;color:var(--dan_60);}
+#content table.pf_table td{text-align:left;vertical-align:top;font-size:0.8125rem;}
+#content table.pf_table td.pf_period{white-space:nowrap;color:var(--gray_60);}
+.pf_bar{display:block;position:relative;height:8px;margin:4px 0;border-radius:4px;background:var(--gray_10);}
+.pf_bar span{display:block;height:100%;border-radius:4px;background:var(--sec_70);}
+.pf_bar i{position:absolute;top:-4px;width:2px;height:16px;background:var(--dan_50);}
+.pf_pct{font-size:0.75rem;color:var(--gray_60);white-space:nowrap;}
+.pf_pct b{color:var(--gray_90);}
+
 /* 프로젝트 개요 종합 대시보드 (pm_docs) */
 .pm_dash{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:0 0 24px;}
 a.pm_card{display:flex;flex-direction:column;gap:4px;padding:14px 16px;border:1px solid var(--gray_20);border-radius:var(--radius_l);background:var(--gray_0);color:var(--gray_90);text-decoration:none;}
@@ -1550,6 +1566,7 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 
 /* ===== 데스크톱 (900px 이상) ===== */
 @media (min-width:900px){
+#content table.pf_table td.pf_prog{width:14%;}
 .mc_grid{grid-template-columns:repeat(3,1fr);}
 .mc_compare{grid-template-columns:repeat(2,1fr);}
 .pm_rounds{grid-template-columns:repeat(3,1fr);}

@@ -14,6 +14,7 @@ require_relative 'lib/pm_kit/status_suggest'
 require_relative 'lib/pm_kit/hooks'
 require_relative 'lib/pm_kit/sla'
 require_relative 'lib/pm_kit/report'
+require_relative 'lib/pm_kit/portfolio'
 
 Redmine::Plugin.register :pm_docs do
   name '산출물 관리'
@@ -72,6 +73,14 @@ Redmine::Plugin.register :pm_docs do
   menu :project_menu, :staff, { controller: 'pm_staffs', action: 'index' }, caption: :label_pm_staffs, param: :project_id
   menu :project_menu, :sec_scans, { controller: 'pm_sec_scans', action: 'index' }, caption: :label_pm_sec_scans, param: :project_id
   menu :project_menu, :pm_reports, { controller: 'pm_reports', action: 'index' }, caption: :label_pm_reports, param: :project_id
+end
+
+# 전체 프로젝트 현황 (PMO) — 상단 공통 메뉴 · 초기화면 메뉴
+Redmine::MenuManager.map :top_menu do |menu|
+  menu.push :pm_portfolio, { controller: 'pm_portfolio', action: 'index' }, caption: :label_pm_portfolio, after: :projects, if: ->(_) { User.current.logged? }
+end
+Redmine::MenuManager.map :application_menu do |menu|
+  menu.push :pm_portfolio, { controller: 'pm_portfolio', action: 'index' }, caption: :label_pm_portfolio, after: :projects, if: ->(_) { User.current.logged? }
 end
 
 unless Project.reflect_on_association(:pm_deliverables)
