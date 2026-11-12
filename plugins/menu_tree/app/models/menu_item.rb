@@ -12,6 +12,7 @@ class MenuItem < ApplicationRecord
   has_many :menu_item_issues, dependent: :delete_all
   has_many :issues, through: :menu_item_issues
   has_many :menu_role_accesses, dependent: :delete_all
+  has_many :menu_captures, dependent: :destroy
 
   serialize :extra, coder: JSON
 

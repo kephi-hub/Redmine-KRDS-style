@@ -1,0 +1,71 @@
+<%# 프로젝트 > 메뉴 구조도 > 화면 캡처 — 화면별 최신 캡처 %>
+<% can_run = User.current.allowed_to?(:manage_menu_captures, @project) %>
+<div class="contextual">
+  <% if can_run %>
+    <%= link_to sprite_icon('settings', l(:label_menu_capture_settings)), project_menu_captures_settings_path(@project, :site => @site&.id), :class => 'icon icon-settings' %>
+    <% if @cfg %>
+      <%= form_tag project_menu_captures_run_path(@project, :site => @site&.id), :class => 'st_inline' do %>
+        <%= content_tag(:button, sprite_icon('reload', l(:button_menu_capture_now)), :type => 'submit', :class => 'st_now', :disabled => @busy.present?, :data => { :confirm => l(:text_menu_capture_confirm, :count => @screens.count { |m| m.url.present? }) }) %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
+<h2><%= l(:label_menu_tree) %></h2>
+<%= menu_view_tabs(:captures) %>
+<%= render :partial => 'menu_items/site_bar', :locals => { :url => project_menu_captures_path(@project), :allow_all => false, :manage => false } %>
+<% if !MenuTree::Capture.available? %><p class="flash warning"><%= l(:error_menu_capture_no_chrome) %></p><% end %>
+<% if !@cfg %>
+  <p class="db_hintbox"><%= l(can_run ? :text_menu_capture_first : :text_menu_capture_none) %></p>
+<% else %>
+  <div class="mc_info">
+    <span><b><%= l(:field_menu_capture_base) %></b> <code><%= @cfg.base_url %></code></span>
+    <span><b><%= l(:label_menu_capture_login) %></b> <%= @cfg.login? ? l(:label_menu_capture_login_on, :user => @cfg.username) : l(:label_menu_capture_login_off) %></span>
+    <span><b><%= l(:field_menu_capture_schedule) %></b> <%= l("label_menu_capture_sch_#{@cfg.schedule}") %></span>
+    <span><b><%= l(:field_menu_capture_width) %></b> <%= @cfg.width %>px<%= " + #{l(:label_menu_capture_mobile)}" if @cfg.mobile %></span>
+  </div>
+  <% r = @busy || @run %>
+  <% if r %>
+    <p class="mc_run mc_<%= r.status %>" id="mc_run" data-busy="<%= r.busy? ? 1 : 0 %>">
+      <b><%= l("label_menu_capture_run_#{r.status}") %></b>
+      <%= format_time(r.started_at || r.created_at) %><% if r.user %> · <%= r.user %><% end %>
+      · <%= l(:label_menu_capture_progress, :done => r.ok + r.failed, :total => r.total, :ok => r.ok, :failed => r.failed, :changed => r.changed_count) %>
+      <% if r.error.present? %><br><span class="mc_err"><%= r.error %></span><% end %>
+    </p>
+  <% end %>
+<% end %>
+<% latest = @latest %>
+<ul class="mt_kpi db_stats">
+  <% [[nil, :label_menu_capture_k_screens, @screens.size], ['changed', :label_menu_capture_k_changed, @screens.count { |m| latest[m.id]&.changed_from_prev }],
+      ['error', :label_menu_capture_k_error, @screens.count { |m| latest[m.id] && !latest[m.id].ok? }], ['none', :label_menu_capture_k_none, @screens.count { |m| m.url.present? && !latest[m.id] }],
+      ['nourl', :label_menu_capture_k_nourl, @screens.count { |m| m.url.blank? }]].each do |f, label, n| %>
+    <li class="<%= 'on' if @filter == f %>"><%= link_to project_menu_captures_path(@project, :site => @site&.id, :filter => f) do %><span><%= l(label) %></span><strong class="<%= 'qa_fail' if f == 'error' && n.positive? %>"><%= n %></strong><% end %></li>
+  <% end %>
+</ul>
+<% if @list.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<ul class="mc_grid">
+  <% @list.each do |m| %>
+    <% c = latest[m.id] %>
+    <li class="mc_card<%= ' mc_bad' if c && !c.ok? %>">
+      <%= link_to project_menu_capture_path(@project, m), :class => 'mc_thumb' do %>
+        <% if c&.thumb %><%= image_tag project_menu_capture_image_path(@project, c, :thumb => 1), :alt => m.name, :loading => 'lazy' %>
+        <% else %><span class="mc_empty"><%= m.url.present? ? l(:label_menu_capture_k_none) : l(:label_menu_capture_k_nourl) %></span><% end %>
+      <% end %>
+      <div class="mc_meta">
+        <strong><%= m.name %></strong><% if m.screen_id %> <code><%= m.screen_id %></code><% end %>
+        <span class="mc_path"><%= m.path(@index, site: false) %></span>
+        <span class="mc_sub">
+          <% if c %><%= format_time(c.captured_at) %><% if c.changed_from_prev %> <span class="st_tag mc_chg"><%= l(:label_menu_capture_changed) %></span><% end %>
+            <% unless c.ok? %><br><span class="mc_err"><%= c.error %></span><% end %>
+          <% elsif m.url.present? %><code class="mc_url"><%= m.url %></code><% end %>
+        </span>
+      </div>
+    </li>
+  <% end %>
+</ul>
+<% end %>
+<% if (r = @busy) %>
+<%= javascript_tag do %>setTimeout(function() { location.reload(); }, 5000);<% end %>
+<% end %>
+<% html_title "#{l(:label_menu_view_captures)} - #{l(:label_menu_tree)}" %>

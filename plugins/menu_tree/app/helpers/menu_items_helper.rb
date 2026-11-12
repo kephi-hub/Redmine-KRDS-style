@@ -97,6 +97,7 @@ module MenuItemsHelper
     items = [[l(:label_menu_view_grid), project_menu_items_path(@project), :grid],
              [l(:label_menu_view_diagram), project_menu_items_diagram_path(@project), :diagram],
              [l(:label_menu_view_status), project_menu_items_status_path(@project), :status]]
+    items << [l(:label_menu_view_captures), project_menu_captures_path(@project), :captures] if User.current.allowed_to?(:view_menu_captures, @project)
     content_tag(:div, class: 'tabs') do
       content_tag(:ul, safe_join(items.map { |label, url, key| content_tag(:li, link_to(label, url, class: (key == current ? 'selected' : nil))) }))
     end

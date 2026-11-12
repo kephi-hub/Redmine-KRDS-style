@@ -1,0 +1,40 @@
+<%# 프로젝트 > 메뉴 구조도 > 화면 캡처 > 화면 하나 — 최신 캡처, 두 시점 비교, 이력 %>
+<% m = @menu %>
+<h2><%= link_to l(:label_menu_view_captures), project_menu_captures_path(@project, :site => m.menu_site_id) %> &#187; <%= m.name %><% if m.screen_id %> <code><%= m.screen_id %></code><% end %></h2>
+<p class="subtitle"><%= m.path(@index) %><% if m.url.present? %> · <code><%= m.url %></code><% end %> · <%= link_to l(:label_menu_capture_in_tree), project_menu_items_path(@project, :focus => m.id) %></p>
+<% if @captures.empty? %>
+  <p class="nodata"><%= l(:label_menu_capture_k_none) %></p>
+<% else %>
+  <% pcs = @captures.select { |c| c.kind == 'pc' && c.ok? } %>
+  <% if pcs.size > 1 %>
+  <%= form_tag project_menu_capture_path(@project, m), :method => :get, :class => 'qa_filter' do %>
+    <label><%= l(:label_menu_capture_compare) %></label>
+    <%= select_tag 'a', options_for_select(pcs.map { |c| [format_time(c.captured_at), c.id] }, @a&.id) %> ↔
+    <%= select_tag 'b', options_for_select(pcs.map { |c| [format_time(c.captured_at), c.id] }, @b&.id) %>
+    <%= submit_tag l(:button_apply), :name => nil %>
+  <% end %>
+  <% end %>
+  <div class="mc_compare">
+    <% [@a, (@b if pcs.size > 1)].compact.each do |c| %>
+      <figure>
+        <figcaption><%= format_time(c.captured_at) %> · <%= c.width %>×<%= c.height %><% if c.changed_from_prev %> <span class="st_tag mc_chg"><%= l(:label_menu_capture_changed) %></span><% end %>
+          · <%= link_to l(:label_menu_capture_original), project_menu_capture_image_path(@project, c), :target => '_blank', :rel => 'noopener' %>
+          · <%= link_to l(:label_menu_capture_download), project_menu_capture_image_path(@project, c, :download => 1) %></figcaption>
+        <%= link_to image_tag(project_menu_capture_image_path(@project, c), :alt => "#{m.name} #{format_time(c.captured_at)}"), project_menu_capture_image_path(@project, c), :target => '_blank', :rel => 'noopener' %>
+      </figure>
+    <% end %>
+    <% mob = @captures.find { |c| c.kind == 'mobile' && c.ok? } %>
+    <% if mob %><figure class="mc_mobile"><figcaption><%= l(:label_menu_capture_mobile) %> · <%= format_time(mob.captured_at) %></figcaption><%= image_tag project_menu_capture_image_path(@project, mob), :alt => "#{m.name} mobile" %></figure><% end %>
+  </div>
+  <h3 class="ag_sec"><%= l(:label_menu_capture_history) %></h3>
+  <div class="autoscroll"><table class="list pm_list">
+    <thead><tr><th><%= l(:label_menu_capture_at) %></th><th><%= l(:label_menu_capture_kind) %></th><th><%= l(:field_status) %></th><th>HTTP</th><th class="name"><%= l(:label_menu_capture_final) %></th><th></th></tr></thead>
+    <tbody><% @captures.each do |c| %><tr>
+      <td><%= format_time(c.captured_at) %><% if c.changed_from_prev %> <span class="st_tag mc_chg"><%= l(:label_menu_capture_changed) %></span><% end %></td>
+      <td><%= c.kind == 'pc' ? 'PC' : l(:label_menu_capture_mobile) %></td>
+      <td><%= c.ok? ? l(:label_menu_capture_ok) : content_tag(:span, c.error, :class => 'mc_err') %></td><td><%= c.http_status %></td>
+      <td class="name"><code><%= c.final_url %></code><% if c.title.present? %><br><span class="db_dim"><%= c.title %></span><% end %></td>
+      <td><% if c.file %><%= link_to l(:label_menu_capture_original), project_menu_capture_image_path(@project, c), :target => '_blank', :rel => 'noopener' %><% end %></td></tr><% end %></tbody>
+  </table></div>
+<% end %>
+<% html_title "#{m.name} - #{l(:label_menu_view_captures)}" %>

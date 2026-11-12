@@ -23,8 +23,16 @@ RUN set -eux; \
     apt-get purge -y --auto-remove unzip; \
     rm -rf /var/lib/apt/lists/*
 
-# DB 관리 플러그인의 gem(SSH 터널용 net-ssh 등)도 같은 단계에서 설치 — 실행 때는 같은 Gemfile 이 plugins/db_manage 로 마운트됨
+# 메뉴 구조도 화면 캡처: 헤드리스 크롬 + 한글 글꼴 (서버가 운영 화면을 열어 캡처)
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends chromium fonts-noto-cjk; \
+    rm -rf /var/lib/apt/lists/*
+ENV CHROME_PATH=/usr/bin/chromium
+
+# 플러그인 gem(DB 관리: SSH 터널용 net-ssh 등, 메뉴 구조도: 화면 캡처용 ferrum)도 같은 단계에서 설치 — 실행 때는 같은 Gemfile 이 마운트됨
 COPY plugins/db_manage/Gemfile plugins/db_manage/Gemfile
+COPY plugins/menu_tree/Gemfile plugins/menu_tree/Gemfile
 
 # Vault 의존 gem(iconv 등)은 네이티브 빌드가 필요 → 빌드 도구 잠깐 설치 후 제거
 # 공식 이미지와 동일하게 임시 database.yml 로 Gemfile.lock 의 DB 어댑터 구성을 유지

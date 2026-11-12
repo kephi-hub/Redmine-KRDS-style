@@ -3,6 +3,7 @@ class MenuSite < ApplicationRecord
   belongs_to :project
   has_many :menu_items, dependent: :restrict_with_error
   has_many :sys_roles, dependent: :nullify
+  has_many :menu_capture_configs, dependent: :destroy
 
   validates :name, presence: true, length: { maximum: 60 }, uniqueness: { scope: :project_id, case_sensitive: false }
   validates :code, length: { maximum: 20 }, format: { with: /\A[A-Za-z0-9_\-]*\z/ }

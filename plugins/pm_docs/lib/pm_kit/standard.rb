@@ -5,7 +5,7 @@ module PmKit
       ['start', 'S-01', '사업수행계획서', true, nil], ['start', 'S-02', '착수보고서', true, nil], ['start', 'S-03', 'WBS(일정계획)', true, 'wbs'],
       ['analysis', 'A-01', '요구사항 정의서·추적표', true, 'requirements'], ['analysis', 'A-02', '현행 시스템 분석서', false, nil],
       ['analysis', 'A-03', '인터페이스 정의서', true, 'interfaces'], ['analysis', 'A-04', '변경요청 관리대장', true, 'change_requests'],
-      ['design', 'D-01', '아키텍처 설계서', true, nil], ['design', 'D-02', '메뉴 구조도', true, 'menu_tree'], ['design', 'D-03', '화면 설계서', true, nil],
+      ['design', 'D-01', '아키텍처 설계서', true, nil], ['design', 'D-02', '메뉴 구조도', true, 'menu_tree'], ['design', 'D-03', '화면 설계서', true, 'screen_captures'],
       ['design', 'D-04', '시스템 권한 설계서', true, 'sys_roles'], ['design', 'D-05', '테이블 정의서', true, 'table_def'], ['design', 'D-06', 'ERD', true, 'erd'],
       ['design', 'D-07', '공통코드 정의서', true, 'common_code'], ['design', 'D-08', '용어사전', false, 'glossary'], ['design', 'D-09', '개인정보 처리 설계서', true, 'privacy'],
       ['design', 'D-10', '프로그램 목록', true, 'programs'], ['design', 'D-11', '배치 정의서', false, 'schedules'], ['design', 'D-12', '테스트 계획서·시나리오', true, 'test_cases'],

@@ -15,3 +15,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # 자산 만료 알림 메일 (만료 30·7·1일 전·당일·다음 날) — 관리 > 메일 서버에서 메일 발송을 켜야 보냄
 # 설치: /etc/cron.d/redmine_asset_notify 로 저장
 10 8 * * * root cd /root/redmine && docker compose exec -T -u redmine redmine sh -c 'SECRET_KEY_BASE=$REDMINE_SECRET_KEY_BASE bundle exec rake redmine:ops_asset:notify' >> /var/log/redmine_asset_notify.log 2>&1
+
+# 메뉴 구조도 화면 캡처: 캡처 설정의 자동 캡처가 매일·매주(월)인 사이트를 새벽 4시에 캡처
+# 설치: /etc/cron.d/redmine_capture 로 저장 후 chmod 600
+0 4 * * * root cd /root/redmine && docker compose exec -T -u redmine redmine sh -c 'SECRET_KEY_BASE=$REDMINE_SECRET_KEY_BASE bundle exec rake redmine:menu_tree:capture' >> /var/log/redmine_capture.log 2>&1

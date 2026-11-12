@@ -1,0 +1,49 @@
+<%# 프로젝트 > 메뉴 구조도 > 화면 캡처 > 설정 — 기본 주소 · 로그인 정보(암호화) · 크기 · 예약 %>
+<h2><%= link_to l(:label_menu_view_captures), project_menu_captures_path(@project, :site => @site&.id) %> &#187; <%= l(:label_menu_capture_settings) %><% if @site %> · <%= @site.name %><% end %></h2>
+<p class="subtitle"><%= l(:text_menu_capture_settings) %></p>
+<% if @test %>
+  <div class="flash <%= @test[:ok] ? 'notice' : 'error' %>"><%= @test[:message] %></div>
+  <% if @test[:image] %><p class="mc_login"><%= image_tag project_menu_capture_image_path(@project, 'login', :cfg => @cfg.id, :t => Time.now.to_i), :alt => l(:label_menu_capture_test) %></p><% end %>
+<% end %>
+<%= labelled_form_for @cfg, :url => project_menu_captures_settings_path(@project, :site => @site&.id), :method => :post do |f| %>
+  <%= error_messages_for @cfg %>
+  <div class="box tabular">
+    <p><%= f.text_field :base_url, :size => 60, :required => true, :placeholder => 'https://www.sample.go.kr', :label => :field_menu_capture_base %>
+      <em class="info"><%= l(:text_menu_capture_base) %></em></p>
+    <h3 class="ag_sec"><%= l(:label_menu_capture_login) %></h3>
+    <p><%= f.text_field :login_url, :size => 60, :placeholder => 'https://www.sample.go.kr/member/login.do', :label => :field_menu_capture_login_url %>
+      <em class="info"><%= l(:text_menu_capture_login_url) %></em></p>
+    <p><%= f.text_field :username, :size => 30, :autocomplete => 'off', :label => :field_menu_capture_username %></p>
+    <p><label for="menu_capture_config_password"><%= l(:field_menu_capture_password) %></label>
+      <%= password_field_tag 'menu_capture_config[password]', '', :id => 'menu_capture_config_password', :size => 30, :autocomplete => 'new-password', :placeholder => (@cfg.password_enc.present? ? l(:label_menu_capture_pw_saved) : '') %>
+      <% if @cfg.password_enc.present? %><label class="inline"><%= check_box_tag 'clear_password', '1', false %> <%= l(:label_menu_capture_pw_clear) %></label><% end %>
+      <em class="info"><%= l(:text_menu_capture_password) %></em></p>
+    <details class="mc_adv" <%= 'open' if @cfg.user_selector.present? || @cfg.pass_selector.present? || @cfg.submit_selector.present? || @cfg.check_selector.present? %>>
+      <summary><%= l(:label_menu_capture_selectors) %></summary>
+      <p><%= f.text_field :user_selector, :size => 50, :placeholder => '#userId', :label => :field_menu_capture_user_sel %></p>
+      <p><%= f.text_field :pass_selector, :size => 50, :placeholder => '#userPw', :label => :field_menu_capture_pass_sel %></p>
+      <p><%= f.text_field :submit_selector, :size => 50, :placeholder => 'button.btn_login', :label => :field_menu_capture_submit_sel %></p>
+      <p><%= f.text_field :check_selector, :size => 50, :placeholder => '.btn_logout', :label => :field_menu_capture_check_sel %>
+        <em class="info"><%= l(:text_menu_capture_selectors) %></em></p>
+    </details>
+    <h3 class="ag_sec"><%= l(:label_menu_capture_options) %></h3>
+    <p><%= f.number_field :width, :min => 320, :max => 2560, :label => :field_menu_capture_width %> px</p>
+    <p><%= f.check_box :mobile, :label => :field_menu_capture_mobile %><em class="info"><%= l(:text_menu_capture_mobile) %></em></p>
+    <p><%= f.number_field :wait_ms, :min => 0, :max => 30000, :step => 500, :label => :field_menu_capture_wait %> ms<em class="info"><%= l(:text_menu_capture_wait) %></em></p>
+    <p><%= f.number_field :max_height, :min => 900, :max => 30000, :step => 1000, :label => :field_menu_capture_max_height %> px</p>
+    <p><%= f.number_field :keep, :min => 1, :max => 100, :label => :field_menu_capture_keep %><em class="info"><%= l(:text_menu_capture_keep) %></em></p>
+    <p><%= f.select :schedule, MenuCaptureConfig::SCHEDULES.map { |s| [l("label_menu_capture_sch_#{s}"), s] }, { :label => :field_menu_capture_schedule } %>
+      <em class="info"><%= l(:text_menu_capture_schedule) %></em></p>
+    <p><%= f.check_box :only_active, :label => :field_menu_capture_only_active %></p>
+  </div>
+  <p class="form_btns">
+    <%= link_to l(:button_cancel), project_menu_captures_path(@project, :site => @site&.id), :class => 'btn_line' %>
+    <% if @cfg.persisted? && @cfg.login? %><button type="submit" formaction="<%= project_menu_captures_test_path(@project, :site => @site&.id) %>" class="btn_line" id="mc_test"><%= l(:label_menu_capture_test) %></button><% end %>
+    <%= submit_tag l(:button_save) %>
+  </p>
+<% end %>
+<p class="mt_dim"><%= l(:text_menu_capture_privacy) %></p>
+<%= javascript_tag do %>
+$(function() { $('#mc_test').on('click', function() { var $b = $(this); setTimeout(function() { $b.prop('disabled', true).text(<%= raw l(:label_menu_capture_testing).to_json %>); }, 0); }); });
+<% end %>
+<% html_title l(:label_menu_capture_settings) %>

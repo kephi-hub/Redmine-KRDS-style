@@ -1211,6 +1211,34 @@ button.sr_cell:disabled{cursor:default;}
 #content table.sr_matrix th.role{font-size:0.8125rem;}
 .sr_down{width:22px;height:22px;padding:0;margin:0 0 0 6px;border:1px solid var(--gray_30);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.75rem;color:var(--gray_60);cursor:pointer;}
 .sr_down:hover{border-color:var(--pri_50);color:var(--pri_60);}
+/* 메뉴 구조도 화면 캡처 (menu_tree) */
+.mc_info{display:flex;flex-wrap:wrap;gap:6px 20px;padding:12px 16px;margin:0 0 12px;border:1px solid var(--gray_20);border-radius:var(--radius_l);background:var(--gray_5);font-size:0.875rem;}
+.mc_info code{word-break:break-all;}
+.mc_run{padding:10px 14px;margin:0 0 16px;border-left:4px solid var(--pri_50);border-radius:var(--radius_m);background:var(--pri_5);font-size:0.875rem;}
+.mc_run.mc_done{border-left-color:var(--suc_60);background:var(--suc_5);}
+.mc_run.mc_failed{border-left-color:var(--dan_50);background:var(--dan_5);}
+.mc_err{color:var(--dan_60);}
+.mc_grid{display:grid;grid-template-columns:1fr;gap:12px;padding:0;margin:0;list-style:none;}
+.mc_card{display:flex;flex-direction:column;border:1px solid var(--gray_20);border-radius:var(--radius_l);background:var(--gray_0);overflow:hidden;}
+.mc_card.mc_bad{border-color:var(--dan_10);}
+a.mc_thumb{display:flex;align-items:flex-start;justify-content:center;height:200px;border-bottom:1px solid var(--gray_10);background:var(--gray_5);overflow:hidden;}
+a.mc_thumb img{width:100%;height:auto;}
+.mc_empty{align-self:center;font-size:0.875rem;color:var(--gray_50);}
+.mc_meta{display:flex;flex-direction:column;gap:2px;padding:10px 12px;font-size:0.8125rem;}
+.mc_meta strong{font-size:0.9375rem;color:var(--gray_90);}
+.mc_path{color:var(--gray_60);}
+.mc_sub{color:var(--gray_50);}
+.mc_url{word-break:break-all;}
+.st_tag.mc_chg{background:var(--war_5);color:var(--war_60);}
+.mc_adv{margin:8px 0;}
+.mc_adv summary{cursor:pointer;font-weight:700;color:var(--sec_80);}
+.mc_login img{max-width:100%;border:1px solid var(--gray_20);}
+.mc_compare{display:grid;grid-template-columns:1fr;gap:16px;margin:0 0 20px;}
+.mc_compare figure{margin:0;}
+.mc_compare figcaption{margin:0 0 6px;font-size:0.8125rem;color:var(--gray_60);}
+.mc_compare img{max-width:100%;border:1px solid var(--gray_20);}
+.mc_compare .mc_mobile img{max-width:390px;}
+
 /* KRDS 모달 — alert·confirm 대신 (theme.js KrdsDialog). KRDS 규격: 작은 크기 400px, 모서리 12px, 화면 어둡게 75% */
 html.kd_open,html.kd_open body{overflow:hidden;}
 .kd_modal{display:flex;position:fixed;top:0;right:0;bottom:0;left:0;z-index:10010;align-items:center;justify-content:center;padding:12px;}
@@ -1516,6 +1544,8 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 
 /* ===== 데스크톱 (900px 이상) ===== */
 @media (min-width:900px){
+.mc_grid{grid-template-columns:repeat(3,1fr);}
+.mc_compare{grid-template-columns:repeat(2,1fr);}
 .pm_rounds{grid-template-columns:repeat(3,1fr);}
 .pm_dash{grid-template-columns:repeat(4,1fr);}
 .kd_title{padding:56px 40px 0;font-size:1.5rem;}
@@ -1631,6 +1661,7 @@ table.list.db_list tr.db_row>td.name,table.list.db_cols tr.db_col>td.name{white-
 
 /* ===== 넓은 화면 (1200px 이상) ===== */
 @media (min-width:1200px){
+.mc_grid{grid-template-columns:repeat(4,1fr);}
 .pmod_grid{grid-template-columns:repeat(3,1fr);}
 #main-menu{padding:0 16px;}
 #main-menu .gnb_trigger{padding:0 16px;}

@@ -10,12 +10,14 @@ require_relative 'lib/menu_tree/sheet'
 require_relative 'lib/menu_tree/stats'
 require_relative 'lib/menu_tree/hooks'
 require_relative 'lib/menu_tree/issue_query_patch'
+require_relative 'lib/menu_tree/capture'
+require_relative 'lib/menu_tree/capture_job'
 
 Redmine::Plugin.register :menu_tree do
   name '메뉴 구조도'
   author 'kephi-hub'
-  description '메뉴 구조도(사이트별 · 엑셀형 편집·일감 연결·구조도·현황)와 시스템 권한 매트릭스'
-  version '1.2.0'
+  description '메뉴 구조도(사이트별 · 엑셀형 편집·일감 연결·구조도·현황·화면 캡처)와 시스템 권한 매트릭스'
+  version '1.3.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
 
@@ -23,6 +25,9 @@ Redmine::Plugin.register :menu_tree do
     permission :view_menu_tree, { menu_items: [:index, :data, :diagram, :status, :export] }, read: true
     permission :manage_menu_tree, { menu_items: [:create, :update, :move, :destroy, :import, :issues],
                                     menu_columns: [:create, :update, :destroy], menu_sites: [:create, :update, :destroy] }, require: :member
+    # 화면 캡처: 보기는 메뉴 구조도 보기, 설정·실행(로그인 정보 포함)은 따로
+    permission :view_menu_captures, { menu_captures: [:index, :show, :image] }, read: true
+    permission :manage_menu_captures, { menu_captures: [:settings, :save_settings, :test_login, :run] }, require: :member
   end
   project_module :sys_roles do
     permission :view_sys_roles, { sys_roles: [:index, :matrix, :export] }, read: true
@@ -45,6 +50,9 @@ unless Project.reflect_on_association(:menu_roots)
   Project.has_many :menu_roots, -> { where(parent_id: nil) }, class_name: 'MenuItem', dependent: :destroy
   Project.has_many :menu_columns, dependent: :delete_all
   Project.has_many :menu_sites, dependent: :delete_all
+  Project.has_many :menu_capture_configs, dependent: :delete_all
+  Project.has_many :menu_capture_runs, dependent: :delete_all
+  Project.has_many :menu_captures, dependent: :destroy
   Project.has_many :sys_roles, dependent: :destroy
 end
 IssueQuery.prepend(MenuTree::IssueQueryPatch) unless IssueQuery.ancestors.include?(MenuTree::IssueQueryPatch)

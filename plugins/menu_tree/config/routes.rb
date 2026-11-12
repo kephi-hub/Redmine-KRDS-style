@@ -7,6 +7,14 @@ resources :projects, only: [] do
   get 'menus/diagram', to: 'menu_items#diagram', as: 'menu_items_diagram'
   get 'menus/status', to: 'menu_items#status', as: 'menu_items_status'
   get 'menus/export', to: 'menu_items#export', as: 'menu_items_export'
+  # 화면 캡처 (고정 주소를 :id 보다 먼저)
+  get 'menus/captures', to: 'menu_captures#index', as: 'menu_captures'
+  get 'menus/captures/settings', to: 'menu_captures#settings', as: 'menu_captures_settings'
+  post 'menus/captures/settings', to: 'menu_captures#save_settings'
+  post 'menus/captures/test', to: 'menu_captures#test_login', as: 'menu_captures_test'
+  post 'menus/captures/run', to: 'menu_captures#run', as: 'menu_captures_run'
+  get 'menus/captures/image/:id', to: 'menu_captures#image', as: 'menu_capture_image', constraints: { id: /\d+|login/ }
+  get 'menus/captures/:id', to: 'menu_captures#show', as: 'menu_capture', constraints: { id: /\d+/ }
   match 'menus/import', to: 'menu_items#import', via: [:get, :post], as: 'menu_items_import'
   post 'menus/issues', to: 'menu_items#issues', as: 'menu_items_issues'
   patch 'menus/:id', to: 'menu_items#update', as: 'menu_item', constraints: { id: /\d+/ }

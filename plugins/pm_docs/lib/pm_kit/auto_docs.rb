@@ -8,6 +8,33 @@ module PmKit
       project.module_enabled?(name)
     end
 
+    # 화면 설계서: 화면마다 최신 PC(·모바일) 캡처 PNG + 화면목록.xlsx — 사이트·1뎁스 폴더
+    def screen_captures(p)
+      ordered = MenuItem.ordered(p)
+      index = ordered.to_h { |m, _| [m.id, m] }
+      screens = MenuItem.screens(ordered)
+      caps = MenuCapture.ok.where(menu_item_id: screens.map(&:id)).order(captured_at: :desc).to_a.group_by { |c| [c.menu_item_id, c.kind] }.transform_values(&:first)
+      clean = ->(t) { t.to_s.gsub(%r{[\\/:*?"<>|]+}, '_').strip.truncate(60, omission: '') }
+      files = []
+      rows = screens.each_with_index.map do |m, i|
+        root = m.parent_id ? (x = m; x = index[x.parent_id] while x.parent_id && index[x.parent_id]; x) : m
+        folder = [m.site_label, root.name].compact.map(&clean).join('/')
+        names = %w(pc mobile).filter_map do |k|
+          c = caps[[m.id, k]]
+          next unless c&.path && File.file?(c.path)
+          name = "화면설계서/#{folder}/#{format('%03d', i + 1)}_#{clean.(m.screen_id || m.name)}#{'_모바일' if k == 'mobile'}.png"
+          files << [name, File.binread(c.path)]
+          name
+        end
+        pc = caps[[m.id, 'pc']]
+        [i + 1, m.site_label, m.screen_id, m.path(index, site: false), m.url, MenuTree::Sheet::TYPE_LABELS[m.screen_type], m.in_menu? ? 'Y' : 'N',
+         pc&.captured_at&.strftime('%Y-%m-%d %H:%M'), names.join("\n").presence || '캡처 없음']
+      end
+      list = KrdsUi::Xlsx.build([{ name: '화면 목록', header: %w(번호 사이트 화면\ ID 메뉴\ 경로 URL 화면\ 유형 메뉴\ 노출 캡처\ 일시 파일), rows: rows,
+                                   widths: [6, 14, 16, 40, 40, 10, 8, 16, 60] }])
+      [["화면설계서/화면목록_#{today}.xlsx", list]] + files
+    end
+
     def today
       User.current.today.strftime('%Y%m%d')
     end
@@ -129,6 +156,9 @@ module PmKit
                    generate: ->(p) { [["이슈위험관리대장_#{today}.xlsx", PmKit::Sheet.risks(PmRisk.where(project_id: p.id).includes(:owner).order(:code).to_a)]] } },
       'meetings' => { label: '회의록 모음', available: ->(p) { mod?(p, :meetings) },
                       generate: ->(p) { [["회의록모음_#{today}.xlsx", PmKit::Sheet.meetings(PmMeeting.where(project_id: p.id).order(:held_at).to_a)]] } },
+      'screen_captures' => { label: '화면 설계서 (운영 화면 캡처)',
+                             available: ->(p) { defined?(MenuCapture) && mod?(p, :menu_tree) && MenuCapture.where(project_id: p.id).exists? },
+                             generate: ->(p) { PmKit::AutoDocs.screen_captures(p) } },
       'audits' => { label: '감리 시정조치 계획·결과', available: ->(p) { mod?(p, :audits) },
                     generate: ->(p) { [["감리시정조치_#{today}.xlsx", PmKit::Sheet.audits(PmAudit.where(project_id: p.id).includes(:owner, :pm_audit_round, :pm_deliverable).sorted.to_a)]] } },
       'staff' => { label: '투입인력 현황', available: ->(p) { mod?(p, :staff) },

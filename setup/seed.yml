@@ -138,6 +138,8 @@ roles:
   - view_deploys
   - view_glossary
   - view_menu_tree
+  - view_menu_captures
+  - manage_menu_captures
   - view_sys_roles
   - manage_menu_tree
   - manage_sys_roles
@@ -269,6 +271,7 @@ roles:
   - view_deploys
   - view_glossary
   - view_menu_tree
+  - view_menu_captures
   - view_sys_roles
   - manage_menu_tree
   - manage_sys_roles
@@ -356,6 +359,7 @@ roles:
   - view_deploys
   - view_glossary
   - view_menu_tree
+  - view_menu_captures
   - view_sys_roles
   - manage_menu_tree
   - view_qa_requirements
@@ -425,6 +429,7 @@ roles:
   - view_deploys
   - view_glossary
   - view_menu_tree
+  - view_menu_captures
   - view_sys_roles
   - view_qa_requirements
   - view_qa_tests
