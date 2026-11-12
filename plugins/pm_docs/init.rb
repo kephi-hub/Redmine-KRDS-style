@@ -9,6 +9,9 @@ require_relative 'lib/pm_kit/standard'
 require_relative 'lib/pm_kit/package'
 require_relative 'lib/pm_kit/suggest'
 require_relative 'lib/pm_kit/importer'
+require_relative 'lib/pm_kit/dashboard'
+require_relative 'lib/pm_kit/status_suggest'
+require_relative 'lib/pm_kit/hooks'
 
 Redmine::Plugin.register :pm_docs do
   name '산출물 관리'
@@ -31,7 +34,7 @@ Redmine::Plugin.register :pm_docs do
   end
   project_module :programs do
     permission :view_programs, { pm_programs: [:index, :show, :export] }, read: true
-    permission :manage_programs, { pm_programs: [:new, :create, :edit, :update, :destroy, :from_menus, :suggest, :import] }, require: :member
+    permission :manage_programs, { pm_programs: [:new, :create, :edit, :update, :destroy, :from_menus, :suggest, :status_suggest, :import] }, require: :member
   end
   project_module :meetings do
     permission :view_meetings, { pm_meetings: [:index, :show] }, read: true

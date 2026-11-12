@@ -1,0 +1,17 @@
+<%# 프로젝트 개요 — 종합 대시보드 (PmKit::Dashboard) %>
+<% cards = PmKit::Dashboard.cards(project, User.current, self) %>
+<% if cards.any? %>
+<section class="pm_dash" id="pm_dash" aria-label="<%= l(:label_pm_dashboard) %>">
+  <% cards.each do |c| %>
+    <%= link_to c[:url], :class => "pm_card#{" #{c[:tone]}" if c[:tone]}", :data => { :k => c[:key] } do %>
+      <span class="pm_ctit"><%= c[:title] %></span>
+      <strong class="pm_cval"><%= c[:value] %></strong>
+      <% if c[:ratio] %><span class="pm_cbar"><span style="width:<%= c[:ratio].to_i.clamp(0, 100) %>%"></span></span><% end %>
+      <span class="pm_csub"><%= safe_join(c[:sub].map { |x| content_tag(:span, x) }) %></span>
+    <% end %>
+  <% end %>
+</section>
+<%= javascript_tag do %>
+$(function() { var $d = $('#pm_dash'), $s = $d.closest('.splitcontent'); if ($s.length) $d.insertBefore($s); });
+<% end %>
+<% end %>

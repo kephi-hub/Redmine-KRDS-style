@@ -116,6 +116,24 @@ class PmProgramsController < ApplicationController
     redirect_to project_pm_programs_path(@project)
   end
 
+  # 상태 제안: GET 목록, POST 고른 것 반영 (apply[프로그램 id] = 새 상태)
+  def status_suggest
+    if request.post?
+      input = params[:apply].respond_to?(:to_unsafe_h) ? params[:apply].to_unsafe_h : {}
+      n = 0
+      PmProgram.where(project_id: @project.id, id: input.keys.map(&:to_i)).each do |p|
+        st = input[p.id.to_s].to_s
+        next unless %w(dev tested).include?(st)
+        attrs = { status: st }
+        attrs[:done_on] = User.current.today if st == 'tested' && p.done_on.nil?
+        n += 1 if p.update(attrs)
+      end
+      flash[:notice] = l(:notice_pm_status_applied, count: n)
+      return redirect_to(project_pm_programs_path(@project))
+    end
+    @suggestions = PmKit::StatusSuggest.run(@project)
+  end
+
   # 소스 경로 추천: GET 목록, POST 고른 것 반영 (paths[프로그램 id][] )
   def suggest
     if request.post?

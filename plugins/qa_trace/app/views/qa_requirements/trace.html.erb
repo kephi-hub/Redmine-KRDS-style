@@ -5,7 +5,7 @@
 <% else %>
 <div class="autoscroll">
 <table class="list qa_trace">
-  <thead><tr><th><%= l(:label_qa_code) %></th><th class="name"><%= l(:label_qa_name) %></th><th><%= l(:field_status) %></th><% if @menus_on %><th><%= l(:label_qa_menus) %></th><% end %><th><%= l(:label_qa_issues) %></th><th><%= l(:label_qa_cases) %></th><th><%= l(:label_qa_risk) %></th></tr></thead>
+  <thead><tr><th><%= l(:label_qa_code) %></th><th class="name"><%= l(:label_qa_name) %></th><th><%= l(:field_status) %></th><% if @menus_on %><th><%= l(:label_qa_menus) %></th><% end %><% if (progs_on = QaTrace::Trace.programs_on?(@project)) %><th><%= l(:label_qa_programs) %></th><% end %><th><%= l(:label_qa_issues) %></th><th><%= l(:label_qa_cases) %></th><th><%= l(:label_qa_risk) %></th></tr></thead>
   <tbody>
   <% @reqs.each do |r| %>
     <% i = @info[r.id] %>
@@ -15,6 +15,11 @@
       <td class="status"><%= qa_status_badge(r.status) %></td>
       <% if @menus_on %>
       <td class="menus"><% if i[:menus].any? %><ul class="qa_cell"><% i[:menus].each do |m| %><li><%= link_to m.path(i[:menu_index]), project_menu_items_path(@project, :focus => m.id) %><% if m.screen_id %> <code><%= m.screen_id %></code><% end %></li><% end %></ul><% else %><span class="mt_dim">-</span><% end %></td>
+      <% end %>
+      <% if progs_on %>
+      <td class="progs"><% ps = i[:programs] || [] %><% if ps.any? %><span class="qa_pdone"><%= l(:label_qa_prog_done, :done => i[:programs_done], :total => ps.size) %></span>
+        <ul class="qa_cell"><% ps.first(6).each do |p| %><li class="<%= 'qa_closed' if %w(done tested).include?(p.status) %>"><%= link_to p.code, project_pm_program_path(@project, p), :title => p.name %></li><% end %><% if ps.size > 6 %><li class="mt_dim">+<%= ps.size - 6 %></li><% end %></ul>
+        <% else %><span class="mt_dim">-</span><% end %></td>
       <% end %>
       <td class="issues"><% if i[:issues].any? %><ul class="qa_cell"><% i[:issues].each do |x| %><li class="<%= 'qa_closed' if x.closed? %>"><%= link_to "##{x.id}", issue_path(x), :title => x.subject %> <span class="mt_dim"><%= x.status.name %></span></li><% end %></ul><% else %><span class="mt_dim">-</span><% end %></td>
       <td class="cases"><% if i[:cases].any? %><ul class="qa_cell"><% i[:cases].each do |c| %><% res = i[:results][c.id] %><li><%= link_to c.code, project_qa_test_case_path(@project, c), :title => c.name %> <%= qa_result_badge(res&.result || 'none', res&.retest?) %></li><% end %></ul><% else %><span class="mt_dim">-</span><% end %></td>

@@ -1,0 +1,25 @@
+<%# 프로그램 > 상태 제안 — 커밋·테스트 결과로 상태를 제안, 골라서 반영 (PmKit::StatusSuggest) %>
+<h2><%= link_to l(:label_pm_programs), project_pm_programs_path(@project) %> &#187; <%= l(:label_pm_status_suggest) %></h2>
+<p class="subtitle"><%= l(:text_pm_status_suggest) %></p>
+<% if @suggestions.empty? %>
+  <p class="nodata"><%= l(:text_pm_no_status_suggest) %></p>
+<% else %>
+<%= form_tag(project_pm_programs_status_suggest_path(@project)) do %>
+  <div class="autoscroll"><table class="list pm_list">
+    <thead><tr><th></th><th><%= l(:label_pm_prog_code) %></th><th class="name"><%= l(:label_pm_prog_name) %></th><th><%= l(:field_status) %></th><th class="name"><%= l(:label_pm_reason) %></th></tr></thead>
+    <tbody>
+    <% @suggestions.each do |p, st, reason| %>
+      <tr>
+        <td><%= check_box_tag "apply[#{p.id}]", st, true, :id => "pm_ss_#{p.id}", :'aria-label' => p.code %></td>
+        <td class="code"><%= link_to p.code, project_pm_program_path(@project, p) %></td>
+        <td class="name"><%= p.name %></td>
+        <td><%= pm_badge(pm_label('pstatus', p.status), p.status) %> → <%= pm_badge(pm_label('pstatus', st), st) %></td>
+        <td class="name"><%= reason %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table></div>
+  <p class="form_btns"><%= link_to l(:button_cancel), project_pm_programs_path(@project), :class => 'btn_line' %><%= submit_tag l(:label_pm_apply_status) %></p>
+<% end %>
+<% end %>
+<% html_title l(:label_pm_status_suggest) %>

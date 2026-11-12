@@ -18,6 +18,7 @@ resources :projects, only: [] do
   end
   post 'programs/from_menus', to: 'pm_programs#from_menus', as: 'pm_programs_from_menus'
   match 'programs/suggest', to: 'pm_programs#suggest', via: [:get, :post], as: 'pm_programs_suggest'
+  match 'programs/status_suggest', to: 'pm_programs#status_suggest', via: [:get, :post], as: 'pm_programs_status_suggest'
   get 'programs/export', to: 'pm_programs#export', as: 'pm_programs_export'
   match 'programs/import', to: 'pm_programs#import', via: [:get, :post], as: 'pm_programs_import'
   resources :pm_programs, path: 'programs'

@@ -1,4 +1,11 @@
 en:
+  label_pm_dashboard: "Project status"
+  label_pm_status_suggest: "Status suggestions"
+  label_pm_reason: "Reason"
+  label_pm_apply_status: "Apply selected"
+  text_pm_status_suggest: "Suggests program status from commits and test results."
+  text_pm_no_status_suggest: "No suggestions."
+  notice_pm_status_applied: "Updated %{count} programs."
   project_module_deliverables: Deliverables
   project_module_change_requests: Change requests
   project_module_programs: Programs

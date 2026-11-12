@@ -20,7 +20,8 @@
     <%= link_to l(:label_pm_by_screen), project_pm_programs_from_menus_path(@project, :mode => 'screen'), :method => :post, :class => 'pm_mk', :data => { :confirm => l(:text_pm_from_menus) } %>
     <%= link_to l(:label_pm_by_func), project_pm_programs_from_menus_path(@project, :mode => 'function'), :method => :post, :class => 'pm_mk', :data => { :confirm => l(:text_pm_from_menus_func) } %><% end %>
   <% if can_edit %>
-    · <%= link_to l(:label_pm_suggest), project_pm_programs_suggest_path(@project) %><% end %></p>
+    · <%= link_to l(:label_pm_suggest), project_pm_programs_suggest_path(@project) %>
+    · <%= link_to l(:label_pm_status_suggest), project_pm_programs_status_suggest_path(@project) %><% end %></p>
 <% if @by_dev.size > 1 %>
   <ul class="db_tags"><% @by_dev.each do |u, n, d| %><li><%= link_to (u ? u.name : l(:label_pm_no_dev)), project_pm_programs_path(@project, :developer_id => u&.id) %> <span><%= d %>/<%= n %></span></li><% end %></ul>
 <% end %>

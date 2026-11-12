@@ -18,7 +18,8 @@ module QaTrace
       project.module_enabled?(:menu_tree)
     end
 
-    # { 요구사항 id => { menus:, issues:, issues_closed:, cases:, results:, pass:, fail:, untested:, state:, risks: } }
+    # { 요구사항 id => { menus:, programs:, programs_done:, issues:, issues_closed:, cases:, results:, pass:, fail:, untested:, state:, risks: } }
+    # 프로그램: 요구사항 메뉴(하위 포함)에 연결된 프로그램 목록(pm_docs)의 프로그램
     def build(project, reqs, latest = nil)
       ids = reqs.map(&:id)
       menus = menus_on?(project) ? MenuItem.where(project_id: project.id).to_a : []
@@ -32,6 +33,7 @@ module QaTrace
       by_menu = cases.group_by(&:menu_item_id)
       direct = pairs(QaCaseRequirement.where(qa_requirement_id: ids).pluck(:qa_requirement_id, :qa_test_case_id))
       latest ||= latest_results(project)
+      progs = programs_on?(project) ? PmProgram.where(project_id: project.id).where.not(menu_item_id: nil).to_a.group_by(&:menu_item_id) : nil
       reqs.to_h do |r|
         mids = (req_menus[r.id] || []).select { |m| index[m] }
         all_mids = mids.flat_map { |m| [m] + index[m].descendant_ids(by_parent) }.uniq
@@ -42,6 +44,11 @@ module QaTrace
         info = { menus: mids.map { |m| index[m] }, menu_index: index, issues: is, issues_closed: is.count(&:closed?), cases: cs,
                  results: results, pass: res.count('pass'), fail: res.count('fail'), untested: res.count('none'),
                  skip: res.count('skip') }
+        if progs
+          ps = all_mids.flat_map { |m| progs[m] || [] }.uniq.sort_by(&:code)
+          info[:programs] = ps
+          info[:programs_done] = ps.count { |p| %w(done tested).include?(p.status) }
+        end
         info[:state] = state(info)
         info[:risks] = risks(r, info)
         [r.id, info]
@@ -65,6 +72,7 @@ module QaTrace
       return(info[:issues].any? { |i| !i.closed? } ? %w(deleted_open) : []) if req.deleted?
       out = []
       out << 'no_menu' if info[:menus].empty?
+      out << 'no_prog' if info[:programs] && info[:menus].any? && info[:programs].empty?
       out << 'no_test' if info[:cases].empty?
       out << 'fail' if info[:fail].positive?
       out

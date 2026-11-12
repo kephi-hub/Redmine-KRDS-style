@@ -1,4 +1,11 @@
 ko:
+  label_pm_dashboard: 프로젝트 현황
+  label_pm_status_suggest: 상태 제안
+  label_pm_reason: 근거
+  label_pm_apply_status: 고른 것 반영
+  text_pm_status_suggest: 커밋과 테스트 결과로 프로그램 상태를 제안합니다. 미착수인데 커밋이 있으면(커밋 메시지에 프로그램 ID, 또는 바뀐 파일이 소스 경로) 개발 중, 연결된 테스트 케이스가 모두 합격이면 단위테스트 완료. 골라서 반영하세요.
+  text_pm_no_status_suggest: 제안할 상태 변경이 없습니다.
+  notice_pm_status_applied: "%{count}개 프로그램의 상태를 바꿨습니다."
   project_module_deliverables: 산출물
   project_module_change_requests: 변경요청
   project_module_programs: 프로그램 목록
