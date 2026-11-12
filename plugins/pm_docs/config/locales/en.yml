@@ -6,7 +6,8 @@ en:
   project_module_risks: Issues & risks
   label_pm_deliverables: Deliverables
   label_pm_crs: Change requests
-  label_pm_actions: "Actions"
+  label_pm_paction: "Actions"
+  label_pm_actions: "Follow-up actions"
   label_pm_by_screen: "[per screen]"
   label_pm_by_func: "[per function]"
   label_pm_no_menu: "No menu"

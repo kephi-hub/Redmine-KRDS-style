@@ -172,7 +172,7 @@ ko:
   label_pm_planned: 계획일
   label_pm_done_on: 완료일
   label_pm_no_dev: 개발자 없음
-  label_pm_actions: 처리 구분
+  label_pm_paction: 처리 구분
   label_pm_by_screen: "[화면 단위]"
   label_pm_by_func: "[기능 단위]"
   label_pm_no_menu: 메뉴 없음

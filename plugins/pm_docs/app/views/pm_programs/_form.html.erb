@@ -3,7 +3,7 @@
   <p><%= f.text_field :code, :required => true, :size => 24, :maxlength => 60, :placeholder => 'MB-CUS-001', :label => :label_pm_prog_code %></p>
   <p><%= f.text_field :name, :required => true, :size => 50, :maxlength => 150, :label => :label_pm_prog_name %></p>
   <p><%= f.select :kind, pm_options('pkind', PmProgram::KINDS), { :label => :label_pm_kind } %></p>
-  <p><label><%= l(:label_pm_actions) %></label>
+  <p><label><%= l(:label_pm_paction) %></label>
     <%= hidden_field_tag 'pm_program[action_list][]', '', :id => nil %>
     <span class="pm_acts"><% PmProgram::ACTIONS.each do |a| %><label class="ag_chip"><%= check_box_tag 'pm_program[action_list][]', a, @program.action_list.include?(a), :id => "pm_act_#{a}" %><span><%= pm_label('paction', a) %></span></label><% end %></span>
     <em class="info"><%= l(:text_pm_actions) %></em></p>
