@@ -26,7 +26,8 @@ module PmKit
       r = { from: from, to: to, next_from: nfrom, next_to: nto, sections: [] }
       issues = on.(:issue_tracking) ? Issue.visible(user).where(project_id: project.id).includes(:tracker, :status, :assigned_to) : Issue.none
       closed = issues.where(closed_on: from.beginning_of_day..to.end_of_day).to_a
-      progress = issues.open.where(updated_on: from.beginning_of_day..to.end_of_day).to_a
+      # 진행: 기간 안에 바뀐 열린 일감 중 이미 시작한 것 (다음 기간에 시작할 일감은 계획으로)
+      progress = issues.open.where(updated_on: from.beginning_of_day..to.end_of_day).where('start_date IS NULL OR start_date <= ?', to).to_a
       plan = issues.open.where('(start_date BETWEEN :a AND :b) OR (due_date BETWEEN :a AND :b)', a: nfrom, b: nto).to_a
       late = issues.open.where('due_date < ?', to + 1).to_a
       all = issues.to_a
