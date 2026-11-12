@@ -16,7 +16,7 @@ class MenuCaptureConfig < ApplicationRecord
   validates :user_selector, :pass_selector, :submit_selector, :check_selector, length: { maximum: 200 }
   validates :width, numericality: { only_integer: true, greater_than_or_equal_to: 320, less_than_or_equal_to: 2560 }
   validates :wait_ms, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 30_000 }
-  validates :max_height, numericality: { only_integer: true, greater_than_or_equal_to: 900, less_than_or_equal_to: 30_000 }
+  validates :max_height, numericality: { only_integer: true, greater_than_or_equal_to: 1000, less_than_or_equal_to: 30_000 }
   validates :keep, numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 100 }
   validates :schedule, inclusion: { in: SCHEDULES }
 
