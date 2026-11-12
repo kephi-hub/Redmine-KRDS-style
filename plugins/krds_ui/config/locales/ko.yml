@@ -2,7 +2,7 @@
 ko:
   label_krds_welcome: "환영합니다"
   label_krds_manual: "사용 매뉴얼"
-  text_krds_manual: "탭을 눌러 분야별 사용법을 보세요. 왼쪽 목차를 누르면 해당 내용으로 이동합니다."
+  text_krds_manual: "탭을 눌러 분야별 사용법을 보세요. 목차를 누르면 해당 내용으로 이동합니다."
   label_krds_manual_toc: "%{title} 목차"
   label_krds_manual_toc_short: "이 탭의 내용"
   text_krds_q_mypage: "내가 맡은 일감과 할 일"
