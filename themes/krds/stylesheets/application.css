@@ -1427,8 +1427,9 @@ a.pf_name{font-weight:700;}
 .pf_bar{display:block;position:relative;height:8px;margin:4px 0;border-radius:4px;background:var(--gray_10);}
 .pf_bar span{display:block;height:100%;border-radius:4px;background:var(--sec_70);}
 .pf_bar i{position:absolute;top:-4px;width:2px;height:16px;background:var(--dan_50);}
-.pm_bl_form{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 16px;padding:12px;border:1px solid var(--gray_10);border-radius:var(--radius_m);background:var(--gray_5);}
-.pm_bl_form input[type=text]{width:100%;max-width:280px;}
+.pm_bl_form{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 12px;margin:0 0 16px;padding:12px;border:1px solid var(--gray_10);border-radius:var(--radius_m);background:var(--gray_5);}
+.pm_bl_fld{display:flex;flex-direction:column;gap:4px;width:100%;}
+.pm_bl_fld input[type=text]{width:100%;}
 .pm_list tr.on td{background:var(--pri_5);}
 .pm_list tr.pm_total th{background:var(--gray_5);text-align:left;}
 .pm_mm .pf_bar{width:100%;max-width:160px;}
@@ -1603,6 +1604,7 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 
 /* ===== 데스크톱 (900px 이상) ===== */
 @media (min-width:900px){
+.pm_bl_fld{width:auto;flex:1 1 220px;max-width:320px;}
 #wrapper #content table.pf_table{display:table;}
 #wrapper #content table.pf_table thead{display:table-header-group;}
 #wrapper #content table.pf_table tbody{display:table-row-group;}

@@ -7,10 +7,10 @@
 <p class="subtitle"><%= l(:text_pm_baselines) %></p>
 <% if can_edit %>
 <%= form_tag project_pm_baselines_path(@project), :class => 'pm_bl_form' do %>
-  <label for="bl_name"><%= l(:label_pm_baseline_name) %></label>
-  <%= text_field_tag 'name', '', :id => 'bl_name', :maxlength => 100, :placeholder => l(:text_pm_baseline_name_ph) %>
-  <label for="bl_note"><%= l(:field_notes) %></label>
-  <%= text_field_tag 'note', '', :id => 'bl_note', :maxlength => 500 %>
+  <span class="pm_bl_fld"><label for="bl_name"><%= l(:label_pm_baseline_name) %></label>
+    <%= text_field_tag 'name', '', :id => 'bl_name', :maxlength => 100, :placeholder => l(:text_pm_baseline_name_ph) %></span>
+  <span class="pm_bl_fld"><label for="bl_note"><%= l(:label_pm_baseline_note) %></label>
+    <%= text_field_tag 'note', '', :id => 'bl_note', :maxlength => 500 %></span>
   <%= submit_tag l(:button_pm_baseline_take), :class => 'btn_main', :data => { :confirm => l(:text_pm_baseline_take_confirm) } %>
 <% end %>
 <% end %>

@@ -1,4 +1,5 @@
 en:
+  label_pm_baseline_note: "Note"
   label_pm_baselines: "Baselines"
   text_pm_baselines: "Save the current issue schedule as a baseline and compare it later."
   label_pm_baseline_name: "Baseline name"

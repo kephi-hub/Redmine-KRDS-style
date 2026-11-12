@@ -44,7 +44,7 @@ module PmKit
       if defined?(QaRequirement) && on?(p, user, :qa_requirements, :view_qa_requirements)
         reqs = QaRequirement.where(project_id: p.id).alive.to_a
         okc = reqs.count { |r| %w(confirmed changed).include?(r.status) }
-        out << item('req_confirmed', 'dev', '요구사항 모두 확정', reqs.empty? ? 'ng' : ratio(okc, reqs.size), "확정 #{okc}/#{reqs.size}", [:project_qa_requirements_path, p])
+        out << item('req_confirmed', 'dev', '요구사항 모두 확정', reqs.empty? ? 'na' : ratio(okc, reqs.size), "확정 #{okc}/#{reqs.size}", [:project_qa_requirements_path, p])
         if defined?(QaTrace::Trace) && p.module_enabled?(:qa_tests) && reqs.any?
           info = QaTrace::Trace.build(p, reqs)
           passed = reqs.count { |r| info[r.id][:state] == 'pass' }
