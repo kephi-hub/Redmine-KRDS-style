@@ -1327,6 +1327,12 @@ table.list.db_pvtbl tr.db_gone td.col code{text-decoration:line-through;}
 /* 관리 도구 (site_tools) — 메일 서버 상태, 커미터 연결 */
 .st_state{display:inline-flex;align-items:center;height:28px;padding:0 12px;margin:0 0 16px;border-radius:14px;background:var(--dan_5);font-size:0.875rem;font-weight:700;color:var(--dan_60);}
 .st_state.on{background:var(--suc_10);color:var(--suc_60);}
+.st_inline{display:inline;}
+.st_ok{color:var(--suc_60);}
+.st_bad{color:var(--dan_60);}
+.st_tag{display:inline-flex;align-items:center;height:20px;padding:0 6px;border-radius:var(--radius_s);background:var(--sec_5);font-size:0.6875rem;font-weight:700;color:var(--sec_80);}
+#content table.st_backups td{text-align:left;}
+#content table.st_backups td.cmd code{font-size:0.8125rem;}
 .st_bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin:0 0 16px;}
 table.list.st_list td{text-align:center;}
 table.list.st_list td.name{text-align:left;word-break:keep-all;}

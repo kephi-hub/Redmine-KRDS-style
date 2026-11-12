@@ -1,4 +1,32 @@
 ko:
+  label_pms_backups: 백업
+  text_pms_backups: PMS 의 DB · 첨부파일 · 접속정보 키 파일을 서버 안에 매일 날짜별로 백업합니다. 바뀌지 않은 첨부파일은 앞 백업과 공유해 용량이 늘지 않습니다.
+  text_pms_backup_not_mounted: "백업 상태 폴더가 연결되지 않았습니다. 서버에서 compose.yaml 의 ./backup/ctl 마운트와 cron(setup/cron.example 의 백업 줄)을 확인하세요."
+  error_pms_backup_not_ready: 백업 요청을 남길 수 없습니다 (서버의 backup/ctl 폴더 권한 확인).
+  notice_pms_backup_busy: 이미 백업 중이거나 요청이 있습니다.
+  notice_pms_backup_requested: 백업을 요청했습니다. 1분 안에 시작하며, 끝나면 이 화면에 표시됩니다.
+  button_pms_backup_now: 지금 백업
+  text_pms_backup_confirm: 지금 백업할까요? (서비스는 멈추지 않습니다)
+  label_pms_backup_running: "백업 중입니다 (%{since} 시작)"
+  label_pms_backup_requested: 백업 요청됨 — 1분 안에 시작합니다
+  label_pms_backup_failed: "마지막 백업(%{name})이 실패했습니다: %{error}"
+  label_pms_backup_stale: 최근 26시간 동안 성공한 백업이 없습니다. 서버의 cron 과 backup/backup.log 를 확인하세요.
+  label_pms_backup_last: 마지막 백업
+  label_pms_backup_result: 결과
+  label_pms_backup_ok: 성공
+  label_pms_backup_ng: 실패
+  label_pms_backup_count: 보관 중
+  label_pms_backup_used: 백업 용량
+  label_pms_backup_disk: 디스크 여유
+  label_pms_backup_keep: 보관 기간
+  label_pms_backup_days: "%{count}일"
+  label_pms_backup_name: 백업 일시
+  label_pms_backup_db: DB
+  label_pms_backup_files: 첨부 수
+  label_pms_backup_files_size: 첨부 용량
+  label_pms_backup_restore_cmd: 복원 명령 (서버)
+  label_pms_backup_latest: 최근
+  text_pms_backup_help: "· 일정: 매일 03:00 (서버 /etc/cron.d/redmine_backup), 보관 기간은 .env 의 BACKUP_KEEP_DAYS\n· 위치: 서버 /root/redmine/backup (db · files) — .env(암호화 키)는 백업에 넣지 않으니 서버 밖으로 옮길 때 따로 보관하세요\n· 복원: 서버에서 cd /root/redmine && setup/restore.sh <백업 이름> (RESTORE 입력 확인, 복원 전에 지금 상태를 한 번 더 백업, DB 만 --db · 첨부만 --files)"
   label_smtp_settings: 메일 서버(SMTP)
   text_smtp_settings: 알림 메일을 보낼 메일 서버를 설정합니다. 저장하면 바로 적용되며(재시작 불필요), 비밀번호는 암호화해 저장합니다.
   text_smtp_file_configured: 서버의 config/configuration.yml 에 메일 설정(email_delivery)이 있어 그 설정을 씁니다. 이 화면에서 바꾸려면 파일의 설정을 지우고 재시작하세요.

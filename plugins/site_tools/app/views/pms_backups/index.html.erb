@@ -1,0 +1,50 @@
+<%# 관리 > 백업 — 서버 setup/backup.sh 가 만든 백업 목록·상태 %>
+<div class="contextual">
+  <%= button_to sprite_icon('save', l(:button_pms_backup_now)), pms_backups_path, :method => :post, :class => 'st_btn', :form_class => 'st_inline',
+        :disabled => (@running || @requested || !SiteTools::Backup.writable?), :data => { :confirm => l(:text_pms_backup_confirm) } %>
+</div>
+<h2><%= l(:label_pms_backups) %></h2>
+<p class="subtitle"><%= l(:text_pms_backups) %></p>
+
+<% if !SiteTools::Backup.mounted? %>
+  <p class="db_hintbox"><%= l(:text_pms_backup_not_mounted) %></p>
+<% else %>
+  <% if @running %><p class="flash notice"><%= l(:label_pms_backup_running, :since => @running) %></p>
+  <% elsif @requested %><p class="flash notice"><%= l(:label_pms_backup_requested) %></p><% end %>
+  <% if @status && !@status['ok'] %><p class="flash error"><%= l(:label_pms_backup_failed, :name => @status['name'], :error => @status['error']) %></p>
+  <% elsif SiteTools::Backup.stale? %><p class="flash warning"><%= l(:label_pms_backup_stale) %></p><% end %>
+
+  <% if @status %>
+  <ul class="db_stats mt_kpi">
+    <li><span><%= l(:label_pms_backup_last) %></span><strong><%= @status['started_at'] %></strong></li>
+    <li><span><%= l(:label_pms_backup_result) %></span><strong class="<%= @status['ok'] ? 'st_ok' : 'st_bad' %>"><%= @status['ok'] ? l(:label_pms_backup_ok) : l(:label_pms_backup_ng) %></strong></li>
+    <li><span><%= l(:label_pms_backup_count) %></span><strong><%= @list.size %></strong></li>
+    <li><span><%= l(:label_pms_backup_used) %></span><strong><%= number_to_human_size(@status['backup_used']) %></strong></li>
+    <li><span><%= l(:label_pms_backup_disk) %></span><strong><%= number_to_human_size(@status['disk_free']) %></strong></li>
+    <li><span><%= l(:label_pms_backup_keep) %></span><strong><%= l(:label_pms_backup_days, :count => @status['keep_days']) %></strong></li>
+  </ul>
+  <% end %>
+
+  <% if @list.empty? %>
+    <p class="nodata"><%= l(:label_no_data) %></p>
+  <% else %>
+  <div class="autoscroll">
+  <table class="list st_backups">
+    <thead><tr><th><%= l(:label_pms_backup_name) %></th><th><%= l(:label_pms_backup_db) %></th><th><%= l(:label_pms_backup_files) %></th><th><%= l(:label_pms_backup_files_size) %></th><th class="cmd"><%= l(:label_pms_backup_restore_cmd) %></th></tr></thead>
+    <tbody>
+    <% @list.each_with_index do |b, i| %>
+      <tr>
+        <td class="name"><strong><%= b['name'].sub('_', ' ').sub(/(\d\d)(\d\d)\z/, '\1:\2') %></strong><% if i.zero? %> <span class="st_tag"><%= l(:label_pms_backup_latest) %></span><% end %></td>
+        <td><%= number_to_human_size(b['db_bytes']) %></td>
+        <td><%= b['files'] %></td>
+        <td><%= number_to_human_size(b['files_bytes']) %></td>
+        <td class="cmd"><code>setup/restore.sh <%= b['name'] %></code></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  </div>
+  <% end %>
+  <div class="db_hintbox"><%= simple_format(l(:text_pms_backup_help)) %></div>
+<% end %>
+<% html_title l(:label_pms_backups) %>
