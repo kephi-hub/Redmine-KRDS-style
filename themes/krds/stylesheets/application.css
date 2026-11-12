@@ -1228,7 +1228,7 @@ html.kd_open,html.kd_open body{overflow:hidden;}
 .mt_sitebar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 16px;margin:0 0 16px;border:1px solid var(--sec_10);border-radius:var(--radius_l);background:var(--sec_5);}
 .mt_sitesel{display:flex;flex:1 1 100%;align-items:center;gap:8px;}
 .mt_sitesel label{font-weight:700;color:var(--sec_80);}
-.mt_sitesel select{flex:1 1 auto;}
+.mt_sitesel select{flex:1 1 auto;padding-right:36px;}
 .mt_num{max-width:72px;}
 #content table.sr_matrix td.sr_na{text-align:center;color:var(--gray_30);}
 #content table.sr_matrix tr.sr_site th{padding:8px 12px;background:var(--sec_5);font-weight:700;text-align:left;color:var(--sec_80);}
