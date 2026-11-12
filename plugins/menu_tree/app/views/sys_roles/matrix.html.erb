@@ -6,6 +6,7 @@
 <h2><%= l(:label_sys_roles) %></h2>
 <p class="subtitle"><%= l(:text_sys_matrix) %></p>
 <%= render :partial => 'sys_roles/tabs', :locals => { :current => :matrix } %>
+<%= render :partial => 'menu_items/site_bar', :locals => { :url => project_sys_roles_matrix_path(@project), :allow_all => true, :manage => false } %>
 <% if !@project.module_enabled?(:menu_tree) %>
   <p class="db_hintbox"><%= l(:text_sys_need_menu) %></p>
 <% elsif @roles.empty? || @ordered.empty? %>
@@ -24,18 +25,22 @@
     <thead><tr>
       <th class="area"><%= l(:label_menu_tree) %></th>
       <% @roles.each do |r| %>
-        <th class="role"><span class="sr_level"><%= r.level %></span> <%= r.name %><% if r.code %><br><code><%= r.code %></code><% end %>
+        <th class="role"><span class="sr_level"><%= r.level %></span> <%= r.name %><% if r.code %><br><code><%= r.code %></code><% end %><% if r.menu_site_id && @sites.size > 1 %><br><span class="sr_sitetag"><%= MenuSite.names_for(@project.id)[r.menu_site_id] %></span><% end %>
           <% if can_edit %><br><button type="button" class="ag_coltog sr_col" data-role="<%= r.id %>"><%= l(:label_sys_col_read) %></button><% end %></th>
       <% end %>
     </tr></thead>
     <tbody>
     <% @ordered.each do |m, d| %>
+      <% if @site_all && @sites.size > 1 && d.zero? && m.menu_site_id != @prev_site %><% @prev_site = m.menu_site_id %>
+        <tr class="sr_site"><th colspan="<%= @roles.size + 1 %>"><%= m.menu_site&.name %></th></tr>
+      <% end %>
       <tr class="sr_row" data-id="<%= m.id %>" data-depth="<%= d %>">
         <th class="area" style="padding-left:<%= 12 + d * 18 %>px">
           <span class="<%= 'mt_off' unless m.active? %>"><%= m.name %></span><% if m.screen_id %> <code><%= m.screen_id %></code><% end %>
           <% if can_edit && @ordered.any? { |x, _| x.parent_id == m.id } %><button type="button" class="sr_down" title="<%= l(:text_sys_apply_down) %>">↓</button><% end %>
         </th>
         <% @roles.each do |r| %>
+          <% unless r.applies_to?(m) %><td class="sr_na" title="<%= l(:text_sys_not_site) %>">·</td><% next %><% end %>
           <% v = @cells[[m.id, r.id]].to_s %>
           <td>
             <button type="button" class="sr_cell sr_<%= v.presence || 'none' %>" data-role="<%= r.id %>" data-value="<%= v %>" data-orig="<%= v %>"<%= raw(' disabled') unless can_edit %> title="<%= m.name %> · <%= r.name %>"><%= MenuRoleAccess::CODES[v] || '—' %></button>

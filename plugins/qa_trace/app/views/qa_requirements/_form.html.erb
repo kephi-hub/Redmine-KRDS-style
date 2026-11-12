@@ -14,7 +14,7 @@
       <% index = @ordered.to_h { |m, _| [m.id, m] } %>
       <% chosen = params[:menus_sent] == '1' ? Array(params[:menu_item_ids]).map(&:to_i) : @req.menu_item_ids %>
       <%= render :partial => 'qa_trace/pick', :locals => { :pick_id => 'qa_menu_pick', :field => 'menu_item_ids[]', :sent => 'menus_sent', :chosen => chosen, :placeholder => l(:label_qa_menu_pick),
-            :items => @ordered.map { |m, d| { :id => m.id, :chip => m.path(index), :label => m.name, :sub => m.screen_id, :q => "#{m.path(index)} #{m.screen_id}", :depth => d } } } %>
+            :items => @ordered.map { |m, d| { :id => m.id, :chip => m.path(index), :label => m.pick_label(d), :sub => m.screen_id, :q => "#{m.path(index)} #{m.screen_id}", :depth => d } } } %>
     <% else %>
       <span class="mt_dim"><%= l(:text_qa_need_menu) %></span>
     <% end %>

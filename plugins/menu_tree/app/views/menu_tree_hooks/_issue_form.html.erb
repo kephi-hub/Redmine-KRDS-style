@@ -14,7 +14,7 @@
         <input type="search" class="mt_q" placeholder="<%= l(:label_menu_pick) %>" aria-label="<%= l(:label_menu_pick) %>" autocomplete="off">
         <span class="mt_drop" hidden>
           <% ordered.each do |m, d| %>
-            <a href="#" data-id="<%= m.id %>" data-path="<%= m.path(index) %>" data-q="<%= "#{m.path(index)} #{m.screen_id}".downcase %>" style="padding-left:<%= 10 + d * 14 %>px"><%= m.name %><% if m.screen_id %> <code><%= m.screen_id %></code><% end %></a>
+            <a href="#" data-id="<%= m.id %>" data-path="<%= m.path(index) %>" data-q="<%= "#{m.path(index)} #{m.screen_id}".downcase %>" style="padding-left:<%= 10 + d * 14 %>px"><%= m.pick_label(d) %><% if m.screen_id %> <code><%= m.screen_id %></code><% end %></a>
           <% end %>
         </span>
       </span>

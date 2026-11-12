@@ -3,8 +3,12 @@
 <%= form_tag project_menu_items_import_path(@project), :multipart => true do %>
   <div class="box">
     <p><%= l(:text_menu_import) %></p>
-    <p class="gl_cols"><code>1뎁스</code> <code>2뎁스</code> <code>3뎁스</code> <code>…</code> <code>화면 ID</code> <code>URL</code> <code>화면 유형</code> <code>채널</code> <code>사용</code> <code>비고</code> <code>(추가 칼럼)</code></p>
+    <p class="gl_cols"><code>(사이트)</code> <code>1뎁스</code> <code>2뎁스</code> <code>3뎁스</code> <code>…</code> <code>화면 ID</code> <code>URL</code> <code>화면 유형</code> <code>채널</code> <code>사용</code> <code>비고</code> <code>(추가 칼럼)</code></p>
     <p class="mt_dim"><%= l(:text_menu_import_rules) %></p>
+    <% if @sites.any? %>
+    <p class="mt_dim"><%= l(:text_menu_import_site) %></p>
+    <p><label for="mt_imp_site"><%= l(:label_menu_import_site) %></label> <%= select_tag 'site', options_for_select(@sites.map { |x| [x.name, x.id] }, @site&.id), :id => 'mt_imp_site' %></p>
+    <% end %>
     <p><%= file_field_tag 'file', :accept => '.xlsx,.csv' %></p>
     <p>
       <label class="inline"><%= radio_button_tag 'mode', 'merge', true %> <%= l(:label_menu_import_merge) %></label><br>
@@ -23,6 +27,7 @@
     <li><%= l(:label_menu_import_created) %> <strong><%= @result[:created] %></strong></li>
     <li><%= l(:label_menu_import_updated) %> <strong><%= @result[:updated] %></strong></li>
     <li><%= l(:label_menu_import_cols) %> <strong><%= @result[:columns].size %></strong><% if @result[:columns].any? %> <span class="mt_dim">(<%= @result[:columns].join(', ') %>)</span><% end %></li>
+    <% if @result[:sites].any? %><li><%= l(:label_menu_import_sites) %> <strong><%= @result[:sites].size %></strong> <span class="mt_dim">(<%= @result[:sites].join(', ') %>)</span></li><% end %>
     <li><%= l(:label_menu_import_failed) %> <strong><%= @result[:errors].size %></strong></li>
   </ul>
   <% if @result[:errors].any? %><ul class="gl_errors"><% @result[:errors].first(50).each do |line, msg| %><li><%= line %>번째 줄 — <%= msg %></li><% end %></ul><% end %>

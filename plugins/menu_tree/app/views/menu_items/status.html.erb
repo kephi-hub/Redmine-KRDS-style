@@ -1,6 +1,7 @@
 <%# 프로젝트 > 메뉴 구조도 > 현황 — 화면(말단 메뉴) 기준 일감 연결·완료·진행률, 1뎁스별·화면 유형별, 일감 없는 화면 %>
 <h2><%= l(:label_menu_tree) %></h2>
 <%= menu_view_tabs(:status) %>
+<%= render :partial => 'menu_items/site_bar', :locals => { :url => project_menu_items_status_path(@project), :allow_all => true, :manage => false } %>
 <% if @ordered.empty? %>
 <p class="nodata"><%= l(:label_menu_g_no_rows) %></p>
 <% else %>
@@ -25,7 +26,7 @@
       <% lk = leaves.select { |m| own[m.id] }; dn = lk.select { |m| own[m.id][:closed] == own[m.id][:total] } %>
       <% tree = @stats[:tree][root.id] || {} %>
       <tr>
-        <td class="name"><%= link_to root.name, project_menu_items_path(@project, :focus => root.id) %></td>
+        <td class="name"><%= link_to (@site_all ? root.path(@index) : root.name), project_menu_items_path(@project, :focus => root.id, :site => root.menu_site_id) %></td>
         <td><%= leaves.size %></td>
         <td><%= lk.size %></td>
         <td><%= dn.size %></td>
@@ -51,7 +52,7 @@
   <% else %>
     <ul class="mt_nolist">
       <% empty.first(100).each do |m| %>
-        <li><%= link_to m.path(@index), project_menu_items_path(@project, :focus => m.id) %><% if m.screen_id %> <code><%= m.screen_id %></code><% end %></li>
+        <li><%= link_to m.path(@index), project_menu_items_path(@project, :focus => m.id, :site => m.menu_site_id) %><% if m.screen_id %> <code><%= m.screen_id %></code><% end %></li>
       <% end %>
     </ul>
     <% if empty.size > 100 %><p class="mt_dim"><%= l(:label_menu_st_more, :count => empty.size - 100) %></p><% end %>

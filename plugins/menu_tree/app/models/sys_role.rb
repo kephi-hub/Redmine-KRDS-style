@@ -2,6 +2,7 @@
 class SysRole < ApplicationRecord
   belongs_to :project
   has_many :menu_role_accesses, dependent: :delete_all
+  belongs_to :menu_site, optional: true
 
   validates :name, presence: true, length: { maximum: 60 }, uniqueness: { scope: :project_id, case_sensitive: false }
   validates :code, length: { maximum: 30 }, format: { with: /\A[A-Za-z0-9_\-]*\z/ }
@@ -11,6 +12,12 @@ class SysRole < ApplicationRecord
   scope :active, -> { where(active: true) }
 
   before_validation { self.code = code.to_s.strip.upcase.presence }
+  validate { errors.add(:menu_site_id, :invalid) if menu_site && menu_site.project_id != project_id }
+
+  # 이 등급이 해당 메뉴에 쓰이는지 (적용 사이트가 비어 있으면 모든 사이트)
+  def applies_to?(menu)
+    menu_site_id.nil? || menu_site_id == menu.menu_site_id
+  end
 
   def to_s
     name

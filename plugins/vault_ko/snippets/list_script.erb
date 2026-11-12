@@ -45,7 +45,10 @@ $(function() {
       return { id: this.value, project: String($tr.data('project-id') || defaultProject), name: $.trim($tr.find('td:nth-child(' + ($tr.find('td').length > 7 ? 4 : 3) + ')').text()) };
     }).get().filter(function(x) { return x.project; });
     if (!items.length) return;
-    if (!confirm('선택한 접속정보 ' + items.length + '개를 삭제할까요?\n삭제하면 되돌릴 수 없습니다.')) return;
+    var question = '선택한 접속정보 ' + items.length + '개를 삭제할까요?\n삭제하면 되돌릴 수 없습니다.';
+    (window.KrdsDialog ? window.KrdsDialog.confirm(question) : Promise.resolve(window.confirm(question))).then(function(ok) { if (ok) removeItems(items); });
+  });
+  function removeItems(items) {
     var token = $('meta[name="csrf-token"]').attr('content');
     $btn.prop('disabled', true).text('삭제 중...');
     var fail = [];
@@ -58,10 +61,11 @@ $(function() {
         }).then(function(r) { if (!r.ok) fail.push(it.name || it.id); }, function() { fail.push(it.name || it.id); });
       });
     }, Promise.resolve()).then(function() {
-      if (fail.length) alert('삭제하지 못한 항목 ' + fail.length + '개: ' + fail.join(', ') + '\n(권한이 없거나 이미 삭제된 항목일 수 있습니다)');
-      location.reload();
+      // 알림을 닫은 뒤 새로 고침 (KRDS 모달은 기다리지 않으므로)
+      var note = '삭제하지 못한 항목 ' + fail.length + '개: ' + fail.join(', ') + '\n(권한이 없거나 이미 삭제된 항목일 수 있습니다)';
+      (fail.length ? (window.KrdsDialog ? window.KrdsDialog.alert(note) : Promise.resolve(window.alert(note))) : Promise.resolve()).then(function() { location.reload(); });
     });
-  });
+  }
   refresh();
 });
 </script>

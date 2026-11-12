@@ -1,5 +1,5 @@
 # 메뉴 구조도 ↔ 엑셀 표 (가져오기·내보내기 같은 양식)
-# 머리줄: 1뎁스 2뎁스 … | 화면 ID | URL | 화면 유형 | 채널 | 사용 | (추가 칼럼…) | 비고  (+ 내보내기 전용: 대상 권한·일감 수·완료·진행률)
+# 머리줄: (사이트) | 1뎁스 2뎁스 … | 화면 ID | URL | 화면 유형 | 채널 | 사용 | (추가 칼럼…) | 비고  (+ 내보내기 전용: 대상 권한·일감 수·완료·진행률)
 # 가져오기: 위 칸이 비어 있으면 바로 윗줄 값을 이어받음(엑셀 셀 병합·생략 모두 가능), 같은 경로의 메뉴는 합침
 module MenuTree
   module Sheet
@@ -8,6 +8,7 @@ module MenuTree
     DEPTH = [/\A(\d+)\s*(뎁스|depth|단계|레벨|level|차|dep)\z/i, /\A(depth|level|레벨|뎁스|lv)\s*\.?\s*(\d+)\z/i].freeze
     NAMED = { '대메뉴' => 1, '중메뉴' => 2, '소메뉴' => 3, '세메뉴' => 4, '세부메뉴' => 4 }.freeze
     FIELDS = {
+      'site' => %w(사이트 사이트명 site),
       'screen_id' => %w(화면id 화면아이디 프로그램id 프로그램아이디 screenid 화면번호 메뉴id),
       'url' => %w(url 경로 주소 링크 uri),
       'screen_type' => %w(화면유형 유형 화면구분 type),
@@ -52,14 +53,15 @@ module MenuTree
     end
 
     # rows: 2차원 배열. 반환: { created:, updated:, columns: [새 칼럼 이름], errors: [[줄, 메시지]] }
-    def import(project, rows, replace: false, author: nil, new_columns: true)
+    # site: "사이트" 칸이 없는 파일을 넣을 사이트 (사이트 칸이 있으면 줄마다 그 사이트, 없는 사이트는 새로 만듦)
+    def import(project, rows, replace: false, author: nil, new_columns: true, site: nil)
       header_idx = rows.index { |r| r.any? { |c| depth_of(c) } }
       return nil unless header_idx
       header = rows[header_idx]
       depth_cols = {}
       field_cols = {}
       extra_cols = {}
-      result = { created: 0, updated: 0, columns: [], errors: [] }
+      result = { created: 0, updated: 0, columns: [], sites: [], errors: [] }
       columns = project_columns(project)
       header.each_with_index do |h, i|
         next if h.blank?
@@ -80,13 +82,39 @@ module MenuTree
         end
       end
       levels = depth_cols.keys.sort
+      site_col = field_cols['site']
+      body = rows[(header_idx + 1)..].to_a
       MenuItem.transaction do
-        MenuItem.where(project_id: project.id, parent_id: nil).destroy_all if replace
+        # 줄마다 사이트 (빈칸은 윗줄 사이트) — 없는 사이트는 메뉴를 읽기 전에 먼저 만듦
+        site_ids = []
+        if site_col
+          sites = MenuSite.where(project_id: project.id).to_a.index_by { |x| x.name.downcase }
+          cur = site&.id
+          body.each do |row|
+            name = row[site_col].to_s.strip
+            if name.present?
+              unless (x = sites[name.downcase])
+                x = MenuSite.create!(project: project, name: name.truncate(60), position: (MenuSite.where(project_id: project.id).maximum(:position) || 0) + 1)
+                sites[name.downcase] = x
+                result[:sites] << x.name
+              end
+              cur = x.id
+            end
+            site_ids << cur
+          end
+        end
+        roots = MenuItem.where(project_id: project.id, parent_id: nil)
+        roots = roots.where(menu_site_id: site.id) if site && !site_col
+        roots.destroy_all if replace
         existing = MenuItem.where(project_id: project.id).to_a
-        children = existing.group_by(&:parent_id)
+        # 1뎁스는 사이트별로 따로 찾음
+        children = existing.group_by { |m| m.parent_id || "s#{m.menu_site_id}" }
         stack = []
-        rows[(header_idx + 1)..].to_a.each_with_index do |row, n|
+        body.each_with_index do |row, n|
           line = header_idx + n + 2
+          row_site = site_col ? site_ids[n] : site&.id
+          # 사이트가 바뀌면 윗줄 이어받기를 끊음
+          stack = [] if site_col && n.positive? && site_ids[n] != site_ids[n - 1]
           names = levels.map { |d| row[depth_cols[d]].to_s.strip.presence }
           last = names.rindex { |v| v }
           next unless last
@@ -98,10 +126,10 @@ module MenuTree
           stack = path.dup
           parent = nil
           path.each_with_index do |name, k|
-            siblings = children[parent&.id] ||= []
+            siblings = children[parent ? parent.id : "s#{row_site}"] ||= []
             node = siblings.find { |m| m.name.casecmp?(name) }
             unless node
-              node = MenuItem.new(project: project, parent: parent, name: name.truncate(150), author_id: author&.id,
+              node = MenuItem.new(project: project, parent: parent, name: name.truncate(150), author_id: author&.id, menu_site_id: row_site,
                                   position: (siblings.map(&:position).max || 0) + 1)
               node.save!
               siblings << node
@@ -141,17 +169,37 @@ module MenuTree
     # 내보내기 표: [머리줄, 행들]
     def export(project, ordered, columns, stats, roles)
       max = (ordered.map(&:last).max || 0) + 1
-      header = (1..max).map { |d| "#{d}뎁스" } + %w(화면\ ID URL 화면\ 유형 채널 사용) + columns.map(&:name) +
+      sites = MenuSite.names_for(project.id)
+      header = (sites.any? ? ['사이트'] : []) + (1..max).map { |d| "#{d}뎁스" } + %w(화면\ ID URL 화면\ 유형 채널 사용) + columns.map(&:name) +
                (roles ? ['대상 권한'] : []) + %w(일감\ 수 완료 진행률 비고)
       rows = ordered.map do |m, depth|
         s = stats[m.id] || {}
-        Array.new(depth) + [m.name] + Array.new(max - depth - 1) +
+        (sites.any? ? [sites[m.menu_site_id]] : []) + Array.new(depth) + [m.name] + Array.new(max - depth - 1) +
           [m.screen_id, m.url, TYPE_LABELS[m.screen_type], CHANNEL_LABELS[m.channel], m.active? ? 'Y' : 'N'] +
           columns.map { |c| v = m.extra[c.id.to_s]; c.kind == 'bool' ? (v ? 'Y' : nil) : v } +
           (roles ? [(roles[m.id] || []).map { |n, code| "#{n}(#{code})" }.join(', ')] : []) +
           [s[:total].to_i.positive? ? s[:total] : nil, s[:total].to_i.positive? ? s[:closed] : nil, s[:total].to_i.positive? ? "#{s[:ratio]}%" : nil, m.note]
       end
-      [header, rows, max]
+      [header, rows, max, sites.any?]
+    end
+
+    # 시스템 권한 엑셀 (메뉴 권한 · 권한 등급 · 표기 시트) — 시스템 권한 화면과 산출물 자동 생성이 같이 씀
+    def roles_book(project, ordered, roles, cells)
+      max = (ordered.map(&:last).max || 0) + 1
+      sites = MenuSite.names_for(project.id)
+      multi = sites.any?
+      header = (multi ? ['사이트'] : []) + (1..max).map { |d| "#{d}뎁스" } + ['화면 ID', 'URL'] + roles.map { |r| r.code ? "#{r.name}(#{r.code})" : r.name }
+      rows = ordered.map do |m, d|
+        (multi ? [sites[m.menu_site_id]] : []) + Array.new(d) + [m.name] + Array.new(max - d - 1) + [m.screen_id, m.url] +
+          roles.map { |r| r.applies_to?(m) ? MenuRoleAccess::CODES[cells[[m.id, r.id]]] : '·' }
+      end
+      legend = [['R', '조회'], ['CRU', '등록·수정'], ['CRUD', '전체(삭제 포함)'], ['·', '해당 사이트에 쓰지 않는 등급']]
+      grades = roles.map { |r| [r.level, r.name, r.code] + (multi ? [r.menu_site_id ? sites[r.menu_site_id] : '전체'] : []) + [r.description, r.active? ? 'Y' : 'N'] }
+      KrdsUi::Xlsx.build([
+        { name: '메뉴 권한', header: header, rows: rows, widths: (multi ? [16] : []) + Array.new(max, 18) + [16, 28] + roles.map { 12 } },
+        { name: '권한 등급', header: %w(등급 이름 코드) + (multi ? ['적용 사이트'] : []) + %w(설명 사용), rows: grades, widths: [8, 20, 14] + (multi ? [16] : []) + [50, 6] },
+        { name: '표기', header: %w(표기 의미), rows: legend, widths: [10, 40] }
+      ])
     end
   end
 end

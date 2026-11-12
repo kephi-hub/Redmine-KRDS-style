@@ -26,7 +26,8 @@ module PmKit
       menus = defined?(MenuItem) && project.module_enabled?(:menu_tree) ? MenuItem.where(project_id: project.id).to_a : []
       index = menus.index_by(&:id)
       by_sid = menus.select(&:screen_id).index_by { |m| m.screen_id.downcase }
-      by_path = menus.index_by { |m| key(m.path(index)) }
+      # 사이트 표시가 있는 경로 · 없는 경로 모두로 찾음
+      by_path = menus.index_by { |m| key(m.path(index, site: false)) }.merge(menus.index_by { |m| key(m.path(index)) })
       users = project.users.to_a
       kinds = invert('pkind')
       statuses = invert('pstatus')

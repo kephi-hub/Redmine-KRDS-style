@@ -9,6 +9,8 @@
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function t(k) { return C.t[k] || k; }
+  // KRDS 모달 확인창 (테마가 없으면 브라우저 확인창)
+  function ask(m) { return window.KrdsDialog ? window.KrdsDialog.confirm(m) : Promise.resolve(window.confirm(m)); }
   function url(k, id) { return C.urls[k].replace(/\/0(\/|$)/, '/' + id + '$1'); }
   function token() { return $('meta[name="csrf-token"]').attr('content'); }
   function api(method, u, data) {
@@ -254,8 +256,9 @@
   function remove(id) {
     var count = 0, walk = function(pid) { rows.forEach(function(r) { if (r.parent_id === pid) { count++; walk(r.id); } }); };
     walk(id);
-    if (!confirm(t('delete_confirm').replace('%{name}', byId[id].name).replace('%{count}', count))) return;
-    api('DELETE', url('item', id)).done(function() { delete selected[id]; load(); });
+    ask(t('delete_confirm').replace('%{name}', byId[id].name).replace('%{count}', count)).then(function(ok) {
+      if (ok) api('DELETE', url('item', id)).done(function() { delete selected[id]; load(); });
+    });
   }
 
   // 행 ⋯ 메뉴
@@ -267,6 +270,10 @@
                  ['up', function() { move(id, 'up'); }], ['down', function() { move(id, 'down'); }],
                  ['issues_view', function() { location.href = C.urls.issueList.replace('__ID__', id); }]];
     if (C.canIssue) items.push(['issue_new', function() { location.href = C.urls.newIssue.replace('__ID__', id); }]);
+    // 다른 사이트로 옮기기 (하위 메뉴 포함, 그 사이트 1뎁스 맨 끝으로)
+    (C.sites || []).forEach(function(s) {
+      items.push([t('move_site').replace('%{name}', s.name), function() { move(id, 'site', function() { msg(t('saved')); }, { site_id: s.id }); }]);
+    });
     items.push(['delete', function() { remove(id); }]);
     var $p = $('<div class="mt_pop" role="menu"></div>');
     items.forEach(function(it) {
@@ -321,6 +328,7 @@
     $('#mt_collapse').on('click', function() { collapsed = {}; rows.forEach(function(r) { if (r.has_children) collapsed[r.id] = true; }); saveCollapsed(); render(); });
     $('#mt_add_root').on('click', function() { add({}); });
     $('#mt_cols_btn').on('click', function() { showModal('mt_cols_dialog', '760px'); });
+    $('#mt_sites_btn').on('click', function() { showModal('mt_sites_dialog', '820px'); });
     $('#mt_issue_btn').on('click', function() { selCount(); showModal('mt_issue_dialog', '520px'); });
     $('#mt_issue_go').on('click', makeIssues);
 

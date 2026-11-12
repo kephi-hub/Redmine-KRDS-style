@@ -46,7 +46,7 @@ module QaTraceHelper
 
   # 메뉴 선택 목록: [[경로, id], …] (뎁스만큼 들여씀)
   def qa_menu_options(ordered)
-    ordered.map { |m, d| ["#{"  " * d}#{m.name}#{" (#{m.screen_id})" if m.screen_id}", m.id] }
+    ordered.map { |m, d| ["#{"  " * d}#{m.pick_label(d)}#{" (#{m.screen_id})" if m.screen_id}", m.id] }
   end
 
   # 변경 이력 한 줄 설명

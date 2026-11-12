@@ -15,7 +15,7 @@ module MenuItemsHelper
     {
       canEdit: User.current.allowed_to?(:manage_menu_tree, @project),
       canIssue: User.current.allowed_to?(:add_issues, @project) && User.current.allowed_to?(:manage_menu_tree, @project),
-      urls: { data: project_menu_items_data_path(@project), create: project_menu_items_path(@project),
+      urls: { data: project_menu_items_data_path(@project, site: @site&.id), create: project_menu_items_path(@project, site: @site&.id),
               item: project_menu_item_path(@project, 0), move: project_move_menu_item_path(@project, 0), issues: project_menu_items_issues_path(@project),
               issueList: project_issues_path(@project, set_filter: 1, f: ['menu_item_id', 'status_id'], op: { 'menu_item_id' => '=', 'status_id' => '*' }, v: { 'menu_item_id' => ['__ID__'] }),
               newIssue: new_project_issue_path(@project, menu_item_id: '__ID__'), matrix: (project_sys_roles_matrix_path(@project) if @project.module_enabled?(:sys_roles)) },
@@ -23,15 +23,18 @@ module MenuItemsHelper
       types: menu_type_options.map { |label, key| [key, label] }.to_h,
       channels: menu_channel_options.map { |label, key| [key, label] }.to_h,
       focus: params[:focus].to_i,
+      # 다른 사이트로 옮기기 (지금 사이트 제외)
+      sites: (@sites || []).reject { |x| x.id == @site&.id }.map { |x| { id: x.id, name: x.name } },
       t: %w(depth screen_id url type channel roles active issues progress note add_child add_below indent outdent up down
             delete delete_confirm issues_view issue_new saved error none yes no new_name expand collapse no_rows
-            drag select_all done subtotal k_menus k_screens k_linked k_done k_issues k_ratio).to_h { |k| [k, l("label_menu_g_#{k}")] }
+            drag select_all done subtotal k_menus k_screens k_linked k_done k_issues k_ratio move_site).to_h { |k| [k, l("label_menu_g_#{k}")] }
     }
   end
 
   # 구조도 (Mermaid flowchart) — 완료(초록)·진행(파랑)·일감 없음(흰색)·미사용(회색 점선)
   # (classDef 이름은 Mermaid 내부 클래스(.root 등)와 겹치지 않게 mt_ 를 붙임)
-  def menu_mermaid(ordered, stats, root: nil, dir: 'LR', depth: nil, show_id: true, hide_unused: false)
+  # sites: "전체" 사이트 보기일 때 사이트 목록 → 프로젝트 → 사이트 → 1뎁스 메뉴로 묶음 / site: 고른 사이트(맨 위 이름에 표시)
+  def menu_mermaid(ordered, stats, root: nil, dir: 'LR', depth: nil, show_id: true, hide_unused: false, sites: nil, site: nil)
     index = ordered.to_h { |m, _| [m.id, m] }
     keep = ordered.select do |m, d|
       next false if depth && d >= depth
@@ -43,7 +46,10 @@ module MenuItemsHelper
     end
     ids = keep.map { |m, _| m.id }.to_set
     out = +"flowchart #{dir}\n"
-    out << %(  P0(["#{menu_esc(@project.name)}"]):::mt_root\n) unless root
+    top = site && @sites.to_a.size > 1 ? "#{@project.name} · #{site.name}" : @project.name
+    out << %(  P0(["#{menu_esc(top)}"]):::mt_root\n) unless root
+    used_sites = sites ? keep.map { |m, _| m.menu_site_id }.uniq : []
+    (sites || []).each { |x| out << %(  S#{x.id}(["#{menu_esc(x.name)}"]):::mt_site\n  P0 --> S#{x.id}\n) if used_sites.include?(x.id) } unless root
     keep.each do |m, _|
       label = menu_esc(m.name)
       label += "<br/>#{menu_esc(m.screen_id)}" if show_id && m.screen_id
@@ -59,10 +65,11 @@ module MenuItemsHelper
       if m.parent_id && ids.include?(m.parent_id)
         out << "  M#{m.parent_id} --> M#{m.id}\n"
       elsif !root
-        out << "  P0 --> M#{m.id}\n"
+        out << (sites && m.menu_site_id && used_sites.include?(m.menu_site_id) ? "  S#{m.menu_site_id} --> M#{m.id}\n" : "  P0 --> M#{m.id}\n")
       end
     end
     out << "  classDef mt_root fill:#256ef4,stroke:#0b50d0,color:#ffffff\n"
+    out << "  classDef mt_site fill:#eef2f7,stroke:#063a74,color:#052b57\n"
     out << "  classDef mt_done fill:#eaf6ec,stroke:#267337,color:#1e2124\n"
     out << "  classDef mt_prog fill:#ecf2fe,stroke:#256ef4,color:#1e2124\n"
     out << "  classDef mt_todo fill:#ffffff,stroke:#8a949e,color:#1e2124\n"

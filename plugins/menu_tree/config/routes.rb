@@ -13,6 +13,7 @@ resources :projects, only: [] do
   delete 'menus/:id', to: 'menu_items#destroy', constraints: { id: /\d+/ }
   post 'menus/:id/move', to: 'menu_items#move', as: 'move_menu_item', constraints: { id: /\d+/ }
   resources :menu_columns, only: [:create, :update, :destroy]
+  resources :menu_sites, only: [:create, :update, :destroy]
   get 'sys_roles/matrix', to: 'sys_roles#matrix', as: 'sys_roles_matrix'
   post 'sys_roles/matrix', to: 'sys_roles#save_matrix'
   get 'sys_roles/export', to: 'sys_roles#export', as: 'sys_roles_export'

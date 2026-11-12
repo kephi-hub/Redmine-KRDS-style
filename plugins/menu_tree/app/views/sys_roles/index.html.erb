@@ -13,13 +13,14 @@
 <% else %>
 <div class="autoscroll">
 <table class="list sr_list">
-  <thead><tr><th><%= l(:field_sys_level) %></th><th class="name"><%= l(:field_name) %></th><th><%= l(:field_sys_code) %></th><th class="desc"><%= l(:field_description) %></th><th><%= l(:label_sys_menu_count) %></th><th><%= l(:field_active) %></th><th></th></tr></thead>
+  <thead><tr><th><%= l(:field_sys_level) %></th><th class="name"><%= l(:field_name) %></th><th><%= l(:field_sys_code) %></th><% if @sites.any? %><th><%= l(:field_menu_site) %></th><% end %><th class="desc"><%= l(:field_description) %></th><th><%= l(:label_sys_menu_count) %></th><th><%= l(:field_active) %></th><th></th></tr></thead>
   <tbody>
   <% @roles.each do |r| %>
     <tr class="<%= 'sr_off' unless r.active? %>">
       <td class="level"><span class="sr_level"><%= r.level %></span></td>
       <td class="name"><strong><%= r.name %></strong></td>
       <td class="code"><% if r.code %><code><%= r.code %></code><% end %></td>
+      <% if @sites.any? %><td class="site"><%= r.menu_site ? r.menu_site.name : l(:label_menu_site_all) %></td><% end %>
       <td class="desc"><%= r.description %></td>
       <td class="count"><%= @counts[r.id].to_i %></td>
       <td class="active"><span class="mt_yn <%= 'on' if r.active? %>"><%= r.active? ? l(:general_text_Yes) : l(:general_text_No) %></span></td>

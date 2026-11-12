@@ -1,0 +1,17 @@
+<%# 사이트 고르기 (사용자 페이지 · 관리자 페이지 …) — url: 고르면 갈 주소, allow_all: "전체 사이트" 선택 가능, manage: [사이트 관리] 버튼 %>
+<% if @sites.any? || manage %>
+<div class="mt_sitebar">
+  <% if @sites.any? %>
+    <%= form_tag url, :method => :get, :class => 'mt_sitesel' do %>
+      <label for="mt_site"><%= l(:field_menu_site) %></label>
+      <% opts = (allow_all ? [[l(:label_menu_site_all), 'all']] : []) + @sites.map { |x| [x.name, x.id] } %>
+      <%= select_tag 'site', options_for_select(opts, @site_all ? 'all' : @site&.id), :id => 'mt_site', :onchange => 'this.form.submit();' %>
+      <noscript><%= submit_tag l(:button_apply), :name => nil %></noscript>
+    <% end %>
+  <% end %>
+  <% if manage %>
+    <button type="button" class="mt_btn" id="mt_sites_btn"><%= sprite_icon('settings', @sites.any? ? l(:label_menu_sites) : l(:label_menu_sites_start)) %></button>
+  <% end %>
+  <% if @sites.empty? && manage %><span class="mt_dim"><%= l(:text_menu_sites_hint) %></span><% end %>
+</div>
+<% end %>

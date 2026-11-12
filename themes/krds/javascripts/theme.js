@@ -160,3 +160,78 @@ $(function() {
   $btns.find('form').contents().filter(function() { return this.nodeType === 3; }).each(function() { this.nodeValue = this.nodeValue.replace(/\|/g, ''); });
   $ctx.remove();
 });
+
+/* KRDS 모달 — 브라우저 기본 alert·confirm 대신 (KRDS 모달 컴포넌트 규격: 작은 크기, 제목·내용·버튼, 닫기, 화면 어둡게)
+   - window.KrdsDialog.alert(메시지) / .confirm(메시지) → Promise (confirm 은 true|false)
+   - window.alert 를 바꿔 core·플러그인의 alert 도 모달로 (기다리지 않는 알림이라 그대로 동작)
+   - Redmine(rails-ujs)의 data-confirm 링크·버튼·폼: Rails.confirm 을 바꿔 [확인]을 누르면 같은 동작을 다시 실행
+   - 여러 개가 겹치면 차례로, Esc·닫기 = 취소, 포커스는 모달 안에서만 돌고 닫으면 원래 자리로 */
+(function($) {
+  var en = /^en/i.test(document.documentElement.lang || '');
+  var T = en ? { alert: 'Notice', confirm: 'Confirm', ok: 'OK', cancel: 'Cancel', close: 'Close' }
+             : { alert: '알림', confirm: '확인', ok: '확인', cancel: '취소', close: '닫기' };
+  var chain = Promise.resolve(), seq = 0;
+  var nativeAlert = window.alert.bind(window), nativeConfirm = window.confirm.bind(window);
+
+  function show(opts) {
+    return new Promise(function(resolve) {
+      var id = 'kd_' + (++seq), prev = document.activeElement;
+      var $m = $('<section class="kd_modal" role="alertdialog" aria-modal="true"></section>').attr({ 'aria-labelledby': id + '_t', 'aria-describedby': id + '_b' });
+      var $box = $('<div class="kd_box"></div>');
+      var $ok = $('<button type="button" class="kd_btn kd_pri"></button>').text(opts.ok || T.ok);
+      var $btns = $('<div class="kd_btns"></div>');
+      if (opts.cancel) $btns.append($('<button type="button" class="kd_btn"></button>').text(T.cancel).on('click', function() { done(false); }));
+      $btns.append($ok.on('click', function() { done(true); }));
+      $box.append($('<h2 class="kd_title"></h2>').attr('id', id + '_t').text(opts.title),
+                  $('<div class="kd_body"></div>').attr('id', id + '_b').text(String(opts.message == null ? '' : opts.message)),
+                  $btns,
+                  $('<button type="button" class="kd_close"></button>').attr('aria-label', T.close).html('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>').on('click', function() { done(!opts.cancel); }));
+      $m.append('<div class="kd_back"></div>', $box).appendTo('body');
+      $('html').addClass('kd_open');
+      $ok.trigger('focus');
+      $m.on('keydown', function(e) {
+        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); done(!opts.cancel); return; }
+        if (e.key !== 'Tab') return;
+        var $f = $box.find('button:visible'), i = $f.index(document.activeElement);
+        if (e.shiftKey && i <= 0) { e.preventDefault(); $f.last().trigger('focus'); }
+        else if (!e.shiftKey && i === $f.length - 1) { e.preventDefault(); $f.first().trigger('focus'); }
+      });
+      function done(v) {
+        $m.remove();
+        if (!$('.kd_modal').length) $('html').removeClass('kd_open');
+        if (prev && document.contains(prev) && prev.focus) prev.focus();
+        resolve(v);
+      }
+    });
+  }
+  // 하나씩 차례로 띄움
+  function queue(opts) { var p = chain.then(function() { return show(opts); }); chain = p.then(function() {}, function() {}); return p; }
+
+  window.KrdsDialog = {
+    alert: function(message, title) { return queue({ title: title || T.alert, message: message }); },
+    confirm: function(message, title) { return queue({ title: title || T.confirm, message: message, cancel: true }); },
+    nativeAlert: nativeAlert, nativeConfirm: nativeConfirm
+  };
+  window.alert = function(message) { window.KrdsDialog.alert(message); };
+
+  $(function() {
+    // rails-ujs data-confirm: 처음에는 막고 모달 → [확인]이면 같은 요소를 다시 실행(이번에는 통과)
+    if (window.Rails) {
+      window.Rails.confirm = function(message, el) {
+        if (el.__kdOk) { el.__kdOk = false; return true; }
+        window.KrdsDialog.confirm(message).then(function(ok) {
+          if (!ok) return;
+          el.__kdOk = true;
+          if (el.tagName === 'FORM') { if (el.requestSubmit) el.requestSubmit(); else window.Rails.fire(el, 'submit') && el.submit(); }
+          else el.click();
+        });
+        return false;
+      };
+    }
+    // jQuery UI 대화상자(showModal)가 열려 있어도 KRDS 모달 버튼에 포커스가 가도록
+    if ($.ui && $.ui.dialog) {
+      var allow = $.ui.dialog.prototype._allowInteraction;
+      $.ui.dialog.prototype._allowInteraction = function(e) { return $(e.target).closest('.kd_modal').length > 0 || allow.call(this, e); };
+    }
+  });
+})(jQuery);

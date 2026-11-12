@@ -5,6 +5,10 @@
     <em class="info"><%= l(:text_sys_code) %></em></p>
   <p><%= f.number_field :level, :min => 0, :max => 999, :label => :field_sys_level %>
     <em class="info"><%= l(:text_sys_level) %></em></p>
+  <% if @sites.any? %>
+  <p><%= f.select :menu_site_id, @sites.map { |x| [x.name, x.id] }, { :include_blank => l(:label_menu_site_all), :label => :field_menu_site } %>
+    <em class="info"><%= l(:text_sys_site) %></em></p>
+  <% end %>
   <p><%= f.text_area :description, :rows => 3, :cols => 60, :label => :field_description %></p>
   <p><%= f.check_box :active, :label => :field_active %></p>
 </div>

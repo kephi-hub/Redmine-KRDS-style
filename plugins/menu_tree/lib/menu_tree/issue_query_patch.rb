@@ -18,7 +18,7 @@ module MenuTree
       super
       return unless MenuTree.enabled_for?(project)
       add_available_filter 'menu_item_id', type: :list_optional, name: l(:label_menu_item),
-                           values: lambda { MenuItem.ordered(project).map { |m, d| ["#{'— ' * d}#{m.name}", m.id.to_s] } }
+                           values: lambda { MenuItem.ordered(project).map { |m, d| ["#{'— ' * d}#{m.pick_label(d)}", m.id.to_s] } }
     end
 
     def available_columns

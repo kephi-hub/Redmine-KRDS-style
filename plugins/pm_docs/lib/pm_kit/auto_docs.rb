@@ -24,8 +24,8 @@ module PmKit
                        generate: lambda { |p|
                          ordered = MenuItem.ordered(p)
                          columns = MenuColumn.where(project_id: p.id).sorted.to_a
-                         header, rows, depth = MenuTree::Sheet.export(p, ordered, columns, MenuTree::Stats.build(ordered)[:own], nil)
-                         widths = Array.new(depth, 18) + [16, 30, 10, 8, 6] + columns.map { 14 } + [8, 6, 8, 30]
+                         header, rows, depth, has_site = MenuTree::Sheet.export(p, ordered, columns, MenuTree::Stats.build(ordered)[:own], nil)
+                         widths = (has_site ? [16] : []) + Array.new(depth, 18) + [16, 30, 10, 8, 6] + columns.map { 14 } + [8, 6, 8, 30]
                          [["메뉴구조도_#{today}.xlsx", KrdsUi::Xlsx.build([{ name: '메뉴 구조도', header: header, rows: rows, widths: widths }])]]
                        } },
       'sys_roles' => { label: '시스템 권한(메뉴 권한 매트릭스)', available: ->(p) { defined?(SysRole) && mod?(p, :sys_roles) },
@@ -33,12 +33,7 @@ module PmKit
                          roles = SysRole.where(project_id: p.id).active.sorted.to_a
                          ordered = mod?(p, :menu_tree) ? MenuItem.ordered(p) : []
                          cells = MenuRoleAccess.where(menu_item_id: ordered.map { |m, _| m.id }, sys_role_id: roles.map(&:id)).pluck(:menu_item_id, :sys_role_id, :access).to_h { |m, r, a| [[m, r], a] }
-                         max = (ordered.map(&:last).max || 0) + 1
-                         header = (1..max).map { |d| "#{d}뎁스" } + ['화면 ID'] + roles.map { |r| r.code ? "#{r.name}(#{r.code})" : r.name }
-                         rows = ordered.map { |m, d| Array.new(d) + [m.name] + Array.new(max - d - 1) + [m.screen_id] + roles.map { |r| MenuRoleAccess::CODES[cells[[m.id, r.id]]] } }
-                         grades = roles.map { |r| [r.level, r.name, r.code, r.description] }
-                         [["시스템권한_#{today}.xlsx", KrdsUi::Xlsx.build([{ name: '메뉴 권한', header: header, rows: rows, widths: Array.new(max, 18) + [16] + roles.map { 12 } },
-                                                                          { name: '권한 등급', header: %w(등급 이름 코드 설명), rows: grades, widths: [8, 20, 14, 50] }])]]
+                         [["시스템권한_#{today}.xlsx", MenuTree::Sheet.roles_book(p, ordered, roles, cells)]]
                        } },
       'glossary' => { label: '용어사전', available: ->(p) { defined?(GlossaryTerm) && mod?(p, :glossary) },
                       generate: lambda { |p|

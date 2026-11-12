@@ -4,10 +4,14 @@ require 'csv'
 class MenuItemsController < ApplicationController
   menu_item :menu_items
   helper :menu_items
+  include MenuTree::SiteScope
 
   before_action :find_project_by_project_id
   before_action :authorize
   before_action :find_menu, only: [:update, :move, :destroy]
+  # 표 편집은 사이트 하나씩, 구조도·현황은 "전체"도 가능
+  before_action -> { load_sites }, only: [:index, :data, :create, :import]
+  before_action -> { load_sites(allow_all: true) }, only: [:diagram, :status]
 
   FIELDS = %w(name screen_id url screen_type channel active note).freeze
 
@@ -25,9 +29,10 @@ class MenuItemsController < ApplicationController
     parent = params[:parent_id].present? ? scope.find(params[:parent_id]) : nil
     after = params[:after_id].present? ? scope.find(params[:after_id]) : nil
     parent = after.parent if after
-    menu = MenuItem.new(project: @project, parent: parent, name: params[:name].presence || l(:label_menu_new_name), author_id: User.current.id)
+    menu = MenuItem.new(project: @project, parent: parent, name: params[:name].presence || l(:label_menu_new_name), author_id: User.current.id,
+                        menu_site_id: parent ? parent.menu_site_id : (after ? after.menu_site_id : @site&.id))
     MenuItem.transaction do
-      siblings = scope.where(parent_id: parent&.id)
+      siblings = sibling_scope(parent&.id, menu.menu_site_id)
       if after
         siblings.where('position > ?', after.position).update_all('position = position + 1')
         menu.position = after.position + 1
@@ -67,10 +72,10 @@ class MenuItemsController < ApplicationController
   # 구조 바꾸기: op=indent|outdent|up|down|drop(target_id, where=before|after|inside)
   def move
     MenuItem.transaction do
-      siblings = ->(pid) { scope.where(parent_id: pid).where.not(id: @menu.id).order(:position, :id).to_a }
+      siblings = ->(pid, site = @menu.menu_site_id) { sibling_scope(pid, site).where.not(id: @menu.id).order(:position, :id).to_a }
       case params[:op]
       when 'indent'
-        prev = scope.where(parent_id: @menu.parent_id).where('position < ? OR (position = ? AND id < ?)', @menu.position, @menu.position, @menu.id).order(:position, :id).last
+        prev = sibling_scope(@menu.parent_id, @menu.menu_site_id).where('position < ? OR (position = ? AND id < ?)', @menu.position, @menu.position, @menu.id).order(:position, :id).last
         raise ArgumentError, l(:error_menu_cannot_indent) unless prev
         place(@menu, prev.id, siblings.call(prev.id), nil)
       when 'outdent'
@@ -80,7 +85,7 @@ class MenuItemsController < ApplicationController
         place(@menu, parent.parent_id, list, list.index(parent) + 1)
       when 'up', 'down'
         list = siblings.call(@menu.parent_id)
-        mine = scope.where(parent_id: @menu.parent_id).order(:position, :id).to_a.index(@menu)
+        mine = sibling_scope(@menu.parent_id, @menu.menu_site_id).order(:position, :id).to_a.index(@menu)
         pos = params[:op] == 'up' ? [mine - 1, 0].max : [mine + 1, list.size].min
         place(@menu, @menu.parent_id, list, pos)
       when 'drop'
@@ -90,10 +95,16 @@ class MenuItemsController < ApplicationController
         if params[:where] == 'inside'
           place(@menu, target.id, siblings.call(target.id), nil)
         else
-          list = siblings.call(target.parent_id)
+          @menu.menu_site_id = target.menu_site_id if target.parent_id.nil?
+          list = siblings.call(target.parent_id, target.menu_site_id)
           idx = list.index(target)
           place(@menu, target.parent_id, list, params[:where] == 'before' ? idx : idx + 1)
         end
+      when 'site'
+        # 다른 사이트의 1뎁스 맨 끝으로 (하위 메뉴도 함께)
+        site = MenuSite.find_by!(id: params[:site_id], project_id: @project.id)
+        @menu.menu_site_id = site.id
+        place(@menu, nil, siblings.call(nil, site.id), nil)
       else
         raise ArgumentError, l(:error_menu_bad_field)
       end
@@ -110,7 +121,7 @@ class MenuItemsController < ApplicationController
 
   # 구조도 (Mermaid flowchart)
   def diagram
-    @ordered = MenuItem.ordered(@project)
+    @ordered = MenuItem.ordered(@project, site: site_filter)
     @roots = @ordered.select { |_, d| d.zero? }.map(&:first)
     @root = @roots.find { |m| m.id.to_s == params[:root].to_s }
     @dir = %w(LR TD).include?(params[:dir]) ? params[:dir] : 'LR'
@@ -118,8 +129,9 @@ class MenuItemsController < ApplicationController
     @show_id = params.key?(:applied) ? params[:show_id] == '1' : true
     @hide_unused = params[:hide_unused] == '1'
     @stats = MenuTree::Stats.build(@ordered)
-    @mermaid = helpers.menu_mermaid(@ordered, @stats, root: @root, dir: @dir, depth: @depth, show_id: @show_id, hide_unused: @hide_unused)
-    base = "메뉴구조도_#{@project.identifier}_#{User.current.today.strftime('%Y%m%d')}"
+    @mermaid = helpers.menu_mermaid(@ordered, @stats, root: @root, dir: @dir, depth: @depth, show_id: @show_id, hide_unused: @hide_unused,
+                                    sites: (@site_all && @sites.size > 1 ? @sites : nil), site: @site)
+    base = "메뉴구조도_#{@project.identifier}#{"_#{@site.name}" if @site && @sites.size > 1}_#{User.current.today.strftime('%Y%m%d')}"
     case params[:download]
     when 'mmd' then send_data @mermaid, filename: "#{base}.mmd", type: 'text/plain; charset=utf-8'
     when 'md'
@@ -130,7 +142,7 @@ class MenuItemsController < ApplicationController
 
   # 현황: 1뎁스별 화면(말단 메뉴) 수·일감 연결·완료·진행률
   def status
-    @ordered = MenuItem.ordered(@project)
+    @ordered = MenuItem.ordered(@project, site: site_filter)
     @stats = MenuTree::Stats.build(@ordered)
     by_parent = @ordered.map(&:first).group_by(&:parent_id)
     @leaves = @ordered.reject { |m, _| by_parent[m.id] }.map(&:first)
@@ -144,8 +156,8 @@ class MenuItemsController < ApplicationController
     columns = MenuColumn.where(project_id: @project.id).sorted.to_a
     stats = MenuTree::Stats.build(ordered)[:own]
     roles = role_summary(ordered.map { |m, _| m.id })
-    header, rows, depth = MenuTree::Sheet.export(@project, ordered, columns, stats, roles)
-    widths = Array.new(depth, 18) + [16, 30, 10, 8, 6] + columns.map { 14 } + (roles ? [28] : []) + [8, 6, 8, 30]
+    header, rows, depth, has_site = MenuTree::Sheet.export(@project, ordered, columns, stats, roles)
+    widths = (has_site ? [16] : []) + Array.new(depth, 18) + [16, 30, 10, 8, 6] + columns.map { 14 } + (roles ? [28] : []) + [8, 6, 8, 30]
     data = KrdsUi::Xlsx.build([{ name: '메뉴 구조도', header: header, rows: rows, widths: widths }])
     send_data data, filename: "메뉴구조도_#{@project.identifier}_#{User.current.today.strftime('%Y%m%d')}.xlsx",
                     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -165,7 +177,7 @@ class MenuItemsController < ApplicationController
              CSV.parse(text) rescue nil
            end
     return import_error(l(:error_menu_bad_file)) if rows.blank?
-    @result = MenuTree::Sheet.import(@project, rows, replace: params[:mode] == 'replace', author: User.current, new_columns: params[:new_columns] == '1')
+    @result = MenuTree::Sheet.import(@project, rows, replace: params[:mode] == 'replace', author: User.current, new_columns: params[:new_columns] == '1', site: @site)
     return import_error(l(:error_menu_no_depth)) unless @result
     flash.now[:notice] = l(:notice_menu_imported, created: @result[:created], updated: @result[:updated])
   rescue ActiveRecord::RecordInvalid => e
@@ -208,6 +220,12 @@ class MenuItemsController < ApplicationController
 
   def scope
     MenuItem.where(project_id: @project.id)
+  end
+
+  # 같은 부모의 형제 — 1뎁스는 같은 사이트 안에서만 순서를 매김
+  def sibling_scope(parent_id, site_id)
+    s = scope.where(parent_id: parent_id)
+    parent_id.nil? ? s.where(menu_site_id: site_id) : s
   end
 
   def find_menu
@@ -255,7 +273,7 @@ class MenuItemsController < ApplicationController
   end
 
   def grid_data
-    ordered = MenuItem.ordered(@project)
+    ordered = MenuItem.ordered(@project, site: site_filter)
     stats = MenuTree::Stats.build(ordered)
     roles = role_summary(ordered.map { |m, _| m.id })
     parents = ordered.map { |m, _| m.parent_id }.compact.to_set

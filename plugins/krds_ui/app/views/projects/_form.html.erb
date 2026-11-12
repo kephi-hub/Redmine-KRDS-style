@@ -48,9 +48,10 @@
     $(document).ready(function() {
       $("#project_inherit_members").change(function(){
         if (!$(this).is(':checked')) {
-          if (!confirm("<%= escape_javascript(l(:text_own_membership_delete_confirmation)) %>")) {
-            $("#project_inherit_members").attr("checked", true);
-          }
+          var $cb = $(this), msg = "<%= escape_javascript(l(:text_own_membership_delete_confirmation)) %>";
+          (window.KrdsDialog ? window.KrdsDialog.confirm(msg) : Promise.resolve(window.confirm(msg))).then(function(ok) {
+            if (!ok) $cb.prop("checked", true);
+          });
         }
       });
     });

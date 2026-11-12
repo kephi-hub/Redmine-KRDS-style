@@ -10,6 +10,7 @@
 <h2><%= l(:label_menu_tree) %></h2>
 <p class="subtitle"><%= l(:text_menu_tree) %></p>
 <%= menu_view_tabs(:grid) %>
+<%= render :partial => 'menu_items/site_bar', :locals => { :url => project_menu_items_path(@project), :allow_all => false, :manage => can_edit } %>
 
 <ul class="db_stats mt_kpi" id="mt_kpi"></ul>
 
@@ -57,6 +58,42 @@
     <%= text_area_tag 'menu_column[options]', '', :rows => 1, :placeholder => l(:text_menu_col_options), :id => nil, :'aria-label' => l(:label_menu_col_options) %>
     <%= submit_tag l(:button_add), :name => nil %>
   <% end %>
+  <p class="buttons"><%= link_to_function l(:button_close), 'hideModal(this);', :class => 'btn_line' %></p>
+</div>
+
+<%# 사이트 관리 (사용자 페이지 · 관리자 페이지 …) %>
+<div id="mt_sites_dialog" class="mt_dialog" style="display:none;">
+  <h3 class="title"><%= l(:label_menu_sites) %></h3>
+  <p class="mt_dim"><%= l(:text_menu_sites) %></p>
+  <% @sites.each do |x| %><%= form_tag project_menu_site_path(@project, x), :method => :patch, :id => "mt_site_#{x.id}" do %><% end %><% end %>
+  <% if @sites.any? %>
+  <table class="list mt_cols">
+    <thead><tr><th><%= l(:field_name) %></th><th><%= l(:field_menu_site_code) %></th><th><%= l(:field_menu_site_url) %></th><th><%= l(:label_menu_site_order) %></th><th><%= l(:label_menu_g_k_menus) %></th><th></th></tr></thead>
+    <tbody>
+    <% counts = MenuItem.where(project_id: @project.id).group(:menu_site_id).count %>
+    <% @sites.each do |x| %>
+      <tr>
+        <td><%= text_field_tag 'menu_site[name]', x.name, :form => "mt_site_#{x.id}", :maxlength => 60, :id => nil, :required => true, :'aria-label' => l(:field_name) %></td>
+        <td><%= text_field_tag 'menu_site[code]', x.code, :form => "mt_site_#{x.id}", :maxlength => 20, :size => 8, :id => nil, :'aria-label' => l(:field_menu_site_code) %></td>
+        <td><%= text_field_tag 'menu_site[url]', x.url, :form => "mt_site_#{x.id}", :maxlength => 300, :id => nil, :'aria-label' => l(:field_menu_site_url) %></td>
+        <td><%= number_field_tag 'menu_site[position]', x.position, :form => "mt_site_#{x.id}", :min => 1, :max => 99, :id => nil, :class => 'mt_num', :'aria-label' => l(:label_menu_site_order) %></td>
+        <td class="count"><%= counts[x.id].to_i %></td>
+        <td class="buttons">
+          <%= submit_tag l(:button_save), :form => "mt_site_#{x.id}", :name => nil, :class => 'mt_btn' %>
+          <%= link_to sprite_icon('del', l(:button_delete)), project_menu_site_path(@project, x), :method => :delete, :data => { :confirm => l(:text_menu_site_delete, :name => x.name) }, :class => 'icon icon-del' %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  <% end %>
+  <%= form_tag project_menu_sites_path(@project), :class => 'mt_col_new' do %>
+    <%= text_field_tag 'menu_site[name]', '', :maxlength => 60, :placeholder => l(:label_menu_site_new), :id => nil, :required => true, :'aria-label' => l(:label_menu_site_new) %>
+    <%= text_field_tag 'menu_site[code]', '', :maxlength => 20, :size => 8, :placeholder => 'USR', :id => nil, :'aria-label' => l(:field_menu_site_code) %>
+    <%= text_field_tag 'menu_site[url]', '', :maxlength => 300, :placeholder => l(:field_menu_site_url), :id => nil, :'aria-label' => l(:field_menu_site_url) %>
+    <%= submit_tag l(:button_add), :name => nil %>
+  <% end %>
+  <% if @sites.empty? && MenuItem.where(project_id: @project.id).exists? %><p class="mt_dim"><%= l(:text_menu_sites_first) %></p><% end %>
   <p class="buttons"><%= link_to_function l(:button_close), 'hideModal(this);', :class => 'btn_line' %></p>
 </div>
 

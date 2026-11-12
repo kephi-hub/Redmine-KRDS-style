@@ -1,6 +1,7 @@
 <%# 프로젝트 > 메뉴 구조도 > 구조도 — Mermaid flowchart (완료·진행·일감 없음·미사용 색 구분), .md/.mmd/SVG/PNG %>
 <h2><%= l(:label_menu_tree) %></h2>
 <%= menu_view_tabs(:diagram) %>
+<%= render :partial => 'menu_items/site_bar', :locals => { :url => project_menu_items_diagram_path(@project), :allow_all => true, :manage => false } %>
 <% if @ordered.empty? %>
 <p class="nodata"><%= l(:label_menu_g_no_rows) %></p>
 <% else %>
@@ -8,7 +9,7 @@
   <%= hidden_field_tag 'applied', '1', :id => nil %>
   <div class="erd_opts">
     <label class="ag_flabel" for="mt_root"><%= l(:label_menu_dg_root) %></label>
-    <%= select_tag 'root', options_for_select([[l(:label_menu_all), '']] + @roots.map { |m| [m.name, m.id] }, @root&.id), :id => 'mt_root' %>
+    <%= select_tag 'root', options_for_select([[l(:label_menu_all), '']] + @roots.map { |m| [(@site_all ? m.path : m.name), m.id] }, @root&.id), :id => 'mt_root' %>
     <label class="ag_flabel" for="mt_depth"><%= l(:label_menu_dg_depth) %></label>
     <%= select_tag 'depth', options_for_select([[l(:label_menu_all), '']] + (1..[(@ordered.map(&:last).max || 0) + 1, 1].max).map { |d| ["#{d}#{l(:label_menu_g_depth)}", d] }, @depth), :id => 'mt_depth' %>
     <% [['LR', :label_menu_dg_lr], ['TD', :label_menu_dg_td]].each do |v, label| %>

@@ -22,7 +22,7 @@
     <p><label><%= l(:label_pm_menu) %></label>
       <% chosen = params[:menus_sent] == '1' ? Array(params[:menu_item_ids]).map(&:to_i) : @cr.link_ids('menu') %>
       <%= render :partial => 'qa_trace/pick', :locals => { :pick_id => 'pm_menu_pick', :field => 'menu_item_ids[]', :sent => 'menus_sent', :chosen => chosen, :placeholder => l(:label_pm_pick_menu),
-            :items => @ordered.map { |m, d| { :id => m.id, :chip => m.path(index), :label => m.name, :sub => m.screen_id, :q => "#{m.path(index)} #{m.screen_id}", :depth => d } } } %></p>
+            :items => @ordered.map { |m, d| { :id => m.id, :chip => m.path(index), :label => m.pick_label(d), :sub => m.screen_id, :q => "#{m.path(index)} #{m.screen_id}", :depth => d } } } %></p>
   <% end %>
   <% if @if_on && @all_ifs.any? %>
     <p><label><%= l(:label_pm_interfaces) %></label>

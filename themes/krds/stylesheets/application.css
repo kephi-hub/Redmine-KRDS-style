@@ -1207,6 +1207,32 @@ button.sr_cell:disabled{cursor:default;}
 #content table.sr_matrix th.role{font-size:0.8125rem;}
 .sr_down{width:22px;height:22px;padding:0;margin:0 0 0 6px;border:1px solid var(--gray_30);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.75rem;color:var(--gray_60);cursor:pointer;}
 .sr_down:hover{border-color:var(--pri_50);color:var(--pri_60);}
+/* KRDS 모달 — alert·confirm 대신 (theme.js KrdsDialog). KRDS 규격: 작은 크기 400px, 모서리 12px, 화면 어둡게 75% */
+html.kd_open,html.kd_open body{overflow:hidden;}
+.kd_modal{display:flex;position:fixed;top:0;right:0;bottom:0;left:0;z-index:10010;align-items:center;justify-content:center;padding:12px;}
+.kd_back{position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,0.75);}
+.kd_box{display:flex;position:relative;flex-direction:column;width:100%;max-width:400px;max-height:80%;border:1px solid var(--gray_30);border-radius:12px;background:var(--gray_0);box-shadow:0 0 2px 0 rgba(0,0,0,0.08),0 16px 24px 0 rgba(0,0,0,0.12);color:var(--gray_90);}
+.kd_title{padding:52px 24px 0;margin:0;font-size:1.375rem;font-weight:700;line-height:1.4;color:var(--gray_90);}
+.kd_body{overflow-y:auto;padding:16px 24px 8px;font-size:1.0625rem;line-height:1.6;white-space:pre-line;word-break:keep-all;overflow-wrap:anywhere;color:var(--gray_80);}
+.kd_btns{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px 24px;}
+.kd_btn{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 20px;margin:0;border:1px solid var(--gray_40);border-radius:6px;background:var(--gray_0);font-size:1rem;font-weight:700;color:var(--gray_90);cursor:pointer;}
+.kd_btn:hover{background:var(--gray_5);}
+.kd_btn.kd_pri{border-color:var(--pri_50);background:var(--pri_50);color:var(--gray_0);}
+.kd_btn.kd_pri:hover{border-color:var(--pri_60);background:var(--pri_60);}
+.kd_btn:focus-visible,.kd_close:focus-visible{outline:2px solid var(--pri_50);outline-offset:2px;}
+.kd_close{display:inline-flex;position:absolute;top:20px;right:20px;align-items:center;justify-content:center;width:40px;height:40px;padding:0;border:0;border-radius:6px;background:none;cursor:pointer;}
+.kd_close:hover{background:var(--gray_5);}
+.kd_close svg{width:24px;height:24px;fill:none;stroke:var(--gray_90);stroke-width:2;stroke-linecap:round;}
+
+/* 메뉴 구조도 사이트 (사용자 페이지 · 관리자 페이지) */
+.mt_sitebar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 16px;margin:0 0 16px;border:1px solid var(--sec_10);border-radius:var(--radius_l);background:var(--sec_5);}
+.mt_sitesel{display:flex;flex:1 1 100%;align-items:center;gap:8px;}
+.mt_sitesel label{font-weight:700;color:var(--sec_80);}
+.mt_sitesel select{flex:1 1 auto;}
+.mt_num{max-width:72px;}
+#content table.sr_matrix td.sr_na{text-align:center;color:var(--gray_30);}
+#content table.sr_matrix tr.sr_site th{padding:8px 12px;background:var(--sec_5);font-weight:700;text-align:left;color:var(--sec_80);}
+.sr_sitetag{display:inline-block;padding:0 6px;margin:2px 0 0;border-radius:var(--radius_s);background:var(--sec_5);font-size:0.6875rem;font-weight:400;color:var(--sec_80);}
 
 /* 요구사항 · 테스트 (qa_trace 플러그인) — 필터, 배지(data-k 로 색), 추적표, 상세, 결과 입력 */
 .qa_filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 16px;}
@@ -1438,6 +1464,11 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 
 /* ===== 데스크톱 (900px 이상) ===== */
 @media (min-width:900px){
+.kd_title{padding:56px 40px 0;font-size:1.5rem;}
+.kd_body{padding:16px 40px 8px;}
+.kd_btns{padding:16px 40px 40px;}
+.kd_close{top:24px;right:24px;}
+.mt_sitesel{flex:0 1 auto;}
 #content table#browser{display:table;overflow:visible;}
 #header{position:relative;z-index:62;padding-bottom:57px;}
 #top-menu{position:relative;z-index:62;}
