@@ -144,12 +144,12 @@ module PmKit
                            ["보안약점진단_#{s.name.gsub(%r{[\\/:*?"<>|\s]+}, '_')}.xlsx", PmKit::Sheet.sec_scan(s, s.pm_sec_items.includes(:fixer, :pm_program).order(:kind, :file_path, :line).to_a)]
                          end
                        } },
-      'weekly_report' => { label: '주간 보고서 (지난주)', available: ->(p) { mod?(p, :pm_reports) },
+      'pm_weekly' => { label: '주간 보고서 (지난주)', available: ->(p) { mod?(p, :pm_reports) },
                            generate: lambda { |p|
                              from, to = PmKit::Report.period('last_week')
                              [["주간보고서_#{from.strftime('%Y%m%d')}.xlsx", PmKit::Sheet.report(p, PmKit::Report.build(p, from, to))]]
                            } },
-      'monthly_report' => { label: '월간 보고서 (지난달)', available: ->(p) { mod?(p, :pm_reports) },
+      'pm_monthly' => { label: '월간 보고서 (지난달)', available: ->(p) { mod?(p, :pm_reports) },
                             generate: lambda { |p|
                               from, to = PmKit::Report.period('last_month')
                               [["월간보고서_#{from.strftime('%Y%m')}.xlsx", PmKit::Sheet.report(p, PmKit::Report.build(p, from, to))]]
