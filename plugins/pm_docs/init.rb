@@ -12,6 +12,7 @@ require_relative 'lib/pm_kit/importer'
 require_relative 'lib/pm_kit/dashboard'
 require_relative 'lib/pm_kit/status_suggest'
 require_relative 'lib/pm_kit/hooks'
+require_relative 'lib/pm_kit/sla'
 
 Redmine::Plugin.register :pm_docs do
   name '산출물 관리'
@@ -61,6 +62,11 @@ unless Project.reflect_on_association(:pm_deliverables)
 end
 # 일감을 지우면 위험의 일감 번호를 비우고 변경요청의 일감 연결을 지움
 Issue.has_many :pm_risks, dependent: :nullify unless Issue.reflect_on_association(:pm_risks)
+# SR 일감: 완료 기한을 비워 두면 긴급도로 자동 (PmKit::Sla)
+unless Issue.instance_variable_get(:@pm_sla_hooked)
+  Issue.before_validation { PmKit::Sla.fill_due(self) }
+  Issue.instance_variable_set(:@pm_sla_hooked, true)
+end
 Issue.has_many :pm_cr_issue_links, -> { where(target_type: 'issue') }, class_name: 'PmCrLink', foreign_key: :target_id, dependent: :delete_all unless Issue.reflect_on_association(:pm_cr_issue_links)
 if Redmine::Plugin.installed?(:menu_tree)
   MenuItem.has_many :pm_programs, dependent: :nullify unless MenuItem.reflect_on_association(:pm_programs)

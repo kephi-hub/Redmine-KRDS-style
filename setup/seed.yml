@@ -65,6 +65,29 @@ trackers:
   default_status: 신규
 - name: 퍼블리싱
   default_status: 신규
+# 유지관리 서비스 요청 — 긴급도로 처리 기한(완료 기한)을 자동으로 정하고 기한 준수율(SLA)을 대시보드·월간 보고서에 표시
+# 유지관리 프로젝트만 설정 → 일감 유형에서 켬
+- name: SR
+  default_status: 신규
+
+# 일감 사용자 정의 항목 — 이름으로 찾아 없을 때만 만들고, 있으면 일감 유형 연결만 보강 (관리 화면에서 바꾼 값은 유지)
+issue_custom_fields:
+- name: 요청 구분
+  format: list
+  values: [장애, 변경, 개선, 문의, 자료 요청]
+  trackers: [SR]
+  filter: true
+- name: 긴급도
+  format: list
+  values: [긴급, 높음, 보통, 낮음]
+  default: 보통
+  required: true
+  trackers: [SR]
+  filter: true
+- name: 요청자
+  format: string
+  trackers: [SR]
+  filter: true
 time_entry_activities:
 - 설계
 - 개발

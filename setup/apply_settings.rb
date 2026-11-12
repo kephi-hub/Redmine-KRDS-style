@@ -55,6 +55,25 @@ ActiveRecord::Base.transaction do
     log "#{tracker.name}#{' (새로 만듦, 업무흐름 복사)' if created}"
   end
 
+  puts '[일감 사용자 정의 항목]'
+  (SEED['issue_custom_fields'] || []).each do |c|
+    cf = IssueCustomField.find_by(name: c['name'])
+    trackers = Tracker.where(name: Array(c['trackers'])).to_a
+    if cf
+      missing = trackers - cf.trackers.to_a
+      cf.trackers << missing if missing.any?
+      log "#{cf.name}: 있음#{" (일감 유형 #{missing.map(&:name).join(', ')} 연결)" if missing.any?}"
+    else
+      cf = IssueCustomField.new(name: c['name'], field_format: c['format'], is_for_all: true, is_filter: c['filter'] ? true : false,
+                                is_required: c['required'] ? true : false, visible: true, searchable: c['format'] == 'string')
+      cf.possible_values = c['values'] if c['values']
+      cf.default_value = c['default'] if c['default']
+      cf.trackers = trackers
+      cf.save!
+      log "#{cf.name}: 새로 만듦 (#{trackers.map(&:name).join(', ')})"
+    end
+  end
+
   puts '[업무흐름]'
   # 역할 × 일감 유형 조합에 업무흐름이 하나도 없을 때만 기본값을 채움 (관리 화면에서 바꾼 업무흐름은 그대로)
   statuses = IssueStatus.all.index_by(&:name)
