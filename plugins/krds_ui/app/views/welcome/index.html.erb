@@ -1,0 +1,104 @@
+<%# 초기화면 (Redmine 6.1.6 welcome/index 대체) — 안내문(설정 › 초기화면 안내문) + 바로 가기 + 새소식 + 탭 매뉴얼(KrdsUi::Manual) %>
+<h2 class="wl_sr"><%= l(:label_home) %></h2>
+
+<section class="wl_hero" aria-label="<%= l(:label_krds_welcome) %>">
+  <div class="wl_intro wiki"><%= textilizable Setting.welcome_text %></div>
+  <% if User.current.logged? %>
+  <ul class="wl_quick">
+    <li><%= link_to my_page_path do %><%= sprite_icon('user') %><strong><%= l(:label_my_page) %></strong><span><%= l(:text_krds_q_mypage) %></span><% end %></li>
+    <li><%= link_to projects_path do %><%= sprite_icon('projects') %><strong><%= l(:label_project_plural) %></strong><span><%= l(:text_krds_q_projects) %></span><% end %></li>
+    <% if Redmine::Plugin.installed?(:pm_docs) %>
+    <li><%= link_to '/pmo' do %><%= sprite_icon('stats') %><strong><%= l(:label_pm_portfolio) %></strong><span><%= l(:text_krds_q_pmo) %></span><% end %></li>
+    <% end %>
+    <li><%= link_to '#manual' do %><%= sprite_icon('help') %><strong><%= l(:label_krds_manual) %></strong><span><%= l(:text_krds_q_manual) %></span><% end %></li>
+  </ul>
+  <% end %>
+</section>
+
+<% if @news.any? %>
+<section class="wl_news box" aria-labelledby="wl_news_tit">
+  <h3 id="wl_news_tit" class="icon icon-news"><%= sprite_icon('news', l(:label_news_latest)) %></h3>
+  <%= render :partial => 'news/news', :collection => @news %>
+  <%= link_to l(:label_news_view_all), :controller => 'news' %>
+</section>
+<% end %>
+<%= call_hook(:view_welcome_index_left) %>
+<%= call_hook(:view_welcome_index_right) %>
+
+<% tabs = KrdsUi::Manual.tabs %>
+<% if tabs.any? %>
+<section class="man" id="manual" aria-labelledby="man_title">
+  <div class="man_head">
+    <h2 id="man_title"><%= l(:label_krds_manual) %></h2>
+    <p><%= l(:text_krds_manual) %></p>
+  </div>
+  <div class="man_tabs" role="tablist" aria-label="<%= l(:label_krds_manual) %>">
+    <% tabs.each_with_index do |t, i| %>
+      <button type="button" class="man_tab<%= ' on' if i.zero? %>" role="tab" id="man_t_<%= t.key %>" aria-controls="man_p_<%= t.key %>"
+              aria-selected="<%= i.zero? %>" tabindex="<%= i.zero? ? 0 : -1 %>" data-key="<%= t.key %>"><%= sprite_icon(t.icon) %><span><%= t.title %></span></button>
+    <% end %>
+  </div>
+  <% tabs.each_with_index do |t, i| %>
+  <div class="man_panel" role="tabpanel" id="man_p_<%= t.key %>" aria-labelledby="man_t_<%= t.key %>" tabindex="0"<%= ' hidden' unless i.zero? %>>
+    <div class="man_intro">
+      <span class="man_ico" aria-hidden="true"><%= sprite_icon(t.icon) %></span>
+      <div><h3 class="man_ptit"><%= t.title %></h3><% if t.summary.present? %><p><%= t.summary %></p><% end %></div>
+    </div>
+    <div class="man_wrap">
+      <% if t.toc.size > 1 %>
+      <nav class="man_toc" aria-label="<%= l(:label_krds_manual_toc, :title => t.title) %>">
+        <strong><%= l(:label_krds_manual_toc_short) %></strong>
+        <ol><% t.toc.each do |id, text| %><li><a href="#<%= id %>"><%= text %></a></li><% end %></ol>
+      </nav>
+      <% end %>
+      <div class="man_body wiki"><%= t.html %></div>
+    </div>
+  </div>
+  <% end %>
+</section>
+<%= javascript_tag do %>
+(function() {
+  var box = document.getElementById('manual'); if (!box) return;
+  var tabs = [].slice.call(box.querySelectorAll('.man_tab'));
+  function pick(tab, focus, keep) {
+    tabs.forEach(function(t) {
+      var on = t === tab, p = document.getElementById(t.getAttribute('aria-controls'));
+      t.classList.toggle('on', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); t.tabIndex = on ? 0 : -1;
+      if (p) p.hidden = !on;
+    });
+    if (focus) tab.focus();
+    if (!keep) { try { localStorage.setItem('krds_manual_tab', tab.dataset.key); } catch (e) {} }
+  }
+  tabs.forEach(function(t, i) {
+    t.addEventListener('click', function() { pick(t, false); if (history.replaceState) history.replaceState(null, '', '#man-' + t.dataset.key); });
+    t.addEventListener('keydown', function(e) {
+      var n = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+      if (n === undefined) return;
+      e.preventDefault(); pick(tabs[(n + tabs.length) % tabs.length], true);
+    });
+  });
+  // 주소 #man-<탭> 또는 #man_<탭>_<절> 이면 그 탭을 열고 그 절로 이동
+  function fromHash(scroll) {
+    var h = decodeURIComponent(location.hash.slice(1)), tab = null, target = null;
+    if (h.indexOf('man-') === 0) tab = document.getElementById('man_t_' + h.slice(4));
+    else if (h.indexOf('man_') === 0 && (target = document.getElementById(h))) { var p = target.closest('.man_panel'); tab = p && document.getElementById(p.getAttribute('aria-labelledby')); }
+    if (!tab) return false;
+    pick(tab, false, true);
+    if (scroll) (target || box).scrollIntoView({ block: 'start' });
+    return true;
+  }
+  if (!fromHash(true)) {
+    var saved = null; try { saved = localStorage.getItem('krds_manual_tab'); } catch (e) {}
+    var st = saved && document.getElementById('man_t_' + saved); if (st) pick(st, false, true);
+  }
+  window.addEventListener('hashchange', function() { fromHash(true); });
+})();
+<% end %>
+<% end %>
+
+<% content_for :header_tags do %>
+<%= auto_discovery_link_tag(:atom, {:controller => 'news', :action => 'index', :key => User.current.atom_key, :format => 'atom'},
+                                   :title => "#{Setting.app_title}: #{l(:label_news_latest)}") %>
+<%= auto_discovery_link_tag(:atom, {:controller => 'activities', :action => 'index', :key => User.current.atom_key, :format => 'atom'},
+                                   :title => "#{Setting.app_title}: #{l(:label_activity)}") %>
+<% end %>

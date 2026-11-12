@@ -1,5 +1,14 @@
 # Redmine 6.1.6 한국어 번역 누락분 보충 (core ko.yml 에 영어로 남아 있는 키)
 ko:
+  label_krds_welcome: "환영합니다"
+  label_krds_manual: "사용 매뉴얼"
+  text_krds_manual: "탭을 눌러 분야별 사용법을 보세요. 왼쪽 목차를 누르면 해당 내용으로 이동합니다."
+  label_krds_manual_toc: "%{title} 목차"
+  label_krds_manual_toc_short: "이 탭의 내용"
+  text_krds_q_mypage: "내가 맡은 일감과 할 일"
+  text_krds_q_projects: "참여 중인 프로젝트"
+  text_krds_q_pmo: "전체 프로젝트 신호등"
+  text_krds_q_manual: "분야별 사용법"
   label_pmod_desc_baselines: "일정 기준선 저장 · 지금 일정과 비교"
   label_pmod_desc_closing: "준공(검수) 체크리스트 · 완료보고 엑셀"
   button_save_object: "%{object_name} 저장"
