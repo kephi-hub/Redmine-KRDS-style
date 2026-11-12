@@ -112,14 +112,14 @@ module KrdsUi
                               id: pid, class: 'gnb_panel', hidden: true)
           lis << content_tag(:li, trigger + panel)
         end
-        mtabs << content_tag(:li, link_to(label, "##{mid}", class: (active ? 'on' : nil), 'aria-selected': (active ? 'true' : 'false')))
+        mtabs << content_tag(:li, link_to(label, "##{mid}", class: (active ? 'on' : nil), 'aria-current': (active ? 'true' : nil)))
         msecs << content_tag(:div, content_tag(:h2, label, class: 'mnav_tit') + content_tag(:ul, links), id: mid, class: 'mnav_sec')
       end
       if (s = by[:settings])
         caption, url, sel = extract_node_details(s, project)
         lis << content_tag(:li, link_to(caption, url, class: "gnb_trigger is_link#{' selected' if sel}", 'aria-current': (sel ? 'page' : nil)))
         mid = 'mnav_settings'
-        mtabs << content_tag(:li, link_to(caption, "##{mid}", class: (sel ? 'on' : nil), 'aria-selected': (sel ? 'true' : 'false')))
+        mtabs << content_tag(:li, link_to(caption, "##{mid}", class: (sel ? 'on' : nil), 'aria-current': (sel ? 'true' : nil)))
         msecs << content_tag(:div, content_tag(:h2, caption, class: 'mnav_tit') + content_tag(:ul, content_tag(:li, krds_link(caption, url, sel, 'gnb_link', :settings))), id: mid, class: 'mnav_sec')
       end
       mobile = content_tag(:div, content_tag(:ul, safe_join(mtabs), class: 'mnav_tabs') + content_tag(:div, safe_join(msecs), class: 'mnav_body'),

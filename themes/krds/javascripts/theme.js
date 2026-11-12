@@ -138,7 +138,7 @@ $(function() {
     var top = $fly.offset().top + 64, cur = null;
     $secs.each(function() { if ($(this).offset().top <= top + 4) cur = this.id; });
     if (!cur) cur = $secs.first().attr('id');
-    $tabs.each(function() { var on = $(this).attr('href') === '#' + cur; $(this).toggleClass('on', on).attr('aria-selected', on ? 'true' : 'false'); });
+    $tabs.each(function() { var on = $(this).attr('href') === '#' + cur; $(this).toggleClass('on', on); if (on) { $(this).attr('aria-current', 'true'); } else { $(this).removeAttr('aria-current'); } });
   });
   // 레이어를 열면 지금 메뉴가 있는 묶음으로 (코어 핸들러가 stopPropagation 하므로 버튼에 직접 건다)
   $('.js-flyout-menu-toggle-button').on('click', function() {
@@ -234,4 +234,39 @@ $(function() {
       $.ui.dialog.prototype._allowInteraction = function(e) { return $(e.target).closest('.kd_modal').length > 0 || allow.call(this, e); };
     }
   });
+})(jQuery);
+
+// 웹 접근성 — Redmine 기본 화면 요소에 이름 붙이기 (KWCAG 7.3.2 레이블 · 6.4.3 링크 텍스트 · 6.1.1 키보드)
+// 이름 없는 아이콘 링크·입력칸에 aria-label, 가로로 넘치는 코드 블록은 키보드로 스크롤 가능하게
+(function($) {
+  var NAMES = { 'from': '시작일', 'to': '종료일', 'months': '개월 수', 'month': '월', 'year': '연도', 'user_id': '사용자', 'content[text]': '내용',
+                'content[comments]': '변경 설명', 'notes': '댓글', 'q': '검색어', 'per_page': '쪽당 개수' };
+  function named(el) {
+    if (el.getAttribute('aria-label') || el.getAttribute('aria-labelledby') || el.getAttribute('title')) return true;
+    if (el.id && document.querySelector('label[for="' + (window.CSS && CSS.escape ? CSS.escape(el.id) : el.id) + '"]')) return true;
+    return !!$(el).closest('label').length;
+  }
+  function fix(root) {
+    var $r = $(root || document);
+    $r.find('#sidebar-switch-button').attr('aria-label', '사이드바 접기·펼치기');
+    $r.find('.mobile-toggle-button').attr('aria-label', '메뉴 열기');
+    $r.find('a.reaction-button').each(function() { if (!$.trim($(this).text())) $(this).attr('aria-label', $(this).attr('title') || '공감'); });
+    $r.find('a').each(function() {
+      if ($.trim($(this).text()) || this.getAttribute('aria-label') || this.getAttribute('title') || $(this).find('img[alt]:not([alt=""])').length) return;
+      var t = $(this).find('svg title').text(); if (t) this.setAttribute('aria-label', t);
+    });
+    $r.find('input:not([type=hidden]):not([type=submit]):not([type=button]):not([type=reset]), select, textarea').each(function() {
+      if (named(this)) return;
+      var n = this.getAttribute('name') || '';
+      if (n === 'ids[]') { this.setAttribute('aria-label', '#' + this.value + ' 선택'); return; }
+      if (this.type === 'file') { this.setAttribute('aria-label', '파일 선택'); return; }
+      var key = NAMES[n] || NAMES[this.id];
+      if (key) { this.setAttribute('aria-label', key); return; }
+      if (this.getAttribute('placeholder')) this.setAttribute('aria-label', this.getAttribute('placeholder'));
+    });
+    $r.find('.wiki pre, pre.wiki, .pre-wrapper pre').attr('tabindex', '0');
+  }
+  $(function() { fix(document); });
+  $(document).ajaxComplete(function() { setTimeout(function() { fix(document); }, 0); });
+  window.krdsA11yFix = fix;
 })(jQuery);

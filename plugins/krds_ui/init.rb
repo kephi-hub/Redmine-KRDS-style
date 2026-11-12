@@ -75,6 +75,16 @@ module KrdsUi
   end
 
   # 문서 편집 저장 때 첨부 추가·삭제 — 추가는 편집 권한(원본 add_attachment 와 동일), 삭제는 문서 삭제 권한(원본 첨부 삭제와 동일)
+  # 웹 접근성: 글자 아바타(role=img)에 사용자 이름을 대체 텍스트로 (KWCAG 5.1.1)
+  module AvatarNamePatch
+    def initials_avatar_tag(user, options)
+      tag = super
+      name = user.respond_to?(:name) ? user.name.to_s : ''
+      return tag if name.empty? || tag.to_s.include?('aria-label=')
+      tag.to_s.sub('<span ', "<span aria-label=\"#{ERB::Util.html_escape(name)}\" ").html_safe
+    end
+  end
+
   module DocumentAttachmentsPatch
     def update
       before_ids = @document.attachments.pluck(:id)
@@ -91,6 +101,7 @@ module KrdsUi
   end
 end
 User.prepend(KrdsUi::UserInitialsPatch) unless User.ancestors.include?(KrdsUi::UserInitialsPatch)
+AvatarsHelper.prepend(KrdsUi::AvatarNamePatch) unless AvatarsHelper.ancestors.include?(KrdsUi::AvatarNamePatch)
 DocumentsController.prepend(KrdsUi::DocumentAttachmentsPatch) unless DocumentsController.ancestors.include?(KrdsUi::DocumentAttachmentsPatch)
 DocumentsController.prepend(KrdsUi::DocumentListPatch) unless DocumentsController.ancestors.include?(KrdsUi::DocumentListPatch)
 NewsController.prepend(KrdsUi::NewsSearchPatch) unless NewsController.ancestors.include?(KrdsUi::NewsSearchPatch)
