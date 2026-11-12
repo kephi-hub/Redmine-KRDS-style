@@ -13,6 +13,7 @@ class PmStaffsController < ApplicationController
     today = User.current.today
     @from, @to = period
     @month = [today.beginning_of_month, today.end_of_month]
+    @months = @staffs.any? ? PmKit::Sheet.staff_months(@staffs, @from, @to) : []
     @kpi = { active: @staffs.count { |s| s.active?(today) }, plan: @staffs.sum { |s| s.plan_mm(@from, @to) }.round(2),
              actual: @staffs.sum { |s| s.actual_mm(@from, @to).to_f }.round(2), month: @staffs.sum { |s| s.plan_mm(*@month) }.round(2),
              nopledge: @staffs.count { |s| s.active?(today) && s.pledge_on.nil? }, unrevoked: @staffs.count { |s| s.end_on && s.end_on < today && s.accounts.present? && s.revoked_on.nil? } }

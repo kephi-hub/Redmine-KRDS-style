@@ -1,5 +1,7 @@
 # Redmine 6.1.6 한국어 번역 누락분 보충 (core ko.yml 에 영어로 남아 있는 키)
 ko:
+  label_pmod_desc_baselines: "일정 기준선 저장 · 지금 일정과 비교"
+  label_pmod_desc_closing: "준공(검수) 체크리스트 · 완료보고 엑셀"
   button_save_object: "%{object_name} 저장"
   label_attachment_description: 파일 설명
   field_any_searchable: 검색 가능한 모든 텍스트

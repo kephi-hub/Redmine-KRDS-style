@@ -1427,6 +1427,29 @@ a.pf_name{font-weight:700;}
 .pf_bar{display:block;position:relative;height:8px;margin:4px 0;border-radius:4px;background:var(--gray_10);}
 .pf_bar span{display:block;height:100%;border-radius:4px;background:var(--sec_70);}
 .pf_bar i{position:absolute;top:-4px;width:2px;height:16px;background:var(--dan_50);}
+.pm_bl_form{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 16px;padding:12px;border:1px solid var(--gray_10);border-radius:var(--radius_m);background:var(--gray_5);}
+.pm_bl_form input[type=text]{width:100%;max-width:280px;}
+.pm_list tr.on td{background:var(--pri_5);}
+.pm_list tr.pm_total th{background:var(--gray_5);text-align:left;}
+.pm_mm .pf_bar{width:100%;max-width:160px;}
+.pm_cl_head{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 8px;font-size:1.0625rem;}
+.pm_cl_head .pf_bar{flex:1 1 100%;max-width:480px;height:10px;}
+.pm_cl{margin:0 0 16px;padding:0;list-style:none;}
+.pm_cl_item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray_10);}
+.pm_cl_mark{flex:0 0 auto;width:20px;height:20px;margin-top:1px;border:2px solid var(--gray_30);border-radius:50%;}
+.pm_cl_item[data-s=ok] .pm_cl_mark{border-color:var(--suc_60);background:var(--suc_60) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5l10 -10'/%3E%3C/svg%3E") center/14px no-repeat;}
+.pm_cl_item[data-s=ng] .pm_cl_mark{border-color:var(--dan_50);}
+.pm_cl_item[data-s=na]{color:var(--gray_50);}
+.pm_cl_item[data-s=na] .pm_cl_mark{border-style:dashed;}
+.pm_cl_body{flex:1 1 auto;overflow-wrap:anywhere;}
+.pm_cl_body strong{margin-right:6px;}
+.pm_cl_state{display:inline-block;margin-right:6px;font-size:0.8125rem;font-weight:700;}
+.pm_cl_item[data-s=ok] .pm_cl_state{color:var(--suc_60);}
+.pm_cl_item[data-s=ng] .pm_cl_state{color:var(--dan_60);}
+.pm_cl_form{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px;}
+.pm_cl_form input[type=text]{flex:1 1 200px;max-width:420px;}
+.pm_cl_chk{display:inline-flex;align-items:center;gap:4px;}
+.pm_cl_note{margin:4px 0 0;color:var(--gray_60);}
 .pf_pct{font-size:0.75rem;color:var(--gray_60);white-space:nowrap;}
 .pf_pct b{color:var(--gray_90);}
 /* 모바일: 프로젝트마다 카드 (칸 이름은 data-l), 900px 이상은 표 */

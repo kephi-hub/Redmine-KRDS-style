@@ -39,6 +39,8 @@ module AccessGuide
     { key: 'staff', view: %i[view_staff], write: %i[], manage: %i[manage_staff] },
     { key: 'secscans', view: %i[view_sec_scans], write: %i[manage_sec_scans], manage: %i[] },
     { key: 'reports', view: %i[view_pm_reports], write: %i[], manage: %i[] },
+    { key: 'baselines', view: %i[view_baselines], write: %i[], manage: %i[manage_baselines] },
+    { key: 'closing', view: %i[view_closing], write: %i[manage_closing], manage: %i[] },
     { key: 'calendar', view: %i[view_calendar view_gantt], write: %i[], manage: %i[] },
   ].freeze
 

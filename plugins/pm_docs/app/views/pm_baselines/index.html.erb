@@ -1,0 +1,59 @@
+<%# 프로젝트 > 일정 기준선 — 기준선 저장 · 고른 기준선과 지금 일정 비교 %>
+<% can_edit = User.current.allowed_to?(:manage_baselines, @project) %>
+<div class="contextual">
+  <% if @baseline %><%= link_to sprite_icon('download', l(:label_pm_baseline_export)), export_project_pm_baseline_path(@project, @baseline), :class => 'icon icon-download' %><% end %>
+</div>
+<h2><%= l(:label_pm_baselines) %></h2>
+<p class="subtitle"><%= l(:text_pm_baselines) %></p>
+<% if can_edit %>
+<%= form_tag project_pm_baselines_path(@project), :class => 'pm_bl_form' do %>
+  <label for="bl_name"><%= l(:label_pm_baseline_name) %></label>
+  <%= text_field_tag 'name', '', :id => 'bl_name', :maxlength => 100, :placeholder => l(:text_pm_baseline_name_ph) %>
+  <label for="bl_note"><%= l(:field_notes) %></label>
+  <%= text_field_tag 'note', '', :id => 'bl_note', :maxlength => 500 %>
+  <%= submit_tag l(:button_pm_baseline_take), :class => 'btn_main', :data => { :confirm => l(:text_pm_baseline_take_confirm) } %>
+<% end %>
+<% end %>
+<% if @baselines.empty? %>
+  <p class="nodata"><%= l(:text_pm_baseline_none) %></p>
+<% else %>
+  <%= form_tag project_pm_baselines_path(@project), :method => :get, :class => 'qa_filter' do %>
+    <label for="bl_pick"><%= l(:label_pm_baseline_pick) %></label>
+    <%= select_tag 'id', options_for_select(@baselines.map { |b| ["#{b.name} (#{format_date(b.taken_on)}, #{l(:label_pm_baseline_count, :count => b.issue_count)})", b.id] }, @baseline.id), :id => 'bl_pick', :onchange => 'this.form.submit()' %>
+    <noscript><%= submit_tag l(:button_apply), :name => nil %></noscript>
+  <% end %>
+  <% s = @cmp[:summary] %>
+  <ul class="db_stats mt_kpi">
+    <li><span><%= l(:label_pm_bl_end) %></span><strong><%= s[:base_end] ? format_date(s[:base_end]) : '-' %> → <%= s[:now_end] ? format_date(s[:now_end]) : '-' %></strong></li>
+    <li><span><%= l(:label_pm_bl_shift) %></span><strong class="<%= 'qa_fail' if s[:end_shift].to_i.positive? %>"><%= s[:end_shift].nil? ? '-' : l(:label_pm_bl_days, :n => "#{'+' if s[:end_shift].positive?}#{s[:end_shift]}") %></strong></li>
+    <% [['late', :label_pm_bl_late, s[:late]], ['early', :label_pm_bl_early, s[:early]], ['added', :label_pm_bl_added, s[:added]], ['removed', :label_pm_bl_removed, s[:removed]]].each do |f, label, n| %>
+      <li class="<%= 'on' if @filter == f %>"><%= link_to project_pm_baseline_path(@project, @baseline, :filter => (@filter == f ? nil : f)) do %><span><%= l(label) %></span><strong class="<%= 'qa_fail' if f == 'late' && n.positive? %>"><%= n %></strong><% end %></li>
+    <% end %>
+  </ul>
+  <p class="mt_dim"><%= l(:text_pm_baseline_info, :name => @baseline.name, :date => format_date(@baseline.taken_on), :user => @baseline.author&.name.to_s) %><%= " · #{@baseline.note}" if @baseline.note.present? %>
+    <% if can_edit %> · <%= link_to l(:button_delete), project_pm_baseline_path(@project, @baseline), :method => :delete, :data => { :confirm => l(:text_are_you_sure) } %><% end %></p>
+  <% if @rows.empty? %>
+    <p class="nodata"><%= l(:label_no_data) %></p>
+  <% else %>
+  <div class="autoscroll">
+  <table class="list pm_list pm_bl">
+    <thead><tr><th>#</th><th class="name"><%= l(:field_subject) %></th><th><%= l(:field_status) %></th><th><%= l(:field_assigned_to) %></th>
+      <th><%= l(:label_pm_bl_base_due) %></th><th><%= l(:label_pm_bl_now_due) %></th><th><%= l(:label_pm_bl_due_shift) %></th><th><%= l(:label_pm_bl_ratio) %></th></tr></thead>
+    <tbody>
+    <% @rows.each do |r| %>
+      <% i = r[:issue]; x = r[:base] %>
+      <tr class="<%= 'pm_off' if r[:kind] == 'removed' %>">
+        <td><%= i ? link_to("##{r[:id]}", issue_path(i)) : "##{r[:id]}" %></td>
+        <td class="name"><%= r[:subject] %><% if r[:kind] != 'kept' %> <%= pm_badge(l("label_pm_bl_k_#{r[:kind]}"), r[:kind] == 'added' ? 'review' : 'late') %><% end %></td>
+        <td><%= i&.status&.name %></td><td><%= i&.assigned_to&.name %></td>
+        <td><%= format_date(x&.due_date) %></td><td><%= format_date(i&.due_date) %></td>
+        <td class="<%= 'qa_fail' if r[:due_shift].to_i.positive? %>"><%= r[:due_shift].nil? ? '' : "#{'+' if r[:due_shift].positive?}#{r[:due_shift]}" %></td>
+        <td><%= x ? "#{x.done_ratio.to_i}%" : '-' %> → <%= i ? "#{i.done_ratio.to_i}%" : '-' %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  </div>
+  <% end %>
+<% end %>
+<% html_title l(:label_pm_baselines) %>

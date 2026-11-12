@@ -12,11 +12,13 @@ module PmKit
       ['red', ->(m) { m[:overdue].to_i >= 5 }, ->(m) { "기한 지난 일감 #{m[:overdue]}" }],
       ['red', ->(m) { m[:sr_over].to_i.positive? }, ->(m) { "SR 기한 지남 #{m[:sr_over]}" }],
       ['red', ->(m) { m[:deliv_late].to_i >= 3 }, ->(m) { "산출물 마감 지남 #{m[:deliv_late]}" }],
+      ['red', ->(m) { m[:base_slip].to_i >= 30 }, ->(m) { "기준선보다 종료 #{m[:base_slip]}일 늦음" }],
       ['yellow', ->(m) { m[:gap] && m[:gap] <= -10 }, ->(m) { "진척이 경과보다 #{-m[:gap]}%p 늦음" }],
       ['yellow', ->(m) { m[:overdue].to_i.positive? }, ->(m) { "기한 지난 일감 #{m[:overdue]}" }],
       ['yellow', ->(m) { m[:deliv_late].to_i.positive? }, ->(m) { "산출물 마감 지남 #{m[:deliv_late]}" }],
       ['yellow', ->(m) { m[:defects].to_i.positive? }, ->(m) { "미조치 결함 #{m[:defects]}" }],
-      ['yellow', ->(m) { m[:audit_late].to_i.positive? }, ->(m) { "감리 조치 기한 지남 #{m[:audit_late]}" }]
+      ['yellow', ->(m) { m[:audit_late].to_i.positive? }, ->(m) { "감리 조치 기한 지남 #{m[:audit_late]}" }],
+      ['yellow', ->(m) { m[:base_slip].to_i >= 7 }, ->(m) { "기준선보다 종료 #{m[:base_slip]}일 늦음" }]
     ].freeze
 
     def projects(user)
@@ -92,6 +94,11 @@ module PmKit
         m[:staff_now] = st.count { |s| s.active?(today) }
         m[:mm_month] = st.sum { |s| s.plan_mm(today.beginning_of_month, today.end_of_month) }.round(1)
       end
+      # 일정 기준선: 가장 최근 기준선 대비 종료일 변동(일)
+      if on.(:baselines, :view_baselines) && (b = PmBaseline.where(project_id: p.id).recent.first)
+        m[:base_name] = b.name
+        m[:base_slip] = b.compare(user)[:summary][:end_shift]
+      end
       m[:signal], m[:reasons] = signal(m)
       m
     end
@@ -113,15 +120,15 @@ module PmKit
       [m[:project].name, SIGNAL[m[:signal]], m[:reasons].join(', '), m[:start_on]&.to_s, m[:end_on]&.to_s, m[:elapsed] && "#{m[:elapsed]}%",
        m[:progress] && "#{m[:progress]}%", m[:gap], m[:overdue], m[:due_week], frac(m[:req_ok], m[:req_total]), frac(m[:prog_done], m[:prog_total]),
        m[:test_rate] && "#{m[:test_rate]}%", m[:defects], m[:risk_open], m[:risk_high], frac(m[:deliv_sub], m[:deliv_req]), m[:deliv_late], m[:cr_wait],
-       m[:sr_open], m[:sr_over], m[:sr_rate] && "#{m[:sr_rate]}%", m[:audit_open], m[:staff_now], m[:mm_month]]
+       m[:sr_open], m[:sr_over], m[:sr_rate] && "#{m[:sr_rate]}%", m[:audit_open], m[:staff_now], m[:mm_month], m[:base_slip]]
     end
 
     HEAD = %w(프로젝트 신호 이유 시작 종료 경과율 진척률 진척-경과(%p) 기한\ 지난\ 일감 이번\ 주\ 마감 요구사항\ 확정 프로그램\ 완료 테스트\ 합격률 미조치\ 결함
-              열린\ 위험 위험\ 상 산출물\ 제출(필수) 산출물\ 마감\ 지남 변경요청\ 대기 SR\ 처리\ 중 SR\ 기한\ 지남 SR\ 준수율(이번\ 달) 감리\ 미확인 투입\ 인원 이번\ 달\ 계획\ M/M).freeze
+              열린\ 위험 위험\ 상 산출물\ 제출(필수) 산출물\ 마감\ 지남 변경요청\ 대기 SR\ 처리\ 중 SR\ 기한\ 지남 SR\ 준수율(이번\ 달) 감리\ 미확인 투입\ 인원 이번\ 달\ 계획\ M/M 기준선\ 대비\ 종료(일)).freeze
 
     def sheet(rows, today = User.current.today)
       KrdsUi::Xlsx.build([{ name: "프로젝트 현황 #{today}", header: HEAD, rows: rows.map { |m| sheet_row(m) },
-                            widths: [30, 8, 40, 12, 12, 8, 8, 10, 10, 10, 10, 10, 10, 10, 8, 8, 12, 12, 10, 10, 10, 12, 10, 8, 12] }])
+                            widths: [30, 8, 40, 12, 12, 8, 8, 10, 10, 10, 10, 10, 10, 10, 8, 8, 12, 12, 10, 10, 10, 12, 10, 8, 12, 12] }])
     end
   end
 end

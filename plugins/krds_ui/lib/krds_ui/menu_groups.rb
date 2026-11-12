@@ -9,11 +9,11 @@ module KrdsUi
   module MenuGroups
     GROUPS = [
       [:overview, %i(overview activity)],
-      [:work, %i(issues new_issue gantt calendar roadmap time_entries)],
+      [:work, %i(issues new_issue gantt calendar roadmap baselines time_entries)],
       [:design, %i(qa_requirements change_requests menu_items sys_roles glossary)],
       [:dev, %i(repository programs db_schemas qa_tests sec_scans deploys)],
       [:ops, %i(ops_assets ops_schedules ops_incidents ops_interfaces keys)],
-      [:docs, %i(deliverables pm_reports meetings risks audits staff documents files)],
+      [:docs, %i(deliverables pm_reports closing meetings risks audits staff documents files)],
       [:collab, %i(wiki boards news)]
     ].freeze
     FIXED = %i(new_object settings).freeze
@@ -25,7 +25,7 @@ module KrdsUi
       repository: 'changeset', programs: 'apps', db_schemas: 'table-multiple', qa_tests: 'shield-check', deploys: 'arrow-narrow-right',
       ops_assets: 'server-authentication', ops_schedules: 'hourglass', ops_incidents: 'alert-circle', ops_interfaces: 'link', keys: 'key',
       deliverables: 'folder-open', meetings: 'comments', risks: 'warning', documents: 'document', files: 'file',
-      pm_reports: 'summary', audits: 'message-report', staff: 'group', sec_scans: 'lock',
+      pm_reports: 'summary', audits: 'message-report', staff: 'group', sec_scans: 'lock', baselines: 'stats', closing: 'checked',
       wiki: 'wiki-page', boards: 'message', news: 'news', settings: 'settings'
     }.freeze
     FALLBACK_ICON = 'arrow-right'
@@ -37,11 +37,11 @@ module KrdsUi
     }.freeze
     # 프로젝트 모듈 선택 화면의 대분류 (메뉴와 같은 묶음, 목록에 없는 모듈은 "기타")
     MODULE_GROUPS = [
-      [:work, %w(issue_tracking time_tracking gantt calendar)],
+      [:work, %w(issue_tracking time_tracking gantt calendar baselines)],
       [:design, %w(qa_requirements change_requests menu_tree sys_roles glossary)],
       [:dev, %w(repository programs db_manage qa_tests sec_scans jenkins_deploy)],
       [:ops, %w(ops_assets ops_schedules ops_logs ops_interfaces keys)],
-      [:docs, %w(deliverables pm_reports meetings risks audits staff documents files)],
+      [:docs, %w(deliverables pm_reports closing meetings risks audits staff documents files)],
       [:collab, %w(wiki boards news)]
     ].freeze
   end

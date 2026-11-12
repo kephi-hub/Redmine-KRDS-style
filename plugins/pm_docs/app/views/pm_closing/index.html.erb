@@ -1,0 +1,46 @@
+<%# 프로젝트 > 준공 체크리스트 — 자동 항목 + 직접 확인 항목, 준비율, 완료보고 엑셀 %>
+<% can_edit = User.current.allowed_to?(:manage_closing, @project) %>
+<div class="contextual">
+  <%= link_to sprite_icon('download', l(:label_pm_closing_export)), project_pm_closing_export_path(@project), :class => 'icon icon-download' %>
+</div>
+<h2><%= l(:label_pm_closing) %></h2>
+<p class="subtitle"><%= l(:text_pm_closing) %></p>
+<% okc, total, pct = @progress %>
+<div class="pm_cl_head">
+  <strong><%= l(:label_pm_closing_ready) %> <%= pct %>%</strong> <span class="mt_dim"><%= okc %>/<%= total %></span>
+  <span class="pf_bar"><span style="width:<%= pct %>%"></span></span>
+</div>
+<% groups = @items.group_by { |i| i[:group] } %>
+<% PmKit::Closing::GROUPS.each do |g, title| %>
+  <% list = groups[g] or next %>
+  <h3 class="ag_sec"><%= title %></h3>
+  <ul class="pm_cl">
+  <% list.each do |i| %>
+    <li id="cl_<%= i[:key] %>" class="pm_cl_item" data-s="<%= i[:state] %>">
+      <span class="pm_cl_mark" aria-hidden="true"></span>
+      <div class="pm_cl_body">
+        <strong><%= i[:title] %></strong>
+        <% if i[:auto] %>
+          <span class="pm_cl_state"><%= l("label_pm_cl_#{i[:state]}") %></span>
+          <% if i[:detail] %><span class="mt_dim"><%= i[:detail] %></span><% end %>
+          <% if i[:link] && i[:state] != 'na' %><% path = (send(*i[:link]) rescue nil) %><% if path %> · <%= link_to l(:label_pm_cl_go), path %><% end %><% end %>
+        <% else %>
+          <% c = i[:check] %>
+          <span class="pm_cl_state"><%= l(i[:state] == 'ok' ? :label_pm_cl_done : :label_pm_cl_todo) %></span>
+          <% if c&.checked_at %><span class="mt_dim"><%= c.user&.name %> · <%= format_date(c.checked_at) %></span><% end %>
+          <% if can_edit %>
+            <%= form_tag project_pm_closing_check_path(@project), :class => 'pm_cl_form' do %>
+              <%= hidden_field_tag 'key', i[:key], :id => nil %>
+              <label class="pm_cl_chk"><%= check_box_tag 'done', '1', c&.done, :id => "cl_done_#{i[:key]}" %> <%= l(:label_pm_cl_done) %></label>
+              <%= text_field_tag 'note', c&.note, :id => "cl_note_#{i[:key]}", :maxlength => 1000, :placeholder => l(:label_pm_cl_note), :'aria-label' => l(:label_pm_cl_note) %>
+              <%= submit_tag l(:button_save), :name => nil %>
+            <% end %>
+          <% elsif c&.note.present? %><p class="pm_cl_note"><%= c.note %></p><% end %>
+        <% end %>
+      </div>
+    </li>
+  <% end %>
+  </ul>
+<% end %>
+<p class="db_hintbox"><%= l(:text_pm_closing_note) %></p>
+<% html_title l(:label_pm_closing) %>

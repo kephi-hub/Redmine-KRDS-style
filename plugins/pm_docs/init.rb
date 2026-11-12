@@ -15,12 +15,13 @@ require_relative 'lib/pm_kit/hooks'
 require_relative 'lib/pm_kit/sla'
 require_relative 'lib/pm_kit/report'
 require_relative 'lib/pm_kit/portfolio'
+require_relative 'lib/pm_kit/closing'
 
 Redmine::Plugin.register :pm_docs do
   name '산출물 관리'
   author 'kephi-hub'
-  description '산출물(단계별·자동 생성·일괄 다운로드), 변경요청, 프로그램 목록, 회의록, 이슈·위험, 감리 지적사항, 투입 인력, 보안약점 진단, 주간·월간 보고서'
-  version '1.3.0'
+  description '산출물(단계별·자동 생성·일괄 다운로드), 변경요청, 프로그램 목록, 회의록, 이슈·위험, 감리 지적사항, 투입 인력, 보안약점 진단, 주간·월간 보고서, 일정 기준선, 준공 체크리스트'
+  version '1.4.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
 
@@ -63,6 +64,14 @@ Redmine::Plugin.register :pm_docs do
   project_module :pm_reports do
     permission :view_pm_reports, { pm_reports: [:index, :export] }, read: true
   end
+  project_module :baselines do
+    permission :view_baselines, { pm_baselines: [:index, :show, :export] }, read: true
+    permission :manage_baselines, { pm_baselines: [:create, :destroy] }, require: :member
+  end
+  project_module :closing do
+    permission :view_closing, { pm_closing: [:index, :export] }, read: true
+    permission :manage_closing, { pm_closing: [:check] }, require: :member
+  end
 
   menu :project_menu, :deliverables, { controller: 'pm_deliverables', action: 'index' }, caption: :label_pm_deliverables, param: :project_id
   menu :project_menu, :change_requests, { controller: 'pm_change_requests', action: 'index' }, caption: :label_pm_crs, param: :project_id
@@ -73,6 +82,8 @@ Redmine::Plugin.register :pm_docs do
   menu :project_menu, :staff, { controller: 'pm_staffs', action: 'index' }, caption: :label_pm_staffs, param: :project_id
   menu :project_menu, :sec_scans, { controller: 'pm_sec_scans', action: 'index' }, caption: :label_pm_sec_scans, param: :project_id
   menu :project_menu, :pm_reports, { controller: 'pm_reports', action: 'index' }, caption: :label_pm_reports, param: :project_id
+  menu :project_menu, :baselines, { controller: 'pm_baselines', action: 'index' }, caption: :label_pm_baselines, param: :project_id
+  menu :project_menu, :closing, { controller: 'pm_closing', action: 'index' }, caption: :label_pm_closing, param: :project_id
 end
 
 # 전체 프로젝트 현황 (PMO) — 상단 공통 메뉴 · 초기화면 메뉴
@@ -94,6 +105,8 @@ unless Project.reflect_on_association(:pm_deliverables)
   Project.has_many :pm_sec_items, dependent: :delete_all
   Project.has_many :pm_sec_scans, dependent: :delete_all
   Project.has_many :pm_risks, dependent: :delete_all
+  Project.has_many :pm_baselines, dependent: :destroy
+  Project.has_many :pm_closing_checks, dependent: :delete_all
 end
 # 일감을 지우면 위험의 일감 번호를 비우고 변경요청의 일감 연결을 지움
 Issue.has_many :pm_risks, dependent: :nullify unless Issue.reflect_on_association(:pm_risks)

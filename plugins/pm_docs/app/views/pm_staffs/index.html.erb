@@ -39,6 +39,26 @@
   </tbody>
 </table>
 </div>
+<% if @months.any? %>
+<h3 class="ag_sec"><%= l(:label_pm_mm_months) %></h3>
+<div class="autoscroll">
+<table class="list pm_list pm_mm">
+  <thead><tr><th><%= l(:label_pm_month) %></th><th><%= l(:label_pm_plan_mm) %></th><th><%= l(:label_pm_actual_mm) %></th><th><%= l(:label_pm_mm_diff) %></th><th><%= l(:label_pm_mm_rate) %></th><th class="name"></th></tr></thead>
+  <tbody>
+  <% @months.each do |r| %>
+    <tr class="<%= 'on' if r[:month] == today.beginning_of_month %>">
+      <td><%= r[:month].strftime('%Y-%m') %></td><td><%= r[:plan] %></td><td><%= r[:actual] %></td>
+      <td class="<%= 'qa_fail' if r[:diff].negative? && r[:month] < today.beginning_of_month %>"><%= "#{'+' if r[:diff].positive?}#{r[:diff]}" %></td>
+      <td><%= r[:rate] ? "#{r[:rate]}%" : '-' %></td>
+      <td class="name"><span class="pf_bar" title="<%= r[:rate] %>%"><span style="width:<%= [r[:rate].to_i, 100].min %>%"></span></span></td>
+    </tr>
+  <% end %>
+  <% tp = @months.sum { |r| r[:plan] }.round(2); ta = @months.sum { |r| r[:actual] }.round(2) %>
+  <tr class="pm_total"><th><%= l(:label_total) %></th><th><%= tp %></th><th><%= ta %></th><th><%= (ta - tp).round(2) %></th><th><%= tp.positive? ? "#{(ta * 100 / tp).round}%" : '-' %></th><th></th></tr>
+  </tbody>
+</table>
+</div>
+<% end %>
 <p class="mt_dim"><%= l(:text_pm_mm_rule) %></p>
 <% end %>
 <% html_title l(:label_pm_staffs) %>

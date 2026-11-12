@@ -37,6 +37,13 @@ resources :projects, only: [] do
   resources :pm_sec_scans, path: 'sec_scans'
   get 'reports', to: 'pm_reports#index', as: 'pm_reports'
   get 'reports/export', to: 'pm_reports#export', as: 'pm_reports_export'
+  # 일정 기준선 · 준공 체크리스트
+  resources :pm_baselines, path: 'baselines', only: [:index, :show, :create, :destroy] do
+    member { get :export }
+  end
+  get 'closing', to: 'pm_closing#index', as: 'pm_closing'
+  post 'closing/check', to: 'pm_closing#check', as: 'pm_closing_check'
+  get 'closing/export', to: 'pm_closing#export', as: 'pm_closing_export'
 end
 # 전체 프로젝트 현황 (PMO)
 get 'pmo', to: 'pm_portfolio#index', as: 'pm_portfolio'

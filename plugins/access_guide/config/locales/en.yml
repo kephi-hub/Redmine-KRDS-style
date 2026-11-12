@@ -1,4 +1,6 @@
 en:
+  label_access_area_baselines: "Baselines"
+  label_access_area_closing: "Closing checklist"
   label_ag_perm_tab: Permissions
   text_ag_perm: Each area is summarised per role as manage/write/view/none. Click an area to show its permissions; the summary updates as you change checkboxes. Click Save when done.
   label_ag_roles_shown: Roles shown

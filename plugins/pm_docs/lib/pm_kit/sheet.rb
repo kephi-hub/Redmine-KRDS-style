@@ -106,7 +106,42 @@ module PmKit
         { name: '투입 인력', header: %w(이름 소속 역할 등급 투입\ 시작 투입\ 종료 투입률(%) 계획\ M/M 실적\ M/M 보안서약서 계정\ 발급 회수일 교체\ 전 교체\ 사유 교체\ 승인일 비고),
           rows: people, widths: [12, 16, 10, 8, 12, 12, 10, 10, 10, 12, 30, 12, 12, 24, 12, 24] },
         { name: '월별 계획 MM', header: %w(이름 역할) + mh + %w(합계), rows: plan, widths: [12, 10] + months.map { 9 } + [9] },
-        { name: '월별 실적 MM', header: %w(이름 역할) + mh + %w(합계), rows: act, widths: [12, 10] + months.map { 9 } + [9] }
+        { name: '월별 실적 MM', header: %w(이름 역할) + mh + %w(합계), rows: act, widths: [12, 10] + months.map { 9 } + [9] },
+        { name: '월별 계획 대 실적', header: %w(월 계획\ M/M 실적\ M/M 차이 실적률(%)),
+          rows: staff_months(list, from, to).map { |r| [r[:month].strftime('%Y-%m'), r[:plan], r[:actual], r[:diff], r[:rate]] }, widths: [10, 10, 10, 10, 10] }
+      ])
+    end
+
+    # 월별 계획 대 실적 (실적은 Redmine 사용자를 연결한 인력만) — [{ month:, plan:, actual:, diff:, rate: }]
+    def staff_months(list, from, to)
+      rows = []
+      m = from.beginning_of_month
+      while m <= to
+        e = m.end_of_month
+        plan = list.sum { |x| x.plan_mm(m, e) }.round(2)
+        actual = list.sum { |x| x.actual_mm(m, e).to_f }.round(2)
+        rows << { month: m, plan: plan, actual: actual, diff: (actual - plan).round(2), rate: plan.positive? ? (actual * 100 / plan).round : nil }
+        m = m.next_month
+      end
+      rows
+    end
+
+    # 일정 기준선 비교 — 요약 · 일감별
+    def baseline(b, cmp)
+      s = cmp[:summary]
+      kind = { 'kept' => '', 'added' => '기준 뒤 추가', 'removed' => '삭제됨' }
+      info = [['기준선', b.name], ['저장일', b.taken_on.to_s], ['저장자', b.author&.name], ['메모', b.note], ['기준 일감 수', b.issue_count],
+              ['기준 종료일', s[:base_end]&.to_s], ['지금 종료일', s[:now_end]&.to_s], ['종료일 변동(일)', s[:end_shift]],
+              ['완료 기한이 늦어진 일감', s[:late]], ['앞당겨진 일감', s[:early]], ['추가된 일감', s[:added]], ['삭제된 일감', s[:removed]], ['가장 많이 늦어진 일수', s[:max_late]]]
+      rows = cmp[:rows].map do |r|
+        i = r[:issue]; x = r[:base]
+        [r[:id], i&.tracker&.name, r[:subject], i&.status&.name, i&.assigned_to&.name, x&.start_date&.to_s, x&.due_date&.to_s, i&.start_date&.to_s, i&.due_date&.to_s,
+         r[:start_shift], r[:due_shift], x&.done_ratio, i&.done_ratio, kind[r[:kind]]]
+      end
+      KrdsUi::Xlsx.build([
+        { name: '요약', header: %w(항목 값), rows: info, widths: [24, 40] },
+        { name: '일감별 비교', header: %w(번호 유형 제목 상태 담당자 기준\ 시작 기준\ 완료 지금\ 시작 지금\ 완료 시작\ 변동(일) 완료\ 변동(일) 기준\ 진척(%) 지금\ 진척(%) 구분),
+          rows: rows, widths: [8, 10, 40, 8, 10, 12, 12, 12, 12, 10, 10, 10, 10, 12] }
       ])
     end
 

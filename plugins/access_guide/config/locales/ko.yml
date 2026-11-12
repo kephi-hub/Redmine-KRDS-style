@@ -1,4 +1,6 @@
 ko:
+  label_access_area_baselines: "일정 기준선"
+  label_access_area_closing: "준공 체크리스트"
   label_ag_perm_tab: 권한 설정
   text_ag_perm: 역할마다 영역별로 할 수 있는 일을 관리/작성/보기/없음으로 요약했습니다. 영역을 누르면 실제 권한이 펼쳐지고, 체크를 바꾸면 요약이 바로 바뀝니다. 다 고친 뒤 아래 [저장]을 누르세요.
   label_ag_roles_shown: 표시할 역할

@@ -162,6 +162,10 @@ roles:
   - view_staff
   - view_sec_scans
   - view_pm_reports
+  - view_baselines
+  - manage_baselines
+  - view_closing
+  - manage_closing
   - manage_deliverables
   - approve_deliverables
   - manage_change_requests
@@ -291,6 +295,8 @@ roles:
   - view_audits
   - view_sec_scans
   - view_pm_reports
+  - view_baselines
+  - view_closing
   - manage_deliverables
   - manage_change_requests
   - manage_programs
@@ -375,6 +381,8 @@ roles:
   - view_risks
   - view_audits
   - view_pm_reports
+  - view_baselines
+  - view_closing
   - run_qa_tests
   - add_issues
   - edit_issues
@@ -444,6 +452,8 @@ roles:
   - view_risks
   - view_audits
   - view_pm_reports
+  - view_baselines
+  - view_closing
 # 발주처(고객) — 진척·산출물·보고서·요구사항·테스트 결과·감리 보기 + SR 등록·댓글만
 # 내부 정보(투입 인력·접속 정보·DB·배포·운영 로그·소요 시간·비공개 댓글)는 주지 않음
 - name: 발주처
@@ -471,6 +481,8 @@ roles:
   - view_meetings
   - view_audits
   - view_pm_reports
+  - view_baselines
+  - view_closing
   # 일감 등록은 SR 유형만 (유형별 권한)
   tracker_permissions:
     add_issues: [SR]
