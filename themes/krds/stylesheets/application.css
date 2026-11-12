@@ -1328,6 +1328,9 @@ table.list.db_pvtbl tr.db_gone td.col code{text-decoration:line-through;}
 .st_state{display:inline-flex;align-items:center;height:28px;padding:0 12px;margin:0 0 16px;border-radius:14px;background:var(--dan_5);font-size:0.875rem;font-weight:700;color:var(--dan_60);}
 .st_state.on{background:var(--suc_10);color:var(--suc_60);}
 .st_inline{display:inline;}
+.st_now{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 16px;border:1px solid var(--pri_50);border-radius:var(--radius_m);background:var(--pri_50);font-size:0.9375rem;font-weight:700;color:var(--gray_0);cursor:pointer;}
+.st_now .icon-svg{stroke:var(--gray_0);}
+.st_now:disabled{border-color:var(--gray_30);background:var(--gray_10);color:var(--gray_50);cursor:default;}
 .st_ok{color:var(--suc_60);}
 .st_bad{color:var(--dan_60);}
 .st_tag{display:inline-flex;align-items:center;height:20px;padding:0 6px;border-radius:var(--radius_s);background:var(--sec_5);font-size:0.6875rem;font-weight:700;color:var(--sec_80);}

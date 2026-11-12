@@ -1,7 +1,9 @@
 <%# 관리 > 백업 — 서버 setup/backup.sh 가 만든 백업 목록·상태 %>
 <div class="contextual">
-  <%= button_to sprite_icon('save', l(:button_pms_backup_now)), pms_backups_path, :method => :post, :class => 'st_btn', :form_class => 'st_inline',
-        :disabled => (@running || @requested || !SiteTools::Backup.writable?), :data => { :confirm => l(:text_pms_backup_confirm) } %>
+  <%= form_tag pms_backups_path, :class => 'st_inline' do %>
+    <%= content_tag(:button, sprite_icon('save', l(:button_pms_backup_now)), :type => 'submit', :class => 'st_now',
+          :disabled => (@running || @requested || !SiteTools::Backup.writable?), :data => { :confirm => l(:text_pms_backup_confirm) }) %>
+  <% end %>
 </div>
 <h2><%= l(:label_pms_backups) %></h2>
 <p class="subtitle"><%= l(:text_pms_backups) %></p>
