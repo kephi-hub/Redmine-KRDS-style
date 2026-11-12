@@ -1626,7 +1626,7 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 .wl_hero{display:grid;grid-template-columns:1fr;gap:16px;margin:0 0 24px;padding:20px;border-radius:var(--radius_l);background:linear-gradient(135deg,var(--pri_5),var(--sec_5));}
 .wl_intro h2{margin:0 0 8px;font-size:1.375rem;line-height:1.4;color:var(--gray_90);}
 .wl_intro p{margin:0 0 8px;line-height:1.7;color:var(--gray_70);}
-.wl_quick{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:0;padding:0;list-style:none;}
+.wl_quick{display:grid;grid-template-columns:1fr;gap:8px;margin:0;padding:0;list-style:none;word-break:keep-all;}
 .wl_quick li{display:flex;margin:0;padding:0;}
 .wl_quick a{display:grid;flex:1 1 auto;grid-template-columns:auto 1fr;grid-template-rows:auto auto;align-items:center;column-gap:12px;row-gap:2px;box-sizing:border-box;padding:14px 16px;border:1px solid var(--gray_10);border-radius:var(--radius_l);background:var(--gray_0);text-decoration:none;color:var(--gray_90);transition:border-color 0.2s,box-shadow 0.2s;}
 .wl_quick a:hover{border-color:var(--sec_70);box-shadow:0 2px 8px rgba(5,43,87,0.08);text-decoration:none;}
@@ -1682,7 +1682,8 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 .man_note{margin:12px 0;padding:12px 14px 12px 40px;border:0;border-radius:var(--radius_m);background:var(--war_5) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a5c00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 8h.01M11 12h1v4h1'/%3E%3C/svg%3E") 12px 14px/18px no-repeat;color:var(--gray_80);}
 .man_note p{margin:0;}
 @media (min-width:900px){
-.wl_hero{grid-template-columns:3fr 2fr;align-items:center;padding:28px 32px;}
+.wl_hero{padding:28px 32px;}
+.wl_quick{grid-template-columns:repeat(4,1fr);gap:12px;}
 .pm_bl_fld{width:auto;flex:1 1 220px;max-width:320px;}
 #wrapper #content table.pf_table{display:table;}
 #wrapper #content table.pf_table thead{display:table-header-group;}
@@ -1808,6 +1809,8 @@ table.list.db_list tr.db_row>td.name,table.list.db_cols tr.db_col>td.name{white-
 
 /* ===== 넓은 화면 (1200px 이상) ===== */
 @media (min-width:1200px){
+.wl_hero{grid-template-columns:3fr 2fr;align-items:center;}
+.wl_quick{grid-template-columns:repeat(2,1fr);}
 #content .man_tab{padding:0 16px;font-size:1.1875rem;}
 .man_wrap{grid-template-columns:220px 1fr;align-items:start;gap:32px;}
 .man_toc{position:sticky;top:16px;}
