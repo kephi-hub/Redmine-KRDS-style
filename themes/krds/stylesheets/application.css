@@ -1619,6 +1619,9 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 #footer a,p a:not(.icon):not([class*=btn]),.author a,.next-prev-links a,.mt_help a,.wiki a:not(.icon):not(.wiki-anchor){text-decoration:underline;text-underline-offset:2px;}
 #sidebar a.query,#sidebar ul li a,#sidebar label a{display:inline-block;padding:4px 0;}
 #sidebar input[type=checkbox]{width:18px;height:18px;margin:3px 6px 3px 0;vertical-align:middle;}
+#content .next-prev-links{color:var(--gray_60);}
+#search-form input[type=checkbox]{width:18px;height:18px;margin:3px 6px 3px 0;vertical-align:middle;}
+.pm_cl_body a,.mt_dim a,#content h2>a{text-decoration:underline;text-underline-offset:3px;}
 @media (min-width:900px){
 .pm_bl_fld{width:auto;flex:1 1 220px;max-width:320px;}
 #wrapper #content table.pf_table{display:table;}
