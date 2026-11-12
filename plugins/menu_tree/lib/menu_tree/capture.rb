@@ -72,17 +72,74 @@ module MenuTree
         node.evaluate("this.value = ''")
         node.type(value.to_s)
       end
-      btn = first_node(b, cfg.submit_selector.presence || MenuCaptureConfig::SUBMIT_SELECTORS)
-      btn ? btn.click : pass.type(:Enter)
-      sleep 0.5
-      settle(b, cfg)
-      return true if logged_in?(b, cfg)
+      # 사이트 알림창(비밀번호 오류·중복 로그인 확인 등)은 자동 확인하고 메시지는 실패 이유에 씀
+      dialogs = []
+      b.on(:dialog) { |d| dialogs << d.message.to_s.strip; d.accept rescue nil }
+      btn = cfg.submit_selector.present? ? first_node(b, cfg.submit_selector) : submit_near(b, pass)
+      if btn
+        # 창 밖(아래쪽)에 있는 버튼은 마우스 클릭이 안 먹으므로 화면 가운데로 옮긴 뒤 누름
+        btn.evaluate("this.scrollIntoView({block: 'center'})") rescue nil
+        btn.click
+      else
+        pass.type(:Enter)
+      end
+      return true if wait_login(b, cfg)
+      # 그래도 로그인 화면이면 스크립트로 한 번 더 누름 (겹친 요소·마우스 이벤트를 막는 화면)
+      if btn && dialogs.empty? && password_shown?(b)
+        (btn.evaluate('this.click()') rescue nil)
+        return true if wait_login(b, cfg)
+      end
       save_png(b, debug_path, cfg, full: false) if debug_path
       why = if cfg.logout_url.present? then "로그아웃 주소(#{cfg.logout_url})로 가는 링크가 없음"
             elsif cfg.check_selector.present? then '로그인 확인 요소가 없음'
             else '비밀번호 입력칸이 남아 있음'
             end
+      why += " · 사이트 알림: #{dialogs.last.truncate(100)}" if dialogs.any?
       raise LoginError, "로그인하지 못했습니다 (로그인 후 화면에 #{why}) — 아이디·비밀번호·입력칸 선택자·로그아웃 주소를 확인하세요"
+    end
+
+    # 로그인 처리(Ajax 여러 단계 → 화면 이동)가 끝날 때까지 최대 약 6초 동안 확인
+    def wait_login(b, cfg)
+      sleep 0.5
+      settle(b, cfg)
+      8.times do
+        return true if (logged_in?(b, cfg) rescue false)
+        sleep 0.7
+        settle(b, cfg) rescue nil
+      end
+      false
+    end
+
+    def password_shown?(b)
+      b.css('input[type=password]').any? { |n| n.evaluate('this.offsetParent !== null') rescue false }
+    rescue StandardError
+      false
+    end
+
+    # 로그인 버튼 찾기 (선택자를 비웠을 때) — 비밀번호 칸에서 가까운 곳부터 넓혀 가며
+    # 보이는 버튼 중 글자·id·class·onclick 에 '로그인/login/signin' 이 있는 것 → 그 영역의 submit 버튼
+    # (화면 위쪽 공유·메뉴 버튼이 먼저 잡히지 않게, type=button + onclick 으로 로그인하는 화면도)
+    SUBMIT_JS = <<~'JS'.freeze
+      function (pw) {
+        const vis = e => e.offsetParent !== null && !e.disabled;
+        const re = /로그인|log\s*-?in|sign\s*-?in/i;
+        const said = e => re.test((e.innerText || e.value || '') + ' ' + (e.id || '') + ' ' + (e.getAttribute('class') || '') + ' ' + (e.getAttribute('onclick') || '') + ' ' + (e.getAttribute('href') || ''));
+        const sel = 'button, input[type=submit], input[type=button], input[type=image], a[href], a[onclick], [role=button]';
+        for (let box = pw.form || pw.parentElement; box; box = box.parentElement) {
+          const all = Array.from(box.querySelectorAll(sel)).filter(vis);
+          const hit = all.find(said) || all.find(e => e.matches('button[type=submit], input[type=submit]') || (e.tagName === 'BUTTON' && !e.getAttribute('type') && e.form));
+          if (hit) return hit;
+          if (box === document.body) break;
+        }
+        return null;
+      }
+    JS
+
+    def submit_near(b, pass)
+      pass.evaluate("(#{SUBMIT_JS.strip})(this) && (#{SUBMIT_JS.strip})(this).setAttribute('data-mc-submit', '1')")
+      first_node(b, '[data-mc-submit]')
+    rescue StandardError
+      nil
     end
 
     # 로그인 여부: 로그아웃 주소 → 로그인 확인 요소 → 비밀번호 칸이 사라짐 순서로 판단
