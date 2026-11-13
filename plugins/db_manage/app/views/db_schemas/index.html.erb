@@ -116,7 +116,7 @@
           </tr>
         <% end %>
         </tbody>
-      <% when 'synonym', 'package' %>
+      <% when 'synonym', 'package', 'type' %>
         <thead><tr><th class="name"><%= l(:field_name) %></th><th class="comment"><%= l(kind == 'synonym' ? :label_db_target : :field_db_comment) %></th><th><%= l(:field_status) %></th></tr></thead>
         <tbody>
         <% items.each do |o| %>

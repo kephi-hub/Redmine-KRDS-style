@@ -271,15 +271,44 @@ module DbManage
       n
     end
 
-    # ---- 뷰·구체화 뷰·함수·프로시저 (함수 키는 이름(인자 형식)) ----
+    # ---- 형식·시퀀스·뷰·구체화 뷰·함수·프로시저·트리거 (함수 키는 이름(인자 형식)) ----
     def object_kinds
-      %w(view matview function procedure)
+      %w(type sequence view matview function procedure trigger)
+    end
+
+    # 사용자 정의 형식 { 이름 => CREATE 문 } — enum · domain · 복합 형식 (확장이 만든 것 제외). DB 화면(Dialect)도 이것을 씀
+    def type_defs(only = nil)
+      rows = c.exec_params(<<~SQL, [schema]).to_a
+        SELECT t.typname AS name, t.typtype AS tt, format_type(t.typbasetype, t.typtypmod) AS base, t.typnotnull AS nn, t.typdefault AS def,
+               (SELECT string_agg(quote_literal(e.enumlabel), ', ' ORDER BY e.enumsortorder) FROM pg_enum e WHERE e.enumtypid = t.oid) AS labels,
+               (SELECT string_agg('CONSTRAINT ' || quote_ident(k.conname) || ' ' || pg_get_constraintdef(k.oid), ' ' ORDER BY k.conname) FROM pg_constraint k WHERE k.contypid = t.oid) AS checks,
+               (SELECT string_agg(quote_ident(a.attname) || ' ' || format_type(a.atttypid, a.atttypmod), ', ' ORDER BY a.attnum)
+                  FROM pg_attribute a WHERE a.attrelid = t.typrelid AND a.attnum > 0 AND NOT a.attisdropped) AS attrs
+        FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+        WHERE n.nspname = $1 AND (t.typtype IN ('e', 'd') OR (t.typtype = 'c' AND (SELECT relkind FROM pg_class WHERE oid = t.typrelid) = 'c'))
+          AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid = 'pg_type'::regclass AND d.objid = t.oid AND d.deptype = 'e')
+        ORDER BY t.typname
+      SQL
+      rows.select { |r| only.nil? || r['name'] == only }.to_h do |r|
+        d = case r['tt']
+            when 'e' then "CREATE TYPE #{q(r['name'])} AS ENUM (#{r['labels']})"
+            when 'd' then "CREATE DOMAIN #{q(r['name'])} AS #{r['base']}#{" DEFAULT #{r['def']}" if r['def']}#{' NOT NULL' if r['nn'] == 't'}#{" #{r['checks']}" if r['checks']}"
+            else "CREATE TYPE #{q(r['name'])} AS (#{r['attrs']})"
+            end
+        [r['name'], d]
+      end
     end
 
     def obj_oid(kind, key)
-      if %w(view matview).include?(kind)
+      case kind
+      when 'view', 'matview', 'sequence'
         c.exec_params('SELECT c.oid FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = $1 AND c.relname = $2 AND c.relkind = $3',
-                      [schema, key, kind == 'view' ? 'v' : 'm']).values.first&.first
+                      [schema, key, { 'view' => 'v', 'matview' => 'm', 'sequence' => 'S' }[kind]]).values.first&.first
+      when 'type'
+        c.exec_params('SELECT t.oid FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace WHERE n.nspname = $1 AND t.typname = $2', [schema, key]).values.first&.first
+      when 'trigger'
+        c.exec_params('SELECT t.oid FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid JOIN pg_namespace n ON n.oid = c.relnamespace ' \
+                      'WHERE n.nspname = $1 AND t.tgname = $2 AND NOT t.tgisinternal ORDER BY c.relname LIMIT 1', [schema, key]).values.first&.first
       else
         c.exec_params("SELECT p.oid FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname = $1 AND p.prokind = $3 " \
                       "AND p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')' = $2", [schema, key, kind == 'procedure' ? 'p' : 'f']).values.first&.first
@@ -295,29 +324,66 @@ module DbManage
       text.gsub(/"#{Regexp.escape(schema)}"\./, "#{q(to_schema)}.").gsub(/\b#{Regexp.escape(schema)}\./, "#{q(to_schema)}.")
     end
 
-    def object_ddl(kind, key, to_schema)
+    def one(sql, *params)
+      c.exec_params(sql, params).values.first&.first
+    end
+
+    def object_ddl(kind, key, to)
       oid = obj_oid(kind, key) or raise Error, t(:error_db_mig_obj_def)
       case kind
+      when 'type' then [type_defs(key)[key] || raise(Error, t(:error_db_mig_obj_def))]
+      when 'sequence'
+        r = c.exec_params('SELECT data_type, start_value, min_value, max_value, increment_by, cycle, cache_size, last_value FROM pg_sequences ' \
+                          'WHERE schemaname = $1 AND sequencename = $2', [schema, key]).to_a.first
+        st = ["CREATE SEQUENCE #{q(key)} AS #{r['data_type']} INCREMENT BY #{r['increment_by']} MINVALUE #{r['min_value']} MAXVALUE #{r['max_value']} " \
+              "START WITH #{r['start_value']} CACHE #{r['cache_size']} #{r['cycle'] == 't' ? 'CYCLE' : 'NO CYCLE'}"]
+        st << "SELECT setval(#{c.escape_literal(q(key))}, GREATEST(#{r['last_value']}, (SELECT CASE WHEN is_called THEN last_value ELSE last_value - 1 END FROM #{q(key)})), true)" if r['last_value']
+        st
       when 'view'
-        d = c.exec_params('SELECT pg_get_viewdef($1::oid, true)', [oid]).getvalue(0, 0).to_s.strip.chomp(';')
-        ["CREATE OR REPLACE VIEW #{q(key)} AS\n#{rename_schema(d, to_schema)}"]
+        d = one('SELECT pg_get_viewdef($1::oid, true)', oid).to_s.strip.chomp(';')
+        ["CREATE OR REPLACE VIEW #{q(key)} AS\n#{rename_schema(d, to.schema)}"]
       when 'matview'
-        d = c.exec_params('SELECT pg_get_viewdef($1::oid, true)', [oid]).getvalue(0, 0).to_s.strip.chomp(';')
-        ["DROP MATERIALIZED VIEW IF EXISTS #{q(key)}", "CREATE MATERIALIZED VIEW #{q(key)} AS\n#{rename_schema(d, to_schema)}"]
+        d = one('SELECT pg_get_viewdef($1::oid, true)', oid).to_s.strip.chomp(';')
+        ["DROP MATERIALIZED VIEW IF EXISTS #{q(key)}", "CREATE MATERIALIZED VIEW #{q(key)} AS\n#{rename_schema(d, to.schema)}"]
+      when 'trigger'
+        r = c.exec_params('SELECT pg_get_triggerdef(t.oid) AS def, t.tgenabled AS en, c.relname AS tbl FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid WHERE t.oid = $1', [oid]).to_a.first
+        d = rename_schema(r['def'], to.schema)
+        d = d.sub(/\ACREATE TRIGGER/, 'CREATE OR REPLACE TRIGGER')
+        [d, *("ALTER TABLE #{q(r['tbl'])} DISABLE TRIGGER #{q(key)}" if r['en'] == 'D')]
       else
-        d = c.exec_params('SELECT pg_get_functiondef($1::oid)', [oid]).getvalue(0, 0).to_s.strip
-        [rename_schema(d, to_schema)]
+        [rename_schema(one('SELECT pg_get_functiondef($1::oid)', oid).to_s.strip, to.schema)]
       end
     end
 
-    # CREATE OR REPLACE 가 안 되는 변경(뷰 칼럼 변경·반환 형식 변경)은 지우고 다시
+    # CREATE OR REPLACE 가 안 되는 변경(뷰 칼럼 변경·반환 형식 변경)은 지우고 다시. 형식은 같으면 그대로, enum 은 없는 값만 추가
+    # 시퀀스가 이미 있으면 속성만 바꾸고 값은 원본·대상 중 큰 쪽으로
     def create_object(kind, key, statements)
+      exists = object_exists?(kind, key)
+      if exists && kind == 'type'
+        mine = type_defs(key)[key]
+        return if mine == statements.first
+        if statements.first.include?(' AS ENUM (') && mine.to_s.include?(' AS ENUM (')
+          labels = ->(d) { d[/AS ENUM \((.*)\)\z/m, 1].to_s.scan(/'(?:[^']|'')*'/) }
+          (labels.call(statements.first) - labels.call(mine)).each { |l| exec("ALTER TYPE #{q(key)} ADD VALUE IF NOT EXISTS #{l}") }
+          return
+        end
+        raise Error, t(:error_db_mig_type_diff)
+      end
+      if exists && kind == 'sequence'
+        exec(statements.first.sub('CREATE SEQUENCE', 'ALTER SEQUENCE').sub(/ START WITH -?\d+/, ''))
+        statements.drop(1).each { |x| exec(x) }
+        return
+      end
       statements.each { |x| exec(x) }
     rescue PG::Error
-      raise unless %w(view function procedure).include?(kind) && object_exists?(kind, key)
-      if kind == 'view'
+      raise unless exists && %w(view function procedure trigger).include?(kind)
+      case kind
+      when 'view'
         exec("DROP VIEW #{q(key)}")
         exec(statements.first.sub('CREATE OR REPLACE VIEW', 'CREATE VIEW'))
+      when 'trigger'
+        exec("DROP TRIGGER IF EXISTS #{q(key)} ON #{statements.first[/ ON (\S+)/, 1]}")
+        statements.each { |x| exec(x) }
       else
         name, args = key.match(/\A(.*)\((.*)\)\z/m).captures
         exec("DROP #{kind.upcase} #{q(name)}(#{args})")
@@ -327,7 +393,9 @@ module DbManage
 
     def object_script(kind, key)
       return nil unless object_exists?(kind, key)
-      "-- #{kind} #{key} 이관 전 백업 — psql 로 실행\nSET search_path TO #{q(schema)};\n" + object_ddl(kind, key, schema).map { |x| "#{x};\n" }.join
+      st = object_ddl(kind, key, self)
+      st = ["DROP SEQUENCE IF EXISTS #{q(key)}"] + st if kind == 'sequence'
+      "-- #{kind} #{key} 이관 전 백업 — psql 로 실행\nSET search_path TO #{q(schema)};\n" + st.map { |x| "#{x};\n" }.join
     end
   end
 end

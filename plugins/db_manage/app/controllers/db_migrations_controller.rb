@@ -131,7 +131,8 @@ class DbMigrationsController < ApplicationController
       g[:rows].each { |r| state[[g[:kind], r[:key]]] = r[:state] }
     end
     kinds.flat_map do |k|
-      (sa.dig(:objects, k) || []).map do |o|
+      # 테이블 IDENTITY·serial 이 쓰는 시퀀스는 테이블과 함께 옮기므로 빼고
+      (sa.dig(:objects, k) || []).reject { |o| k == 'sequence' && (o[:owned_by].present? || o[:key].to_s.start_with?('ISEQ$$')) }.map do |o|
         st = state[[k, o[:key]]]
         { kind: k, key: o[:key], name: o[:name], status: { only_a: 'new', changed: 'changed', unknown: 'unknown' }[st] || 'same' }
       end

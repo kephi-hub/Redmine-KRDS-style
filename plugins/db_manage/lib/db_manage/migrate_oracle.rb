@@ -411,8 +411,9 @@ module DbManage
       n
     end
 
-    # ---- 뷰·구체화 뷰·함수·프로시저·패키지 ----
-    OBJ_TYPES = { 'view' => 'VIEW', 'matview' => 'MATERIALIZED VIEW', 'function' => 'FUNCTION', 'procedure' => 'PROCEDURE', 'package' => 'PACKAGE' }.freeze
+    # ---- 형식·시퀀스·뷰·구체화 뷰·함수·프로시저·패키지·트리거·시노님·스케줄러 작업 ----
+    OBJ_TYPES = { 'type' => 'TYPE', 'sequence' => 'SEQUENCE', 'view' => 'VIEW', 'matview' => 'MATERIALIZED VIEW', 'function' => 'FUNCTION',
+                  'procedure' => 'PROCEDURE', 'package' => 'PACKAGE', 'trigger' => 'TRIGGER', 'synonym' => 'SYNONYM', 'event' => 'JOB' }.freeze
 
     def object_kinds
       OBJ_TYPES.keys
@@ -426,13 +427,30 @@ module DbManage
       rows('SELECT text FROM all_source WHERE owner = :1 AND name = :2 AND type = :3 ORDER BY line', schema, key, type).map { |r| r['text'] }.join.rstrip.presence
     end
 
+    # 사용자 정의 형식 { 이름 => 명세(+본문) } — DB 화면(Dialect)도 이것을 씀
+    def type_defs(only = nil)
+      names = rows("SELECT object_name AS n FROM all_objects WHERE owner = :1 AND object_type = 'TYPE' ORDER BY object_name", schema).map { |r| r['n'] }
+      names.select { |n| only.nil? || n == only }.to_h { |n| [n, [source_text('TYPE', n), source_text('TYPE BODY', n)].compact.map { |x| "CREATE OR REPLACE #{x}" }.join("\n/\n")] }
+    end
+
     def rename_schema(text, to_schema)
       return text if to_schema == schema
       text.gsub(/"#{Regexp.escape(schema)}"\./, "#{q(to_schema)}.").gsub(/\b#{Regexp.escape(schema)}\./i, "#{q(to_schema)}.")
     end
 
-    def object_ddl(kind, key, to_schema)
+    def plsql_str(v)
+      v.nil? ? 'NULL' : "'#{v.to_s.gsub("'", "''")}'"
+    end
+
+    def object_ddl(kind, key, to)
       st = case kind
+           when 'type'
+             spec = source_text('TYPE', key) or raise Error, t(:error_db_mig_obj_def)
+             ["CREATE OR REPLACE #{spec}", *(b = source_text('TYPE BODY', key)) ? ["CREATE OR REPLACE #{b}"] : []]
+           when 'sequence'
+             r = rows('SELECT min_value, max_value, increment_by, cycle_flag, order_flag, cache_size, last_number FROM all_sequences WHERE sequence_owner = :1 AND sequence_name = :2', schema, key).first or raise Error, t(:error_db_mig_obj_def)
+             ["CREATE SEQUENCE #{q(key)} START WITH #{r['last_number'].to_i} INCREMENT BY #{r['increment_by'].to_i} MINVALUE #{r['min_value'].to_i} MAXVALUE #{r['max_value'].to_i} " \
+              "#{r['cycle_flag'] == 'Y' ? 'CYCLE' : 'NOCYCLE'} #{r['order_flag'] == 'Y' ? 'ORDER' : 'NOORDER'} #{r['cache_size'].to_i.positive? ? "CACHE #{r['cache_size'].to_i}" : 'NOCACHE'}"]
            when 'view'
              v = rows('SELECT text FROM all_views WHERE owner = :1 AND view_name = :2', schema, key).first or raise Error, t(:error_db_mig_obj_def)
              cols = rows("SELECT column_name FROM all_tab_cols WHERE owner = :1 AND table_name = :2 AND hidden_column = 'NO' ORDER BY column_id", schema, key)
@@ -445,30 +463,71 @@ module DbManage
              spec = source_text('PACKAGE', key) or raise Error, t(:error_db_mig_obj_def)
              body = source_text('PACKAGE BODY', key)
              ["CREATE OR REPLACE #{spec}"] + (body ? ["CREATE OR REPLACE #{body}"] : [])
+           when 'trigger'
+             r = rows('SELECT description, when_clause, trigger_body, status FROM all_triggers WHERE owner = :1 AND trigger_name = :2', schema, key).first or raise Error, t(:error_db_mig_obj_def)
+             ["CREATE OR REPLACE TRIGGER #{r['description'].to_s.strip}\n#{"WHEN (#{r['when_clause'].strip})\n" if r['when_clause'].present?}#{r['trigger_body'].to_s.strip}",
+              *("ALTER TRIGGER #{q(key)} DISABLE" if r['status'] == 'DISABLED')]
+           when 'synonym'
+             r = rows('SELECT table_owner, table_name, db_link FROM all_synonyms WHERE owner = :1 AND synonym_name = :2', schema, key).first or raise Error, t(:error_db_mig_obj_def)
+             owner = r['table_owner'] == schema ? to.schema : r['table_owner']
+             ["CREATE OR REPLACE SYNONYM #{q(key)} FOR #{owner ? "#{q(owner)}." : ''}#{q(r['table_name'])}#{"@#{r['db_link']}" if r['db_link']}"]
+           when 'event' then [job_block(key, to)]
            else
              ["CREATE OR REPLACE #{source_text(OBJ_TYPES.fetch(kind), key) || raise(Error, t(:error_db_mig_obj_def))}"]
            end
-      st.map { |x| rename_schema(x, to_schema) }
+      st.map { |x| rename_schema(x, to.schema) }
+    end
+
+    # 스케줄러 작업 → 지우고 다시 만드는 PL/SQL (프로그램·일정 개체를 쓰거나 인자가 있는 작업은 지원 안 함)
+    def job_name(key)
+      key.match?(/\A[A-Z][A-Z0-9_$#]*\z/) ? key : q(key)
+    end
+
+    def job_block(key, to)
+      j = rows('SELECT job_type, job_action, number_of_arguments AS nargs, program_name, schedule_name, repeat_interval, enabled, auto_drop, comments, ' \
+               "TO_CHAR(start_date, 'YYYY-MM-DD HH24:MI:SS.FF TZH:TZM') AS sd, TO_CHAR(end_date, 'YYYY-MM-DD HH24:MI:SS.FF TZH:TZM') AS ed " \
+               'FROM all_scheduler_jobs WHERE owner = :1 AND job_name = :2', schema, key).first or raise Error, t(:error_db_mig_obj_def)
+      raise Error, t(:error_db_mig_job_kind) if j['program_name'] || j['schedule_name'] || j['nargs'].to_i.positive? || !%w(PLSQL_BLOCK STORED_PROCEDURE).include?(j['job_type'])
+      ts = ->(v) { v ? "TO_TIMESTAMP_TZ(#{plsql_str(v)}, 'YYYY-MM-DD HH24:MI:SS.FF TZH:TZM')" : 'NULL' }
+      "BEGIN\n  BEGIN DBMS_SCHEDULER.DROP_JOB(job_name => #{plsql_str(job_name(key))}, force => TRUE); EXCEPTION WHEN OTHERS THEN IF SQLCODE != -27475 THEN RAISE; END IF; END;\n" \
+        "  DBMS_SCHEDULER.CREATE_JOB(job_name => #{plsql_str(job_name(key))}, job_type => #{plsql_str(j['job_type'])}, job_action => #{plsql_str(rename_schema(j['job_action'].to_s, to.schema))}, " \
+        "start_date => #{ts.call(j['sd'])}, repeat_interval => #{plsql_str(j['repeat_interval'])}, end_date => #{ts.call(j['ed'])}, " \
+        "enabled => #{j['enabled'] == 'TRUE' ? 'TRUE' : 'FALSE'}, auto_drop => #{j['auto_drop'] == 'TRUE' ? 'TRUE' : 'FALSE'}, comments => #{plsql_str(j['comments'])});\nEND;"
     end
 
     # 컴파일 오류(ORA-24344)로 만들어진 개체는 INVALID → 오류 내용을 올려 다음 차례에 다시 시도
+    # 형식은 같으면 그대로(다르면 사용 중일 수 있어 오류), 시퀀스가 이미 있으면 속성만 바꾸고 값은 원본이 더 앞서 있을 때만 RESTART
     def create_object(kind, key, statements)
+      exists = object_exists?(kind, key)
+      if exists && kind == 'type'
+        mine = object_ddl(kind, key, self)
+        return if mine.map(&:strip) == statements.map(&:strip)
+      end
+      if exists && kind == 'sequence'
+        nxt = statements.first[/ START WITH (-?\d+)/, 1].to_i
+        mine = rows('SELECT last_number FROM all_sequences WHERE sequence_owner = :1 AND sequence_name = :2', schema, key).first['last_number'].to_i
+        exec(statements.first.sub('CREATE SEQUENCE', 'ALTER SEQUENCE').sub(/ START WITH -?\d+/, ''))
+        exec("ALTER SEQUENCE #{q(key)} RESTART START WITH #{nxt}") if nxt > mine
+        return
+      end
       statements.each do |x|
         exec(x)
       rescue OCIError => e
         raise unless e.code == 24_344
       end
+      return if %w(matview sequence synonym event).include?(kind)
       bad = rows("SELECT object_type FROM all_objects WHERE owner = :1 AND object_name = :2 AND status = 'INVALID'", schema, key)
-      return if bad.empty? || kind == 'matview'
+      return if bad.empty?
       errs = rows('SELECT type, line, position, text FROM all_errors WHERE owner = :1 AND name = :2 ORDER BY sequence', schema, key).first(3)
       raise Error, t(:error_db_mig_compile, msg: errs.map { |r| "#{r['type']} #{r['line']}:#{r['position']} #{r['text'].to_s.strip}" }.join(' / ').presence || 'INVALID')
     end
 
     def object_script(kind, key)
       return nil unless object_exists?(kind, key)
-      st = object_ddl(kind, key, schema)
+      st = object_ddl(kind, key, self)
+      st = ["BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE #{q(key).gsub("'", "''")}'; EXCEPTION WHEN OTHERS THEN NULL; END;"] + st if kind == 'sequence'
       "-- #{kind} #{key} 이관 전 백업 — SQLcl·SQL*Plus 로 실행\nSET DEFINE OFF\nALTER SESSION SET CURRENT_SCHEMA = #{q(schema)};\n" +
-        st.map { |x| kind == 'view' || x.start_with?('CREATE MATERIALIZED') ? "#{x};\n" : "#{x}\n/\n" }.join
+        st.map { |x| x.match?(/\A(CREATE OR REPLACE (FORCE )?VIEW|CREATE MATERIALIZED|CREATE SEQUENCE|CREATE OR REPLACE SYNONYM|ALTER )/) ? "#{x};\n" : "#{x}\n/\n" }.join
     end
   end
 end

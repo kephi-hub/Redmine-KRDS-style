@@ -14,7 +14,9 @@ module DbManage
 
     MODES = %w(skip structure replace upsert insert_new).freeze
     # 뷰·함수·프로시저 등 — 이 순서로 만들고, 다른 개체에 기대 실패한 것은 몇 번 더 시도
-    OBJ_KINDS = %w(function package view matview procedure).freeze
+    OBJ_KINDS = %w(type sequence function package view matview procedure trigger synonym event).freeze
+    # 테이블보다 먼저 (테이블 칼럼이 형식을, 기본값이 시퀀스를 쓸 수 있음)
+    PRE_KINDS = %w(type sequence).freeze
     OBJ_PASSES = 3
     DATA_MODES = %w(replace upsert insert_new).freeze
     BIG_ROWS = 1_000_000
@@ -76,7 +78,7 @@ module DbManage
         sort_objects(objects).each do |o|
           item = { object: o['object'], table: o['table'], mode: 'object', statements: [], warnings: [] }
           begin
-            item[:statements] = src.object_ddl(o['object'], o['table'], tgt.schema)
+            item[:statements] = src.object_ddl(o['object'], o['table'], tgt).compact
             item[:status] = tgt.object_exists?(o['object'], o['table']) ? 'replace' : 'new'
           rescue StandardError => e
             item[:error] = msg(e)
@@ -120,6 +122,8 @@ module DbManage
       open_pair(source, target, write: true) do |src, tgt|
         models = {}
         tables, objects = mig.plan_list.partition { |c| c['object'].nil? }
+        pre, objects = objects.partition { |c| PRE_KINDS.include?(c['object']) }
+        run_objects(src, tgt, sort_objects(pre), dir, results) { save(mig, results, force: true) } if pre.any?
         tables.each do |c|
           models[c['table']] = src.describe(c['table'])
         rescue StandardError
@@ -140,7 +144,7 @@ module DbManage
           r['seconds'] = (Time.now - t0).round(1)
           save(mig, results, force: true)
         end
-        run_objects(src, tgt, sort_objects(objects), dir, results) { save(mig, results, force: true) }
+        run_objects(src, tgt, sort_objects(objects), dir, results) { save(mig, results, force: true) } if objects.any?
       end
       ok = results.count { |x| x['status'] == 'done' }
       mig.update!(status: ok == results.size ? 'done' : (ok.zero? ? 'failed' : 'partial'), finished_at: Time.current, results: results)
@@ -195,7 +199,7 @@ module DbManage
           t0 = Time.now
           r['status'] = 'running'
           begin
-            ddl = src.object_ddl(r['object'], r['table'], tgt.schema)
+            ddl = src.object_ddl(r['object'], r['table'], tgt)
             # 이관 전 상태는 첫 시도 전에만 (앞 차례에 실패하며 남은 개체를 백업하지 않게)
             if pass.zero? && (script = tgt.object_script(r['object'], r['table']))
               FileUtils.mkdir_p(dir)
@@ -206,14 +210,14 @@ module DbManage
             end
             r['plan'] ||= r['backup'] ? 'replace' : 'new'
             tgt.create_object(r['object'], r['table'], ddl)
-            r['ddl'] = ddl
+            r['ddl'] = ddl.compact
             r['status'] = 'done'
             r.delete('error')
             progress = true
           rescue StandardError => e
             r['status'] = 'failed'
             r['error'] = msg(e)
-            r['ddl'] = ddl if ddl
+            r['ddl'] = ddl.compact if ddl
           end
           r['seconds'] = ((r['seconds'] || 0) + (Time.now - t0)).round(1)
           r['passes'] = pass + 1

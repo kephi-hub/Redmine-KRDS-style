@@ -348,36 +348,162 @@ module DbManage
         "WHERE fk.referenced_object_id = #{obj} AND fk.parent_object_id <> fk.referenced_object_id;"
     end
 
-    # ---- 뷰·함수·프로시저 ----
+    # ---- 형식·시퀀스·뷰·함수·프로시저·트리거·시노님·에이전트 작업 ----
     def object_kinds
-      %w(view function procedure)
+      %w(type sequence view function procedure trigger synonym event)
     end
 
-    def object_exists?(_kind, key)
-      !rows("SELECT OBJECT_ID(#{s(qt(key))}) AS id").first['id'].nil?
+    def db_name
+      @db_name ||= rows('SELECT DB_NAME() AS d').first['d']
     end
 
-    # OBJECT_DEFINITION 그대로 (암호화된 개체는 NULL) → [CREATE OR ALTER …, 원래 CREATE …]
-    def object_ddl(_kind, key, to_schema)
-      d = rows("SELECT OBJECT_DEFINITION(OBJECT_ID(#{s(qt(key))})) AS d").first['d'] or raise Error, t(:error_db_mig_obj_def)
-      d = d.gsub(/\[#{Regexp.escape(schema)}\]\./i, "#{q(to_schema)}.").gsub(/\b#{Regexp.escape(schema)}\./i, "#{q(to_schema)}.") if to_schema != schema
-      head = /\A((?:\s|--[^\n]*\n|\/\*.*?\*\/)*)CREATE(\s+)(VIEW|FUNCTION|PROCEDURE|PROC)\b/im
-      [d.sub(head) { "#{Regexp.last_match(1)}CREATE OR ALTER#{Regexp.last_match(2)}#{Regexp.last_match(3)}" }, d]
+    def instance
+      @instance ||= rows("SELECT CAST(SERVERPROPERTY('ServerName') AS nvarchar(200)) AS s").first['s']
     end
 
-    # CREATE OR ALTER 가 안 되는 변경(함수 종류 변경 등)은 지우고 원래 CREATE 로
+    # 사용자 정의 형식 { 이름 => CREATE 문 } — 별칭 형식 · 테이블 형식. DB 화면(Dialect)도 이것을 씀
+    def type_defs(only = nil)
+      list = rows(<<~SQL)
+        SELECT t.name, t.is_table_type AS tbl, st.name AS tname, t.max_length AS len, t.precision AS prec, t.scale, t.is_nullable AS nullable, tt.type_table_object_id AS oid
+        FROM sys.types t JOIN sys.schemas sc ON sc.schema_id = t.schema_id
+        LEFT JOIN sys.types st ON st.user_type_id = t.system_type_id AND t.is_table_type = 0
+        LEFT JOIN sys.table_types tt ON tt.user_type_id = t.user_type_id
+        WHERE t.is_user_defined = 1 AND sc.name = #{s(schema)} ORDER BY t.name
+      SQL
+      list.select { |r| only.nil? || r['name'] == only }.to_h do |r|
+        d = if r['tbl']
+              cols = rows("SELECT col.name, ty.name AS tname, col.max_length AS len, col.precision AS prec, col.scale, col.is_nullable AS nullable " \
+                          "FROM sys.columns col JOIN sys.types ty ON ty.user_type_id = col.user_type_id WHERE col.object_id = #{r['oid'].to_i} ORDER BY col.column_id")
+              "CREATE TYPE #{qt(r['name'])} AS TABLE (#{cols.map { |x| "#{q(x['name'])} #{type_of(x)}#{x['nullable'] ? ' NULL' : ' NOT NULL'}" }.join(', ')})"
+            else
+              "CREATE TYPE #{qt(r['name'])} FROM #{type_of(r)}#{r['nullable'] ? ' NULL' : ' NOT NULL'}"
+            end
+        [r['name'], d]
+      end
+    end
+
+    def object_exists?(kind, key)
+      case kind
+      when 'type' then rows("SELECT TYPE_ID(#{s(qt(key))}) AS id").first['id'].present?
+      when 'event' then rows("SELECT COUNT(*) AS n FROM msdb.dbo.sysjobs WHERE name = #{s(key)}").first['n'].to_i.positive?
+      else !rows("SELECT OBJECT_ID(#{s(qt(key))}) AS id").first['id'].nil?
+      end
+    end
+
+    # 반환: [첫 문장, 첫 문장이 안 될 때 쓸 문장, 뒤이어 실행할 문장…]
+    def object_ddl(kind, key, to)
+      ren = lambda do |d|
+        d = d.gsub(/\[#{Regexp.escape(db_name)}\]\./i, "#{q(to.db_name)}.") if to.db_name != db_name
+        to.schema == schema ? d : d.gsub(/\[#{Regexp.escape(schema)}\]\./i, "#{q(to.schema)}.").gsub(/\b#{Regexp.escape(schema)}\./i, "#{q(to.schema)}.")
+      end
+      case kind
+      when 'type' then [ren.call(type_defs(key)[key] || raise(Error, t(:error_db_mig_obj_def)))]
+      when 'sequence'
+        r = rows("SELECT ty.name AS tname, CAST(sq.start_value AS nvarchar(60)) AS start, CAST(sq.increment AS nvarchar(60)) AS inc, CAST(sq.minimum_value AS nvarchar(60)) AS mn, " \
+                 "CAST(sq.maximum_value AS nvarchar(60)) AS mx, sq.is_cycling AS cyc, sq.is_cached AS cached, sq.cache_size AS cache, CAST(sq.last_used_value AS nvarchar(60)) AS used " \
+                 "FROM sys.sequences sq JOIN sys.types ty ON ty.user_type_id = sq.user_type_id WHERE sq.object_id = OBJECT_ID(#{s(qt(key))})").first or raise Error, t(:error_db_mig_obj_def)
+        nxt = r['used'] ? r['used'].to_i + r['inc'].to_i : r['start'].to_i
+        opts = "INCREMENT BY #{r['inc']} MINVALUE #{r['mn']} MAXVALUE #{r['mx']} #{r['cyc'] ? 'CYCLE' : 'NO CYCLE'} #{r['cached'] ? (r['cache'] ? "CACHE #{r['cache']}" : 'CACHE') : 'NO CACHE'}"
+        ["CREATE SEQUENCE #{qt(key)} AS #{r['tname']} START WITH #{nxt} #{opts}", nil, "-- opts #{opts}"]
+      when 'synonym'
+        base = rows("SELECT base_object_name AS b FROM sys.synonyms WHERE object_id = OBJECT_ID(#{s(qt(key))})").first&.dig('b') or raise Error, t(:error_db_mig_obj_def)
+        ["DROP SYNONYM IF EXISTS #{qt(key)}", nil, "CREATE SYNONYM #{qt(key)} FOR #{ren.call(base)}"]
+      when 'event'
+        # 에이전트 작업은 서버 단위 — 같은 인스턴스면 대상 작업이 곧 원본 작업이라 옮기지 않음
+        raise Error, t(:error_db_mig_job_same_server) if to.instance == instance
+        [job_script(key, to.db_name), nil]
+      else
+        d = rows("SELECT OBJECT_DEFINITION(OBJECT_ID(#{s(qt(key))})) AS d").first['d'] or raise Error, t(:error_db_mig_obj_def)
+        d = ren.call(d)
+        head = /\A((?:\s|--[^\n]*\n|\/\*.*?\*\/)*)CREATE(\s+)(VIEW|FUNCTION|PROCEDURE|PROC|TRIGGER)\b/im
+        after = []
+        if kind == 'trigger'
+          tr = rows("SELECT tr.is_disabled AS dis, OBJECT_SCHEMA_NAME(tr.parent_id) AS sname, OBJECT_NAME(tr.parent_id) AS tname FROM sys.triggers tr WHERE tr.object_id = OBJECT_ID(#{s(qt(key))})").first
+          after << "DISABLE TRIGGER #{qt(key)} ON #{q(tr['sname'] == schema ? to.schema : tr['sname'])}.#{q(tr['tname'])}" if tr && tr['dis']
+        end
+        [d.sub(head) { "#{Regexp.last_match(1)}CREATE OR ALTER#{Regexp.last_match(2)}#{Regexp.last_match(3)}" }, d, *after]
+      end
+    end
+
+    # msdb 의 enabled 는 tinyint·int (0 도 Ruby 에서는 참)
+    def bit(v)
+      v == true || v.to_i == 1 ? 1 : 0
+    end
+
+    # 에이전트 작업 → 다시 만드는 T-SQL (있으면 지우고, 이 DB 에서 도는 단계는 대상 DB 로). T-SQL 단계만
+    def job_script(name, to_db)
+      j = rows("SELECT job_id, enabled, description FROM msdb.dbo.sysjobs WHERE name = #{s(name)}").first or raise Error, t(:error_db_mig_obj_def)
+      jid = "'#{j['job_id']}'"
+      steps = rows("SELECT step_id, step_name, subsystem, command, database_name, on_success_action, on_fail_action, retry_attempts, retry_interval " \
+                   "FROM msdb.dbo.sysjobsteps WHERE job_id = #{jid} ORDER BY step_id")
+      bad = steps.reject { |x| x['subsystem'] == 'TSQL' }
+      raise Error, t(:error_db_mig_job_step, name: bad.map { |x| "#{x['step_name']}(#{x['subsystem']})" }.join(', ')) if bad.any?
+      scheds = rows("SELECT sc.name, sc.enabled, sc.freq_type, sc.freq_interval, sc.freq_subday_type, sc.freq_subday_interval, sc.freq_relative_interval, " \
+                    "sc.freq_recurrence_factor, sc.active_start_date, sc.active_end_date, sc.active_start_time, sc.active_end_time " \
+                    "FROM msdb.dbo.sysjobschedules js JOIN msdb.dbo.sysschedules sc ON sc.schedule_id = js.schedule_id WHERE js.job_id = #{jid}")
+      out = +"IF EXISTS (SELECT 1 FROM msdb.dbo.sysjobs WHERE name = #{s(name)}) EXEC msdb.dbo.sp_delete_job @job_name = #{s(name)};\n"
+      out << "EXEC msdb.dbo.sp_add_job @job_name = #{s(name)}, @enabled = #{bit(j['enabled'])}, @description = #{s(j['description'].to_s)};\n"
+      steps.each do |x|
+        db = x['database_name'] == db_name ? to_db : x['database_name']
+        out << "EXEC msdb.dbo.sp_add_jobstep @job_name = #{s(name)}, @step_name = #{s(x['step_name'])}, @subsystem = N'TSQL', @command = #{s(x['command'])}, " \
+               "@database_name = #{s(db)}, @on_success_action = #{x['on_success_action']}, @on_fail_action = #{x['on_fail_action']}, " \
+               "@retry_attempts = #{x['retry_attempts']}, @retry_interval = #{x['retry_interval']};\n"
+      end
+      scheds.each do |x|
+        out << "EXEC msdb.dbo.sp_add_jobschedule @job_name = #{s(name)}, @name = #{s(x['name'])}, @enabled = #{bit(x['enabled'])}, @freq_type = #{x['freq_type']}, " \
+               "@freq_interval = #{x['freq_interval']}, @freq_subday_type = #{x['freq_subday_type']}, @freq_subday_interval = #{x['freq_subday_interval']}, " \
+               "@freq_relative_interval = #{x['freq_relative_interval']}, @freq_recurrence_factor = #{x['freq_recurrence_factor']}, " \
+               "@active_start_date = #{x['active_start_date']}, @active_end_date = #{x['active_end_date']}, @active_start_time = #{x['active_start_time']}, @active_end_time = #{x['active_end_time']};\n"
+      end
+      out << "EXEC msdb.dbo.sp_add_jobserver @job_name = #{s(name)}, @server_name = N'(LOCAL)';"
+      out
+    end
+
+    # CREATE OR ALTER 가 안 되는 변경은 지우고 원래 CREATE 로. 형식은 같으면 그대로(다르면 사용 중일 수 있어 오류)
+    # 시퀀스가 이미 있으면 속성만 바꾸고 값은 원본이 더 앞서 있을 때만 RESTART
     def create_object(kind, key, statements)
-      exec(statements.first)
-    rescue TinyTds::Error
-      raise unless object_exists?(kind, key)
-      exec("DROP #{kind == 'view' ? 'VIEW' : kind.upcase} #{qt(key)}")
-      exec(statements.last)
+      first, plain, *after = statements
+      exists = object_exists?(kind, key)
+      if exists && kind == 'type'
+        return if type_defs(key)[key] == first
+        raise Error, t(:error_db_mig_type_diff)
+      end
+      if exists && kind == 'sequence'
+        nxt = first[/ START WITH (-?\d+)/, 1].to_i
+        cur = rows("SELECT CAST(last_used_value AS nvarchar(60)) AS used, CAST(start_value AS nvarchar(60)) AS start, CAST(increment AS nvarchar(60)) AS inc " \
+                   "FROM sys.sequences WHERE object_id = OBJECT_ID(#{s(qt(key))})").first
+        mine = cur['used'] ? cur['used'].to_i + cur['inc'].to_i : cur['start'].to_i
+        exec("ALTER SEQUENCE #{qt(key)}#{" RESTART WITH #{nxt}" if nxt > mine} #{after.first.to_s.delete_prefix('-- opts ')}")
+        return
+      end
+      if kind == 'sequence'
+        exec(first)
+        return
+      end
+      if exists && kind == 'event'
+        own = rows("SELECT CASE WHEN SUSER_SNAME(owner_sid) = SUSER_SNAME() OR IS_SRVROLEMEMBER('sysadmin') = 1 THEN 1 ELSE 0 END AS ok FROM msdb.dbo.sysjobs WHERE name = #{s(key)}").first
+        raise Error, t(:error_db_mig_job_owner) unless own && own['ok'].to_i == 1
+      end
+      begin
+        exec(first)
+      rescue TinyTds::Error
+        raise unless plain && object_exists?(kind, key)
+        exec("DROP #{kind == 'view' ? 'VIEW' : kind.upcase} #{qt(key)}")
+        exec(plain)
+      end
+      after.each { |x| exec(x) }
     end
 
     def object_script(kind, key)
       return nil unless object_exists?(kind, key)
-      st = object_ddl(kind, key, schema)
-      "-- #{kind} #{key} 이관 전 백업 — sqlcmd 로 실행\nSET QUOTED_IDENTIFIER ON;\nGO\nDROP #{kind == 'view' ? 'VIEW' : kind.upcase} IF EXISTS #{qt(key)};\nGO\n#{st.last}\nGO\n"
+      first, plain, *after = object_ddl(kind, key, self)
+      drop = { 'type' => "DROP TYPE IF EXISTS #{qt(key)}", 'sequence' => "DROP SEQUENCE IF EXISTS #{qt(key)}", 'event' => nil, 'synonym' => nil }
+      body = case kind
+             when 'sequence', 'type', 'event' then [drop[kind], first].compact
+             when 'synonym' then [first, *after]
+             else ["DROP #{kind == 'view' ? 'VIEW' : kind.upcase} IF EXISTS #{qt(key)}", plain, *after]
+             end
+      "-- #{kind} #{key} 이관 전 백업 — sqlcmd 로 실행\nSET QUOTED_IDENTIFIER ON;\nGO\n" + body.map { |x| "#{x}\nGO\n" }.join
     end
   end
 end

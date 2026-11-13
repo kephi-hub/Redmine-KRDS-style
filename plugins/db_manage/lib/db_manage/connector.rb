@@ -14,9 +14,9 @@ module DbManage
     KINDS = {
       'mariadb' => %w(table view function procedure trigger event sequence),
       'mysql' => %w(table view function procedure trigger event),
-      'postgresql' => %w(table view matview function procedure trigger sequence event),
-      'mssql' => %w(table view function procedure trigger sequence synonym event),
-      'oracle' => %w(table view matview function procedure package trigger sequence synonym event)
+      'postgresql' => %w(table view matview function procedure trigger sequence type event),
+      'mssql' => %w(table view function procedure trigger sequence synonym type event),
+      'oracle' => %w(table view matview function procedure package trigger sequence synonym type event)
     }.freeze
     DIALECTS = { 'mariadb' => 'DialectMysql', 'postgresql' => 'DialectPostgresql', 'mssql' => 'DialectMssql', 'oracle' => 'DialectOracle' }.freeze
     DEFAULT_SCHEMA = { 'postgresql' => 'public', 'mssql' => 'dbo' }.freeze

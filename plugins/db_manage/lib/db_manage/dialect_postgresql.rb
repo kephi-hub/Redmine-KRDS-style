@@ -108,7 +108,8 @@ module DbManage
           end
         end
       end
-      { 'view' => views.reject { |v| v[:matview] }, 'matview' => views.select { |v| v[:matview] },
+      types = safe { DbManage::MigratePostgresql.new(c, @schema).type_defs.map { |n, d| { key: n, name: n, definition: d } } }
+      { 'view' => views.reject { |v| v[:matview] }, 'matview' => views.select { |v| v[:matview] }, 'type' => types,
         'function' => routines.select { |r| r[:kind] == 'function' }, 'procedure' => routines.select { |r| r[:kind] == 'procedure' },
         'trigger' => triggers, 'sequence' => sequences, 'event' => events }
     end

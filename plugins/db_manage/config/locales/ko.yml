@@ -1,9 +1,15 @@
 ko:
+  error_db_mig_job_same_server: "원본과 대상이 같은 SQL Server 인스턴스입니다. 에이전트 작업은 서버 단위라 옮기면 원본 작업이 바뀌므로 옮기지 않습니다 (작업 단계의 DB 를 직접 확인하세요)."
+  error_db_mig_job_owner: "대상 서버에 같은 이름의 에이전트 작업이 있고 다른 계정 소유라 바꿀 수 없습니다 (sysadmin 이거나 작업 소유자여야 함)."
+  label_db_kind_type: "형식"
+  error_db_mig_type_diff: "대상에 같은 이름의 형식이 있고 정의가 달라 바꾸지 않았습니다 (테이블·개체가 쓰고 있을 수 있음 — 직접 확인)."
+  error_db_mig_job_step: "T-SQL 이 아닌 작업 단계는 옮기지 않습니다: %{name}"
+  error_db_mig_job_kind: "프로그램·일정 개체를 쓰거나 인자가 있는 스케줄러 작업은 옮기지 않습니다 (PL/SQL 블록·저장 프로시저 작업만)."
   label_db_mig_item: "항목"
   label_db_mig_obj_sql_n: "만들기 SQL %{n}개"
   label_db_mig_st_unknown: "비교 불가"
-  label_db_mig_objects: "뷰·함수·프로시저"
-  text_db_mig_objects: "고른 개체를 대상에 만들거나 원본 정의로 바꿉니다 (함수·패키지 → 뷰 → 프로시저 순서, 다른 개체에 기대 실패하면 최대 3번 다시 시도). 대상에만 있는 개체는 지우지 않습니다."
+  label_db_mig_objects: "형식·시퀀스·뷰·함수·프로시저·트리거·시노님·DB 잡"
+  text_db_mig_objects: "고른 개체를 대상에 만들거나 원본 정의로 바꿉니다. 형식·시퀀스는 테이블보다 먼저, 나머지는 함수·패키지 → 뷰 → 프로시저 → 트리거 → 시노님 → DB 잡 순서로, 다른 개체에 기대 실패하면 최대 3번 다시 시도합니다. 시퀀스 값은 원본·대상 중 큰 쪽으로 맞춥니다(줄이지 않음). 대상에만 있는 개체는 지우지 않습니다."
   label_db_mig_obj_all: "개체 모두 고르기"
   label_db_mig_obj_kind: "종류"
   label_db_mig_mode_object: "만들기·바꾸기"
@@ -97,7 +103,7 @@ ko:
   error_db_mig_link_gone: "원본·대상 DB 연결이 없어졌습니다."
   field_db_write_user: "이관용 계정"
   field_db_write_password: "이관용 비밀번호"
-  text_db_write_user: "이관(쓰기)에 쓸 계정 — 비우면 위 계정으로 이관합니다. 대상 테이블을 만들고·고치고·데이터를 넣을 권한이 필요합니다 (MariaDB: CREATE·ALTER·INDEX·REFERENCES·INSERT·UPDATE·DELETE / PostgreSQL: 테이블 소유자, 슈퍼유저면 외래키 검사를 끄고 옮김 / SQL Server: db_owner 또는 db_ddladmin+쓰기 / Oracle: 스키마 소유자, IDENTITY 칼럼이 있으면 CREATE SEQUENCE)."
+  text_db_write_user: "이관(쓰기)에 쓸 계정 — 비우면 위 계정으로 이관합니다. 대상 테이블을 만들고·고치고·데이터를 넣을 권한이 필요합니다 (MariaDB: CREATE·ALTER·INDEX·REFERENCES·INSERT·UPDATE·DELETE / PostgreSQL: 테이블 소유자, 슈퍼유저면 외래키 검사를 끄고 옮김 / SQL Server: db_owner 또는 db_ddladmin+쓰기 / Oracle: 스키마 소유자, IDENTITY 칼럼이 있으면 CREATE SEQUENCE). 트리거·이벤트·시노님·작업을 옮기려면 그 권한도 필요 (MariaDB 원본 조회 계정: 트리거 TRIGGER·이벤트 EVENT, SQL Server: msdb 의 sysjobs·sysjobsteps·sysjobschedules·sysschedules 조회와 SQLAgent 역할, Oracle: CREATE TYPE·TRIGGER·SYNONYM·JOB)."
   notice_db_write_ok: "이관용 계정(%{user}) 접속 확인"
   project_module_db_manage: DB 관리
   permission_view_db_schema: DB 스키마 보기

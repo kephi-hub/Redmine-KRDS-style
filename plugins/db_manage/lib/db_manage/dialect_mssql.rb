@@ -100,7 +100,8 @@ module DbManage
           definition: list.sort_by { |x| x['step_id'].to_i }.map { |x| "-- #{x['step_name']}\n#{x['command']}" }.uniq.join("\n\n").presence,
           last_run: r['last_run'] }
       end
-      { 'view' => views, 'function' => routines.select { |r| r[:kind] == 'function' }, 'procedure' => routines.select { |r| r[:kind] == 'procedure' },
+      types = safe { DbManage::MigrateMssql.new(c, @schema).type_defs.map { |n, d| { key: n, name: n, definition: d } } }
+      { 'view' => views, 'type' => types, 'function' => routines.select { |r| r[:kind] == 'function' }, 'procedure' => routines.select { |r| r[:kind] == 'procedure' },
         'trigger' => triggers, 'sequence' => sequences, 'synonym' => synonyms, 'event' => jobs }
     end
 

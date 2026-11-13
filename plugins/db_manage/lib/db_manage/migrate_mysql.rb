@@ -227,44 +227,61 @@ module DbManage
       n
     end
 
-    # ---- 뷰·함수·프로시저 ----
+    # ---- 뷰·함수·프로시저·트리거·이벤트·시퀀스 ----
+    OBJ_SHOW = { 'view' => ['VIEW', 'Create View'], 'function' => ['FUNCTION', 'Create Function'], 'procedure' => ['PROCEDURE', 'Create Procedure'],
+                 'trigger' => ['TRIGGER', 'SQL Original Statement'], 'event' => ['EVENT', 'Create Event'], 'sequence' => ['SEQUENCE', 'Create Table'] }.freeze
+
     def object_kinds
-      %w(view function procedure)
+      %w(sequence view function procedure trigger event)
     end
 
     def object_exists?(kind, key)
-      sql = if kind == 'view'
-              "SELECT 1 FROM information_schema.VIEWS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '#{c.escape(key)}'"
-            else
-              "SELECT 1 FROM information_schema.ROUTINES WHERE ROUTINE_SCHEMA = DATABASE() AND ROUTINE_TYPE = '#{kind.upcase}' AND ROUTINE_NAME = '#{c.escape(key)}'"
+      k = "'#{c.escape(key)}'"
+      sql = case kind
+            when 'view' then "SELECT 1 FROM information_schema.VIEWS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = #{k}"
+            when 'trigger' then "SELECT 1 FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE() AND TRIGGER_NAME = #{k}"
+            when 'event' then "SELECT 1 FROM information_schema.EVENTS WHERE EVENT_SCHEMA = DATABASE() AND EVENT_NAME = #{k}"
+            when 'sequence' then "SELECT 1 FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = #{k} AND TABLE_TYPE = 'SEQUENCE'"
+            else "SELECT 1 FROM information_schema.ROUTINES WHERE ROUTINE_SCHEMA = DATABASE() AND ROUTINE_TYPE = '#{kind.upcase}' AND ROUTINE_NAME = #{k}"
             end
       c.query(sql).any?
     end
 
-    # SHOW CREATE … (함수·프로시저 본문은 정의자이거나 mysql.proc 조회 권한이 있어야 보임)
+    # SHOW CREATE … (함수·프로시저 본문은 정의자이거나 mysql.proc 조회 권한, 트리거는 TRIGGER, 이벤트는 EVENT 권한이 있어야 보임)
     def object_def(kind, key)
-      row = c.query("SHOW CREATE #{kind.upcase} #{q(key)}").first
-      row && row[kind == 'view' ? 'Create View' : "Create #{kind.capitalize}"]
+      what, col = OBJ_SHOW.fetch(kind)
+      row = c.query("SHOW CREATE #{what} #{q(key)}").first
+      row && row[col]
     rescue Mysql2::Error => e
-      raise unless [1305, 1146, 1356].include?(e.error_number)
+      raise unless [1305, 1146, 1356, 1360, 1539, 1142, 1227].include?(e.error_number)
       nil
     end
 
     # 대상에서 실행할 문장 — DEFINER 는 빼고(대상 계정이 정의자가 됨) 원본 스키마 이름은 대상 스키마로
-    def object_ddl(kind, key, to_schema)
+    def object_ddl(kind, key, to)
       d = object_def(kind, key) or raise Error, t(:error_db_mig_obj_def)
       d = d.sub(/\s+DEFINER=`(?:[^`]|``)*`@`(?:[^`]|``)*`/, '')
-      d = d.gsub("#{q(schema)}.", "#{q(to_schema)}.") if to_schema != schema
-      kind == 'view' ? [d.sub(/\ACREATE\s+/, 'CREATE OR REPLACE ')] : ["DROP #{kind.upcase} IF EXISTS #{q(key)}", d]
+      d = d.gsub("#{q(schema)}.", "#{q(to.schema)}.") if to.schema != schema
+      case kind
+      when 'view' then [d.sub(/\ACREATE\s+/, 'CREATE OR REPLACE ')]
+      when 'sequence'
+        nxt = c.query("SELECT next_not_cached_value AS n FROM #{q(key)}").first&.dig('n')
+        [d.sub(/\s+ENGINE=\S+.*\z/m, ''), *("SELECT SETVAL(#{q(key)}, #{nxt.to_i - 1})" if nxt)]
+      else ["DROP #{OBJ_SHOW[kind][0]} IF EXISTS #{q(key)}", d]
+      end
     end
 
-    def create_object(_kind, _key, statements)
+    # 시퀀스가 이미 있으면 값만 앞으로 (SETVAL 은 지금보다 작은 값이면 바꾸지 않음)
+    def create_object(kind, key, statements)
+      statements = statements.drop(1) if kind == 'sequence' && object_exists?(kind, key)
       statements.each { |x| exec(x) }
     end
 
     def object_script(kind, key)
-      st = object_ddl(kind, key, schema)
+      return nil unless object_exists?(kind, key)
+      st = object_ddl(kind, key, self)
       head = "-- #{kind} #{key} 이관 전 백업 — mysql 클라이언트로 실행\n"
+      return head + "DROP SEQUENCE IF EXISTS #{q(key)};\n" + st.map { |x| "#{x};\n" }.join if kind == 'sequence'
       return head + st.map { |x| "#{x};\n" }.join if kind == 'view'
       "#{head}DELIMITER $$\n#{st.map { |x| "#{x} $$\n" }.join}DELIMITER ;\n"
     rescue Error

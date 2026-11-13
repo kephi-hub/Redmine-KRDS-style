@@ -120,7 +120,8 @@ module DbManage
         { key: r['name'], name: r['name'], schedule: r['repeat'].presence || tm(r['next_run']), status: r['enabled'] == 'TRUE' ? 'ENABLED' : 'DISABLED',
           last_run: tm(r['last_run']), comment: r['comments'].presence, definition: r['action'].presence }
       end
-      { 'view' => views, 'matview' => mviews, 'function' => functions, 'procedure' => procedures, 'package' => packages,
+      types = safe { DbManage::MigrateOracle.new(c, @schema).type_defs.map { |n, d| { key: n, name: n, definition: d } } }
+      { 'view' => views, 'matview' => mviews, 'type' => types, 'function' => functions, 'procedure' => procedures, 'package' => packages,
         'trigger' => triggers, 'sequence' => sequences, 'synonym' => synonyms, 'event' => jobs }
     end
 
