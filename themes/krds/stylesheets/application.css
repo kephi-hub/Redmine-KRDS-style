@@ -1703,7 +1703,7 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 @media (min-width:900px){
 .lb_table thead{display:table-header-group;}
 .lb_table tr{display:table-row;padding:0;border:0;}
-.lb_table th,.lb_table td{display:table-cell;padding:8px;border-bottom:1px solid var(--gray_10);text-align:left;vertical-align:middle;}
+#content table.lb_table th,#content table.lb_table td{display:table-cell;padding:8px;border-bottom:1px solid var(--gray_10);text-align:left;vertical-align:middle;}
 .lb_table th.lb_new,.lb_table td.lb_new{width:50%;}
 .lb_table td.lb_new input{max-width:320px;}
 .wl_hero{padding:28px 32px;}
