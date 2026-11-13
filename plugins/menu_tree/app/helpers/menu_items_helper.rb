@@ -1,9 +1,8 @@
 module MenuItemsHelper
-  TYPE_KEYS = %w(list detail form popup tab link).freeze
   CHANNEL_KEYS = %w(both pc mobile).freeze
 
   def menu_type_options
-    TYPE_KEYS.map { |k| [l("label_menu_type_#{k}"), k] }
+    MenuScreenType.for(@project.id).map { |t| [t.name, t.code] }
   end
 
   def menu_channel_options

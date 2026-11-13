@@ -1,4 +1,13 @@
 ko:
+  label_menu_types: "화면 유형"
+  text_menu_types: "이 프로젝트에서 쓰는 화면 유형입니다. 이름을 바꾸거나 추가·삭제하고 저장하세요. ‘메뉴에 보임’을 끄면 그 유형 화면은 메뉴 노출 기본값이 N(상세·팝업처럼 화면만)입니다."
+  label_menu_types_in_menu: "메뉴 노출 기본"
+  label_menu_types_show: "메뉴에 보임"
+  label_menu_types_add: "유형 추가"
+  text_menu_types_del_used: "이 유형을 쓰는 화면이 %{count}개 있습니다. 저장하면 그 화면들의 화면 유형이 비워집니다. 삭제할까요?"
+  error_menu_types_empty: "화면 유형이 하나 이상 있어야 합니다."
+  error_menu_types_dup: "같은 이름의 화면 유형이 있습니다: %{name}"
+  notice_menu_types_cleared: "저장했습니다. 삭제한 유형을 쓰던 화면 %{count}개의 화면 유형을 비웠습니다."
   label_menu_a11y: "웹 접근성 자동 점검"
   label_menu_a11y_sheet: "웹 접근성 점검표"
   label_menu_a11y_k: "접근성 위반"

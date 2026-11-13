@@ -1,4 +1,13 @@
 en:
+  label_menu_types: "Screen types"
+  text_menu_types: "Screen types used in this project."
+  label_menu_types_in_menu: "Shown in menu"
+  label_menu_types_show: "Shown in menu"
+  label_menu_types_add: "Add type"
+  text_menu_types_del_used: "%{count} screens use this type. Saving will clear their type. Delete?"
+  error_menu_types_empty: "At least one screen type is required."
+  error_menu_types_dup: "Duplicate screen type: %{name}"
+  notice_menu_types_cleared: "Saved. Cleared the type of %{count} screens."
   label_menu_a11y: "Accessibility check"
   label_menu_a11y_sheet: "Accessibility report"
   label_menu_a11y_k: "A11y issues"

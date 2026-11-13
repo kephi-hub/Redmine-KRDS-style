@@ -40,8 +40,9 @@
 
   <h3 class="ag_sec"><%= l(:label_menu_st_by_type) %></h3>
   <ul class="db_tags">
-    <% @leaves.group_by(&:screen_type).sort_by { |k, _| MenuItemsHelper::TYPE_KEYS.index(k) || 99 }.each do |type, list| %>
-      <li><%= type ? l("label_menu_type_#{type}") : l(:label_menu_type_none) %> <span><%= list.size %></span></li>
+    <% tl = MenuScreenType.labels(@project.id); tk = tl.keys %>
+    <% @leaves.group_by(&:screen_type).sort_by { |k, _| tk.index(k) || 99 }.each do |type, list| %>
+      <li><%= type ? (tl[type] || type) : l(:label_menu_type_none) %> <span><%= list.size %></span></li>
     <% end %>
   </ul>
 

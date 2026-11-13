@@ -1,4 +1,7 @@
 ko:
+  notice_vk_order_saved: "순서를 저장했습니다"
+  error_vk_order: "순서를 저장하지 못했습니다. 새로 고침 후 다시 시도하세요."
+  text_vk_order_moved: "%{name} — %{n}번째로 옮김"
   label_vault_type_plural: 접속정보 유형
   label_vault_type_new: 새 유형
   label_vault_type_manage: 유형 관리

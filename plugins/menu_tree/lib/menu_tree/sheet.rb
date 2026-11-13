@@ -32,12 +32,15 @@ module MenuTree
       nil
     end
 
-    def type_code(v)
+    # names: 프로젝트 화면 유형 { 이름(공백 뺀 소문자) => code } — 프로젝트에서 바꾼·추가한 유형 이름 먼저
+    def type_code(v, names = {})
       s = v.to_s.strip
       return nil if s.empty?
-      return s.downcase if TYPE_LABELS.key?(s.downcase)
-      { '목록' => 'list', '리스트' => 'list', '조회' => 'list', '상세' => 'detail', '등록·수정' => 'form', '등록' => 'form', '수정' => 'form',
-        '등록/수정' => 'form', '입력' => 'form', '팝업' => 'popup', '탭' => 'tab', '링크' => 'link' }[s.delete(' ')]
+      return names[s.delete(' ').downcase] if names[s.delete(' ').downcase]
+      return s.downcase if TYPE_LABELS.key?(s.downcase) && (names.empty? || names.value?(s.downcase))
+      code = { '목록' => 'list', '리스트' => 'list', '조회' => 'list', '상세' => 'detail', '등록·수정' => 'form', '등록' => 'form', '수정' => 'form',
+               '등록/수정' => 'form', '입력' => 'form', '팝업' => 'popup', '탭' => 'tab', '링크' => 'link' }[s.delete(' ')]
+      code if code && (names.empty? || names.value?(code))
     end
 
     def channel_code(v)
@@ -64,6 +67,7 @@ module MenuTree
       extra_cols = {}
       result = { created: 0, updated: 0, columns: [], sites: [], errors: [] }
       columns = project_columns(project)
+      type_names = MenuScreenType.for(project.id).to_h { |t| [t.name.delete(' ').downcase, t.code] }
       header.each_with_index do |h, i|
         next if h.blank?
         if (d = depth_of(h))
@@ -141,7 +145,7 @@ module MenuTree
               attrs = {}
               attrs[:screen_id] = row[field_cols['screen_id']] if field_cols['screen_id']
               attrs[:url] = row[field_cols['url']] if field_cols['url']
-              attrs[:screen_type] = type_code(row[field_cols['screen_type']]) if field_cols['screen_type']
+              attrs[:screen_type] = type_code(row[field_cols['screen_type']], type_names) if field_cols['screen_type']
               attrs[:channel] = channel_code(row[field_cols['channel']]) if field_cols['channel']
               attrs[:active] = active_value(row[field_cols['active']]) if field_cols['active']
               # 메뉴 노출: 빈칸이면 화면 유형 기본값(상세·등록·팝업·탭은 N)
@@ -174,12 +178,13 @@ module MenuTree
     def export(project, ordered, columns, stats, roles)
       max = (ordered.map(&:last).max || 0) + 1
       sites = MenuSite.names_for(project.id)
+      tl = MenuScreenType.labels(project.id)
       header = (sites.any? ? ['사이트'] : []) + (1..max).map { |d| "#{d}뎁스" } + %w(화면\ ID URL 화면\ 유형 채널 메뉴\ 노출 사용) + columns.map(&:name) +
                (roles ? ['대상 권한'] : []) + %w(일감\ 수 완료 진행률 비고)
       rows = ordered.map do |m, depth|
         s = stats[m.id] || {}
         (sites.any? ? [sites[m.menu_site_id]] : []) + Array.new(depth) + [m.name] + Array.new(max - depth - 1) +
-          [m.screen_id, m.url, TYPE_LABELS[m.screen_type], CHANNEL_LABELS[m.channel], m.in_menu? ? 'Y' : 'N', m.active? ? 'Y' : 'N'] +
+          [m.screen_id, m.url, tl[m.screen_type], CHANNEL_LABELS[m.channel], m.in_menu? ? 'Y' : 'N', m.active? ? 'Y' : 'N'] +
           columns.map { |c| v = m.extra[c.id.to_s]; c.kind == 'bool' ? (v ? 'Y' : nil) : v } +
           (roles ? [(roles[m.id] || []).map { |n, code| "#{n}(#{code})" }.join(', ')] : []) +
           [s[:total].to_i.positive? ? s[:total] : nil, s[:total].to_i.positive? ? s[:closed] : nil, s[:total].to_i.positive? ? "#{s[:ratio]}%" : nil, m.note]

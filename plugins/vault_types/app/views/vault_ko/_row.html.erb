@@ -5,12 +5,13 @@
 <% tname = vault_type_label(key).to_s %>
 <% tk = case tname when /SSH/i then 'ssh' when /데이터|DB/i then 'db' when /웹|WEB/i then 'web' when /API/i then 'api' when /SFTP|FTP/i then 'sftp' when /인증서|키 파일|KEY/i then 'cert' else 'etc' end %>
 <% tags = (key.tags.map(&:name) rescue []) %>
+<% @vk_order = (!all && @project && params[:sort].blank? && User.current.allowed_to?(:edit_keys, @project)) ? 1 : 0 if @vk_order.nil? %>
 <% copy = lambda do |kind, value| %>
   <a href="#" role="button" class="vk_btn copy-key" data-clipboard-target="copy_<%= kind %>_<%= key.id %>" title="<%= t('key.btn.clipboard') %>" aria-label="<%= t('key.btn.clipboard') %>"><%= sprite_icon('copy') %></a>
   <input class="vk_hide" type="text" id="copy_<%= kind %>_<%= key.id %>" value="<%= value %>" readonly tabindex="-1" aria-hidden="true">
 <% end %>
-<tr class="<%= key.is_a?(Vault::KeyFile) ? 'file' : 'key' %> vk_row <%= 'vk_orphan' if orphan %> <%= parity %>"<% if all %> data-project-id="<%= key.project_id %>" data-key-type="<%= key.type %>"<% end %>>
-  <td class="checkbox hide-when-print"><%= check_box_tag('ids[]', key.id, false, id: nil, 'aria-label': "#{key.name} 선택") %></td>
+<tr class="<%= key.is_a?(Vault::KeyFile) ? 'file' : 'key' %> vk_row <%= 'vk_orphan' if orphan %> <%= parity %>" data-key-id="<%= key.id %>"<% if all %> data-project-id="<%= key.project_id %>" data-key-type="<%= key.type %>"<% end %>>
+  <td class="checkbox hide-when-print"><% if @vk_order == 1 %><button type="button" class="vk_drag" aria-label="<%= key.name %> 순서 옮기기 (위·아래 화살표)" title="끌어서 순서 바꾸기"><%= sprite_icon('krds-grip') %></button><% end %><%= check_box_tag('ids[]', key.id, false, id: nil, 'aria-label': "#{key.name} 선택") %></td>
   <% if all %>
   <td class="vk_proj"><% if orphan %><span class="vk_gone"><%= t('key.project_not_exist', id: key.project_id) %></span><% else %><%= link_to key.project.name, project_keys_path(key.project) %><% end %></td>
   <% end %>

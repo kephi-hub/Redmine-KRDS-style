@@ -1111,6 +1111,10 @@ table.list.db_difftbl tr.db_missing_row td{background:var(--war_5);}
 .mt_tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 8px;}
 .mt_tools .list_field{flex:1 1 100%;}
 .mt_tools .list_field input{width:100%;}
+.mt_right{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-left:auto;}
+table.list.mt_types td{vertical-align:middle;}
+table.list.mt_types input[type=text]{width:100%;}
+table.list.mt_types td.mt_ck{white-space:nowrap;}
 #content .mt_btn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.8125rem;font-weight:500;color:var(--pri_60);cursor:pointer;}
 #content .mt_btn:hover{background:var(--pri_5);}
 #content .mt_btn:disabled{opacity:0.45;cursor:default;}
@@ -1705,6 +1709,14 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 #keys_table tr.vk_row:hover{border-color:var(--gray_30);}
 #keys_table tr.vk_row>td{display:block;padding:0;border:0;background:none;text-align:left;}
 #keys_table td.checkbox{grid-row:1;grid-column:1;}
+#keys_table td.checkbox{white-space:nowrap;}
+#content .vk_drag{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;margin:0 4px 0 -4px;padding:0;border:0;border-radius:var(--radius_s);background:none;vertical-align:middle;color:var(--gray_50);cursor:grab;touch-action:none;}
+#content .vk_drag:hover,#content .vk_drag:focus-visible{background:var(--gray_10);color:var(--gray_80);}
+#content .vk_drag .icon-svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;}
+#keys_table tr.vk_row.on{position:relative;z-index:2;box-shadow:0 6px 18px rgba(0,0,0,0.15);}
+#keys_table tr.vk_row.on>td{background:var(--pri_5);}
+body.vk_dragging,body.vk_dragging *{cursor:grabbing!important;user-select:none;}
+.vk_live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
 #keys_table td.vk_type{grid-row:1;grid-column:2;}
 #keys_table td.vk_acts{grid-row:auto;grid-column:1 / -1;}
 #content #keys_table tr.vk_row>td.vk_acts{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:4px;padding-top:10px;border-top:1px solid var(--gray_10);}

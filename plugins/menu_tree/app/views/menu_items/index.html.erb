@@ -20,10 +20,13 @@
   <select id="mt_active" aria-label="<%= l(:field_menu_active) %>">
     <option value=""><%= l(:label_menu_all) %></option><option value="1"><%= l(:label_menu_active_only) %></option><option value="0"><%= l(:label_menu_unused_only) %></option>
   </select>
-  <button type="button" class="mt_btn" id="mt_expand"><%= l(:label_menu_g_expand) %></button>
-  <button type="button" class="mt_btn" id="mt_collapse"><%= l(:label_menu_g_collapse) %></button>
   <% if can_edit %><button type="button" class="mt_btn" id="mt_cols_btn"><%= sprite_icon('settings', l(:label_menu_columns)) %></button><% end %>
   <% if can_edit && User.current.allowed_to?(:add_issues, @project) %><button type="button" class="mt_btn" id="mt_issue_btn" disabled><%= sprite_icon('add', l(:label_menu_make_issues)) %> <b id="mt_sel_cnt">0</b></button><% end %>
+  <span class="mt_right">
+    <button type="button" class="mt_btn" id="mt_expand"><%= l(:label_menu_g_expand) %></button>
+    <button type="button" class="mt_btn" id="mt_collapse"><%= l(:label_menu_g_collapse) %></button>
+    <% if can_edit %><button type="button" class="mt_btn" id="mt_types_btn"><%= sprite_icon('list', l(:label_menu_types)) %></button><% end %>
+  </span>
 </div>
 <% if can_edit %><p class="mt_help"><%= l(:text_menu_keys) %></p><% end %>
 
@@ -31,6 +34,56 @@
 <div class="mt_msg" id="mt_msg" role="status" aria-live="polite" hidden></div>
 
 <% if can_edit %>
+<%# 화면 유형 관리 (프로젝트별) — 목록 통째로 저장 %>
+<% type_counts = MenuItem.where(project_id: @project.id).where.not(screen_type: nil).group(:screen_type).count %>
+<div id="mt_types_dialog" class="mt_dialog" style="display:none;">
+  <h3 class="title"><%= l(:label_menu_types) %></h3>
+  <p class="mt_dim"><%= l(:text_menu_types) %></p>
+  <%= form_tag project_menu_screen_types_path(@project), id: 'mt_types_form' do %>
+    <%= hidden_field_tag :site, @site&.id, id: nil %>
+    <table class="list mt_types">
+      <thead><tr><th><%= l(:field_name) %></th><th><%= l(:label_menu_types_in_menu) %></th><th><%= l(:label_menu_g_k_screens) %></th><th></th></tr></thead>
+      <tbody id="mt_types_rows">
+      <% MenuScreenType.for(@project.id).each_with_index do |t, i| %>
+        <tr data-count="<%= type_counts[t.code].to_i %>">
+          <td><%= hidden_field_tag "types[#{i}][code]", t.code, id: nil %><%= text_field_tag "types[#{i}][name]", t.name, maxlength: 30, required: true, id: nil, 'aria-label': l(:field_name) %></td>
+          <td class="mt_ck"><label class="inline"><%= check_box_tag "types[#{i}][in_menu]", '1', t.in_menu, id: nil %> <%= l(:label_menu_types_show) %></label></td>
+          <td class="count"><%= type_counts[t.code].to_i %></td>
+          <td class="buttons"><button type="button" class="mt_btn mt_type_del" aria-label="<%= "#{t.name} #{l(:button_delete)}" %>"><%= sprite_icon('del', l(:button_delete)) %></button></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+    <p><button type="button" class="mt_btn" id="mt_type_add"><%= sprite_icon('add', l(:label_menu_types_add)) %></button></p>
+    <p class="buttons">
+      <button type="submit" class="mt_btn mt_primary"><%= l(:button_save) %></button>
+      <%= link_to_function l(:button_cancel), 'hideModal(this);', class: 'btn_line' %>
+    </p>
+  <% end %>
+</div>
+<%= javascript_tag do %>
+$(function() {
+  var $rows = $('#mt_types_rows'), n = 1000;
+  var cleared = <%= raw l(:text_menu_types_del_used).to_json %>;
+  $('#mt_types_btn').on('click', function() { showModal('mt_types_dialog', '640px'); });
+  $('#mt_type_add').on('click', function() {
+    var i = n++, $tr = $('<tr data-count="0">' +
+      '<td><input type="hidden" name="types[' + i + '][code]" value=""><input type="text" name="types[' + i + '][name]" maxlength="30" required aria-label="<%= j l(:field_name) %>"></td>' +
+      '<td class="mt_ck"><label class="inline"><input type="checkbox" name="types[' + i + '][in_menu]" value="1"> <%= j l(:label_menu_types_show) %></label></td>' +
+      '<td class="count">0</td>' +
+      '<td class="buttons"><button type="button" class="mt_btn mt_type_del" aria-label="<%= j l(:button_delete) %>"><%= j sprite_icon('del', l(:button_delete)) %></button></td></tr>');
+    $rows.append($tr); $tr.find('input[type=text]').trigger('focus');
+  });
+  $rows.on('click', '.mt_type_del', function() {
+    var $tr = $(this).closest('tr'), c = +$tr.data('count');
+    var go = function() { $tr.remove(); $('#mt_type_add').trigger('focus'); };
+    if (!c) return go();
+    var q = cleared.replace('%{count}', c);
+    (window.KrdsDialog ? window.KrdsDialog.confirm(q) : Promise.resolve(window.confirm(q))).then(function(ok) { if (ok) go(); });
+  });
+});
+<% end %>
+
 <%# 추가 칼럼 관리 %>
 <div id="mt_cols_dialog" class="mt_dialog" style="display:none;">
   <h3 class="title"><%= l(:label_menu_columns) %></h3>

@@ -3,6 +3,7 @@
 # - 입력 방식은 Vault 기본 3가지(비밀번호·SFTP·키 파일) 중 하나 → 저장 구조·암호화는 Vault 그대로
 # - Vault 화면 연결(유형 선택칸·유형 표시·관리 카드)은 vault_ko/build.rb 가 이미지 빌드 때 넣음
 require_relative 'lib/vault_types/keys_controller_patch'
+require_relative 'lib/vault_types/hooks'
 
 Redmine::Plugin.register :vault_types do
   name '접속정보 유형'

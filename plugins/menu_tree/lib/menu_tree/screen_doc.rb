@@ -80,7 +80,7 @@ module MenuTree
 
     def panel(s, menu, idx, info, cap, y0 = IMG[:y])
       rows = [['화면 ID', menu.screen_id.to_s], ['화면명', menu.name], ['메뉴 경로', menu.path(idx, site: false).truncate(60)],
-              ['URL', menu.url.to_s.truncate(70)], ['화면 유형', MenuTree::Sheet::TYPE_LABELS[menu.screen_type].to_s],
+              ['URL', menu.url.to_s.truncate(70)], ['화면 유형', MenuScreenType.labels(menu.project_id)[menu.screen_type].to_s],
               ['메뉴 노출', menu.in_menu? ? 'Y' : 'N (화면만)'], ['접근 권한', short(info[:roles], 4)], ['요구사항', short(info[:reqs], 6)],
               ['프로그램', short(info[:progs], 4)], ['캡처 일시', cap ? cap.captured_at.in_time_zone(User.current.time_zone || Time.zone).strftime('%Y-%m-%d %H:%M') : '캡처 없음']]
       s.table(PANEL_X, y0, [1.0, PANEL_W - 1.0], rows.map { |k, v| [{ text: k, bold: true, fill: HEAD, color: NAVY }, v.presence || '-'] }, row_h: 0.33, size: 9)
@@ -144,7 +144,7 @@ module MenuTree
         header(s, "화면 목록#{" (#{n + 1}/#{list_pages})" if list_pages > 1}", '', 3 + n, total, project)
         body = chunk.each_with_index.map do |m, i|
           row = [{ text: (n * 15 + i + 1).to_s, align: 'ctr' }, m.screen_id.to_s, m.name.truncate(30), m.path(idx, site: false).truncate(50),
-                 { text: MenuTree::Sheet::TYPE_LABELS[m.screen_type].to_s, align: 'ctr' }, { text: first_page[m.id].to_s, align: 'ctr' }]
+                 { text: MenuScreenType.labels(m.project_id)[m.screen_type].to_s, align: 'ctr' }, { text: first_page[m.id].to_s, align: 'ctr' }]
           row.insert(1, { text: m.menu_site&.name.to_s, align: 'ctr' }) if site_names.size > 1
           row
         end

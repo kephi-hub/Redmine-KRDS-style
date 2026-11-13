@@ -13,6 +13,13 @@ module VaultTypes
       store_vault_type
     end
 
+    # 프로젝트 접속정보 목록 기본 순서 = 드래그로 정한 순서(번호 없는 것은 뒤에 이름순). 제목 칸을 눌러 정렬하면 그 순서
+    def sort_clause
+      return super unless action_name == 'index' && @project && params[:sort].blank?
+      t = Vault::Key.table_name
+      [Arel.sql("#{t}.position IS NULL"), Arel.sql("#{t}.position"), Arel.sql("#{t}.name")]
+    end
+
     private
 
     def apply_vault_type

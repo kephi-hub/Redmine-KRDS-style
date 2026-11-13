@@ -1,9 +1,6 @@
 # 메뉴 구조도의 메뉴 한 줄 — parent_id 로 트리(뎁스 제한 없음), position 은 같은 부모 안 순서
 class MenuItem < ApplicationRecord
-  SCREEN_TYPES = %w(list detail form popup tab link).freeze
   CHANNELS = %w(both pc mobile).freeze
-  # 메뉴에는 보이지 않고 화면만 있는 유형 (메뉴 노출 기본값 N)
-  SCREEN_ONLY = %w(detail form popup tab).freeze
 
   belongs_to :project
   belongs_to :parent, class_name: 'MenuItem', optional: true
@@ -19,7 +16,7 @@ class MenuItem < ApplicationRecord
   validates :name, presence: true, length: { maximum: 150 }
   validates :screen_id, length: { maximum: 60 }
   validates :url, length: { maximum: 500 }
-  validates :screen_type, inclusion: { in: SCREEN_TYPES }, allow_blank: true
+  validate { errors.add(:screen_type, :inclusion) if screen_type.present? && !MenuScreenType.codes(project_id).include?(screen_type) }
   validates :channel, inclusion: { in: CHANNELS }, allow_blank: true
   validate :parent_in_same_project
   validate :site_in_same_project
@@ -27,7 +24,7 @@ class MenuItem < ApplicationRecord
   before_validation { self.name = name.to_s.strip; self.screen_id = screen_id.to_s.strip.presence; self.url = url.to_s.strip.presence }
   # 화면 유형을 바꾸면 메뉴 노출 기본값도 따라감 (같이 바꾸거나 keep_in_menu 로 직접 정한 경우는 그 값)
   attr_accessor :keep_in_menu
-  before_validation { self.in_menu = !SCREEN_ONLY.include?(screen_type) if will_save_change_to_screen_type? && !will_save_change_to_in_menu? && !keep_in_menu }
+  before_validation { self.in_menu = MenuScreenType.in_menu?(project_id, screen_type) if will_save_change_to_screen_type? && !will_save_change_to_in_menu? && !keep_in_menu }
   # 하위 메뉴는 1뎁스 메뉴와 같은 사이트
   before_validation { self.menu_site_id = parent.menu_site_id if parent }
   after_save :spread_site, if: :saved_change_to_menu_site_id?

@@ -1,4 +1,7 @@
 en:
+  notice_vk_order_saved: "Order saved"
+  error_vk_order: "Could not save the order."
+  text_vk_order_moved: "%{name} moved to %{n}"
   label_vault_type_plural: Key types
   label_vault_type_new: New type
   label_vault_type_manage: Manage types

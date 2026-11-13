@@ -26,7 +26,7 @@ Redmine::Plugin.register :menu_tree do
   project_module :menu_tree do
     permission :view_menu_tree, { menu_items: [:index, :data, :diagram, :status, :export] }, read: true
     permission :manage_menu_tree, { menu_items: [:create, :update, :move, :destroy, :import, :issues],
-                                    menu_columns: [:create, :update, :destroy], menu_sites: [:create, :update, :destroy] }, require: :member
+                                    menu_columns: [:create, :update, :destroy], menu_sites: [:create, :update, :destroy], menu_screen_types: [:save] }, require: :member
     # 화면 캡처: 보기는 메뉴 구조도 보기, 설정·실행(로그인 정보 포함)은 따로
     permission :view_menu_captures, { menu_captures: [:index, :show, :image, :document, :a11y] }, read: true
     permission :manage_menu_captures, { menu_captures: [:settings, :save_settings, :test_login, :run, :a11y_issue] }, require: :member
@@ -51,6 +51,7 @@ unless Project.reflect_on_association(:menu_roots)
   # 프로젝트 삭제 시: 최상위 메뉴를 지우면 하위 메뉴·일감 연결·권한도 함께 지워짐
   Project.has_many :menu_roots, -> { where(parent_id: nil) }, class_name: 'MenuItem', dependent: :destroy
   Project.has_many :menu_columns, dependent: :delete_all
+  Project.has_many :menu_screen_types, dependent: :delete_all
   Project.has_many :menu_sites, dependent: :delete_all
   Project.has_many :menu_capture_configs, dependent: :delete_all
   Project.has_many :menu_capture_runs, dependent: :delete_all
