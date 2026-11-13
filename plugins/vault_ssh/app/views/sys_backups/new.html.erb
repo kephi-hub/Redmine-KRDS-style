@@ -1,0 +1,6 @@
+<h2><%= link_to l(:label_sb), project_sys_backups_path(@project) %> &#187; <%= l(:label_sb_new) %></h2>
+<%= labelled_form_for @job, url: project_sys_backups_path(@project), html: { id: 'sb_form' } do |f| %>
+  <%= render partial: 'sys_backups/form', locals: { f: f } %>
+  <p class="form_btns"><%= link_to l(:button_cancel), project_sys_backups_path(@project), class: 'btn_line' %><%= submit_tag l(:button_create) %></p>
+<% end %>
+<% html_title l(:label_sb_new) %>

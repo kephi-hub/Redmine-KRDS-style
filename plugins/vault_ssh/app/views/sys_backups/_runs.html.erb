@@ -1,0 +1,25 @@
+<%# 실행 기록 표 (locals: runs, show_job) %>
+<% can_edit = User.current.allowed_to?(:manage_sys_backups, @project) %>
+<div class="autoscroll">
+<table class="list pm_list sb_runs">
+  <thead><tr><th><%= l(:label_sb_at) %></th><% if show_job %><th class="name"><%= l(:label_sb_job) %></th><% end %><th><%= l(:field_status) %></th>
+    <th><%= l(:label_sb_got) %></th><th><%= l(:label_sb_files) %></th><th><%= l(:label_sb_time) %></th><th><%= l(:label_sb_by) %></th><th></th></tr></thead>
+  <tbody>
+  <% runs.each do |r| %>
+    <tr>
+      <td><%= format_time(r.started_at || r.created_at) %></td>
+      <% if show_job %><td class="name"><%= link_to r.sys_backup_job.name, project_sys_backup_path(@project, r.sys_backup_job) %></td><% end %>
+      <td><span class="sb_st" data-k="<%= r.status %>"><%= l("label_sb_st_#{r.status}") %></span><% if r.error.present? %><br><span class="mc_err"><%= r.error.truncate(160) %></span><% end %></td>
+      <td><% if r.status == 'done' %><%= number_to_human_size(r.bytes) %><% if r.total_bytes > r.bytes %><span class="mt_dim db_pvsub"><%= l(:label_sb_total, size: number_to_human_size(r.total_bytes)) %></span><% end %><% end %></td>
+      <td><% if r.status == 'done' && r.sys_backup_job.files? %><%= l(:label_sb_files_n, total: r.files_total, new: r.files_new, linked: r.files_linked) %><% end %></td>
+      <td><% if (s = r.seconds) %><%= format('%d:%02d', s / 60, s % 60) %><% end %></td>
+      <td><%= r.trigger == 'schedule' ? l(:label_sb_by_schedule) : r.user&.name %></td>
+      <td class="buttons">
+        <% if r.status == 'done' && r.sys_backup_job.db? %><%= link_to sprite_icon('download', l(:label_sb_download)), project_sys_backup_download_path(@project, r.id), class: 'icon icon-download' %><% end %>
+        <% if can_edit && !r.busy? %><%= link_to sprite_icon('del', l(:button_delete)), project_sys_backup_run_path(@project, r.id), method: :delete, data: { confirm: l(:text_sb_delete_run) }, class: 'icon icon-del' %><% end %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>

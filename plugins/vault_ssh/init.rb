@@ -11,6 +11,9 @@ require_relative 'lib/ssh_console/access'
 require_relative 'lib/ssh_console/sheet'
 require_relative 'lib/ssh_console/files'
 require_relative 'lib/ssh_console/exec'
+require_relative 'lib/ssh_console/backup'
+require_relative 'lib/ssh_console/backup_job'
+require_relative 'lib/ssh_console/backup_view'
 require_relative 'lib/ssh_console/cable'
 require_relative 'lib/ssh_console/terminal_channel'
 require_relative 'lib/ssh_console/hooks'
@@ -28,6 +31,13 @@ Redmine::Plugin.register :vault_ssh do
   permission :use_ssh_terminal_prod, { ssh_sessions: [:create, :index, :show, :cast, :export] }, project_module: :keys, require: :member
   permission :manage_ssh_profiles, { ssh_profiles: [:edit, :update, :test] }, project_module: :keys, require: :member
   permission :view_ssh_sessions, { ssh_sessions: [:index, :show, :cast, :export] }, project_module: :keys, read: true
+
+  # 프로젝트 시스템 백업 (운영 DB 덤프 · 첨부파일 폴더) — 덤프에 실데이터가 들어 있어 보기 권한도 따로
+  project_module :sys_backups do
+    permission :view_sys_backups, { sys_backups: [:index, :show, :download] }, read: true
+    permission :manage_sys_backups, { sys_backups: [:new, :create, :edit, :update, :destroy, :run, :destroy_run] }, require: :member
+  end
+  menu :project_menu, :sys_backups, { controller: 'sys_backups', action: 'index' }, caption: :label_sb, param: :project_id
 end
 
 Vault::Key.has_one :ssh_profile, class_name: 'VaultSshProfile', foreign_key: :key_id, dependent: :destroy unless Vault::Key.reflect_on_association(:ssh_profile)

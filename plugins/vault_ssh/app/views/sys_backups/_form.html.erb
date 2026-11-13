@@ -1,0 +1,49 @@
+<%# 시스템 백업 작업 등록·수정 (locals: f) %>
+<% j = @job %>
+<%= error_messages_for 'job' %>
+<div class="box tabular sb_form">
+  <p><%= f.text_field :name, required: true, size: 40, maxlength: 100, label: :label_sb_name, placeholder: l(j.db? ? :text_sb_name_db : :text_sb_name_files) %></p>
+  <p><label><%= l(:label_sb_kind) %></label>
+    <% SysBackupJob::KINDS.each do |k| %><label class="inline"><%= f.radio_button :kind, k, class: 'sb_kind_pick' %> <%= l("label_sb_kind_#{k}") %></label><% end %></p>
+  <p><%= f.select :vault_key_id, @ssh_keys.map { |k| ["#{k.name} (#{[k.login.presence, k.url].compact.join('@')})", k.id] }, { include_blank: true, label: :label_sb_ssh, required: true } %>
+    <em class="info"><%= l(:text_sb_ssh) %></em></p>
+  <div class="sb_db" <%= 'hidden' unless j.db? %>>
+    <p><label><%= l(:label_sb_db) %></label>
+      <% SysBackupJob::DB_KINDS.each do |k| %><label class="inline"><%= f.radio_button :db_kind, k, class: 'sb_dbkind_pick' %> <%= l("label_sb_db_#{k}") %></label><% end %></p>
+    <div class="sb_dbstd" <%= 'hidden' if j.db_kind == 'custom' %>>
+      <p><%= f.text_field :db_host, size: 30, maxlength: 255, placeholder: '127.0.0.1', label: :label_sb_db_host %><em class="info"><%= l(:text_sb_db_host) %></em></p>
+      <p><%= f.number_field :db_port, min: 1, max: 65535, placeholder: '3306 / 5432', label: :label_sb_db_port %></p>
+      <p><%= f.text_field :db_name, size: 30, maxlength: 120, label: :label_sb_db_name %></p>
+      <p><%= f.select :db_key_id, @db_keys.map { |k| ["#{k.name}#{" (#{k.login})" if k.login.present?}", k.id] }, { include_blank: true, label: :label_sb_db_key } %>
+        <em class="info"><%= l(:text_sb_db_key) %></em></p>
+    </div>
+    <div class="sb_dbcustom" <%= 'hidden' unless j.db_kind == 'custom' %>>
+      <p><%= f.text_area :dump_cmd, rows: 3, cols: 70, class: 'oa_mono', label: :label_sb_dump_cmd, placeholder: "sudo -u postgres pg_dump app_db\nmysqldump --defaults-extra-file=~/.my.cnf app_db" %>
+        <em class="info"><%= l(:text_sb_dump_cmd) %></em></p>
+    </div>
+  </div>
+  <div class="sb_files" <%= 'hidden' unless j.files? %>>
+    <p><%= f.text_area :paths, rows: 3, cols: 70, class: 'oa_mono', label: :label_sb_paths, placeholder: "/app/upload\n/data/files" %>
+      <em class="info"><%= l(:text_sb_paths) %></em></p>
+    <p><%= f.text_area :excludes, rows: 3, cols: 70, class: 'oa_mono', label: :label_sb_excludes, placeholder: "*.tmp\ncache/\nthumbs/" %>
+      <em class="info"><%= l(:text_sb_excludes) %></em></p>
+  </div>
+  <p><label><%= l(:label_sb_schedule) %></label>
+    <%= f.select :schedule, SysBackupJob::SCHEDULES.map { |s| [l("label_sb_sch_#{s}"), s] }, {}, class: 'sb_sch_pick', 'aria-label': l(:label_sb_schedule) %>
+    <span class="sb_weekday" <%= 'hidden' unless j.schedule == 'weekly' %>><%= f.select :weekday, (1..7).map { |d| [l(:label_sb_weekday)[d - 1] + l(:label_sb_wd_suffix), d] }, {}, 'aria-label': l(:label_sb_weekday_label) %></span>
+    <%= f.select :hour, (0..23).map { |h| [format('%02d:00', h), h] }, {}, 'aria-label': l(:label_sb_hour) %>
+    <em class="info"><%= l(:text_sb_schedule) %></em></p>
+  <p><%= f.number_field :keep, min: 1, max: 365, label: :label_sb_keep %><em class="info"><%= l(:text_sb_keep) %></em></p>
+  <p><%= f.check_box :active, label: :field_active %></p>
+</div>
+<%= javascript_tag do %>
+$(function() {
+  function sync() {
+    var k = $('.sb_kind_pick:checked').val(), d = $('.sb_dbkind_pick:checked').val();
+    $('.sb_db').prop('hidden', k !== 'db'); $('.sb_files').prop('hidden', k !== 'files');
+    $('.sb_dbstd').prop('hidden', d === 'custom'); $('.sb_dbcustom').prop('hidden', d !== 'custom');
+    $('.sb_weekday').prop('hidden', $('.sb_sch_pick').val() !== 'weekly');
+  }
+  $(document).on('change', '.sb_kind_pick, .sb_dbkind_pick, .sb_sch_pick', sync); sync();
+});
+<% end %>

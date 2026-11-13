@@ -1,4 +1,5 @@
 en:
+  label_access_area_sysbackup: "System backup"
   label_access_area_baselines: "Baselines"
   label_access_area_closing: "Closing checklist"
   label_ag_perm_tab: Permissions

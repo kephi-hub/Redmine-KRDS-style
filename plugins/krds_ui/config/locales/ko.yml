@@ -148,6 +148,7 @@ ko:
   label_pmod_desc_ops_logs: 장애 · 정기점검 · 월간 보고서
   label_pmod_desc_ops_interfaces: 연계 정의 · 구성도
   label_pmod_desc_keys: 서버 · 계정 접속정보 (Vault)
+  label_pmod_desc_sys_backups: 운영 서버 DB 덤프 · 첨부파일 폴더 정기 백업 (SSH)
   label_pmod_desc_deliverables: 단계별 산출물 · 자동 생성 · 일괄 다운로드
   label_pmod_desc_meetings: 회의록 · 후속 조치 일감
   label_pmod_desc_audits: 감리 회차별 지적사항 · 시정조치

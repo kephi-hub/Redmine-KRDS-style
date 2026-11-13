@@ -41,6 +41,7 @@ module AccessGuide
     { key: 'reports', view: %i[view_pm_reports], write: %i[], manage: %i[] },
     { key: 'baselines', view: %i[view_baselines], write: %i[], manage: %i[manage_baselines] },
     { key: 'ssh', view: %i[view_ssh_sessions], write: %i[use_ssh_terminal use_ssh_terminal_prod], manage: %i[manage_ssh_profiles] },
+    { key: 'sysbackup', view: %i[view_sys_backups], write: %i[], manage: %i[manage_sys_backups] },
     { key: 'closing', view: %i[view_closing], write: %i[manage_closing], manage: %i[] },
     { key: 'calendar', view: %i[view_calendar view_gantt], write: %i[], manage: %i[] },
   ].freeze

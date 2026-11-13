@@ -8,6 +8,11 @@ resources :projects, only: [] do
   get 'ssh_sessions/export', to: 'ssh_sessions#export', as: 'ssh_sessions_export'
   get 'ssh_sessions/:id', to: 'ssh_sessions#show', as: 'ssh_session', constraints: { id: /\d+/ }
   get 'ssh_sessions/:id/cast', to: 'ssh_sessions#cast', as: 'ssh_session_cast', constraints: { id: /\d+/ }
+  # 프로젝트 시스템 백업
+  post 'sys_backups/:id/run', to: 'sys_backups#run', as: 'sys_backup_run_now', constraints: { id: /\d+/ }
+  get 'sys_backups/runs/:run_id/download', to: 'sys_backups#download', as: 'sys_backup_download', constraints: { run_id: /\d+/ }
+  delete 'sys_backups/runs/:run_id', to: 'sys_backups#destroy_run', as: 'sys_backup_run', constraints: { run_id: /\d+/ }
+  resources :sys_backups, path: 'sys_backups'
 end
 get 'ssh/t/:ticket', to: 'ssh_sessions#terminal', as: 'ssh_terminal', constraints: { ticket: /[\w-]+/ }
 post 'ssh/t/:ticket/again', to: 'ssh_sessions#again', as: 'ssh_terminal_again', constraints: { ticket: /[\w-]+/ }

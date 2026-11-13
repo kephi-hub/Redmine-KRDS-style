@@ -1,0 +1,34 @@
+<%# 시스템 백업 작업 하나 — 설정 요약 · [지금 백업] · 실행 기록 · 복원 안내 %>
+<% j = @job; can_edit = User.current.allowed_to?(:manage_sys_backups, @project) %>
+<div class="contextual">
+  <% if can_edit %>
+    <% if @busy %><span class="icon btn_main is_off"><%= sprite_icon('reload', l(:label_sb_st_running)) %></span>
+    <% else %><%= link_to sprite_icon('save', l(:button_sb_run)), project_sys_backup_run_now_path(@project, j), method: :post, class: 'icon icon-save btn_main', data: { confirm: l(:text_sb_run_confirm) } %><% end %>
+    <%= link_to sprite_icon('edit', l(:button_edit)), edit_project_sys_backup_path(@project, j), class: 'icon icon-edit' %>
+    <%= link_to sprite_icon('del', l(:button_delete)), project_sys_backup_path(@project, j), method: :delete, data: { confirm: l(:text_sb_delete_job) }, class: 'icon icon-del' %>
+  <% end %>
+</div>
+<h2><%= link_to l(:label_sb), project_sys_backups_path(@project) %> &#187; <%= j.name %></h2>
+<ul class="ss_meta">
+  <li><span><%= l(:label_sb_kind) %></span> <%= l("label_sb_kind_#{j.kind}") %></li>
+  <li><span><%= l(:label_sb_ssh) %></span> <%= j.ssh_key&.name %></li>
+  <% if j.db? %>
+    <li><span>DB</span> <%= l("label_sb_db_#{j.db_kind}") %><% unless j.db_kind == 'custom' %> <code><%= j.db_host.presence || '127.0.0.1' %>:<%= j.db_port || (j.db_kind == 'mysql' ? 3306 : 5432) %>/<%= j.db_name %></code> · <%= j.db_key&.name %><% end %></li>
+  <% else %>
+    <li><span><%= l(:label_sb_paths) %></span> <code><%= j.path_list.join(', ') %></code></li>
+    <% if j.exclude_list.any? %><li><span><%= l(:label_sb_excludes) %></span> <code><%= j.exclude_list.join(', ') %></code></li><% end %>
+  <% end %>
+  <li><span><%= l(:label_sb_schedule) %></span> <%= SshConsole::BackupView.schedule_text(j) %></li>
+  <li><span><%= l(:label_sb_keep) %></span> <%= l(:label_sb_keep_n, n: j.keep) %></li>
+</ul>
+<% if (done = @runs.find { |r| r.status == 'done' }) %>
+  <h3 class="ag_sec"><%= l(:label_sb_restore) %></h3>
+  <p class="db_hintbox"><%= l(j.db? ? :text_sb_restore_db : :text_sb_restore_files) %></p>
+  <pre class="sb_cmd"><code><%= SshConsole::Backup.restore_hint(j, done) %></code></pre>
+<% end %>
+<h3 class="ag_sec"><%= l(:label_sb_history) %></h3>
+<% if @runs.empty? %><p class="nodata"><%= l(:label_sb_never) %></p><% else %>
+<%= render partial: 'sys_backups/runs', locals: { runs: @runs, show_job: false } %>
+<% end %>
+<% if @busy %><%= javascript_tag do %>setTimeout(function() { location.reload(); }, 5000);<% end %><% end %>
+<% html_title "#{j.name} - #{l(:label_sb)}" %>

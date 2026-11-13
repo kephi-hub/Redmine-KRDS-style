@@ -36,6 +36,7 @@ services:
       - files:/usr/src/redmine/files     # 첨부파일
       - keys:/usr/src/redmine/keys       # Vault 키 파일
       - ./backup/ctl:/usr/src/redmine/backup_ctl:z   # PMS 백업 상태(관리 > 백업 화면) — 백업 파일 자체는 마운트하지 않음
+      - ./backup/sys:/usr/src/redmine/sys_backups:z   # 프로젝트 시스템 백업(운영 서버 DB 덤프·폴더) 보관
       - ./config/configuration.yml:/usr/src/redmine/config/configuration.yml:z   # z: SELinux 라벨 (ro 금지: 엔트리포인트가 config/ 를 chown 함)
       - ./themes:/usr/src/redmine/themes:z   # 사용자 테마 (krds)
       - ./plugins/vault_ko:/usr/src/redmine/plugins/vault_ko:z   # Vault 한국어화 (번역+화면 문구)

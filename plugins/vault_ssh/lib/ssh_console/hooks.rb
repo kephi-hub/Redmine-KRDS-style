@@ -3,7 +3,7 @@ module SshConsole
   class Hooks < Redmine::Hook::ViewListener
     def view_layouts_base_html_head(context = {})
       c = context[:controller]
-      return '' unless c.is_a?(KeysController) || c.is_a?(SshSessionsController)
+      return '' unless c.is_a?(KeysController) || c.is_a?(SshSessionsController) || c.is_a?(SysBackupsController)
       stylesheet_link_tag('ssh_console', plugin: 'vault_ssh') + javascript_include_tag('ssh_console', plugin: 'vault_ssh')
     end
 

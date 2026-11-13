@@ -212,6 +212,8 @@ roles:
   - use_ssh_terminal
   - manage_ssh_profiles
   - view_ssh_sessions
+  - view_sys_backups
+  - manage_sys_backups
   - download_keys
   - keys_all
   - commit_access

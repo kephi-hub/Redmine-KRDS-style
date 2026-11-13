@@ -27,3 +27,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # 자산 자동 확인 — 서버 정보 수집(SSH 접속정보 연결된 서버: OS·CPU·메모리·디스크) + 인증서·도메인 자산 HTTPS 인증서 확인 (매일 06:00)
 # 인증서 유형 자산은 만료일이 인증서 만료일로 바뀜. 설치: /etc/cron.d/redmine_asset_probe 로 저장 후 chmod 600
 0 6 * * * root cd /root/redmine && docker compose exec -T -u redmine redmine sh -c 'SECRET_KEY_BASE=$REDMINE_SECRET_KEY_BASE bundle exec rake redmine:ops_asset:probe' >> /var/log/redmine_asset_probe.log 2>&1
+
+# 프로젝트 시스템 백업 — 일정이 그 시각인 작업(운영 DB 덤프·첨부파일 폴더)을 차례로 실행 (매시 5분)
+# 보관: backup/sys/<프로젝트 id>/<작업 id>/<날짜>. 설치: /etc/cron.d/redmine_sys_backup 로 저장 후 chmod 600
+5 * * * * root cd /root/redmine && docker compose exec -T -u redmine redmine sh -c 'SECRET_KEY_BASE=$REDMINE_SECRET_KEY_BASE bundle exec rake redmine:sys_backup:run' >> /var/log/redmine_sys_backup.log 2>&1

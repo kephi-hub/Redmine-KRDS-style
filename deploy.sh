@@ -6,6 +6,8 @@ cd "$(dirname "$0")"
 
 # 관리 > 백업 화면이 쓰는 상태 폴더 (컨테이너 redmine 사용자가 요청 표시를 씀)
 mkdir -p backup/ctl && chown 999:999 backup/ctl
+# 프로젝트 > 시스템 백업 보관 폴더 (운영 서버에서 받은 DB 덤프·폴더)
+mkdir -p backup/sys && chown 999:999 backup/sys && chmod 750 backup/sys
 
 OLD=$(git rev-parse HEAD)
 git pull --ff-only -q

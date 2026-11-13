@@ -1,0 +1,41 @@
+<%# 프로젝트 > 운영 > 시스템 백업 — 백업 작업 카드 · 최근 실행 · 디스크 %>
+<% can_edit = User.current.allowed_to?(:manage_sys_backups, @project) %>
+<div class="contextual">
+  <% if can_edit %>
+    <%= link_to sprite_icon('add', l(:label_sb_new_db)), new_project_sys_backup_path(@project, kind: 'db'), class: 'icon icon-add' %>
+    <%= link_to sprite_icon('add', l(:label_sb_new_files)), new_project_sys_backup_path(@project, kind: 'files'), class: 'icon icon-add' %>
+  <% end %>
+</div>
+<h2><%= l(:label_sb) %></h2>
+<p class="subtitle"><%= l(:text_sb) %></p>
+<% unless @ready %><p class="flash error"><%= l(:error_sb_dir) %></p><% end %>
+<ul class="db_stats mt_kpi">
+  <li><span><%= l(:label_sb_k_jobs) %></span><strong><%= @jobs.size %></strong></li>
+  <li><span><%= l(:label_sb_k_failed) %></span><strong class="<%= 'qa_fail' if (f = @jobs.count { |j| j.last_run&.status == 'failed' }).positive? %>"><%= f %></strong></li>
+  <li><span><%= l(:label_sb_k_free) %></span><strong class="<%= 'qa_fail' if @disk[:free].positive? && @disk[:free] < 10 * 1024**3 %>"><%= number_to_human_size(@disk[:free]) %></strong></li>
+</ul>
+<% if @jobs.empty? %>
+  <p class="nodata"><%= l(:text_sb_none) %></p>
+<% else %>
+<ul class="sb_cards">
+  <% @jobs.each do |j| %>
+    <% r = j.last_run %>
+    <li class="sb_card<%= ' is_off' unless j.active %>">
+      <div class="sb_top">
+        <span class="sb_kind" data-k="<%= j.kind %>"><%= l("label_sb_kind_#{j.kind}") %></span>
+        <%= link_to j.name, project_sys_backup_path(@project, j), class: 'sb_name' %>
+        <% unless j.active %><span class="mt_dim"><%= l(:label_sb_paused) %></span><% end %>
+      </div>
+      <p class="sb_what"><%= j.ssh_key&.name %> · <% if j.db? %><%= l("label_sb_db_#{j.db_kind}") %> <code><%= j.db_name %></code><% else %><code><%= j.path_list.first(3).join(', ') %></code><% end %></p>
+      <p class="sb_when"><%= SshConsole::BackupView.schedule_text(j) %> · <%= l(:label_sb_keep_n, n: j.keep) %></p>
+      <p class="sb_last"><% if r %><span class="sb_st" data-k="<%= r.status %>"><%= l("label_sb_st_#{r.status}") %></span> <%= format_time(r.started_at || r.created_at) %><% if r.status == 'done' %> · <%= number_to_human_size(r.bytes) %><% end %><% else %><span class="mt_dim"><%= l(:label_sb_never) %></span><% end %></p>
+    </li>
+  <% end %>
+</ul>
+<% end %>
+<% if @runs.any? %>
+<h3 class="ag_sec"><%= l(:label_sb_recent) %></h3>
+<%= render partial: 'sys_backups/runs', locals: { runs: @runs, show_job: true } %>
+<% end %>
+<% if @busy %><%= javascript_tag do %>setTimeout(function() { location.reload(); }, 5000);<% end %><% end %>
+<% html_title l(:label_sb) %>
