@@ -7,11 +7,11 @@ $(function() {
   var token = $('meta[name="csrf-token"]').attr('content');
 
   function rows() { return $tb.children('tr.vk_row'); }
+  function ids() { return rows().map(function() { return $(this).data('key-id'); }).get(); }
   function save() {
-    var ids = rows().map(function() { return $(this).data('key-id'); }).get();
     return fetch(C.url, { method: 'POST', credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token },
-      body: JSON.stringify({ ids: ids })
+      body: JSON.stringify({ ids: ids() })
     }).then(function(r) {
       if (!r.ok) throw r;
       if (window.krdsToast) window.krdsToast(C.saved);
@@ -30,7 +30,7 @@ $(function() {
     if (e.button && e.button !== 0) return;
     e.preventDefault();
     var $tr = $(this).closest('tr');
-    drag = { $tr: $tr, moved: false, order: rows().map(function() { return this; }).get().join() };
+    drag = { $tr: $tr, moved: false, order: ids().join() };
     $tr.addClass('on');
     $('body').addClass('vk_dragging');
     this.setPointerCapture && this.setPointerCapture(e.pointerId);
@@ -54,7 +54,7 @@ $(function() {
     var d = drag; drag = null;
     d.$tr.removeClass('on');
     $('body').removeClass('vk_dragging');
-    if (d.moved && rows().map(function() { return this; }).get().join() !== d.order) { restripe(); announce(d.$tr); save(); }
+    if (d.moved && ids().join() !== d.order) { restripe(); announce(d.$tr); save(); }
   });
 
   // 키보드: 위·아래 화살표
