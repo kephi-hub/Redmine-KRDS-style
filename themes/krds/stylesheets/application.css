@@ -845,6 +845,11 @@ body.controller-news.action-show #content>h3{padding-top:20px;margin-top:28px;bo
 #admin-index #admin-menu a.jenkins-servers::after{content:"배포 연동 Jenkins 주소 · 토큰";}
 #admin-index #admin-menu a.db-servers::after{content:"프로젝트 DB 접속정보 · 연결 시험";}
 #admin-index #admin-menu a.glossary-common::after{content:"모든 프로젝트가 함께 쓰는 용어 · 약어";}
+#admin-index #admin-menu a.smtp-settings::after{content:"알림 메일 서버 · 시험 메일";}
+#admin-index #admin-menu a.committer-maps::after{content:"저장소 커미터 ↔ 사용자 연결";}
+#admin-index #admin-menu a.pms-backups::after{content:"PMS 백업 상태 · 지금 백업";}
+#admin-index #admin-menu a.krds-labels::after{content:"메뉴 · 모듈에 보이는 이름 바꾸기";}
+#admin-index #admin-menu a.admin-ops-assets::after{content:"여러 프로젝트 공용 자산 · 만료 관리";}
 /* Vault 메뉴는 아이콘 없이 글자만 있어 자물쇠 상자를 붙임 (responsive.css 의 !important 덮어씀) */
 #admin-index #admin-menu a.vault{padding:18px 20px !important;background-image:none;}
 #admin-index #admin-menu a.vault::before{content:"";grid-row:span 2;width:44px;height:44px;border-radius:var(--radius_m,8px);background:var(--pri_5) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23256ef4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2'/%3E%3Cpath d='M8 11V7a4 4 0 0 1 8 0v4'/%3E%3C/svg%3E") center/22px no-repeat;}
@@ -1688,7 +1693,7 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 .lb_box{scroll-margin-top:16px;}
 .lb_help{margin:0 0 8px;color:var(--gray_60);}
 .lb_table{width:100%;}
-.lb_table td{vertical-align:middle;}
+.lb_table th,.lb_table td{text-align:left;vertical-align:middle;}
 .lb_table td.lb_new input{width:100%;max-width:320px;box-sizing:border-box;}
 .lb_table th.lb_new,.lb_table td.lb_new{width:50%;}
 .lb_table tr.on td{background:var(--pri_5);}
