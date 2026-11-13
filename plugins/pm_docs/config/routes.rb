@@ -25,7 +25,7 @@ resources :projects, only: [] do
   resources :pm_meetings, path: 'meetings'
   get 'risks/export', to: 'pm_risks#export', as: 'pm_risks_export'
   resources :pm_risks, path: 'risks'
-  # 감리 · 투입 인력 · 보안약점 · 보고서
+  # 감리 · 투입 인력 · 보안 취약점 · 보고서
   get 'audits/export', to: 'pm_audits#export', as: 'pm_audits_export'
   match 'audits/import', to: 'pm_audits#import', via: [:get, :post], as: 'pm_audits_import'
   resources :pm_audit_rounds, path: 'audit_rounds', only: [:new, :create, :edit, :update, :destroy]

@@ -179,10 +179,10 @@ module PmKit
                      to = [list.map(&:end_on).compact.max, User.current.today].compact.max
                      [["투입인력현황_#{today}.xlsx", PmKit::Sheet.staff(list, from, to)]]
                    } },
-      'sec_scans' => { label: '보안약점 진단 결과 (회차별)', available: ->(p) { mod?(p, :sec_scans) },
+      'sec_scans' => { label: '보안 취약점 진단 결과 (회차별)', available: ->(p) { mod?(p, :sec_scans) },
                        generate: lambda { |p|
                          PmSecScan.where(project_id: p.id).sorted.map do |s|
-                           ["보안약점진단_#{s.name.gsub(%r{[\\/:*?"<>|\s]+}, '_')}.xlsx", PmKit::Sheet.sec_scan(s, s.pm_sec_items.includes(:fixer, :pm_program).order(:kind, :file_path, :line).to_a)]
+                           ["보안취약점진단_#{s.name.gsub(%r{[\\/:*?"<>|\s]+}, '_')}.xlsx", PmKit::Sheet.sec_scan(s, s.pm_sec_items.includes(:fixer, :pm_program).order(:kind, :file_path, :line).to_a)]
                          end
                        } },
       'pm_weekly' => { label: '주간 보고서 (지난주)', available: ->(p) { mod?(p, :pm_reports) },

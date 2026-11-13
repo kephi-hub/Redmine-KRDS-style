@@ -23,7 +23,7 @@ module KrdsUi
       overview: 'krds-dashboard', activity: 'history',
       issues: 'issue', new_issue: 'add', gantt: 'krds-gantt', calendar: 'calendar', roadmap: 'krds-flag', baselines: 'krds-compare', time_entries: 'time',
       qa_requirements: 'krds-clipboard', change_requests: 'issue-edit', menu_items: 'krds-sitemap', sys_roles: 'roles', glossary: 'krds-book',
-      repository: 'changeset', programs: 'krds-code', db_schemas: 'krds-database', qa_tests: 'krds-flask', sec_scans: 'shield-check', deploys: 'krds-rocket',
+      repository: 'krds-git', programs: 'krds-code', db_schemas: 'krds-database', qa_tests: 'krds-flask', sec_scans: 'shield-check', deploys: 'krds-rocket',
       ops_assets: 'server-authentication', ops_schedules: 'krds-clock', ops_incidents: 'alert-circle', ops_interfaces: 'krds-plug', keys: 'key', sys_backups: 'krds-archive',
       deliverables: 'folder-open', meetings: 'comments', risks: 'warning', documents: 'document', files: 'file',
       pm_reports: 'krds-chart', audits: 'krds-zoom-check', staff: 'group', closing: 'krds-checklist',

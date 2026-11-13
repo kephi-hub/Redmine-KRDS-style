@@ -1,4 +1,4 @@
-# 프로젝트 > 보안약점 — 진단 회차(도구 결과 엑셀 가져오기), 항목별 조치·예외, 회차 사이 재진단, 엑셀
+# 프로젝트 > 보안 취약점 — 진단 회차(도구 결과 엑셀 가져오기), 항목별 조치·예외, 회차 사이 재진단, 엑셀
 class PmSecScansController < ApplicationController
   menu_item :sec_scans
   helper :pm_docs
@@ -82,7 +82,7 @@ class PmSecScansController < ApplicationController
 
   def export
     items = @scan.pm_sec_items.includes(:fixer, :pm_program).order(:kind, :file_path, :line).to_a
-    send_data PmKit::Sheet.sec_scan(@scan, items), filename: "보안약점진단_#{@project.identifier}_#{@scan.scanned_on || User.current.today}.xlsx", type: PmKit::Sheet::XLSX
+    send_data PmKit::Sheet.sec_scan(@scan, items), filename: "보안취약점진단_#{@project.identifier}_#{@scan.scanned_on || User.current.today}.xlsx", type: PmKit::Sheet::XLSX
   end
 
   # 고른 항목 한꺼번에: 상태(조치 완료·예외·미조치) · 사유 · 조치자

@@ -145,7 +145,7 @@ module PmKit
       ])
     end
 
-    # 보안약점 진단 결과 · 조치 내역 (회차)
+    # 보안 취약점 진단 결과 · 조치 내역 (회차)
     def sec_scan(scan, items)
       rows = items.map do |i|
         [i.kind, LABEL['seclevel'][i.level], i.file_path, i.line, i.description, LABEL['secstatus'][i.status], i.reason, i.fixer&.name, i.fixed_on&.to_s,
@@ -156,8 +156,8 @@ module PmKit
               ['전체', items.size], ['미조치', items.count { |i| i.status == 'open' }], ['조치 완료', items.count { |i| i.status == 'fixed' }], ['예외', items.count { |i| i.status == 'except' }]]
       KrdsUi::Xlsx.build([
         { name: '요약', header: %w(항목 값), rows: info, widths: [14, 40] },
-        { name: '유형별', header: %w(보안약점\ 유형 전체 위험도\ 상 조치\ 완료 예외 미조치), rows: by, widths: [36, 8, 10, 10, 8, 8] },
-        { name: '진단 항목', header: %w(보안약점\ 유형 위험도 파일 라인 설명 상태 예외·조치\ 사유 조치자 조치일 재진단 프로그램), rows: rows, widths: [30, 8, 50, 8, 50, 10, 36, 10, 12, 12, 16] }
+        { name: '유형별', header: %w(보안\ 취약점\ 유형 전체 위험도\ 상 조치\ 완료 예외 미조치), rows: by, widths: [36, 8, 10, 10, 8, 8] },
+        { name: '진단 항목', header: %w(보안\ 취약점\ 유형 위험도 파일 라인 설명 상태 예외·조치\ 사유 조치자 조치일 재진단 프로그램), rows: rows, widths: [30, 8, 50, 8, 50, 10, 36, 10, 12, 12, 16] }
       ])
     end
 

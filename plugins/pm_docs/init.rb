@@ -20,7 +20,7 @@ require_relative 'lib/pm_kit/closing'
 Redmine::Plugin.register :pm_docs do
   name '산출물 관리'
   author 'kephi-hub'
-  description '산출물(단계별·자동 생성·일괄 다운로드), 변경요청, 프로그램 목록, 회의록, 이슈·위험, 감리 지적사항, 투입 인력, 보안약점 진단, 주간·월간 보고서, 일정 기준선, 준공 체크리스트'
+  description '산출물(단계별·자동 생성·일괄 다운로드), 변경요청, 프로그램 목록, 회의록, 이슈·위험, 감리 지적사항, 투입 인력, 보안 취약점 진단, 주간·월간 보고서, 일정 기준선, 준공 체크리스트'
   version '1.4.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'

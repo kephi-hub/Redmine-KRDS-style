@@ -1552,7 +1552,7 @@ table.list.pm_list tr.pm_late td.next{font-weight:700;color:var(--dan_60);}
 .pm_ol{padding:0 0 0 20px;margin:0;}
 .pm_rows .pm_row{margin:0 0 6px;}
 .pm_path{display:block;margin:0 0 4px;word-break:break-all;}
-/* 감리 · 투입 인력 · 보안약점 · 보고서 (pm_docs) */
+/* 감리 · 투입 인력 · 보안 취약점 · 보고서 (pm_docs) */
 .pm_badge[data-k=areceived],.pm_badge[data-k=aplanned],.pm_badge[data-k=sopen],.pm_badge[data-k=rfail]{background:var(--pri_10);color:var(--pri_70);}
 .pm_badge[data-k=aacting],.pm_badge[data-k=aadvise]{background:var(--war_5);color:var(--war_60);}
 .pm_badge[data-k=adone],.pm_badge[data-k=averified],.pm_badge[data-k=sfixed],.pm_badge[data-k=rpass]{background:var(--suc_10);color:var(--suc_60);}

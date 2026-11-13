@@ -123,9 +123,9 @@ module PmKit
       result
     end
 
-    # ---- 보안약점 진단 결과 (도구 결과 엑셀) — 같은 유형·파일·라인은 앞 회차와 이어서 ----
+    # ---- 보안 취약점 진단 결과 (도구 결과 엑셀) — 같은 유형·파일·라인은 앞 회차와 이어서 ----
     SEC_FIELDS = {
-      'kind' => %w(보안약점 보안약점유형 유형 항목 취약점 취약점유형 checker rule 규칙 체커), 'level' => %w(위험도 심각도 등급 severity 중요도 위험),
+      'kind' => %w(보안취약점 보안취약점유형 취약점유형 보안약점 보안약점유형 유형 항목 취약점 취약점유형 checker rule 규칙 체커), 'level' => %w(위험도 심각도 등급 severity 중요도 위험),
       'file' => %w(파일 파일경로 경로 file path filepath 소스 소스파일), 'line' => %w(라인 줄 줄번호 line), 'description' => %w(설명 내용 메시지 message 상세)
     }.freeze
     LEVELS = { 'high' => %w(상 높음 high critical major 1 긴급 매우높음), 'low' => %w(하 낮음 low minor info 3 정보) }.freeze

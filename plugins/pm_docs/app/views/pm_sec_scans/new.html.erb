@@ -3,7 +3,7 @@
   <%= render :partial => 'pm_sec_scans/form', :locals => { :f => f } %>
   <div class="box">
     <p><strong><%= l(:label_pm_scan_file) %></strong> <%= l(:text_pm_scan_file) %></p>
-    <p class="gl_cols"><code>보안약점 유형</code> <code>위험도</code> <code>파일</code> <code>라인</code> <code>설명</code></p>
+    <p class="gl_cols"><code>보안 취약점 유형</code> <code>위험도</code> <code>파일</code> <code>라인</code> <code>설명</code></p>
     <p><%= file_field_tag 'file', :accept => '.xlsx,.csv' %></p>
   </div>
   <p class="form_btns"><%= link_to l(:button_cancel), project_pm_sec_scans_path(@project), :class => 'btn_line' %><%= submit_tag l(:button_create) %></p>

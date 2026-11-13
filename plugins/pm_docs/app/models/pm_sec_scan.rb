@@ -1,4 +1,4 @@
-# 보안약점 진단 회차 — 도구·진단일·대상 리비전·진단자
+# 보안 취약점 진단 회차 — 도구·진단일·대상 리비전·진단자
 class PmSecScan < ApplicationRecord
   belongs_to :project
   has_many :pm_sec_items, dependent: :delete_all

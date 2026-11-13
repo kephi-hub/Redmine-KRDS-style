@@ -1,4 +1,4 @@
-<%# 프로젝트 > 보안약점 > 진단 회차 — 항목 목록, 골라서 조치 완료 · 예외(사유) · 미조치 %>
+<%# 프로젝트 > 보안 취약점 > 진단 회차 — 항목 목록, 골라서 조치 완료 · 예외(사유) · 미조치 %>
 <% can_edit = User.current.allowed_to?(:manage_sec_scans, @project) %>
 <div class="contextual">
   <%= link_to sprite_icon('download', l(:label_pm_excel)), project_pm_sec_scan_export_path(@project, @scan), :class => 'icon icon-download' %>

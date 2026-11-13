@@ -1,4 +1,4 @@
-# 감리 지적사항 · 투입 인력 · 보안약점 진단
+# 감리 지적사항 · 투입 인력 · 보안 취약점 진단
 class CreateAuditsStaffSec < ActiveRecord::Migration[7.2]
   def change
     create_table :pm_audit_rounds do |t|

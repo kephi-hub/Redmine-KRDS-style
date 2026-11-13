@@ -95,7 +95,7 @@ module PmKit
       end
       if on?(p, user, :sec_scans, :view_sec_scans)
         open = PmSecItem.where(project_id: p.id, status: 'open').count
-        out << item('sec_fixed', 'mgmt', '보안약점 모두 조치', open.zero? ? 'ok' : 'ng', "미조치 #{open}", [:project_pm_sec_scans_path, p])
+        out << item('sec_fixed', 'mgmt', '보안 취약점 모두 조치', open.zero? ? 'ok' : 'ng', "미조치 #{open}", [:project_pm_sec_scans_path, p])
       end
       if on?(p, user, :deliverables, :view_deliverables)
         req = PmDeliverable.where(project_id: p.id, required: true).to_a
