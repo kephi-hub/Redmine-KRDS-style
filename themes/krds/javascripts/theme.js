@@ -270,3 +270,18 @@ $(function() {
   $(document).ajaxComplete(function() { setTimeout(function() { fix(document); }, 0); });
   window.krdsA11yFix = fix;
 })(jQuery);
+
+// 짧은 알림(토스트) — 접속정보 복사 등. window.krdsToast('복사했습니다')
+(function($) {
+  var box = null, timer = null;
+  window.krdsToast = function(msg) {
+    if (!box) { box = $('<div class="kd_toast" role="status" aria-live="polite"></div>').appendTo('body'); }
+    box.text(msg).addClass('on');
+    clearTimeout(timer); timer = setTimeout(function() { box.removeClass('on'); }, 1600);
+  };
+  // 접속정보 목록 복사 버튼: 복사 뒤 알림 + 버튼 잠깐 표시
+  $(document).on('click', '#keys_table .vk_btn.copy-key', function() {
+    var b = $(this);
+    setTimeout(function() { window.krdsToast('복사했습니다'); b.addClass('on'); setTimeout(function() { b.removeClass('on'); }, 1200); }, 30);
+  });
+})(jQuery);

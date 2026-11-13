@@ -914,16 +914,12 @@ table.list.issues tr.issue>td.buttons{margin-left:auto;}
 table.list.issues tr.issue>td.subject{flex:1 0 100%;order:2;font-size:0.9375rem;}
 table.list.issues tr.issue>td.priority,table.list.issues tr.issue>td.assigned_to,table.list.issues tr.issue>td.updated_on{font-size:0.8125rem;}
 
-/* 접속정보 목록: 접속 주소·아이디·비밀번호 열은 상세 화면에서 확인 */
-body.controller-keys table.list th:nth-child(n+4):nth-child(-n+6),body.controller-keys table.list tr.key>td:nth-child(n+4):nth-child(-n+6){display:none;}
 .keys_search{width:100%;max-width:none;}
 
 /* 검색조건 버튼: 좁으면 줄바꿈, 버튼 글자는 쪼개지 않음 */
 #query_form_with_buttons>p.buttons{flex-wrap:wrap;}
 #query_form_with_buttons>p.buttons a.icon{flex:none;white-space:nowrap;}
 
-/* 접속정보 유형 글자 한 줄 */
-body.controller-keys table.list tr.key>td:nth-child(2){white-space:nowrap;}
 
 /* 작업내역: 같은 사람이 이어서 한 작업(묶음) 들여쓰기를 좁게 */
 div#activity dt.grouped{padding-left:32px;}
@@ -1698,7 +1694,61 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 .lb_table tr.on td{background:var(--pri_5);}
 .lb_key{margin-left:4px;font-size:0.75rem;color:var(--gray_60);}
 .lb_save{position:sticky;bottom:0;margin:0;padding:12px 0;background:var(--gray_0);text-align:right;}
+/* ===== 접속정보 목록 줄 (vault_ko/_row — KRDS) : 모바일 카드 → 900px 부터 표 ===== */
+#keys_table,#keys_table tbody{display:block;border:0;}
+#keys_table thead{display:none;}
+#keys_table tr.vk_row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:6px 10px;margin:0 0 8px;padding:12px 14px;border:1px solid var(--gray_10);border-radius:var(--radius_l);background:var(--gray_0);}
+#keys_table tr.vk_row:hover{border-color:var(--gray_30);}
+#keys_table tr.vk_row>td{display:block;padding:0;border:0;background:none;text-align:left;}
+#keys_table td.checkbox{grid-row:1;grid-column:1;}
+#keys_table td.vk_type{grid-row:1;grid-column:2;}
+#keys_table td.vk_acts{grid-row:1;grid-column:3;}
+#keys_table td.vk_name,#keys_table td.vk_proj,#keys_table td.vk_url,#keys_table td.vk_login,#keys_table td.vk_secret{grid-column:1 / -1;}
+#keys_table td.vk_url::before,#keys_table td.vk_login::before,#keys_table td.vk_secret::before,#keys_table td.vk_proj::before{display:inline-block;margin-right:8px;font-size:0.75rem;color:var(--gray_60);}
+#keys_table td.vk_url::before{content:"접속 주소";}
+#keys_table td.vk_login::before{content:"아이디";}
+#keys_table td.vk_secret::before{content:"비밀번호";}
+#keys_table td.vk_proj::before{content:"프로젝트";}
+.vk_badge{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:12px;background:var(--gray_10);font-size:0.75rem;font-weight:700;white-space:nowrap;color:var(--gray_80);}
+.vk_badge[data-k=ssh]{background:var(--sec_10);color:var(--sec_80);}
+.vk_badge[data-k=db]{background:var(--suc_10);color:var(--suc_60);}
+.vk_badge[data-k=web]{background:var(--pri_10);color:var(--pri_70);}
+.vk_badge[data-k=api]{background:var(--war_10);color:var(--war_60);}
+.vk_badge[data-k=sftp]{background:#efe7fb;color:#5b2a9e;}
+.vk_badge[data-k=cert]{background:var(--dan_5);color:var(--dan_60);}
+.vk_link{font-size:0.9375rem;font-weight:700;color:var(--gray_90);}
+.vk_link:hover{color:var(--pri_60);}
+.vk_tags{display:inline-flex;flex-wrap:wrap;gap:4px;margin-left:6px;vertical-align:middle;}
+.vk_tag{padding:1px 6px;border-radius:var(--radius_s);background:var(--gray_5);font-size:0.75rem;color:var(--gray_60);}
+.vk_val{display:inline-flex;align-items:center;gap:6px;max-width:100%;vertical-align:middle;}
+.vk_code{overflow:hidden;padding:2px 8px;border-radius:var(--radius_s);background:var(--gray_5);font-family:"D2Coding",Consolas,monospace;font-size:0.8125rem;white-space:nowrap;text-overflow:ellipsis;color:var(--gray_90);}
+a.vk_code{text-decoration:none;color:var(--pri_60);}
+a.vk_code:hover{text-decoration:underline;}
+.vk_dots{font-size:0.875rem;letter-spacing:2px;color:var(--gray_60);}
+.vk_none{color:var(--gray_40);}
+.vk_gone{text-decoration:line-through;color:var(--gray_50);}
+.vk_hide{position:absolute;top:-9999px;left:-9999px;}
+.vk_acts_in{display:inline-flex;gap:4px;}
+#content .vk_btn{display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;width:32px;height:32px;margin:0;padding:0;border:1px solid var(--gray_20);border-radius:var(--radius_s);background:var(--gray_0);color:var(--gray_70);cursor:pointer;}
+#content .vk_btn svg.icon-svg{width:16px;height:16px;stroke:currentColor;}
+#content .vk_btn:hover{border-color:var(--sec_70);background:var(--sec_5);color:var(--sec_80);text-decoration:none;}
+#content .vk_btn.vk_del:hover{border-color:var(--dan_40);background:var(--dan_5);color:var(--dan_60);}
+#content .vk_btn.is_off{opacity:0.5;cursor:default;}
+#content .vk_btn.on{border-color:var(--suc_60);background:var(--suc_5);color:var(--suc_60);}
+#keys_table tr.vk_orphan{background:var(--gray_5);}
+.kd_toast{position:fixed;bottom:24px;left:50%;z-index:2000;padding:10px 18px;border-radius:var(--radius_m);background:var(--gray_90);font-size:0.875rem;color:var(--gray_0);transform:translateX(-50%);opacity:0;transition:opacity 0.2s;pointer-events:none;}
+.kd_toast.on{opacity:1;}
 @media (min-width:900px){
+#keys_table{display:table;width:100%;border-collapse:collapse;}
+#keys_table thead{display:table-header-group;}
+#keys_table tbody{display:table-row-group;}
+#keys_table tr.vk_row{display:table-row;margin:0;padding:0;border:0;border-radius:0;}
+#content #keys_table tr.vk_row>td{display:table-cell;padding:10px 8px;border-top:1px solid var(--gray_10);text-align:left;vertical-align:middle;}
+#keys_table td.vk_url::before,#keys_table td.vk_login::before,#keys_table td.vk_secret::before,#keys_table td.vk_proj::before{display:none;}
+#keys_table tr.vk_row:hover>td{background:var(--gray_5);}
+#keys_table th{text-align:left;}
+#keys_table td.vk_acts{text-align:right;white-space:nowrap;}
+.vk_code{max-width:260px;}
 .lb_table thead{display:table-header-group;}
 .lb_table tr{display:table-row;padding:0;border:0;}
 #content table.lb_table th,#content table.lb_table td{display:table-cell;padding:8px;border-bottom:1px solid var(--gray_10);text-align:left;vertical-align:middle;}
@@ -1766,7 +1816,6 @@ table.list.issues tr.issue{display:table-row;padding:0;border:0;}
 table.list.issues tr.issue>td{display:table-cell;padding:12px 10px 12px 0;border-top:1px solid var(--gray_10);}
 table.list.issues tr.issue>td.checkbox{padding:12px 0;}
 table.list.issues tr.issue>td.subject,table.list.issues tr.issue>td.priority,table.list.issues tr.issue>td.assigned_to,table.list.issues tr.issue>td.updated_on{font-size:inherit;}
-body.controller-keys table.list th:nth-child(n+4):nth-child(-n+6),body.controller-keys table.list tr.key>td:nth-child(n+4):nth-child(-n+6){display:table-cell;}
 .keys_search{max-width:420px;}
 #issue-form .tabular label:not(.inline):not(.block):not(.floating){margin-bottom:0;}
 div#activity dt.grouped{padding-left:5em;}
