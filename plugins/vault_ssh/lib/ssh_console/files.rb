@@ -50,9 +50,15 @@ module SshConsole
       sftp.stat!(path)
     end
 
-    def download(sftp, path)
+    # 파일 끝을 지나 읽으면 net-sftp 가 응답을 기다리며 멈춤(4.1.1) → 처음 크기만큼만 정확히 읽음
+    # (받는 동안 커지는 로그는 받기 시작한 시점까지)
+    def download(sftp, path, size)
+      left = size.to_i
       sftp.file.open(path, 'r') do |f|
-        while (data = f.read(CHUNK))
+        while left.positive?
+          data = f.read([CHUNK, left].min)
+          break if data.nil? || data.empty?
+          left -= data.bytesize
           yield data
         end
       end

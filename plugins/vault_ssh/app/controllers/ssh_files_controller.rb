@@ -26,7 +26,7 @@ class SshFilesController < ApplicationController
     response.headers['Last-Modified'] = Time.now.httpdate
     runner = @runner
     self.response_body = Enumerator.new do |y|
-      runner.with_sftp { |s| SshConsole::Files.download(s, path) { |d| runner.touch; y << d } }
+      runner.with_sftp { |s| SshConsole::Files.download(s, path, st.size) { |d| runner.touch; y << d } }
     rescue StandardError => e
       SshFileLog.where(id: log.id).update_all(ok: false, error: e.message.to_s.truncate(255))
     end
