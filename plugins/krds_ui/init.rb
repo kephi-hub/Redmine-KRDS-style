@@ -105,6 +105,21 @@ User.prepend(KrdsUi::UserInitialsPatch) unless User.ancestors.include?(KrdsUi::U
 AvatarsHelper.prepend(KrdsUi::AvatarNamePatch) unless AvatarsHelper.ancestors.include?(KrdsUi::AvatarNamePatch)
 # 관리 → 메뉴·모듈 이름: 메뉴 표시 이름 바꾸기
 Redmine::MenuManager::MenuItem.prepend(KrdsUi::Labels::CaptionPatch) unless Redmine::MenuManager::MenuItem.ancestors.include?(KrdsUi::Labels::CaptionPatch)
+# 관리 메뉴 아이콘 — 겹치지 않게 내용에 맞는 아이콘 (krds- 로 시작하는 것은 KRDS 테마 images/icons.svg, 나머지는 Redmine 기본)
+KrdsUi::ADMIN_ICONS = {
+  trackers: 'krds-category', issue_statuses: 'krds-status', field_permissions: 'krds-forms', enumerations: 'krds-list-numbers',
+  glossary_common: 'krds-book', smtp_settings: 'krds-mail-cog', committer_maps: 'krds-user-code', pms_backups: 'krds-archive',
+  krds_labels: 'krds-tag', db_servers: 'krds-database', jenkins_servers: 'krds-rocket', ldap_authentication: 'krds-address-book',
+  vault: 'krds-lock'
+}.freeze
+module KrdsUi
+  module AdminIconPatch
+    def icon
+      KrdsUi::ADMIN_ICONS[name] || super
+    end
+  end
+end
+Redmine::MenuManager::MenuItem.prepend(KrdsUi::AdminIconPatch) unless Redmine::MenuManager::MenuItem.ancestors.include?(KrdsUi::AdminIconPatch)
 Redmine::MenuManager.map :admin_menu do |menu|
   menu.push :krds_labels, { controller: 'krds_labels', action: 'index' }, caption: :label_krds_labels, after: :settings, html: { class: 'icon icon-list' }, icon: 'list'
 end
