@@ -10,8 +10,9 @@ class SysBackupRun < ApplicationRecord
     dir.present? ? SshConsole::Backup.root.join(dir) : nil
   end
 
+  # 서버 재시작 등으로 끊긴 실행은 12시간 뒤 멈춘 것으로 보고 지울 수 있게
   def busy?
-    %w(queued running).include?(status)
+    %w(queued running).include?(status) && (created_at.nil? || created_at > 12.hours.ago)
   end
 
   def seconds
