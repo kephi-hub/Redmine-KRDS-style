@@ -124,8 +124,10 @@ module DbManage
       "`#{name.to_s.gsub('`', '``')}`"
     end
 
+    # 준비문(prepare/execute, 바이너리 프로토콜)은 SSH 터널(net-ssh 포트 전달)을 거치면 응답을 못 받고 read_timeout 까지 멈춤
+    # (연결 시험·SQL 조회는 일반 쿼리라 통과) → 스키마 이름을 이스케이프해 일반 쿼리로
     def fetch(conn, sql)
-      conn.prepare(sql).execute(@schema).to_a
+      conn.query(sql.sub('?', "'#{conn.escape(@schema.to_s)}'")).to_a
     end
 
     MY_TABLES = <<~SQL.freeze
