@@ -226,5 +226,49 @@ module DbManage
       gz.write("SET FOREIGN_KEY_CHECKS = 1;\n")
       n
     end
+
+    # ---- 뷰·함수·프로시저 ----
+    def object_kinds
+      %w(view function procedure)
+    end
+
+    def object_exists?(kind, key)
+      sql = if kind == 'view'
+              "SELECT 1 FROM information_schema.VIEWS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '#{c.escape(key)}'"
+            else
+              "SELECT 1 FROM information_schema.ROUTINES WHERE ROUTINE_SCHEMA = DATABASE() AND ROUTINE_TYPE = '#{kind.upcase}' AND ROUTINE_NAME = '#{c.escape(key)}'"
+            end
+      c.query(sql).any?
+    end
+
+    # SHOW CREATE … (함수·프로시저 본문은 정의자이거나 mysql.proc 조회 권한이 있어야 보임)
+    def object_def(kind, key)
+      row = c.query("SHOW CREATE #{kind.upcase} #{q(key)}").first
+      row && row[kind == 'view' ? 'Create View' : "Create #{kind.capitalize}"]
+    rescue Mysql2::Error => e
+      raise unless [1305, 1146, 1356].include?(e.error_number)
+      nil
+    end
+
+    # 대상에서 실행할 문장 — DEFINER 는 빼고(대상 계정이 정의자가 됨) 원본 스키마 이름은 대상 스키마로
+    def object_ddl(kind, key, to_schema)
+      d = object_def(kind, key) or raise Error, t(:error_db_mig_obj_def)
+      d = d.sub(/\s+DEFINER=`(?:[^`]|``)*`@`(?:[^`]|``)*`/, '')
+      d = d.gsub("#{q(schema)}.", "#{q(to_schema)}.") if to_schema != schema
+      kind == 'view' ? [d.sub(/\ACREATE\s+/, 'CREATE OR REPLACE ')] : ["DROP #{kind.upcase} IF EXISTS #{q(key)}", d]
+    end
+
+    def create_object(_kind, _key, statements)
+      statements.each { |x| exec(x) }
+    end
+
+    def object_script(kind, key)
+      st = object_ddl(kind, key, schema)
+      head = "-- #{kind} #{key} 이관 전 백업 — mysql 클라이언트로 실행\n"
+      return head + st.map { |x| "#{x};\n" }.join if kind == 'view'
+      "#{head}DELIMITER $$\n#{st.map { |x| "#{x} $$\n" }.join}DELIMITER ;\n"
+    rescue Error
+      nil
+    end
   end
 end

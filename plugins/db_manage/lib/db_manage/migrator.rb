@@ -13,6 +13,9 @@ module DbManage
     module_function
 
     MODES = %w(skip structure replace upsert insert_new).freeze
+    # 뷰·함수·프로시저 등 — 이 순서로 만들고, 다른 개체에 기대 실패한 것은 몇 번 더 시도
+    OBJ_KINDS = %w(function package view matview procedure).freeze
+    OBJ_PASSES = 3
     DATA_MODES = %w(replace upsert insert_new).freeze
     BIG_ROWS = 1_000_000
     KEEP_BACKUPS = 20
@@ -67,9 +70,19 @@ module DbManage
 
     # 미리보기 — 고른 테이블마다 계획 (대상은 읽기 연결로 확인)
     # choices: [{ 'table' =>, 'mode' => }] → [{ table:, mode:, status:, statements:, warnings:, rows:, error: }]
-    def preview(source, target, choices)
+    def preview(source, target, choices, objects = [])
       out = []
       open_pair(source, target, write: false) do |src, tgt|
+        sort_objects(objects).each do |o|
+          item = { object: o['object'], table: o['table'], mode: 'object', statements: [], warnings: [] }
+          begin
+            item[:statements] = src.object_ddl(o['object'], o['table'], tgt.schema)
+            item[:status] = tgt.object_exists?(o['object'], o['table']) ? 'replace' : 'new'
+          rescue StandardError => e
+            item[:error] = msg(e)
+          end
+          out << item
+        end
         rows = src.row_estimates
         choices.each do |c|
           item = { table: c['table'], mode: c['mode'], rows: rows[c['table']], statements: [], warnings: [] }
@@ -84,9 +97,15 @@ module DbManage
           end
           out << item
         end
-        out.first[:notes] = tgt.notes if out.any? && tgt.respond_to?(:notes)
+        @notes = tgt.respond_to?(:notes) && choices.any? ? tgt.notes : []
       end
+      out = out.partition { |x| x[:object].nil? }.flatten
+      out.first[:notes] = @notes if out.any?
       out
+    end
+
+    def sort_objects(list)
+      list.sort_by.with_index { |o, i| [OBJ_KINDS.index(o['object']) || 99, i] }
     end
 
     # ---- 실행 (MigrateJob) ----
@@ -100,12 +119,13 @@ module DbManage
       ActiveRecord::Base.connection_pool.release_connection
       open_pair(source, target, write: true) do |src, tgt|
         models = {}
-        mig.plan_list.each do |c|
+        tables, objects = mig.plan_list.partition { |c| c['object'].nil? }
+        tables.each do |c|
           models[c['table']] = src.describe(c['table'])
         rescue StandardError
           nil
         end
-        ordered(mig.plan_list, models).each do |c|
+        ordered(tables, models).each do |c|
           r = { 'table' => c['table'], 'mode' => c['mode'], 'status' => 'running' }
           results << r
           save(mig, results, force: true)
@@ -120,6 +140,7 @@ module DbManage
           r['seconds'] = (Time.now - t0).round(1)
           save(mig, results, force: true)
         end
+        run_objects(src, tgt, sort_objects(objects), dir, results) { save(mig, results, force: true) }
       end
       ok = results.count { |x| x['status'] == 'done' }
       mig.update!(status: ok == results.size ? 'done' : (ok.zero? ? 'failed' : 'partial'), finished_at: Time.current, results: results)
@@ -156,6 +177,50 @@ module DbManage
         yield
       end
       r['target_rows'] = tgt.count(name)
+    end
+
+    # 뷰·함수·프로시저 — 만들기 전 대상의 지금 정의를 백업, 다른 개체에 기대 실패하면 다음 차례에 다시
+    def run_objects(src, tgt, objects, dir, results)
+      rows = objects.map do |o|
+        r = { 'object' => o['object'], 'table' => o['table'], 'mode' => 'object', 'status' => 'queued' }
+        results << r
+        r
+      end
+      yield
+      OBJ_PASSES.times do |pass|
+        pending = rows.reject { |r| r['status'] == 'done' }
+        break if pending.empty?
+        progress = false
+        pending.each do |r|
+          t0 = Time.now
+          r['status'] = 'running'
+          begin
+            ddl = src.object_ddl(r['object'], r['table'], tgt.schema)
+            # 이관 전 상태는 첫 시도 전에만 (앞 차례에 실패하며 남은 개체를 백업하지 않게)
+            if pass.zero? && (script = tgt.object_script(r['object'], r['table']))
+              FileUtils.mkdir_p(dir)
+              file = dir.join("#{r['object']}_#{r['table'].gsub(/[^\w.-]/, '_')}.sql.gz")
+              Zlib::GzipWriter.open(file.to_s) { |gz| gz.write(script) }
+              r['backup'] = file.basename.to_s
+              r['backup_bytes'] = File.size(file)
+            end
+            r['plan'] ||= r['backup'] ? 'replace' : 'new'
+            tgt.create_object(r['object'], r['table'], ddl)
+            r['ddl'] = ddl
+            r['status'] = 'done'
+            r.delete('error')
+            progress = true
+          rescue StandardError => e
+            r['status'] = 'failed'
+            r['error'] = msg(e)
+            r['ddl'] = ddl if ddl
+          end
+          r['seconds'] = ((r['seconds'] || 0) + (Time.now - t0)).round(1)
+          r['passes'] = pass + 1
+          yield
+        end
+        break unless progress
+      end
     end
 
     def msg(error, len = 500)

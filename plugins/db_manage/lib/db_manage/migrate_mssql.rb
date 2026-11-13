@@ -347,5 +347,37 @@ module DbManage
         "JOIN sys.objects ro ON ro.object_id = fk.referenced_object_id JOIN sys.schemas rsc ON rsc.schema_id = ro.schema_id " \
         "WHERE fk.referenced_object_id = #{obj} AND fk.parent_object_id <> fk.referenced_object_id;"
     end
+
+    # ---- 뷰·함수·프로시저 ----
+    def object_kinds
+      %w(view function procedure)
+    end
+
+    def object_exists?(_kind, key)
+      !rows("SELECT OBJECT_ID(#{s(qt(key))}) AS id").first['id'].nil?
+    end
+
+    # OBJECT_DEFINITION 그대로 (암호화된 개체는 NULL) → [CREATE OR ALTER …, 원래 CREATE …]
+    def object_ddl(_kind, key, to_schema)
+      d = rows("SELECT OBJECT_DEFINITION(OBJECT_ID(#{s(qt(key))})) AS d").first['d'] or raise Error, t(:error_db_mig_obj_def)
+      d = d.gsub(/\[#{Regexp.escape(schema)}\]\./i, "#{q(to_schema)}.").gsub(/\b#{Regexp.escape(schema)}\./i, "#{q(to_schema)}.") if to_schema != schema
+      head = /\A((?:\s|--[^\n]*\n|\/\*.*?\*\/)*)CREATE(\s+)(VIEW|FUNCTION|PROCEDURE|PROC)\b/im
+      [d.sub(head) { "#{Regexp.last_match(1)}CREATE OR ALTER#{Regexp.last_match(2)}#{Regexp.last_match(3)}" }, d]
+    end
+
+    # CREATE OR ALTER 가 안 되는 변경(함수 종류 변경 등)은 지우고 원래 CREATE 로
+    def create_object(kind, key, statements)
+      exec(statements.first)
+    rescue TinyTds::Error
+      raise unless object_exists?(kind, key)
+      exec("DROP #{kind == 'view' ? 'VIEW' : kind.upcase} #{qt(key)}")
+      exec(statements.last)
+    end
+
+    def object_script(kind, key)
+      return nil unless object_exists?(kind, key)
+      st = object_ddl(kind, key, schema)
+      "-- #{kind} #{key} 이관 전 백업 — sqlcmd 로 실행\nSET QUOTED_IDENTIFIER ON;\nGO\nDROP #{kind == 'view' ? 'VIEW' : kind.upcase} IF EXISTS #{qt(key)};\nGO\n#{st.last}\nGO\n"
+    end
   end
 end

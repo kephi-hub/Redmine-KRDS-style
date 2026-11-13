@@ -23,6 +23,7 @@ class DbMigrationsController < ApplicationController
     cmp[:changed].each { |c| status[c[:table]] = 'changed' }
     @tables = sa[:tables].reject { |t| t[:view] }.map { |t| t.merge(status: status[t[:name]] || 'same') }
     @only_target = cmp[:only_b].reject { |t| t[:view] }.map { |t| t[:name] }
+    @objects = object_rows(sa, sb)
     @busy = DbMigration.where(project_id: @project.id, target_link_id: @target.id, status: %w(queued running)).where('created_at > ?', 6.hours.ago).exists?
   end
 
@@ -30,8 +31,9 @@ class DbMigrationsController < ApplicationController
     pick_links
     return unless check_pair
     @choices = choices
-    return redirect_with(:error, l(:error_db_mig_none)) if @choices.empty?
-    @plan = DbManage::Migrator.preview(@source, @target, @choices)
+    @object_choices = object_choices
+    return redirect_with(:error, l(:error_db_mig_none)) if @choices.empty? && @object_choices.empty?
+    @plan = DbManage::Migrator.preview(@source, @target, @choices, @object_choices)
     @sql = sql_text(@plan)
   rescue DbManage::Error => e
     redirect_with(:error, e.message)
@@ -40,7 +42,7 @@ class DbMigrationsController < ApplicationController
   def create
     pick_links
     return unless check_pair
-    list = choices
+    list = choices + object_choices
     return redirect_with(:error, l(:error_db_mig_none)) if list.empty?
     if @target.production?
       return redirect_with(:error, l(:error_db_mig_confirm)) unless params[:confirm].to_s.strip == @project.identifier && params[:reason].to_s.strip.present?
@@ -112,6 +114,30 @@ class DbMigrationsController < ApplicationController
     end
   end
 
+  # oobj[종류][키] = 1 → [{ 'object' => 종류, 'table' => 키, 'mode' => 'object' }]
+  def object_choices
+    raw = params[:oobj].respond_to?(:to_unsafe_h) ? params[:oobj].to_unsafe_h : (params[:oobj] || {})
+    raw.flat_map do |kind, keys|
+      next [] unless DbManage::Migrator::OBJ_KINDS.include?(kind) && keys.respond_to?(:each_pair)
+      keys.filter_map { |key, on| { 'object' => kind, 'table' => key.to_s, 'mode' => 'object' } if on.to_s == '1' && key.to_s.length <= 400 }
+    end
+  end
+
+  # 원본의 뷰·함수·프로시저 등 + 대상과 비교한 상태 (new / changed / same)
+  def object_rows(sa, sb)
+    kinds = DbManage::Migrator::OBJ_KINDS & DbManage::Migrator.engine_class(@source.db_server.adapter).new(nil, nil).object_kinds
+    state = {}
+    DbManage::Analysis.compare_objects(sa, sb, @source.schema, @target.schema).each do |g|
+      g[:rows].each { |r| state[[g[:kind], r[:key]]] = r[:state] }
+    end
+    kinds.flat_map do |k|
+      (sa.dig(:objects, k) || []).map do |o|
+        st = state[[k, o[:key]]]
+        { kind: k, key: o[:key], name: o[:name], status: { only_a: 'new', changed: 'changed', unknown: 'unknown' }[st] || 'same' }
+      end
+    end
+  end
+
   def redirect_with(kind, message)
     flash[kind] = message
     redirect_to project_db_migrations_path(@project, source: @source&.id, target: @target&.id)
@@ -120,7 +146,7 @@ class DbMigrationsController < ApplicationController
   def sql_text(plan)
     out = +"-- #{@source.name} → #{@target.name} 이관 미리보기 (#{Time.current.in_time_zone('Asia/Seoul').strftime('%F %R')})\n-- 대상 DB 세션: SET FOREIGN_KEY_CHECKS = 0\n\n"
     plan.each do |p|
-      out << "-- [#{p[:table]}] #{l("label_db_mig_mode_#{p[:mode]}")}\n"
+      out << "-- [#{p[:object] ? "#{l("label_db_kind_#{p[:object]}")} " : ''}#{p[:table]}] #{l("label_db_mig_mode_#{p[:mode]}")}\n"
       (p[:statements] || []).each { |s| out << "#{s};\n" }
       out << "-- 데이터: #{l("label_db_mig_mode_#{p[:mode]}")} (실행 때 원본에서 읽어 INSERT)\n" if DbManage::Migrator::DATA_MODES.include?(p[:mode])
       out << "\n"

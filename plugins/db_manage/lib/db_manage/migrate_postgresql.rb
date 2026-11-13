@@ -270,5 +270,64 @@ module DbManage
       gz.write("COMMIT;\n")
       n
     end
+
+    # ---- 뷰·구체화 뷰·함수·프로시저 (함수 키는 이름(인자 형식)) ----
+    def object_kinds
+      %w(view matview function procedure)
+    end
+
+    def obj_oid(kind, key)
+      if %w(view matview).include?(kind)
+        c.exec_params('SELECT c.oid FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = $1 AND c.relname = $2 AND c.relkind = $3',
+                      [schema, key, kind == 'view' ? 'v' : 'm']).values.first&.first
+      else
+        c.exec_params("SELECT p.oid FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname = $1 AND p.prokind = $3 " \
+                      "AND p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')' = $2", [schema, key, kind == 'procedure' ? 'p' : 'f']).values.first&.first
+      end
+    end
+
+    def object_exists?(kind, key)
+      !obj_oid(kind, key).nil?
+    end
+
+    def rename_schema(text, to_schema)
+      return text if to_schema == schema
+      text.gsub(/"#{Regexp.escape(schema)}"\./, "#{q(to_schema)}.").gsub(/\b#{Regexp.escape(schema)}\./, "#{q(to_schema)}.")
+    end
+
+    def object_ddl(kind, key, to_schema)
+      oid = obj_oid(kind, key) or raise Error, t(:error_db_mig_obj_def)
+      case kind
+      when 'view'
+        d = c.exec_params('SELECT pg_get_viewdef($1::oid, true)', [oid]).getvalue(0, 0).to_s.strip.chomp(';')
+        ["CREATE OR REPLACE VIEW #{q(key)} AS\n#{rename_schema(d, to_schema)}"]
+      when 'matview'
+        d = c.exec_params('SELECT pg_get_viewdef($1::oid, true)', [oid]).getvalue(0, 0).to_s.strip.chomp(';')
+        ["DROP MATERIALIZED VIEW IF EXISTS #{q(key)}", "CREATE MATERIALIZED VIEW #{q(key)} AS\n#{rename_schema(d, to_schema)}"]
+      else
+        d = c.exec_params('SELECT pg_get_functiondef($1::oid)', [oid]).getvalue(0, 0).to_s.strip
+        [rename_schema(d, to_schema)]
+      end
+    end
+
+    # CREATE OR REPLACE 가 안 되는 변경(뷰 칼럼 변경·반환 형식 변경)은 지우고 다시
+    def create_object(kind, key, statements)
+      statements.each { |x| exec(x) }
+    rescue PG::Error
+      raise unless %w(view function procedure).include?(kind) && object_exists?(kind, key)
+      if kind == 'view'
+        exec("DROP VIEW #{q(key)}")
+        exec(statements.first.sub('CREATE OR REPLACE VIEW', 'CREATE VIEW'))
+      else
+        name, args = key.match(/\A(.*)\((.*)\)\z/m).captures
+        exec("DROP #{kind.upcase} #{q(name)}(#{args})")
+        statements.each { |x| exec(x) }
+      end
+    end
+
+    def object_script(kind, key)
+      return nil unless object_exists?(kind, key)
+      "-- #{kind} #{key} 이관 전 백업 — psql 로 실행\nSET search_path TO #{q(schema)};\n" + object_ddl(kind, key, schema).map { |x| "#{x};\n" }.join
+    end
   end
 end

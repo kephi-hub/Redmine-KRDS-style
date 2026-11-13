@@ -27,7 +27,7 @@
         <label for="mg_all"><%= l(:label_db_mig_apply_all) %></label>
         <select id="mg_all"><option value=""></option><% DbManage::Migrator::MODES.each do |m| %><option value="<%= m %>"><%= l("label_db_mig_mode_#{m}") %></option><% end %></select>
       </span>
-      <span class="mg_count"><%= l(:label_db_mig_selected) %> <b id="mg_cnt">0</b></span>
+      <span class="mg_count"><%= l(:label_db_mig_selected_all) %> <b id="mg_cnt">0</b></span>
     </div>
     <div class="autoscroll">
     <table class="list mg_list">
@@ -44,6 +44,25 @@
       </tbody>
     </table>
     </div>
+    <% if @objects.any? %>
+    <h3 class="ag_sec mg_osec"><%= l(:label_db_mig_objects) %> <span class="mt_dim"><%= @objects.size %></span></h3>
+    <p class="mt_dim"><%= l(:text_db_mig_objects) %></p>
+    <div class="autoscroll">
+    <table class="list mg_list mg_objs">
+      <thead><tr><th class="checkbox"><input type="checkbox" id="mg_oall" aria-label="<%= l(:label_db_mig_obj_all) %>"></th><th><%= l(:label_db_mig_obj_kind) %></th><th class="name"><%= l(:field_name) %></th><th><%= l(:field_status) %></th></tr></thead>
+      <tbody>
+      <% @objects.each do |o| %>
+        <tr data-st="<%= o[:status] %>">
+          <td class="checkbox"><%= check_box_tag "oobj[#{o[:kind]}][#{o[:key]}]", '1', false, id: nil, class: 'mg_obj', 'aria-label': "#{o[:key]} #{l(:label_db_mig_mode_object)}" %></td>
+          <td><span class="mg_kind"><%= l("label_db_kind_#{o[:kind]}") %></span></td>
+          <td class="name"><b><%= o[:key] %></b></td>
+          <td><span class="mg_st" data-k="<%= o[:status] %>"><%= l("label_db_mig_st_#{o[:status]}") %></span></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+    </div>
+    <% end %>
     <% if @only_target.any? %><p class="mt_dim"><%= l(:text_db_mig_only_target, n: @only_target.size, names: @only_target.first(10).join(', ')) %></p><% end %>
     <dl class="mg_help">
       <% DbManage::Migrator::MODES.drop(1).each do |m| %><dt><%= l("label_db_mig_mode_#{m}") %></dt><dd><%= l("text_db_mig_mode_#{m}") %></dd><% end %>
@@ -75,11 +94,13 @@
 <%= javascript_tag do %>
 $(function() {
   function sync() {
-    var n = $('.mg_mode').filter(function() { return this.value !== 'skip'; }).length;
+    var n = $('.mg_mode').filter(function() { return this.value !== 'skip'; }).length + $('.mg_obj:checked').length;
+    $('.mg_obj').each(function() { $(this).closest('tr').toggleClass('on', this.checked); });
     $('#mg_cnt').text(n); $('#mg_go').prop('disabled', n === 0);
     $('.mg_mode').each(function() { $(this).closest('tr').toggleClass('on', this.value !== 'skip'); });
   }
-  $(document).on('change', '.mg_mode', sync);
+  $(document).on('change', '.mg_mode, .mg_obj', sync);
+  $('#mg_oall').on('change', function() { $('.mg_objs tbody tr:visible .mg_obj').prop('checked', this.checked); sync(); });
   $('#mg_all').on('change', function() {
     var v = this.value; if (!v) return;
     $('.mg_list tbody tr:visible .mg_mode').val(v); this.value = ''; sync();
@@ -87,6 +108,8 @@ $(function() {
   $('#mg_diff').on('change', function() {
     var on = this.checked;
     $('.mg_list tbody tr').each(function() { $(this).toggle(!on || $(this).data('st') !== 'same'); });
+    if (on) $('.mg_objs tbody tr:hidden .mg_obj').prop('checked', false);
+    sync();
   });
   $('#mg_swap').on('click', function() {
     var a = $('#mg_src').val(); $('#mg_src').val($('#mg_tgt').val()); $('#mg_tgt').val(a); $(this).closest('form').trigger('submit');

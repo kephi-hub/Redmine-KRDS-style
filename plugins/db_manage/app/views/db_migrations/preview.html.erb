@@ -11,7 +11,7 @@
   <tbody>
   <% @plan.each do |p| %>
     <tr class="<%= 'mg_bad' if p[:error] %>">
-      <td class="name"><b><%= p[:table] %></b></td>
+      <td class="name"><% if p[:object] %><span class="mg_kind"><%= l("label_db_kind_#{p[:object]}") %></span> <% end %><b><%= p[:table] %></b></td>
       <td><%= l("label_db_mig_mode_#{p[:mode]}") %></td>
       <td><% if p[:status] %><span class="mg_st" data-k="<%= p[:status] %>"><%= l("label_db_mig_plan_#{p[:status]}") %></span><% end %></td>
       <td class="mg_num"><%= DbManage::Migrator::DATA_MODES.include?(p[:mode]) && p[:rows] ? "≈#{number_with_delimiter(p[:rows])}" : '-' %></td>
@@ -32,6 +32,7 @@
 <%= form_tag project_db_migrations_path(@project), id: 'mg_run' do %><div class="mg_confirm">
   <%= hidden_field_tag :source, @source.id, id: nil %><%= hidden_field_tag :target, @target.id, id: nil %>
   <% @choices.each do |c| %><%= hidden_field_tag "mode[#{c['table']}]", c['mode'], id: nil %><% end %>
+  <% @object_choices.each do |c| %><%= hidden_field_tag "oobj[#{c['object']}][#{c['table']}]", '1', id: nil %><% end %>
   <p class="db_hintbox"><%= l(:text_db_mig_backup_note) %></p>
   <% if @target.production? %>
     <p class="mg_prod"><%= l(:text_db_mig_prod, name: @target.name) %></p>

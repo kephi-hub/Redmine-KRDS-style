@@ -410,5 +410,65 @@ module DbManage
       gz.write("BEGIN FOR r IN (SELECT ddl FROM MIG_RESTORE_FK) LOOP EXECUTE IMMEDIATE r.ddl; END LOOP; EXECUTE IMMEDIATE 'DROP TABLE MIG_RESTORE_FK PURGE'; END;\n/\n")
       n
     end
+
+    # ---- 뷰·구체화 뷰·함수·프로시저·패키지 ----
+    OBJ_TYPES = { 'view' => 'VIEW', 'matview' => 'MATERIALIZED VIEW', 'function' => 'FUNCTION', 'procedure' => 'PROCEDURE', 'package' => 'PACKAGE' }.freeze
+
+    def object_kinds
+      OBJ_TYPES.keys
+    end
+
+    def object_exists?(kind, key)
+      rows('SELECT 1 AS x FROM all_objects WHERE owner = :1 AND object_name = :2 AND object_type = :3', schema, key, OBJ_TYPES.fetch(kind)).any?
+    end
+
+    def source_text(type, key)
+      rows('SELECT text FROM all_source WHERE owner = :1 AND name = :2 AND type = :3 ORDER BY line', schema, key, type).map { |r| r['text'] }.join.rstrip.presence
+    end
+
+    def rename_schema(text, to_schema)
+      return text if to_schema == schema
+      text.gsub(/"#{Regexp.escape(schema)}"\./, "#{q(to_schema)}.").gsub(/\b#{Regexp.escape(schema)}\./i, "#{q(to_schema)}.")
+    end
+
+    def object_ddl(kind, key, to_schema)
+      st = case kind
+           when 'view'
+             v = rows('SELECT text FROM all_views WHERE owner = :1 AND view_name = :2', schema, key).first or raise Error, t(:error_db_mig_obj_def)
+             cols = rows("SELECT column_name FROM all_tab_cols WHERE owner = :1 AND table_name = :2 AND hidden_column = 'NO' ORDER BY column_id", schema, key)
+             ["CREATE OR REPLACE FORCE VIEW #{q(key)} (#{cols.map { |r| q(r['column_name']) }.join(', ')}) AS #{v['text'].to_s.strip}"]
+           when 'matview'
+             v = rows('SELECT query FROM all_mviews WHERE owner = :1 AND mview_name = :2', schema, key).first or raise Error, t(:error_db_mig_obj_def)
+             ["BEGIN EXECUTE IMMEDIATE 'DROP MATERIALIZED VIEW #{q(key).gsub("'", "''")}'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -12003 THEN RAISE; END IF; END;",
+              "CREATE MATERIALIZED VIEW #{q(key)} AS #{v['query'].to_s.strip}"]
+           when 'package'
+             spec = source_text('PACKAGE', key) or raise Error, t(:error_db_mig_obj_def)
+             body = source_text('PACKAGE BODY', key)
+             ["CREATE OR REPLACE #{spec}"] + (body ? ["CREATE OR REPLACE #{body}"] : [])
+           else
+             ["CREATE OR REPLACE #{source_text(OBJ_TYPES.fetch(kind), key) || raise(Error, t(:error_db_mig_obj_def))}"]
+           end
+      st.map { |x| rename_schema(x, to_schema) }
+    end
+
+    # 컴파일 오류(ORA-24344)로 만들어진 개체는 INVALID → 오류 내용을 올려 다음 차례에 다시 시도
+    def create_object(kind, key, statements)
+      statements.each do |x|
+        exec(x)
+      rescue OCIError => e
+        raise unless e.code == 24_344
+      end
+      bad = rows("SELECT object_type FROM all_objects WHERE owner = :1 AND object_name = :2 AND status = 'INVALID'", schema, key)
+      return if bad.empty? || kind == 'matview'
+      errs = rows('SELECT type, line, position, text FROM all_errors WHERE owner = :1 AND name = :2 ORDER BY sequence', schema, key).first(3)
+      raise Error, t(:error_db_mig_compile, msg: errs.map { |r| "#{r['type']} #{r['line']}:#{r['position']} #{r['text'].to_s.strip}" }.join(' / ').presence || 'INVALID')
+    end
+
+    def object_script(kind, key)
+      return nil unless object_exists?(kind, key)
+      st = object_ddl(kind, key, schema)
+      "-- #{kind} #{key} 이관 전 백업 — SQLcl·SQL*Plus 로 실행\nSET DEFINE OFF\nALTER SESSION SET CURRENT_SCHEMA = #{q(schema)};\n" +
+        st.map { |x| kind == 'view' || x.start_with?('CREATE MATERIALIZED') ? "#{x};\n" : "#{x}\n/\n" }.join
+    end
   end
 end

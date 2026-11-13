@@ -1096,8 +1096,11 @@ table.list .mg_num{text-align:right;white-space:nowrap;}
 .mg_st{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:11px;background:var(--gray_10);font-size:0.75rem;font-weight:700;white-space:nowrap;color:var(--gray_70);}
 .mg_st[data-k=new],.mg_st[data-k=running],.mg_st[data-k=queued]{background:var(--pri_10);color:var(--pri_70);}
 .mg_st[data-k=changed],.mg_st[data-k=partial]{background:var(--war_10);color:var(--war_60);}
+.mg_st[data-k=unknown]{background:var(--gray_5);color:var(--gray_60);}
 .mg_st[data-k=done]{background:var(--suc_10);color:var(--suc_60);}
 .mg_st[data-k=failed],.mg_st[data-k=prod]{background:var(--dan_10);color:var(--dan_60);}
+.mg_kind{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:var(--radius_s);background:var(--sec_10);font-size:0.75rem;font-weight:700;white-space:nowrap;color:var(--sec_80);}
+table.list.mg_objs tr.on>td{background:var(--pri_5);}
 .mg_help{display:grid;grid-template-columns:1fr;gap:2px 12px;padding:12px 14px;margin:12px 0;border-radius:var(--radius_m);background:var(--gray_5);font-size:0.8125rem;}
 .mg_help dt{font-weight:700;color:var(--gray_80);}
 .mg_help dd{margin:0 0 6px;color:var(--gray_60);}

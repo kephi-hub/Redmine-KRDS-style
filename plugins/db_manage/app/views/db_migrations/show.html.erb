@@ -9,14 +9,14 @@
   <% if m.reason.present? %><li><span><%= l(:label_db_mig_reason) %></span> <%= m.reason %></li><% end %>
 </ul>
 <% if m.error.present? %><p class="flash error"><%= m.error %></p><% end %>
-<% done = @results.map { |r| r['table'] } %>
+<% done = @results.map { |r| [r['object'], r['table']] } %>
 <div class="autoscroll">
 <table class="list mg_plan">
   <thead><tr><th class="name"><%= l(:label_db_table) %></th><th><%= l(:label_db_mig_mode) %></th><th><%= l(:field_status) %></th><th><%= l(:label_db_mig_rows_done) %></th><th><%= l(:label_db_mig_backup) %></th><th class="mg_sqlcol"><%= l(:label_db_mig_detail) %></th></tr></thead>
   <tbody>
   <% @results.each do |r| %>
     <tr class="<%= 'mg_bad' if r['status'] == 'failed' %>">
-      <td class="name"><b><%= r['table'] %></b></td>
+      <td class="name"><% if r['object'] %><span class="mg_kind"><%= l("label_db_kind_#{r['object']}") %></span> <% end %><b><%= r['table'] %></b><% if r['passes'].to_i > 1 %> <span class="mt_dim"><%= l(:label_db_mig_passes, n: r['passes']) %></span><% end %></td>
       <td><%= l("label_db_mig_mode_#{r['mode']}") %></td>
       <td><span class="mg_st" data-k="<%= r['status'] %>"><%= l("label_db_mig_run_#{r['status']}") %></span><% if r['seconds'] %> <span class="mt_dim"><%= r['seconds'] %>s</span><% end %></td>
       <td class="mg_num"><% if r['rows'] %><%= number_with_delimiter(r['rows']) %><% if r['target_rows'] %><br><span class="mt_dim"><%= l(:label_db_mig_target_rows, n: number_with_delimiter(r['target_rows'])) %></span><% end %><% else %>-<% end %></td>
@@ -28,8 +28,8 @@
       </td>
     </tr>
   <% end %>
-  <% m.plan_list.reject { |c| done.include?(c['table']) }.each do |c| %>
-    <tr><td class="name"><b><%= c['table'] %></b></td><td><%= l("label_db_mig_mode_#{c['mode']}") %></td><td><span class="mg_st" data-k="queued"><%= l(:label_db_mig_run_queued) %></span></td><td></td><td></td><td></td></tr>
+  <% m.plan_list.reject { |c| done.include?([c['object'], c['table']]) }.each do |c| %>
+    <tr><td class="name"><% if c['object'] %><span class="mg_kind"><%= l("label_db_kind_#{c['object']}") %></span> <% end %><b><%= c['table'] %></b></td><td><%= l("label_db_mig_mode_#{c['mode']}") %></td><td><span class="mg_st" data-k="queued"><%= l(:label_db_mig_run_queued) %></span></td><td></td><td></td><td></td></tr>
   <% end %>
   </tbody>
 </table>
