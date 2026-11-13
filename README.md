@@ -299,6 +299,7 @@ docker compose exec redmine sh -c 'bundle exec rails runner setup/apply_settings
    - PostgreSQL: pg_catalog 로 구조, 데이터는 원본 `COPY TO` → 대상 임시 테이블 `COPY FROM` → 한 트랜잭션에서 반영(replace 는 원본에 없는 행 삭제 + `ON CONFLICT DO UPDATE`), IDENTITY·serial 시퀀스 값 맞춤, 슈퍼유저면 `session_replication_role = replica`
    - MS SQL Server: sys 카탈로그로 구조, 데이터는 칼럼마다 문자열 변환(날짜 126·float 3·money 2·바이너리 0x)으로 읽어 1000행씩 INSERT/MERGE, `IDENTITY_INSERT`, 관련 외래키 NOCHECK 후 다시 CHECK(검증 없이), 계산 칼럼·rowversion 제외
    - Oracle: all_* 딕셔너리로 구조(시스템 이름 제약은 이름 없이, 함수 기반 인덱스·LONG·XMLTYPE 은 알림), 데이터는 TO_CHAR/RAWTOHEX 로 읽어 배열 바인드(LOB 있으면 행 단위) INSERT/MERGE, IDENTITY ALWAYS 는 잠시 BY DEFAULT 후 `START WITH LIMIT VALUE`, 관련 외래키 DISABLE 후 ENABLE NOVALIDATE
+   - **뷰·함수·프로시저**(1.13): MariaDB `SHOW CREATE`(DEFINER 제거) · PostgreSQL `pg_get_viewdef`/`pg_get_functiondef`(구체화 뷰 포함, 키는 이름(인자)) · SQL Server `OBJECT_DEFINITION` → `CREATE OR ALTER` · Oracle `all_views`(칼럼 목록 + FORCE)/`all_source`(패키지 명세·본문)/`all_mviews`. 함수·패키지 → 뷰 → 구체화 뷰 → 프로시저 순서, 실패하면 최대 3번 다시 시도(뷰가 뷰를 쓰는 경우), 안 되는 변경(뷰 칼럼·반환 형식 변경)은 지우고 다시. 첫 시도 전 대상 정의를 `<종류>_<이름>.sql.gz` 로 백업. 원본·대상 스키마 이름이 다르면 정의 안의 스키마 이름을 바꿈
    - 고른 테이블은 외래키 기준으로 참조되는 테이블부터. 백업 스크립트는 복원하는 때 이 테이블을 참조하는 외래키를 찾아 저장·삭제 후 다시 만듦
 - **이관**(1.11, MariaDB·MySQL ↔ 같은 종류, `DbManage::Migrator`): [이관] 탭 → 원본·대상 → 테이블마다 건너뜀/구조만/구조+데이터(전체 교체·추가·갱신·없는 것만) → 미리보기(SQL) → 실행(ActiveJob, `db_migrations` 기록)
    - 구조: 원본 `SHOW CREATE TABLE` 기준 CREATE(AUTO_INCREMENT 값 뺌) / ALTER(칼럼 ADD·MODIFY, 인덱스·외래키 추가·변경, 설명). 대상에만 있는 것은 지우지 않음, 기본키가 다르면 경고만

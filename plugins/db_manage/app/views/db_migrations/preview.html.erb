@@ -1,7 +1,7 @@
 <%# 이관 미리보기 — 테이블마다 실행할 SQL·경고, 실행 확인(운영 대상은 사유 + 프로젝트 식별자) %>
 <h2><%= link_to l(:label_db_migrate), project_db_migrations_path(@project, source: @source.id, target: @target.id) %> &#187; <%= l(:label_db_mig_preview) %></h2>
 <p class="mg_dir"><b><%= @source.name %></b> <span class="mt_dim">(<%= @source.db_server.env_label %>)</span> → <b><%= @target.name %></b> <span class="mt_dim">(<%= @target.db_server.env_label %>)</span>
-  · <%= l(:label_db_mig_selected) %> <%= @plan.size %></p>
+  · <%= l(:label_db_mig_selected_all) %> <%= @plan.size %></p>
 <% errors = @plan.count { |p| p[:error] } %>
 <% (@plan.first&.dig(:notes) || []).each do |n| %><p class="flash warning"><%= n %></p><% end %>
 <% if errors.positive? %><p class="flash error"><%= l(:text_db_mig_preview_errors, n: errors) %></p><% end %>
