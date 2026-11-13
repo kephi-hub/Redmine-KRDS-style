@@ -77,7 +77,7 @@ class SysBackupsController < ApplicationController
     file = @run.path && Dir[@run.path.join('*.sql.gz').to_s].first
     return render_404 unless file && @run.status == 'done'
     Rails.logger.info("[sys_backup] download run #{@run.id} by #{User.current.login}")
-    send_file file, filename: "#{@project.identifier}_#{File.basename(@run.dir)}_#{File.basename(file)}", type: 'application/gzip'
+    send_file file, filename: SshConsole::Backup.download_name(@run), type: 'application/gzip'
   end
 
   def destroy_run

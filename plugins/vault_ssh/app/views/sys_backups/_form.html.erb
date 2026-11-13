@@ -28,10 +28,9 @@
     <p><%= f.text_area :excludes, rows: 3, cols: 70, class: 'oa_mono', label: :label_sb_excludes, placeholder: "*.tmp\ncache/\nthumbs/" %>
       <em class="info"><%= l(:text_sb_excludes) %></em></p>
   </div>
-  <p><label><%= l(:label_sb_schedule) %></label>
-    <%= f.select :schedule, SysBackupJob::SCHEDULES.map { |s| [l("label_sb_sch_#{s}"), s] }, {}, class: 'sb_sch_pick', 'aria-label': l(:label_sb_schedule) %>
-    <span class="sb_weekday" <%= 'hidden' unless j.schedule == 'weekly' %>><%= f.select :weekday, (1..7).map { |d| [l(:label_sb_weekday)[d - 1] + l(:label_sb_wd_suffix), d] }, {}, 'aria-label': l(:label_sb_weekday_label) %></span>
-    <%= f.select :hour, (0..23).map { |h| [format('%02d:00', h), h] }, {}, 'aria-label': l(:label_sb_hour) %>
+  <p><%= f.select :schedule, SysBackupJob::SCHEDULES.map { |s| [l("label_sb_sch_#{s}"), s] }, { label: :label_sb_schedule }, class: 'sb_sch_pick' %>
+    <span class="sb_weekday" <%= 'hidden' unless j.schedule == 'weekly' %>><%= select :sys_backup_job, :weekday, (1..7).map { |d| [l(:label_sb_weekday)[d - 1] + l(:label_sb_wd_suffix), d] }, {}, 'aria-label': l(:label_sb_weekday_label) %></span>
+    <%= select :sys_backup_job, :hour, (0..23).map { |h| [format('%02d:00', h), h] }, {}, 'aria-label': l(:label_sb_hour) %>
     <em class="info"><%= l(:text_sb_schedule) %></em></p>
   <p><%= f.number_field :keep, min: 1, max: 365, label: :label_sb_keep %><em class="info"><%= l(:text_sb_keep) %></em></p>
   <p><%= f.check_box :active, label: :field_active %></p>

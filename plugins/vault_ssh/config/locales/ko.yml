@@ -45,7 +45,7 @@ ko:
   label_sb_keep: "보관"
   label_sb_restore: "복원 방법"
   label_sb_history: "실행 기록"
-  text_sb_restore_db: "자동 복원은 하지 않습니다. 덤프를 받거나 PMS 서버에서 아래처럼 복원하세요 (PMS 설치 폴더 기준, 비밀번호는 물어봄)."
+  text_sb_restore_db: "자동 복원은 하지 않습니다. 실행 기록의 [덤프 받기]로 받은 파일을 DB 에 접속되는 서버(보통 운영 서버)로 옮겨 아래처럼 복원하세요. 비밀번호는 실행할 때 물어봅니다. 복원 전 현재 DB 를 먼저 백업하세요."
   text_sb_restore_files: "자동 복원은 하지 않습니다. PMS 서버의 보관 폴더(files/ 아래에 원래 경로 그대로)에서 필요한 파일을 되돌려 놓으세요. 파일 몇 개는 SSH 터미널의 파일 창으로 올려도 됩니다."
   label_sb_name: "이름"
   text_sb_name_db: "예) 운영 DB"

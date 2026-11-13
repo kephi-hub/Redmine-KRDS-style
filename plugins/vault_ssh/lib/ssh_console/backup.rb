@@ -186,16 +186,21 @@ module SshConsole
       job.sys_backup_runs.where(status: 'failed').where('created_at < ?', 60.days.ago).each(&:destroy)
     end
 
+    # [덤프 받기] 파일 이름 — <프로젝트>_<날짜>_db_<이름>.sql.gz
+    def download_name(run)
+      file = run.path && Dir[run.path.join('*.sql.gz').to_s].first
+      file && "#{run.sys_backup_job.project.identifier}_#{File.basename(run.dir)}_#{File.basename(file)}"
+    end
+
     # 복원 안내 명령 (화면 표시용, 비밀번호 없음)
     def restore_hint(job, run)
       return nil unless run.path
       if job.db?
-        file = Dir[run.path.join('*.sql.gz').to_s].first
-        rel = file && Pathname.new(file).relative_path_from(root).to_s
+        rel = download_name(run)
         case job.db_kind
-        when 'mysql' then "gunzip -c backup/sys/#{rel} | mysql -h #{job.db_host.presence || '127.0.0.1'} -P #{job.db_port || 3306} -u #{job.db_key&.login} -p #{job.db_name}"
-        when 'postgresql' then "gunzip -c backup/sys/#{rel} | psql -h #{job.db_host.presence || '127.0.0.1'} -p #{job.db_port || 5432} -U #{job.db_key&.login} #{job.db_name}"
-        else "gunzip -c backup/sys/#{rel}"
+        when 'mysql' then "gunzip -c #{rel} | mysql -h #{job.db_host.presence || '127.0.0.1'} -P #{job.db_port || 3306} -u #{job.db_key&.login} -p #{job.db_name}"
+        when 'postgresql' then "gunzip -c #{rel} | psql -h #{job.db_host.presence || '127.0.0.1'} -p #{job.db_port || 5432} -U #{job.db_key&.login} #{job.db_name}"
+        else "gunzip -c #{rel}"
         end
       else
         "rsync -a backup/sys/#{run.dir}/files/ <운영 서버>:/   # 예) 폴더 하나만: backup/sys/#{run.dir}/files#{job.path_list.first}/"

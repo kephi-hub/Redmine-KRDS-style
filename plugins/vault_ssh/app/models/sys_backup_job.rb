@@ -19,7 +19,7 @@ class SysBackupJob < ApplicationRecord
   validates :db_port, numericality: { only_integer: true, greater_than: 0, less_than: 65_536 }, allow_nil: true
   validate :check_paths
 
-  scope :sorted, -> { order(:name) }
+  scope :sorted, -> { order(active: :desc, kind: :asc, name: :asc) }
 
   def db?
     kind == 'db'
