@@ -29,7 +29,8 @@ class SimpleWorkflowsController < ApplicationController
     pairs = table.flat_map { |from, tos| Array(tos).map { |to| [from.to_i, to.to_i] } }
                               .select { |a, b| a != b && status_ids.include?(a) && status_ids.include?(b) }.uniq
     WorkflowTransition.transaction do
-      WorkflowTransition.where(role_id: role.id, tracker_id: tracker_ids, author: false, assignee: false).delete_all
+      # 출발 상태 0(새 일감을 만들 때 고를 수 있는 시작 상태)은 이 화면에서 다루지 않으므로 지우지 않음
+      WorkflowTransition.where(role_id: role.id, tracker_id: tracker_ids, author: false, assignee: false).where.not(old_status_id: 0).delete_all
       rows = tracker_ids.flat_map do |tid|
         pairs.map { |a, b| { type: 'WorkflowTransition', role_id: role.id, tracker_id: tid, old_status_id: a, new_status_id: b, author: false, assignee: false } }
       end
