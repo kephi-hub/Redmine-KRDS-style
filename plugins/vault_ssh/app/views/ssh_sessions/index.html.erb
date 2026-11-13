@@ -1,0 +1,43 @@
+<%# 프로젝트 > 접속정보 > 접속 기록 — 누가·언제·어느 서버·사유·시간·종료, 녹화 재생, 엑셀 %>
+<div class="contextual">
+  <%= link_to sprite_icon('download', l(:label_export_to) + ' Excel'), project_ssh_sessions_export_path(@project, env: @env, q: @q.presence), class: 'icon icon-download' %>
+  <%= link_to sprite_icon('krds-lock', l(:label_module_plural)), project_keys_path(@project), class: 'icon' %>
+</div>
+<h2><%= l(:label_ssh_sessions) %></h2>
+<% unless @all %><p class="db_hintbox"><%= l(:label_ssh_mine_only) %></p><% end %>
+<%= form_tag project_ssh_sessions_path(@project), method: :get, class: 'qa_filter ss_filter' do %>
+  <label for="ss_env"><%= l(:label_ssh_env) %></label>
+  <%= select_tag 'env', options_for_select([[l(:label_all), '']] + VaultSshProfile::ENVS.map { |e| [l("label_ssh_env_#{e}"), e] }, @env), id: 'ss_env' %>
+  <label for="ss_q"><%= l(:label_search) %></label>
+  <%= text_field_tag 'q', @q, id: 'ss_q', placeholder: "#{l(:label_ssh_server)} · #{l(:label_ssh_reason)}" %>
+  <%= submit_tag l(:button_apply), name: nil %>
+<% end %>
+<% if @sessions.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list ss_list">
+  <thead><tr><th><%= l(:field_created_on) %></th><th><%= l(:label_ssh_user_col) %></th><th class="name"><%= l(:label_ssh_server) %></th><th><%= l(:label_ssh_env) %></th>
+    <th class="name"><%= l(:label_ssh_reason) %></th><th><%= l(:label_ssh_duration) %></th><th><%= l(:field_status) %></th><th><%= l(:label_ssh_ip) %></th><th></th></tr></thead>
+  <tbody>
+  <% @sessions.each do |s| %>
+    <tr>
+      <td class="ss_when"><%= format_time(s.started_at || s.created_at) %></td>
+      <td><%= s.user&.name %></td>
+      <td class="name"><strong><%= s.key_name %></strong><% if s.target.present? %><br><code class="ss_target"><%= s.target %></code><% end %></td>
+      <td><span class="ss_env" data-k="<%= s.env %>"><%= l("label_ssh_env_#{s.env}") %></span></td>
+      <td class="name"><%= s.reason %></td>
+      <td><% if (d = s.duration) %><%= format('%d:%02d:%02d', d / 3600, d / 60 % 60, d % 60) %><% end %></td>
+      <td><span class="ss_st" data-k="<%= s.status %>"><%= s.live? ? l(:label_ssh_status_running) : l("label_ssh_status_#{s.status}") %></span>
+        <% if s.end_reason.present? && !s.live? %><br><span class="mt_dim"><%= l("label_ssh_end_#{s.end_reason}", default: s.end_reason) %></span><% end %>
+        <% if s.error.present? %><br><span class="mc_err"><%= s.error.truncate(80) %></span><% end %></td>
+      <td><code><%= s.remote_ip %></code></td>
+      <td class="buttons"><% if s.record_file.present? %><%= link_to sprite_icon('krds-terminal', l(:label_ssh_replay)), project_ssh_session_path(@project, s), class: 'icon' %><% end %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<span class="pagination"><%= pagination_links_full @pages, @count %></span>
+<% end %>
+<% html_title l(:label_ssh_sessions) %>

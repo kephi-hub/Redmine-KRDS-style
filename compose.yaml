@@ -41,6 +41,7 @@ services:
       - ./plugins/vault_ko:/usr/src/redmine/plugins/vault_ko:z   # Vault 한국어화 (번역+화면 문구)
       - ./plugins/krds_ui:/usr/src/redmine/plugins/krds_ui:z   # KRDS 화면 마크업 (문서 상세)
       - ./plugins/vault_types:/usr/src/redmine/plugins/vault_types:z   # 접속정보 유형 관리 (DB 테이블은 시작 때 자동 생성)
+      - ./plugins/vault_ssh:/usr/src/redmine/plugins/vault_ssh:z   # SSH 브라우저 터미널 (접속정보 SSH 서버, 접속 기록·녹화)
       - ./plugins/access_guide:/usr/src/redmine/plugins/access_guide:z   # 권한 한눈에 보기·업무흐름 간편 설정
       - ./plugins/jenkins_deploy:/usr/src/redmine/plugins/jenkins_deploy:z   # Jenkins 배포 연동 (DB 테이블은 시작 때 자동 생성)
       - ./plugins/glossary:/usr/src/redmine/plugins/glossary:z   # 용어사전 (프로젝트·공통, DB 테이블은 시작 때 자동 생성)

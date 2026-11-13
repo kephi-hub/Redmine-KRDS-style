@@ -38,5 +38,5 @@
     <% if key.body.blank? && !(key.respond_to?(:file) && key.file.present?) %><span class="vk_none">-</span><% end %>
     </span>
   </td>
-  <td class="buttons vk_acts"><%= render partial: 'shared/key_actions', locals: { key: key } %></td>
+  <td class="buttons vk_acts"><% if !orphan && defined?(SshConsole) && SshConsole::Target.ssh_key?(key) %><span class="vk_ssh"><%= render partial: 'ssh_console/buttons', locals: { key: key } %></span><% end %><%= render partial: 'shared/key_actions', locals: { key: key } %></td>
 </tr>

@@ -1,0 +1,95 @@
+<%# 접속정보 › [SSH 설정] 모달 내용 (ssh_console.js 가 KrdsDialog.panel 에 넣음) %>
+<% p = @profile; host, port, url_user = SshConsole::Target.parse(@key.url, p.port || 22) %>
+<% hops = p.hop_list %>
+<% hop_row = lambda do |i, h| %>
+  <% kind = h['key_id'].present? || h.empty? ? 'key' : 'direct' %>
+  <fieldset class="sp_hop" data-i="<%= i %>">
+    <% n = i.is_a?(Integer) ? i + 1 : i %><legend><%= l(:label_ssh_hop_n, n: n) %></legend>
+    <div class="sp_hop_kind" role="radiogroup" aria-label="<%= l(:label_ssh_hop_n, n: n) %>">
+      <label><input type="radio" name="ssh[hops][<%= i %>][kind]" value="key" <%= 'checked' if kind == 'key' %>> <%= l(:label_ssh_hop_key) %></label>
+      <label><input type="radio" name="ssh[hops][<%= i %>][kind]" value="direct" <%= 'checked' if kind == 'direct' %>> <%= l(:label_ssh_hop_direct) %></label>
+      <button type="button" class="sp_hop_del" aria-label="<%= l(:label_ssh_hop_n, n: n) %> <%= l(:button_delete) %>">&times;</button>
+    </div>
+    <div class="sp_hop_key" <%= 'hidden' if kind != 'key' %>>
+      <select name="ssh[hops][<%= i %>][key_id]" aria-label="<%= l(:label_ssh_hop_pick) %>">
+        <option value=""><%= l(:label_ssh_hop_pick) %></option>
+        <% @hop_keys.each do |k| %><option value="<%= k.id %>" <%= 'selected' if h['key_id'].to_i == k.id %>><%= k.name %> (<%= [k.login.presence, k.url].compact.join('@') %>)</option><% end %>
+      </select>
+    </div>
+    <div class="sp_hop_direct sp_grid" <%= 'hidden' if kind != 'direct' %>>
+      <label><span><%= l(:label_ssh_host) %></span><input type="text" name="ssh[hops][<%= i %>][host]" value="<%= h['host'] %>" maxlength="255"></label>
+      <label><span><%= l(:label_ssh_port) %></span><input type="number" name="ssh[hops][<%= i %>][port]" value="<%= h['port'] || 22 %>" min="1" max="65535"></label>
+      <label><span><%= l(:label_ssh_user) %></span><input type="text" name="ssh[hops][<%= i %>][user]" value="<%= h['user'] %>" maxlength="120" autocomplete="off"></label>
+      <label><span><%= l(:label_ssh_password) %></span><input type="password" name="ssh[hops][<%= i %>][password]" value="" autocomplete="new-password" placeholder="<%= l(:label_ssh_password_keep) if h['secret_enc'].present? %>"></label>
+    </div>
+    <% if h['fp'].present? %><p class="sp_fp"><%= l(:label_ssh_fp) %> <code><%= h['fp'] %></code></p><% end %>
+  </fieldset>
+<% end %>
+<%= form_tag project_key_ssh_profile_path(@project, @key), id: 'ssh_profile_form', class: 'sp_form', data: { test: project_key_ssh_profile_test_path(@project, @key) } do %>
+  <p class="sp_help"><%= l(:text_ssh_profile_help) %></p>
+  <div class="sp_row">
+    <span class="sp_lbl"><%= l(:label_ssh_target) %></span>
+    <div class="sp_target">
+      <code><%= [@key.login.presence || url_user, host].compact.join('@') %></code> :
+      <input type="number" name="ssh[port]" value="<%= p.port || port %>" min="1" max="65535" aria-label="<%= l(:label_ssh_port) %>" class="sp_port">
+    </div>
+  </div>
+  <div class="sp_row">
+    <span class="sp_lbl"><%= l(:label_ssh_env) %></span>
+    <div class="sp_seg" role="radiogroup" aria-label="<%= l(:label_ssh_env) %>">
+      <label><input type="radio" name="ssh[env]" value="dev" <%= 'checked' unless p.prod? %>> <%= l(:label_ssh_env_dev) %></label>
+      <label class="sp_prod"><input type="radio" name="ssh[env]" value="prod" <%= 'checked' if p.prod? %>> <%= l(:label_ssh_env_prod) %></label>
+    </div>
+  </div>
+  <div class="sp_row">
+    <span class="sp_lbl"><%= l(:label_ssh_auth) %></span>
+    <div class="sp_auth" role="radiogroup" aria-label="<%= l(:label_ssh_auth) %>">
+      <% VaultSshProfile::AUTHS.each do |a| %>
+        <label><input type="radio" name="ssh[auth]" value="<%= a %>" <%= 'checked' if p.auth == a %>> <%= l("label_ssh_auth_#{a}") %></label>
+      <% end %>
+      <div class="sp_keyfile sp_grid" <%= 'hidden' unless p.auth == 'key' %>>
+        <label><span><%= l(:label_ssh_key_file) %></span>
+          <select name="ssh[key_file_id]"><option value=""></option><% @key_files.each do |k| %><option value="<%= k.id %>" <%= 'selected' if p.key_file_id == k.id %>><%= k.name %></option><% end %></select></label>
+        <label><span><%= l(:label_ssh_key_pass) %></span><input type="password" name="ssh[key_pass]" autocomplete="new-password" placeholder="<%= l(:label_ssh_key_pass_saved) if p.key_pass_enc.present? %>"></label>
+        <% if p.key_pass_enc.present? %><label class="sp_chk"><input type="checkbox" name="ssh[clear_key_pass]" value="1"> <%= l(:label_ssh_key_pass_clear) %></label><% end %>
+      </div>
+      <div class="sp_ask sp_grid" <%= 'hidden' unless p.auth == 'ask' %>>
+        <label><span><%= l(:label_ssh_user) %></span><input type="text" name="ask_user" value="<%= @key.login %>" autocomplete="off"></label>
+        <label><span><%= l(:label_ssh_password) %> (<%= l(:label_ssh_test) %>)</span><input type="password" name="ask_password" autocomplete="off"></label>
+      </div>
+    </div>
+  </div>
+  <div class="sp_row">
+    <span class="sp_lbl"><%= l(:label_ssh_hops) %></span>
+    <div class="sp_hops" data-max="<%= VaultSshProfile::MAX_HOPS %>">
+      <% hops.each_with_index { |h, i| hop_row.call(i, h) } %>
+      <button type="button" class="sp_add" <%= 'hidden' if hops.size >= VaultSshProfile::MAX_HOPS %>>+ <%= l(:label_ssh_hop_add) %></button>
+      <template id="sp_hop_tpl"><% hop_row.call('__I__', {}) %></template>
+    </div>
+  </div>
+  <div class="sp_row">
+    <label class="sp_lbl" for="sp_start"><%= l(:label_ssh_start_cmd) %></label>
+    <input type="text" id="sp_start" name="ssh[start_cmd]" value="<%= p.start_cmd %>" maxlength="255" placeholder="cd /app && sudo -iu tomcat" class="sp_wide">
+  </div>
+  <div class="sp_row">
+    <span class="sp_lbl"><%= l(:label_ssh_record) %></span>
+    <label class="sp_chk"><input type="checkbox" name="ssh[record]" value="1" <%= 'checked' if p.record || p.prod? %> <%= 'disabled' if p.prod? %>> <%= l(:label_ssh_record_on) %></label>
+  </div>
+  <div class="sp_row">
+    <span class="sp_lbl"><%= l(:label_ssh_fp) %></span>
+    <div class="sp_fps">
+      <% if p.host_key.present? || hops.any? { |h| h['fp'].present? } %>
+        <% hops.each_with_index do |h, i| %><% if h['fp'].present? %><span><%= l(:label_ssh_hop_n, n: i + 1) %> <code><%= h['fp'] %></code></span><% end %><% end %>
+        <% if p.host_key.present? %><span><%= @key.name %> <code><%= p.host_key %></code></span><% end %>
+        <label class="sp_chk"><input type="checkbox" name="ssh[reset_fp]" value="1"> <%= l(:label_ssh_fp_reset) %></label>
+      <% else %><span class="sp_dim"><%= l(:label_ssh_fp_none) %></span><% end %>
+    </div>
+  </div>
+  <div class="sp_test" aria-live="polite"></div>
+  <div class="sp_btns">
+    <button type="button" class="kd_btn sp_test_btn"><%= l(:label_ssh_test) %></button>
+    <span class="sp_gap"></span>
+    <button type="button" class="kd_btn sp_cancel"><%= l(:button_cancel) %></button>
+    <button type="submit" class="kd_btn kd_pri"><%= l(:button_save) %></button>
+  </div>
+<% end %>

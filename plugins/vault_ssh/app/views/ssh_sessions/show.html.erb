@@ -1,0 +1,33 @@
+<%# 접속 기록 > 녹화 재생 — xterm.js 로 cast 를 시간 순서대로 다시 그림 %>
+<% s = @session %>
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'xterm', plugin: 'vault_ssh' %>
+  <%= javascript_include_tag 'xterm', 'xterm-addon-fit', 'ssh_replay', plugin: 'vault_ssh' %>
+<% end %>
+<div class="contextual">
+  <% if @playable %><%= link_to sprite_icon('download', l(:label_ssh_download)), project_ssh_session_cast_path(@project, s, download: 1), class: 'icon icon-download' %><% end %>
+</div>
+<h2><%= link_to l(:label_ssh_sessions), project_ssh_sessions_path(@project) %> &#187; <%= s.key_name %></h2>
+<ul class="ss_meta">
+  <li><span><%= l(:label_ssh_user_col) %></span> <%= s.user&.name %></li>
+  <li><span><%= l(:label_ssh_env) %></span> <span class="ss_env" data-k="<%= s.env %>"><%= l("label_ssh_env_#{s.env}") %></span></li>
+  <li><span><%= l(:field_created_on) %></span> <%= format_time(s.started_at || s.created_at) %></li>
+  <% if (d = s.duration) %><li><span><%= l(:label_ssh_duration) %></span> <%= format('%d:%02d:%02d', d / 3600, d / 60 % 60, d % 60) %></li><% end %>
+  <% if s.reason.present? %><li><span><%= l(:label_ssh_reason) %></span> <%= s.reason %></li><% end %>
+  <% if s.target.present? %><li><span><%= l(:label_ssh_target) %></span> <code><%= s.target %></code></li><% end %>
+</ul>
+<% if @playable %>
+<div class="ss_player" id="ss_player" data-cast="<%= project_ssh_session_cast_path(@project, s) %>">
+  <div class="ss_ctrl">
+    <button type="button" class="ss_play" id="ss_play" aria-label="재생/멈춤">▶</button>
+    <input type="range" id="ss_seek" min="0" max="1000" value="0" aria-label="위치">
+    <span id="ss_clock" class="ss_clock">0:00 / 0:00</span>
+    <label for="ss_speed"><%= l(:label_ssh_speed) %></label>
+    <select id="ss_speed"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select>
+  </div>
+  <div class="ss_screen" id="ss_screen"></div>
+</div>
+<% else %>
+  <p class="nodata"><%= l(:label_ssh_no_record) %></p>
+<% end %>
+<% html_title "#{s.key_name} - #{l(:label_ssh_sessions)}" %>

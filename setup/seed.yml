@@ -209,6 +209,9 @@ roles:
   - export_repository
   - manage_related_issues
   - view_keys
+  - use_ssh_terminal
+  - manage_ssh_profiles
+  - view_ssh_sessions
   - download_keys
   - keys_all
   - commit_access
@@ -336,6 +339,7 @@ roles:
   - export_repository
   - manage_related_issues
   - view_keys
+  - use_ssh_terminal
   - download_keys
   - keys_all
   - commit_access

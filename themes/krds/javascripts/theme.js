@@ -210,7 +210,27 @@ $(function() {
   window.KrdsDialog = {
     alert: function(message, title) { return queue({ title: title || T.alert, message: message }); },
     confirm: function(message, title) { return queue({ title: title || T.confirm, message: message, cancel: true }); },
-    nativeAlert: nativeAlert, nativeConfirm: nativeConfirm
+    nativeAlert: nativeAlert, nativeConfirm: nativeConfirm,
+    // 내용(HTML)을 넣는 큰 모달 — { title, html, wide } → { box, close() }. Esc · 닫기 버튼 · 바깥 클릭 없음(입력 보호)
+    panel: function(opts) {
+      var id = 'kd_' + (++seq), prev = document.activeElement;
+      var $m = $('<section class="kd_modal" role="dialog" aria-modal="true"></section>').attr('aria-labelledby', id + '_t');
+      var $box = $('<div class="kd_box"></div>').toggleClass('kd_wide', opts.wide !== false);
+      var $body = $('<div class="kd_form"></div>').html(opts.html || '');
+      function close() {
+        $m.remove();
+        if (!$('.kd_modal').length) $('html').removeClass('kd_open');
+        if (prev && document.contains(prev) && prev.focus) prev.focus();
+        if (opts.onClose) opts.onClose();
+      }
+      $box.append($('<h2 class="kd_title"></h2>').attr('id', id + '_t').text(opts.title || ''), $body,
+                  $('<button type="button" class="kd_close"></button>').attr('aria-label', T.close).html('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>').on('click', close));
+      $m.append('<div class="kd_back"></div>', $box).appendTo('body');
+      $('html').addClass('kd_open');
+      $m.on('keydown', function(e) { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); } });
+      setTimeout(function() { var f = $body.find('input:visible, select:visible, textarea:visible, button:visible').first(); (f.length ? f : $box.find('.kd_close')).trigger('focus'); }, 0);
+      return { box: $box, body: $body, close: close };
+    }
   };
   window.alert = function(message) { window.KrdsDialog.alert(message); };
 
