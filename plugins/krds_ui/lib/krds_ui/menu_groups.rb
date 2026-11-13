@@ -26,7 +26,7 @@ module KrdsUi
       repository: 'changeset', programs: 'krds-code', db_schemas: 'krds-database', qa_tests: 'krds-flask', sec_scans: 'shield-check', deploys: 'krds-rocket',
       ops_assets: 'server-authentication', ops_schedules: 'krds-clock', ops_incidents: 'alert-circle', ops_interfaces: 'krds-plug', keys: 'key', sys_backups: 'krds-archive',
       deliverables: 'folder-open', meetings: 'comments', risks: 'warning', documents: 'document', files: 'file',
-      pm_reports: 'summary', audits: 'krds-zoom-check', staff: 'group', closing: 'krds-checklist',
+      pm_reports: 'krds-chart', audits: 'krds-zoom-check', staff: 'group', closing: 'krds-checklist',
       wiki: 'wiki-page', boards: 'message', news: 'news', settings: 'settings'
     }.freeze
     FALLBACK_ICON = 'arrow-right'
