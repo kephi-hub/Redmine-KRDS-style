@@ -7,7 +7,7 @@
 <% if errors.positive? %><p class="flash error"><%= l(:text_db_mig_preview_errors, n: errors) %></p><% end %>
 <div class="autoscroll">
 <table class="list mg_plan">
-  <thead><tr><th class="name"><%= l(:label_db_table) %></th><th><%= l(:label_db_mig_mode) %></th><th><%= l(:label_db_mig_structure) %></th><th><%= l(:label_db_mig_rows) %></th><th class="mg_sqlcol"><%= l(:label_db_mig_sql) %></th></tr></thead>
+  <thead><tr><th class="name"><%= l(:label_db_mig_item) %></th><th><%= l(:label_db_mig_mode) %></th><th><%= l(:label_db_mig_structure) %></th><th><%= l(:label_db_mig_rows) %></th><th class="mg_sqlcol"><%= l(:label_db_mig_sql) %></th></tr></thead>
   <tbody>
   <% @plan.each do |p| %>
     <tr class="<%= 'mg_bad' if p[:error] %>">
@@ -18,7 +18,7 @@
       <td class="mg_sqlcol">
         <% if p[:error] %><span class="mc_err"><%= p[:error] %></span><% end %>
         <% (p[:warnings] || []).each do |w| %><div class="mg_warn"><%= w %></div><% end %>
-        <% if p[:statements].present? %><details><summary><%= l(:label_db_mig_sql_n, n: p[:statements].size) %></summary><pre class="mg_sql"><%= p[:statements].join(";\n\n") %>;</pre></details>
+        <% if p[:statements].present? %><details><summary><%= l(p[:object] ? :label_db_mig_obj_sql_n : :label_db_mig_sql_n, n: p[:statements].size) %></summary><pre class="mg_sql"><%= p[:statements].join(";\n\n") %>;</pre></details>
         <% elsif p[:status] %><span class="mt_dim"><%= l(:label_db_mig_no_ddl) %></span><% end %>
       </td>
     </tr>

@@ -1,4 +1,6 @@
 ko:
+  label_db_mig_item: "항목"
+  label_db_mig_obj_sql_n: "만들기 SQL %{n}개"
   label_db_mig_st_unknown: "비교 불가"
   label_db_mig_objects: "뷰·함수·프로시저"
   text_db_mig_objects: "고른 개체를 대상에 만들거나 원본 정의로 바꿉니다 (함수·패키지 → 뷰 → 프로시저 순서, 다른 개체에 기대 실패하면 최대 3번 다시 시도). 대상에만 있는 개체는 지우지 않습니다."
