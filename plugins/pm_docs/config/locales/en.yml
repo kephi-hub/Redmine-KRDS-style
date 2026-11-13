@@ -1,4 +1,10 @@
 en:
+  project_module_baselines: "Baselines"
+  project_module_closing: "Closing checklist"
+  permission_view_baselines: "View baselines"
+  permission_manage_baselines: "Manage baselines"
+  permission_view_closing: "View closing checklist"
+  permission_manage_closing: "Manage closing checklist"
   label_pm_baseline_note: "Note"
   label_pm_baselines: "Baselines"
   text_pm_baselines: "Save the current issue schedule as a baseline and compare it later."

@@ -1,4 +1,10 @@
 ko:
+  project_module_baselines: "일정 기준선"
+  project_module_closing: "준공 체크리스트"
+  permission_view_baselines: "일정 기준선 보기"
+  permission_manage_baselines: "일정 기준선 저장·삭제"
+  permission_view_closing: "준공 체크리스트 보기"
+  permission_manage_closing: "준공 체크리스트 확인 기록"
   label_pm_baseline_note: "메모"
   label_pm_baselines: "일정 기준선"
   text_pm_baselines: "지금 일감 일정(시작·완료 기한·진척)을 기준선으로 저장해 두고, 나중에 지금 일정과 비교해 얼마나 늦어졌는지 봅니다. 착수·계획 확정·변경 승인 때 저장하세요."
