@@ -1,4 +1,4 @@
-<%# [▶ 접속] [⚙ SSH 설정] — 접속정보 목록 줄·상세 화면 공용 (ssh_console.js 가 누름 처리) %>
+<%# [▶ 접속] [⚙ 접속 설정] — 접속정보 목록 줄·상세 화면 공용 (ssh_console.js 가 누름 처리) %>
 <% prof = VaultSshProfile.find_by(key_id: key.id) %>
 <% if SshConsole::Access.can_connect?(User.current, key, prof) %>
   <a href="#" role="button" class="vk_go<%= ' is_prod' if prof&.prod? %>" data-ssh-connect="<%= project_key_ssh_path(key.project, key) %>"
@@ -6,6 +6,6 @@
      data-project="<%= key.project.identifier %>" title="<%= l(:label_ssh_connect) %> — <%= key.name %>"><%= sprite_icon('krds-terminal', l(:label_ssh_connect)) %></a>
 <% end %>
 <% if SshConsole::Access.can_manage?(User.current, key) %>
-  <a href="#" role="button" class="vk_btn" data-ssh-profile="<%= project_key_ssh_profile_path(key.project, key) %>" data-name="<%= key.name %>"
-     title="<%= l(:label_ssh_profile) %>" aria-label="<%= l(:label_ssh_profile) %> — <%= key.name %>"><%= sprite_icon('settings') %></a>
+  <a href="#" role="button" class="vk_set" data-ssh-profile="<%= project_key_ssh_profile_path(key.project, key) %>" data-name="<%= key.name %>"
+     title="<%= l(:label_ssh_profile) %> — <%= key.name %>"><%= sprite_icon('settings', l(:label_ssh_profile)) %></a>
 <% end %>

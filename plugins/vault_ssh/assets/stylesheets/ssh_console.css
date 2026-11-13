@@ -8,6 +8,9 @@
 #content a.vk_go svg.icon-svg{width:16px;height:16px;stroke:#fff;}
 #content a.vk_go.is_prod{border-color:var(--dan_60,#bd2c0f);background:var(--dan_60,#bd2c0f);}
 #content a.vk_go.is_prod:hover{border-color:var(--dan_50,#de3412);background:var(--dan_50,#de3412);}
+#content a.vk_set{display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 10px;border:1px solid var(--gray_30,#b1b8be);border-radius:var(--radius_s,4px);background:var(--gray_0,#fff);font-size:0.8125rem;font-weight:500;white-space:nowrap;text-decoration:none;color:var(--gray_80,#33363d);}
+#content a.vk_set:hover{border-color:var(--sec_70,#063a74);background:var(--sec_5,#eef2f7);color:var(--sec_80,#052b57);}
+#content a.vk_set svg.icon-svg{width:16px;height:16px;stroke:currentColor;}
 .ssh_detail{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;}
 
 /* SSH 설정 · 접속 모달 */
@@ -40,8 +43,10 @@
 .sp_hop_del{margin-left:auto;padding:0 8px;border:0;background:none;font-size:1.25rem;line-height:1;color:var(--gray_60,#58616a);cursor:pointer;}
 .sp_hop_del:hover{color:var(--dan_60,#bd2c0f);}
 .sp_hop_key select{width:100%;}
-.sp_add{align-self:flex-start;padding:6px 12px;border:1px dashed var(--gray_40,#8a949e);border-radius:var(--radius_s,4px);background:none;color:var(--gray_70,#464c53);cursor:pointer;}
-.sp_add:hover{border-color:var(--sec_70,#063a74);color:var(--sec_80,#052b57);}
+.kd_modal .sp_add{display:inline-flex;align-self:flex-start;align-items:center;gap:6px;height:36px;margin:0;padding:0 14px;border:1px solid var(--sec_70,#063a74);border-radius:var(--radius_s,4px);background:var(--gray_0,#fff);font-size:0.875rem;font-weight:700;line-height:1;color:var(--sec_70,#063a74);cursor:pointer;}
+.kd_modal .sp_add::before{content:"+";font-size:1.125rem;font-weight:400;}
+.kd_modal .sp_add:hover{background:var(--sec_5,#eef2f7);}
+.kd_modal .sp_add:focus-visible{outline:2px solid var(--pri_50,#256ef4);outline-offset:2px;}
 .sp_fp,.sp_dim{margin:4px 0 0;font-size:0.75rem;color:var(--gray_60,#58616a);}
 .sp_fps{display:flex;flex-direction:column;gap:4px;font-size:0.8125rem;}
 .sp_fps code,.sp_fp code{font-size:0.75rem;word-break:break-all;}
@@ -55,7 +60,13 @@
 .sp_steps li[data-s=ok] .sp_st{color:var(--suc_60,#267337);font-weight:700;}
 .sp_steps li[data-s=ng] .sp_st{color:var(--dan_60,#bd2c0f);font-weight:700;}
 .sp_steps li[data-s=na] .sp_st{color:var(--gray_50,#6d7882);}
-.sp_btns{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding-top:4px;}
+.sp_btns{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding-top:8px;border-top:1px solid var(--gray_10,#e6e8ea);}
+.kd_modal .sp_btns .kd_btn{display:inline-flex;align-items:center;justify-content:center;height:40px;margin:0;padding:0 20px;border-radius:6px;font-size:0.9375rem;font-weight:500;line-height:1;}
+.kd_modal .sp_btns .kd_btn.kd_pri{border-color:var(--pri_50,#256ef4);background:var(--pri_50,#256ef4);color:#fff;}
+.kd_modal .sp_btns .kd_btn.kd_pri:hover{border-color:var(--pri_60,#0b50d0);background:var(--pri_60,#0b50d0);}
+.kd_modal .sp_btns .kd_btn:not(.kd_pri){border:1px solid var(--gray_40,#8a949e);background:var(--gray_0,#fff);color:var(--gray_80,#33363d);}
+.kd_modal .sp_btns .kd_btn:not(.kd_pri):hover{background:var(--gray_5,#f4f5f6);}
+.kd_modal .sp_btns .kd_btn:disabled{opacity:0.6;cursor:default;}
 .sp_gap{flex:1 1 auto;}
 
 /* 터미널 탭 (테마 밖 단독 화면) */

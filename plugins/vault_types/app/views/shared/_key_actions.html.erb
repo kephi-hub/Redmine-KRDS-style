@@ -1,4 +1,4 @@
-<%# 접속정보 줄 버튼 (KRDS 아이콘 버튼, vault_ko) — 원본과 같은 권한·주소 %>
+<%# 접속정보 줄 버튼 (KRDS 아이콘 버튼) — 복제·삭제 (원본과 같은 권한·주소). 보기·편집은 이름 → 상세 화면 %>
 <span class="vk_acts_in">
 <% if key.project.nil? %>
   <% if User.current.admin? %>
@@ -8,9 +8,8 @@
     <span class="vk_btn is_off" title="<%= t('key.project_deleted') %>"><%= sprite_icon('link-break') %></span>
   <% end %>
 <% else %>
-  <%= link_to project_key_path(key.project, key), class: 'vk_btn', title: t('button_view'), 'aria-label': t('button_view') do %><%= sprite_icon('zoom-in') %><% end %>
+  <%# 보기·편집은 이름을 눌러 상세 화면에서 (2026-11-13 사용자 요청으로 줄 버튼은 복제·삭제만) %>
   <% if User.current.allowed_to?(:edit_keys, key.project) %>
-    <%= link_to edit_project_key_path(key.project, key), class: 'vk_btn', title: t('button_edit'), 'aria-label': t('button_edit') do %><%= sprite_icon('edit') %><% end %>
     <%= link_to project_copy_key_path(key.project, key), class: 'vk_btn', title: t('key.title.copy'), 'aria-label': t('key.title.copy') do %><%= sprite_icon('copy-link') %><% end %>
     <%= link_to project_key_path(key.project, key), class: 'vk_btn vk_del', title: t('button_delete'), 'aria-label': t('button_delete'), data: { confirm: t('confirm.key.delete') }, method: :delete do %><%= sprite_icon('del') %><% end %>
   <% end %>

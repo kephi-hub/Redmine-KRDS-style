@@ -1,11 +1,11 @@
-// 접속정보(Vault) 화면 — [▶ 접속] · [⚙ SSH 설정] 모달, 상세 화면 버튼·[접속 기록] 자리 옮기기
+// 접속정보(Vault) 화면 — [▶ 접속] · [⚙ 접속 설정] 모달, 상세 화면 버튼·[접속 기록] 자리 옮기기
 (function($) {
   'use strict';
   var T = {
-    profile: 'SSH 설정', prodTitle: '운영 서버 접속', askTitle: '접속 정보 입력', open: '터미널 열기', cancel: '취소',
+    profile: '접속 설정', prodTitle: '운영 서버 접속', askTitle: '접속 정보 입력', open: '터미널 열기', cancel: '취소',
     reason: '접속 사유', reasonPh: '예) 배포 후 로그 확인 #123', confirm: '프로젝트 식별자', user: '아이디', password: '비밀번호',
     prodHelp: '운영 서버 접속은 사유와 프로젝트 식별자를 입력해야 하며, 화면이 녹화됩니다.',
-    opening: '터미널을 여는 중...', testing: '연결하는 중...', ok: '연결됨', fail: '실패', skip: '시도 안 함', saved: 'SSH 설정을 저장했습니다.',
+    opening: '터미널을 여는 중...', testing: '연결하는 중...', ok: '연결됨', fail: '실패', skip: '시도 안 함', saved: '접속 설정을 저장했습니다.',
     popup: '새 탭을 열지 못했습니다. 브라우저의 팝업 차단을 이 사이트에서 해제해 주세요.', error: '요청을 처리하지 못했습니다.'
   };
   function token() { return $('meta[name="csrf-token"]').attr('content'); }

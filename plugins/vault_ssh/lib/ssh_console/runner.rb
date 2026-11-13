@@ -100,7 +100,7 @@ module SshConsole
         emit(t: 's', s: 'connecting', m: Target.describe(chain))
         link = Connector.open(chain)
         remember_fingerprints(profile, chain, link.fingerprints) if profile
-        rec = Recorder.new(session, @cols, @rows) if profile.nil? || profile.record || session.prod?
+        rec = Recorder.new(session, @cols, @rows) if profile&.record || session.prod?
         session.update_columns(status: 'running', started_at: Time.current, target: Target.describe(chain).truncate(255), record_file: rec&.file)
         # 몇 시간 이어질 수 있으므로 DB 연결은 반납 (끝날 때 다시 빌림)
         ActiveRecord::Base.connection_pool.release_connection

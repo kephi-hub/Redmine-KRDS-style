@@ -1,4 +1,4 @@
-<%# 접속정보 › [SSH 설정] 모달 내용 (ssh_console.js 가 KrdsDialog.panel 에 넣음) %>
+<%# 접속정보 › [접속 설정] 모달 내용 (ssh_console.js 가 KrdsDialog.panel 에 넣음) %>
 <% p = @profile; host, port, url_user = SshConsole::Target.parse(@key.url, p.port || 22) %>
 <% hops = p.hop_list %>
 <% hop_row = lambda do |i, h| %>
@@ -73,7 +73,7 @@
   </div>
   <div class="sp_row">
     <span class="sp_lbl"><%= l(:label_ssh_record) %></span>
-    <label class="sp_chk"><input type="checkbox" name="ssh[record]" value="1" <%= 'checked' if p.record || p.prod? %> <%= 'disabled' if p.prod? %>> <%= l(:label_ssh_record_on) %></label>
+    <label class="sp_chk"><input type="checkbox" name="ssh[record]" value="1" <%= 'checked' if (p.persisted? && p.record) || p.prod? %> <%= 'disabled' if p.prod? %>> <%= l(:label_ssh_record_on) %></label>
   </div>
   <div class="sp_row">
     <span class="sp_lbl"><%= l(:label_ssh_fp) %></span>
