@@ -1742,7 +1742,7 @@ a.vk_code:hover{text-decoration:underline;}
 .kd_toast{position:fixed;bottom:24px;left:50%;z-index:2000;padding:10px 18px;border-radius:var(--radius_m);background:var(--gray_90);font-size:0.875rem;color:var(--gray_0);transform:translateX(-50%);opacity:0;transition:opacity 0.2s;pointer-events:none;}
 .kd_toast.on{opacity:1;}
 @media (min-width:900px){
-#content #keys_table tr.vk_row>td.vk_acts{margin:0;padding:10px 8px;}
+#content #keys_table tr.vk_row>td.vk_acts{display:table-cell;margin:0;padding:10px 8px;border-top:1px solid var(--gray_10);}
 #keys_table{display:table;width:100%;border-collapse:collapse;}
 #keys_table thead{display:table-header-group;}
 #keys_table tbody{display:table-row-group;}
