@@ -1115,6 +1115,18 @@ table.list.db_difftbl tr.db_missing_row td{background:var(--war_5);}
 table.list.mt_types td{vertical-align:middle;}
 table.list.mt_types input[type=text]{width:100%;}
 table.list.mt_types td.mt_ck{white-space:nowrap;}
+/* 화면 유형 모달 (jQuery UI 모달이라 #content 밖) — 행 삭제는 빨강, 유형 추가는 점선 줄, 아래 취소·저장 같은 크기 */
+.mt_dialog .mt_tdel{display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 10px;border:1px solid var(--dan_40);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.8125rem;font-weight:500;color:var(--dan_60);cursor:pointer;}
+.mt_dialog .mt_tdel:hover,.mt_dialog .mt_tdel:focus-visible{background:var(--dan_5);color:var(--dan_60);}
+.mt_dialog .mt_tdel .icon-svg{width:16px;height:16px;stroke:currentColor;}
+.mt_dialog .mt_tadd{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;height:40px;margin:10px 0 0;border:1px dashed var(--pri_50);border-radius:var(--radius_m);background:var(--pri_5);font-size:0.875rem;font-weight:500;color:var(--pri_60);cursor:pointer;}
+.mt_dialog .mt_tadd:hover,.mt_dialog .mt_tadd:focus-visible{border-style:solid;background:var(--pri_10);}
+.mt_dialog .mt_tadd .icon-svg{width:18px;height:18px;stroke:currentColor;}
+.mt_dialog .mt_tfoot{display:flex;justify-content:flex-end;gap:8px;padding:16px 0 0;margin:16px 0 0;border-top:1px solid var(--gray_10);}
+.mt_dialog .mt_tbtn{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 24px;border:1px solid var(--gray_30);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.9375rem;font-weight:500;color:var(--gray_80);cursor:pointer;}
+.mt_dialog .mt_tbtn:hover{background:var(--gray_5);}
+.mt_dialog .mt_tbtn.mt_tsave{border-color:var(--pri_50);background:var(--pri_50);color:var(--gray_0);}
+.mt_dialog .mt_tbtn.mt_tsave:hover{border-color:var(--pri_60);background:var(--pri_60);}
 #content .mt_btn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.8125rem;font-weight:500;color:var(--pri_60);cursor:pointer;}
 #content .mt_btn:hover{background:var(--pri_5);}
 #content .mt_btn:disabled{opacity:0.45;cursor:default;}

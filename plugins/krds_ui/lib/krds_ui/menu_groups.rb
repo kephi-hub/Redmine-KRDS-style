@@ -18,14 +18,15 @@ module KrdsUi
     ].freeze
     FIXED = %i(new_object settings).freeze
     # 2뎁스 메뉴 아이콘 (Redmine 6 기본 아이콘 세트 config/icon_source.yml 의 이름), 없는 메뉴는 FALLBACK
+    # 겹치지 않게, 메뉴 뜻에 맞게 (krds-* 는 테마 images/icons.svg 의 Tabler 아이콘)
     ICONS = {
-      overview: 'project', activity: 'history',
-      issues: 'issue', new_issue: 'add', gantt: 'stats', calendar: 'calendar', roadmap: 'package', time_entries: 'time',
-      qa_requirements: 'checked', change_requests: 'issue-edit', menu_items: 'list', sys_roles: 'roles', glossary: 'bulb',
-      repository: 'changeset', programs: 'apps', db_schemas: 'table-multiple', qa_tests: 'shield-check', deploys: 'arrow-narrow-right',
-      ops_assets: 'server-authentication', ops_schedules: 'hourglass', ops_incidents: 'alert-circle', ops_interfaces: 'link', keys: 'key', sys_backups: 'krds-archive',
+      overview: 'krds-dashboard', activity: 'history',
+      issues: 'issue', new_issue: 'add', gantt: 'krds-gantt', calendar: 'calendar', roadmap: 'krds-flag', baselines: 'krds-compare', time_entries: 'time',
+      qa_requirements: 'krds-clipboard', change_requests: 'issue-edit', menu_items: 'krds-sitemap', sys_roles: 'roles', glossary: 'krds-book',
+      repository: 'changeset', programs: 'krds-code', db_schemas: 'krds-database', qa_tests: 'krds-flask', sec_scans: 'shield-check', deploys: 'krds-rocket',
+      ops_assets: 'server-authentication', ops_schedules: 'krds-clock', ops_incidents: 'alert-circle', ops_interfaces: 'krds-plug', keys: 'key', sys_backups: 'krds-archive',
       deliverables: 'folder-open', meetings: 'comments', risks: 'warning', documents: 'document', files: 'file',
-      pm_reports: 'summary', audits: 'message-report', staff: 'group', sec_scans: 'lock', baselines: 'stats', closing: 'checked',
+      pm_reports: 'summary', audits: 'krds-zoom-check', staff: 'group', closing: 'krds-checklist',
       wiki: 'wiki-page', boards: 'message', news: 'news', settings: 'settings'
     }.freeze
     FALLBACK_ICON = 'arrow-right'

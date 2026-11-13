@@ -49,16 +49,16 @@
           <td><%= hidden_field_tag "types[#{i}][code]", t.code, id: nil %><%= text_field_tag "types[#{i}][name]", t.name, maxlength: 30, required: true, id: nil, 'aria-label': l(:field_name) %></td>
           <td class="mt_ck"><label class="inline"><%= check_box_tag "types[#{i}][in_menu]", '1', t.in_menu, id: nil %> <%= l(:label_menu_types_show) %></label></td>
           <td class="count"><%= type_counts[t.code].to_i %></td>
-          <td class="buttons"><button type="button" class="mt_btn mt_type_del" aria-label="<%= "#{t.name} #{l(:button_delete)}" %>"><%= sprite_icon('del', l(:button_delete)) %></button></td>
+          <td class="buttons"><button type="button" class="mt_tdel mt_type_del" aria-label="<%= "#{t.name} #{l(:button_delete)}" %>"><%= sprite_icon('del', l(:button_delete)) %></button></td>
         </tr>
       <% end %>
       </tbody>
     </table>
-    <p><button type="button" class="mt_btn" id="mt_type_add"><%= sprite_icon('add', l(:label_menu_types_add)) %></button></p>
-    <p class="buttons">
-      <button type="submit" class="mt_btn mt_primary"><%= l(:button_save) %></button>
-      <%= link_to_function l(:button_cancel), 'hideModal(this);', class: 'btn_line' %>
-    </p>
+    <button type="button" class="mt_tadd" id="mt_type_add"><%= sprite_icon('add', l(:label_menu_types_add)) %></button>
+    <div class="mt_tfoot">
+      <button type="button" class="mt_tbtn" onclick="hideModal(this);"><%= l(:button_cancel) %></button>
+      <button type="submit" class="mt_tbtn mt_tsave"><%= l(:button_save) %></button>
+    </div>
   <% end %>
 </div>
 <%= javascript_tag do %>
@@ -71,7 +71,7 @@ $(function() {
       '<td><input type="hidden" name="types[' + i + '][code]" value=""><input type="text" name="types[' + i + '][name]" maxlength="30" required aria-label="<%= j l(:field_name) %>"></td>' +
       '<td class="mt_ck"><label class="inline"><input type="checkbox" name="types[' + i + '][in_menu]" value="1"> <%= j l(:label_menu_types_show) %></label></td>' +
       '<td class="count">0</td>' +
-      '<td class="buttons"><button type="button" class="mt_btn mt_type_del" aria-label="<%= j l(:button_delete) %>"><%= j sprite_icon('del', l(:button_delete)) %></button></td></tr>');
+      '<td class="buttons"><button type="button" class="mt_tdel mt_type_del" aria-label="<%= j l(:button_delete) %>"><%= j sprite_icon('del', l(:button_delete)) %></button></td></tr>');
     $rows.append($tr); $tr.find('input[type=text]').trigger('focus');
   });
   $rows.on('click', '.mt_type_del', function() {
