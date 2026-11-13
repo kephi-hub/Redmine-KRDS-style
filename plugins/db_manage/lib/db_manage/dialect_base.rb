@@ -22,6 +22,11 @@ module DbManage
       nil
     end
 
+    # 이관용 쓰기 계정 (비우면 조회 계정)
+    def write_user
+      @server.write_account? ? [@server.write_username, @server.write_password] : [@server.username, @server.password]
+    end
+
     def indexes(_conn)
       []
     end

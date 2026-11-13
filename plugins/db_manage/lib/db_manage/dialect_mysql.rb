@@ -19,8 +19,7 @@ module DbManage
     def open_write(host, port)
       require 'mysql2'
       t = @server.timeout
-      user = @server.write_account? ? @server.write_username : @server.username
-      pass = @server.write_account? ? @server.write_password : @server.password
+      user, pass = write_user
       Mysql2::Client.new(host: host, port: port, username: user, password: pass, database: @server.database_name,
                          connect_timeout: t, read_timeout: 900, write_timeout: 300, encoding: 'utf8mb4', reconnect: false)
     end

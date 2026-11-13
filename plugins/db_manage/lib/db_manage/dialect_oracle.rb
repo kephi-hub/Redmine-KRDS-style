@@ -16,6 +16,17 @@ module DbManage
       c
     end
 
+    def open_write(host, port)
+      ENV['NLS_LANG'] ||= 'AMERICAN_AMERICA.AL32UTF8'
+      require 'oci8'
+      user, pass = write_user
+      c = OCI8.new(user, pass, "//#{host}:#{port}/#{@server.database_name}")
+      c.autocommit = false
+      c.long_read_len = 1_000_000
+      c.recv_timeout = 900 if c.respond_to?(:recv_timeout=)
+      c
+    end
+
     def close(conn)
       conn&.rollback
       conn&.logoff

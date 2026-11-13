@@ -34,6 +34,6 @@
   </tbody>
 </table>
 </div>
-<% if @results.any? { |r| r['backup'] } && !m.backup_removed %><p class="db_hintbox"><%= l(:text_db_mig_restore) %></p><% end %>
+<% if @results.any? { |r| r['backup'] } && !m.backup_removed %><p class="db_hintbox"><%= l(:text_db_mig_restore, cmd: DbManage::Migrator::RESTORE[m.target_link&.db_server&.adapter] || DbManage::Migrator::RESTORE['mariadb']) %></p><% end %>
 <% if m.busy? %><%= javascript_tag do %>setTimeout(function() { location.reload(); }, 3000);<% end %><% end %>
 <% html_title "##{m.id} - #{l(:label_db_migrate)}" %>

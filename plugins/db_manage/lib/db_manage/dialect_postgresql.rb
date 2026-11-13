@@ -9,6 +9,14 @@ module DbManage
                  options: "-c statement_timeout=#{t * 3000} -c default_transaction_read_only=on")
     end
 
+    # 이관용 쓰기 연결 — 읽기 전용·시간 제한 없음
+    def open_write(host, port)
+      require 'pg'
+      user, pass = write_user
+      PG.connect(host: host, port: port, dbname: @server.database_name, user: user, password: pass, connect_timeout: @server.timeout,
+                 sslmode: 'prefer', application_name: 'redmine_db_migrate', options: '-c statement_timeout=0')
+    end
+
     def version(c)
       c.exec('SHOW server_version').getvalue(0, 0)
     end

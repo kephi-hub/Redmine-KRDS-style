@@ -3,6 +3,7 @@
 <p class="mg_dir"><b><%= @source.name %></b> <span class="mt_dim">(<%= @source.db_server.env_label %>)</span> → <b><%= @target.name %></b> <span class="mt_dim">(<%= @target.db_server.env_label %>)</span>
   · <%= l(:label_db_mig_selected) %> <%= @plan.size %></p>
 <% errors = @plan.count { |p| p[:error] } %>
+<% (@plan.first&.dig(:notes) || []).each do |n| %><p class="flash warning"><%= n %></p><% end %>
 <% if errors.positive? %><p class="flash error"><%= l(:text_db_mig_preview_errors, n: errors) %></p><% end %>
 <div class="autoscroll">
 <table class="list mg_plan">

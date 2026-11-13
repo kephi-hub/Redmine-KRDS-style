@@ -14,6 +14,15 @@ module DbManage
       c
     end
 
+    def open_write(host, port)
+      require 'tiny_tds'
+      user, pass = write_user
+      c = TinyTds::Client.new(host: host, port: port, username: user, password: pass, database: @server.database_name,
+                              login_timeout: @server.timeout, timeout: 900, appname: 'redmine_db_migrate', encoding: 'UTF-8')
+      c.execute('SET TEXTSIZE 2147483647; SET ANSI_NULLS ON; SET QUOTED_IDENTIFIER ON; SET ANSI_WARNINGS ON; SET ANSI_PADDING ON; SET CONCAT_NULL_YIELDS_NULL ON; SET ARITHABORT ON').do
+      c
+    end
+
     def close(conn)
       conn&.close
     rescue StandardError
