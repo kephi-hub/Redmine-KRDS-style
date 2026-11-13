@@ -7,6 +7,11 @@ resources :projects, only: [] do
   resources :db_links, only: [:new, :create, :edit, :update, :destroy]
   get 'db', to: 'db_schemas#index', as: 'db_schemas'
   get 'db/compare', to: 'db_schemas#compare', as: 'db_compare'
+  get 'db/migrate', to: 'db_migrations#index', as: 'db_migrations'
+  post 'db/migrate/preview', to: 'db_migrations#preview', as: 'db_migrations_preview'
+  post 'db/migrate', to: 'db_migrations#create'
+  get 'db/migrate/:id', to: 'db_migrations#show', as: 'db_migration', constraints: { id: /\d+/ }
+  get 'db/migrate/:id/backup', to: 'db_migrations#backup', as: 'db_migration_backup', constraints: { id: /\d+/ }
   get 'db/:link_id/history', to: 'db_schemas#history', as: 'db_history'
   post 'db/:link_id/history', to: 'db_schemas#save_history'
   get 'db/:link_id/history/:id', to: 'db_schemas#history_diff', as: 'db_history_diff', constraints: { id: /\d+/ }

@@ -181,6 +181,7 @@ roles:
   - manage_qa_tests
   - view_db_schema
   - run_db_query
+  - migrate_db
   - add_issues
   - edit_issues
   - edit_own_issues

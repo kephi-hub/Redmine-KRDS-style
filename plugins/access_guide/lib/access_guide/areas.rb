@@ -21,7 +21,7 @@ module AccessGuide
     { key: 'keys', view: %i[view_keys download_keys keys_all whitelist_keys], write: %i[edit_keys], manage: %i[manage_whitelist_keys export_keys] },
     { key: 'deploys', view: %i[view_deploys], write: %i[run_deploys], manage: %i[run_production_deploys manage_deploy_targets] },
     { key: 'glossary', view: %i[view_glossary], write: %i[manage_glossary], manage: %i[] },
-    { key: 'db', view: %i[view_db_schema], write: %i[run_db_query], manage: %i[manage_db_links run_db_query_production] },
+    { key: 'db', view: %i[view_db_schema], write: %i[run_db_query], manage: %i[manage_db_links run_db_query_production migrate_db migrate_db_production] },
     { key: 'menu', view: %i[view_menu_tree], write: %i[manage_menu_tree], manage: %i[] },
     { key: 'sysroles', view: %i[view_sys_roles], write: %i[], manage: %i[manage_sys_roles] },
     { key: 'requirements', view: %i[view_qa_requirements], write: %i[manage_qa_requirements], manage: %i[] },

@@ -71,6 +71,14 @@ module DbManage
       end
     end
 
+    # 연결 하나를 열어 블록에 (연결, Dialect) — 이관용. write: true 면 이관용(쓰기) 계정·읽기 전용 아님 (MariaDB·MySQL 만)
+    def session(write: false)
+      @write = write
+      connect { |c| yield c, @dialect }
+    ensure
+      @write = false
+    end
+
     # SQL 조회 (읽기 전용 트랜잭션·시간 제한·건수 제한은 Dialect 가 처리)
     def select(sql, limit:, seconds:)
       connect { |c| @dialect.select(c, sql, limit, seconds) }
@@ -96,7 +104,7 @@ module DbManage
     end
 
     def direct(host, port)
-      conn = @dialect.open(host, port)
+      conn = @write ? @dialect.open_write(host, port) : @dialect.open(host, port)
       yield conn
     rescue DbManage::Error
       raise

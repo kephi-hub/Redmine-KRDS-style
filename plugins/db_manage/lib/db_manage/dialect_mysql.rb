@@ -15,6 +15,16 @@ module DbManage
       c
     end
 
+    # 이관용 쓰기 연결 — 읽기 전용 아님, 큰 ALTER·INSERT 를 기다리도록 read_timeout 넉넉히
+    def open_write(host, port)
+      require 'mysql2'
+      t = @server.timeout
+      user = @server.write_account? ? @server.write_username : @server.username
+      pass = @server.write_account? ? @server.write_password : @server.password
+      Mysql2::Client.new(host: host, port: port, username: user, password: pass, database: @server.database_name,
+                         connect_timeout: t, read_timeout: 900, write_timeout: 300, encoding: 'utf8mb4', reconnect: false)
+    end
+
     def version(c)
       c.query('SELECT VERSION() AS v').first['v']
     end

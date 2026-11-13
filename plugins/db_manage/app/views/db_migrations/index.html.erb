@@ -1,0 +1,97 @@
+<%# 프로젝트 > DB > 이관 — 원본·대상 선택, 테이블마다 이관 방식, 최근 이관 기록 %>
+<h2><%= l(:label_db_manage) %></h2>
+<p class="subtitle"><%= l(:text_db_migrate) %></p>
+<% if @links.size < 2 %>
+<p class="nodata"><%= l(:label_db_compare_need) %></p>
+<% else %>
+<%= db_tabs(:migrate) %>
+<%= form_tag project_db_migrations_path(@project), method: :get, class: 'db_pick' do %>
+  <label for="mg_src"><%= l(:label_db_mig_source) %></label><%= select_tag 'source', options_for_select(@links.map { |x| ["#{x.name} (#{x.db_server.env_label})", x.id] }, @source&.id), id: 'mg_src' %>
+  <span class="db_vs">→</span>
+  <label for="mg_tgt"><%= l(:label_db_mig_target) %></label><%= select_tag 'target', options_for_select(@links.map { |x| ["#{x.name} (#{x.db_server.env_label})", x.id] }, @target&.id), id: 'mg_tgt' %>
+  <%= submit_tag l(:label_db_mig_load), name: nil %>
+  <button type="button" class="mg_swap" id="mg_swap" aria-label="<%= l(:label_db_mig_swap) %>">⇄ <%= l(:label_db_mig_swap) %></button>
+<% end %>
+<%= render partial: 'db_schemas/error' %>
+<% if @source == @target %><p class="nodata"><%= l(:label_db_compare_same_link) %></p>
+<% elsif @unsupported %><p class="flash warning"><%= l(:text_db_mig_unsupported) %></p>
+<% elsif @target && !can_target?(@target) %><p class="flash warning"><%= l(:text_db_mig_no_perm, name: @target.name) %></p>
+<% elsif @tables %>
+  <% if @target.production? %><p class="mg_prod"><%= l(:text_db_mig_prod, name: @target.name) %></p><% end %>
+  <% if @busy %><p class="flash warning"><%= l(:notice_db_mig_busy) %></p><% end %>
+  <%= form_tag project_db_migrations_preview_path(@project), id: 'mg_form' do %>
+    <%= hidden_field_tag :source, @source.id, id: nil %><%= hidden_field_tag :target, @target.id, id: nil %>
+    <div class="mg_bar">
+      <label class="inline"><input type="checkbox" id="mg_diff"> <%= l(:label_db_mig_diff_only) %></label>
+      <span class="mg_bulk">
+        <label for="mg_all"><%= l(:label_db_mig_apply_all) %></label>
+        <select id="mg_all"><option value=""></option><% DbManage::Migrator::MODES.each do |m| %><option value="<%= m %>"><%= l("label_db_mig_mode_#{m}") %></option><% end %></select>
+      </span>
+      <span class="mg_count"><%= l(:label_db_mig_selected) %> <b id="mg_cnt">0</b></span>
+    </div>
+    <div class="autoscroll">
+    <table class="list mg_list">
+      <thead><tr><th class="name"><%= l(:label_db_table) %></th><th><%= l(:field_status) %></th><th><%= l(:label_db_mig_rows) %></th><th><%= l(:label_db_mig_mode) %></th></tr></thead>
+      <tbody>
+      <% @tables.each do |t| %>
+        <tr data-st="<%= t[:status] %>">
+          <td class="name"><b><%= t[:name] %></b><% if t[:comment].present? %> <span class="mt_dim"><%= t[:comment] %></span><% end %></td>
+          <td><span class="mg_st" data-k="<%= t[:status] %>"><%= l("label_db_mig_st_#{t[:status]}") %></span></td>
+          <td class="mg_num"><%= t[:rows] ? number_with_delimiter(t[:rows]) : '-' %></td>
+          <td><%= select_tag "mode[#{t[:name]}]", options_for_select(DbManage::Migrator::MODES.map { |m| [l("label_db_mig_mode_#{m}"), m] }, 'skip'), id: nil, class: 'mg_mode', 'aria-label': "#{t[:name]} #{l(:label_db_mig_mode)}" %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+    </div>
+    <% if @only_target.any? %><p class="mt_dim"><%= l(:text_db_mig_only_target, n: @only_target.size, names: @only_target.first(10).join(', ')) %></p><% end %>
+    <dl class="mg_help">
+      <% DbManage::Migrator::MODES.drop(1).each do |m| %><dt><%= l("label_db_mig_mode_#{m}") %></dt><dd><%= l("text_db_mig_mode_#{m}") %></dd><% end %>
+    </dl>
+    <div class="mg_foot"><button type="submit" class="mg_btn mg_primary" id="mg_go" disabled><%= l(:label_db_mig_preview) %></button></div>
+  <% end %>
+<% end %>
+
+<% if @migrations.any? %>
+  <h3 class="ag_sec"><%= l(:label_db_mig_history) %></h3>
+  <div class="autoscroll">
+  <table class="list mg_runs">
+    <thead><tr><th><%= l(:label_db_mig_at) %></th><th><%= l(:label_db_mig_direction) %></th><th><%= l(:field_status) %></th><th><%= l(:label_db_mig_tables) %></th><th><%= l(:label_db_mig_by) %></th></tr></thead>
+    <tbody>
+    <% @migrations.each do |m| %>
+      <tr>
+        <td><%= link_to format_time(m.created_at), project_db_migration_path(@project, m) %></td>
+        <td><%= m.source_name %> → <%= m.target_name %><% if m.target_production %> <span class="mg_st" data-k="prod"><%= l(:label_db_production) %></span><% end %></td>
+        <td><span class="mg_st" data-k="<%= m.status %>"><%= l("label_db_mig_run_#{m.status}") %></span></td>
+        <td class="mg_num"><%= m.plan_list.size %></td>
+        <td><%= m.user&.name %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  </div>
+<% end %>
+<% end %>
+<%= javascript_tag do %>
+$(function() {
+  function sync() {
+    var n = $('.mg_mode').filter(function() { return this.value !== 'skip'; }).length;
+    $('#mg_cnt').text(n); $('#mg_go').prop('disabled', n === 0);
+    $('.mg_mode').each(function() { $(this).closest('tr').toggleClass('on', this.value !== 'skip'); });
+  }
+  $(document).on('change', '.mg_mode', sync);
+  $('#mg_all').on('change', function() {
+    var v = this.value; if (!v) return;
+    $('.mg_list tbody tr:visible .mg_mode').val(v); this.value = ''; sync();
+  });
+  $('#mg_diff').on('change', function() {
+    var on = this.checked;
+    $('.mg_list tbody tr').each(function() { $(this).toggle(!on || $(this).data('st') !== 'same'); });
+  });
+  $('#mg_swap').on('click', function() {
+    var a = $('#mg_src').val(); $('#mg_src').val($('#mg_tgt').val()); $('#mg_tgt').val(a); $(this).closest('form').trigger('submit');
+  });
+  sync();
+});
+<% end %>
+<% html_title "#{l(:label_db_migrate)} - #{l(:label_db_manage)}" %>

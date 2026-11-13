@@ -18,6 +18,7 @@ class DbServer < ApplicationRecord
   validates :username, presence: true, length: { maximum: 120 }
   validates :timeout, numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 60 }
   validates :note, length: { maximum: 255 }
+  validates :write_username, length: { maximum: 120 }
   validates :password_encrypted, presence: { message: :blank }
   # SSH 터널 (예: Redmine → WEB 서버 → DB)
   with_options if: :ssh_enabled? do
@@ -56,6 +57,19 @@ class DbServer < ApplicationRecord
   # 빈 값이면 기존 비밀번호 유지 (편집 화면에서 다시 입력하지 않아도 됨)
   def password=(value)
     self.password_encrypted = Redmine::Ciphering.encrypt_text(value.to_s) if value.present?
+  end
+
+  # 이관용(쓰기) 계정 — 비워 두면 조회 계정으로 씀 (이관에는 CREATE·ALTER·INDEX·INSERT·UPDATE·DELETE 권한 필요)
+  def write_password
+    Redmine::Ciphering.decrypt_text(write_password_encrypted)
+  end
+
+  def write_password=(value)
+    self.write_password_encrypted = Redmine::Ciphering.encrypt_text(value.to_s) if value.present?
+  end
+
+  def write_account?
+    write_username.present?
   end
 
   def password_set?

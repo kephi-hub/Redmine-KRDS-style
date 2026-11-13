@@ -51,6 +51,9 @@ module DbSchemasHelper
   def db_tabs(current)
     items = @links.map { |l| [db_link_label(l), project_db_schemas_path(@project, link: l.id), current == l] }
     items << [l(:label_db_compare), project_db_compare_path(@project), current == :compare] if @links.size > 1
+    if @links.size > 1 && (User.current.allowed_to?(:migrate_db, @project) || User.current.allowed_to?(:migrate_db_production, @project))
+      items << [l(:label_db_migrate), project_db_migrations_path(@project), current == :migrate]
+    end
     content_tag(:div, class: 'tabs') do
       content_tag(:ul, safe_join(items.map { |label, url, on| content_tag(:li, link_to(label, url, class: (on ? 'selected' : nil))) }))
     end

@@ -14,7 +14,8 @@
 # - 1.8.0 : Oracle (ruby-oci8, Instant Client) — 테이블·뷰·구체화 뷰·함수·프로시저·패키지·트리거·시퀀스·시노님·스케줄러 작업
 # - 1.10.0: 공통코드 정의서(코드 테이블 지정·읽기 전용 조회·엑셀), 테이블 정의서·개인정보 엑셀을 DbManage::Docs 로 (산출물 패키지에서도 사용)
 # - 1.9.0 : 개인정보 컬럼(분류·암호화 여부, 이름·설명·용어로 자동 후보, 암호화 누락·DB 에서 사라짐 경고, 엑셀)
-# 원격 DB 에는 읽기 전용 세션으로 접속해 메타데이터만 읽음 (데이터 조회·변경 SQL 없음)
+# - 1.11.0: 이관(MariaDB·MySQL) — 개발 ↔ 운영 테이블 구조·데이터, 미리보기·실행 전 대상 테이블 백업 (이관용 쓰기 계정, 대상별 권한)
+# 원격 DB 에는 읽기 전용 세션으로 접속해 메타데이터만 읽음 (이관만 대상 DB 에 씀)
 require_relative 'lib/db_manage/dialect_base'
 require_relative 'lib/db_manage/dialect_mysql'
 require_relative 'lib/db_manage/dialect_postgresql'
@@ -29,12 +30,14 @@ require_relative 'lib/db_manage/docs'
 require_relative 'lib/db_manage/codes'
 require_relative 'lib/db_manage/erd'
 require_relative 'lib/db_manage/project_settings_patch'
+require_relative 'lib/db_manage/migrator'
+require_relative 'lib/db_manage/migrate_job'
 
 Redmine::Plugin.register :db_manage do
   name 'DB 관리'
   author 'kephi-hub'
   description 'DB 서버 접속정보 관리, 프로젝트 DB 스키마 조회·테이블 정의서·개발/운영 비교·용어 점검'
-  version '1.10.0'
+  version '1.11.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
 
@@ -44,6 +47,9 @@ Redmine::Plugin.register :db_manage do
     # SQL 조회: 개발 DB 와 운영 DB 권한을 따로 (운영은 기본으로 아무 역할에도 주지 않음)
     permission :run_db_query, { db_schemas: [:query, :codes] }, require: :member
     permission :run_db_query_production, { db_schemas: [:query, :codes] }, require: :member
+    # 이관: 대상이 개발 DB / 운영 DB 인 경우 권한을 따로 (원본은 보기 권한으로 충분)
+    permission :migrate_db, { db_migrations: [:index, :preview, :create, :show, :backup] }, require: :member
+    permission :migrate_db_production, { db_migrations: [:index, :preview, :create, :show, :backup] }, require: :member
   end
 
   menu :project_menu, :db_schemas, { controller: 'db_schemas', action: 'index' },

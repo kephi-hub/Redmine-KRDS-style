@@ -18,6 +18,10 @@
     <em class="info"><%= l(:text_db_user_info) %></em></p>
   <p><%= f.password_field :password, :value => '', :required => @server.new_record?, :size => 30, :autocomplete => 'new-password', :label => :field_password %>
     <% if @server.password_set? %><em class="info"><%= l(:label_db_password_keep) %></em><% end %></p>
+  <p><%= f.text_field :write_username, :size => 30, :maxlength => 120, :autocomplete => 'off', :label => :field_db_write_user %>
+    <em class="info"><%= l(:text_db_write_user) %></em></p>
+  <p><%= f.password_field :write_password, :value => '', :size => 30, :autocomplete => 'new-password', :label => :field_db_write_password %>
+    <% if @server.write_password_encrypted.present? %><em class="info"><%= l(:label_db_password_keep) %></em><% end %></p>
   <div class="db_ssh">
     <p><%= f.check_box :ssh_enabled, :label => :label_db_ssh, :id => 'db_ssh_on' %>
       <em class="info"><%= l(:text_db_ssh_info) %></em></p>

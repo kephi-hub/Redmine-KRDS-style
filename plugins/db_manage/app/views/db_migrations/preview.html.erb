@@ -1,0 +1,63 @@
+<%# 이관 미리보기 — 테이블마다 실행할 SQL·경고, 실행 확인(운영 대상은 사유 + 프로젝트 식별자) %>
+<h2><%= link_to l(:label_db_migrate), project_db_migrations_path(@project, source: @source.id, target: @target.id) %> &#187; <%= l(:label_db_mig_preview) %></h2>
+<p class="mg_dir"><b><%= @source.name %></b> <span class="mt_dim">(<%= @source.db_server.env_label %>)</span> → <b><%= @target.name %></b> <span class="mt_dim">(<%= @target.db_server.env_label %>)</span>
+  · <%= l(:label_db_mig_selected) %> <%= @plan.size %></p>
+<% errors = @plan.count { |p| p[:error] } %>
+<% if errors.positive? %><p class="flash error"><%= l(:text_db_mig_preview_errors, n: errors) %></p><% end %>
+<div class="autoscroll">
+<table class="list mg_plan">
+  <thead><tr><th class="name"><%= l(:label_db_table) %></th><th><%= l(:label_db_mig_mode) %></th><th><%= l(:label_db_mig_structure) %></th><th><%= l(:label_db_mig_rows) %></th><th class="mg_sqlcol"><%= l(:label_db_mig_sql) %></th></tr></thead>
+  <tbody>
+  <% @plan.each do |p| %>
+    <tr class="<%= 'mg_bad' if p[:error] %>">
+      <td class="name"><b><%= p[:table] %></b></td>
+      <td><%= l("label_db_mig_mode_#{p[:mode]}") %></td>
+      <td><% if p[:status] %><span class="mg_st" data-k="<%= p[:status] %>"><%= l("label_db_mig_plan_#{p[:status]}") %></span><% end %></td>
+      <td class="mg_num"><%= DbManage::Migrator::DATA_MODES.include?(p[:mode]) && p[:rows] ? "≈#{number_with_delimiter(p[:rows])}" : '-' %></td>
+      <td class="mg_sqlcol">
+        <% if p[:error] %><span class="mc_err"><%= p[:error] %></span><% end %>
+        <% (p[:warnings] || []).each do |w| %><div class="mg_warn"><%= w %></div><% end %>
+        <% if p[:statements].present? %><details><summary><%= l(:label_db_mig_sql_n, n: p[:statements].size) %></summary><pre class="mg_sql"><%= p[:statements].join(";\n\n") %>;</pre></details>
+        <% elsif p[:status] %><span class="mt_dim"><%= l(:label_db_mig_no_ddl) %></span><% end %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<p><button type="button" class="mg_btn" id="mg_dl"><%= sprite_icon('download', l(:label_db_mig_sql_download)) %></button></p>
+<textarea id="mg_sql_all" hidden><%= @sql %></textarea>
+
+<%= form_tag project_db_migrations_path(@project), class: 'mg_confirm', id: 'mg_run' do %>
+  <%= hidden_field_tag :source, @source.id, id: nil %><%= hidden_field_tag :target, @target.id, id: nil %>
+  <% @choices.each do |c| %><%= hidden_field_tag "mode[#{c['table']}]", c['mode'], id: nil %><% end %>
+  <p class="db_hintbox"><%= l(:text_db_mig_backup_note) %></p>
+  <% if @target.production? %>
+    <p class="mg_prod"><%= l(:text_db_mig_prod, name: @target.name) %></p>
+    <p><label for="mg_reason"><%= l(:label_db_mig_reason) %> <span class="required">*</span></label><br>
+      <%= text_field_tag :reason, '', id: 'mg_reason', maxlength: 255, required: true, class: 'mg_input' %></p>
+    <p><label for="mg_confirm"><%= l(:label_db_mig_confirm, id: @project.identifier) %> <span class="required">*</span></label><br>
+      <%= text_field_tag :confirm, '', id: 'mg_confirm', required: true, autocomplete: 'off', class: 'mg_input', placeholder: @project.identifier %></p>
+  <% else %>
+    <p><label for="mg_reason"><%= l(:label_db_mig_reason) %></label><br><%= text_field_tag :reason, '', id: 'mg_reason', maxlength: 255, class: 'mg_input' %></p>
+  <% end %>
+  <div class="mg_foot">
+    <%= link_to l(:button_cancel), project_db_migrations_path(@project, source: @source.id, target: @target.id), class: 'mg_btn' %>
+    <button type="submit" class="mg_btn <%= @target.production? ? 'mg_danger' : 'mg_primary' %>" <%= 'disabled' if errors == @plan.size %>><%= l(:label_db_mig_run) %></button>
+  </div>
+<% end %>
+<%= javascript_tag do %>
+$(function() {
+  $('#mg_dl').on('click', function() {
+    var b = new Blob([$('#mg_sql_all').val()], { type: 'text/plain;charset=utf-8' }), a = document.createElement('a');
+    a.href = URL.createObjectURL(b); a.download = <%= raw "#{@project.identifier}_migrate_#{Time.now.strftime('%Y%m%d_%H%M')}.sql".to_json %>; document.body.appendChild(a); a.click(); a.remove();
+  });
+  $('#mg_run').on('submit', function(e) {
+    var f = this, q = <%= raw l(@target.production? ? :text_db_mig_run_confirm_prod : :text_db_mig_run_confirm, name: @target.name).to_json %>;
+    if (f.dataset.ok) return;
+    e.preventDefault();
+    (window.KrdsDialog ? window.KrdsDialog.confirm(q) : Promise.resolve(window.confirm(q))).then(function(ok) { if (ok) { f.dataset.ok = 1; f.submit(); } });
+  });
+});
+<% end %>
+<% html_title "#{l(:label_db_mig_preview)} - #{l(:label_db_migrate)}" %>

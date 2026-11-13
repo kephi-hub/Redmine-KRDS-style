@@ -49,7 +49,12 @@ class DbServersController < ApplicationController
 
   # 저장된 접속정보로 접속해 DB 버전 확인
   def test
-    flash[:notice] = l(:notice_db_connected, name: @server.name, version: @server.connector.version)
+    msg = l(:notice_db_connected, name: @server.name, version: @server.connector.version)
+    if @server.write_account? && @server.adapter == 'mariadb'
+      @server.connector.session(write: true) { |c| c.query('SELECT 1') }
+      msg += " · #{l(:notice_db_write_ok, user: @server.write_username)}"
+    end
+    flash[:notice] = msg
   rescue DbManage::Error => e
     flash[:error] = "#{@server.name}: #{e.message}"
   ensure
@@ -95,7 +100,7 @@ class DbServersController < ApplicationController
   end
 
   def server_params
-    params.require(:db_server).permit(:name, :production, :adapter, :host, :port, :database_name, :username, :password, :timeout, :note,
+    params.require(:db_server).permit(:name, :production, :adapter, :host, :port, :database_name, :username, :password, :write_username, :write_password, :timeout, :note,
                                       :ssh_enabled, :ssh_host, :ssh_port, :ssh_username, :ssh_auth, :ssh_password, :ssh_private_key,
                                       :ssh_passphrase, :ssh_reset_host_key, ssh_hops: {})
   end

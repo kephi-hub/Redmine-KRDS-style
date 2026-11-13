@@ -1,0 +1,39 @@
+<%# 이관 결과 — 테이블마다 상태·행 수·백업, 실행 중이면 3초마다 새로 고침 %>
+<% m = @mig %>
+<h2><%= link_to l(:label_db_migrate), project_db_migrations_path(@project, source: m.source_link_id, target: m.target_link_id) %> &#187; #<%= m.id %></h2>
+<ul class="mg_meta">
+  <li><span><%= l(:label_db_mig_direction) %></span> <b><%= m.source_name %></b> → <b><%= m.target_name %></b><% if m.target_production %> <span class="mg_st" data-k="prod"><%= l(:label_db_production) %></span><% end %></li>
+  <li><span><%= l(:field_status) %></span> <span class="mg_st" data-k="<%= m.status %>"><%= l("label_db_mig_run_#{m.status}") %></span></li>
+  <li><span><%= l(:label_db_mig_by) %></span> <%= m.user&.name %> · <%= format_time(m.created_at) %></li>
+  <% if m.seconds %><li><span><%= l(:label_db_mig_time) %></span> <%= format('%d:%02d', m.seconds / 60, m.seconds % 60) %></li><% end %>
+  <% if m.reason.present? %><li><span><%= l(:label_db_mig_reason) %></span> <%= m.reason %></li><% end %>
+</ul>
+<% if m.error.present? %><p class="flash error"><%= m.error %></p><% end %>
+<% done = @results.map { |r| r['table'] } %>
+<div class="autoscroll">
+<table class="list mg_plan">
+  <thead><tr><th class="name"><%= l(:label_db_table) %></th><th><%= l(:label_db_mig_mode) %></th><th><%= l(:field_status) %></th><th><%= l(:label_db_mig_rows_done) %></th><th><%= l(:label_db_mig_backup) %></th><th class="mg_sqlcol"><%= l(:label_db_mig_detail) %></th></tr></thead>
+  <tbody>
+  <% @results.each do |r| %>
+    <tr class="<%= 'mg_bad' if r['status'] == 'failed' %>">
+      <td class="name"><b><%= r['table'] %></b></td>
+      <td><%= l("label_db_mig_mode_#{r['mode']}") %></td>
+      <td><span class="mg_st" data-k="<%= r['status'] %>"><%= l("label_db_mig_run_#{r['status']}") %></span><% if r['seconds'] %> <span class="mt_dim"><%= r['seconds'] %>s</span><% end %></td>
+      <td class="mg_num"><% if r['rows'] %><%= number_with_delimiter(r['rows']) %><% if r['target_rows'] %><br><span class="mt_dim"><%= l(:label_db_mig_target_rows, n: number_with_delimiter(r['target_rows'])) %></span><% end %><% else %>-<% end %></td>
+      <td><% if r['backup'] && !m.backup_removed %><%= link_to sprite_icon('download', number_to_human_size(r['backup_bytes'])), project_db_migration_backup_path(@project, m, file: r['backup']), class: 'icon icon-download' %><br><span class="mt_dim"><%= l(:label_db_mig_backup_rows, n: number_with_delimiter(r['backup_rows'].to_i)) %></span><% elsif r['backup'] %><span class="mt_dim"><%= l(:label_db_mig_backup_gone) %></span><% else %>-<% end %></td>
+      <td class="mg_sqlcol">
+        <% if r['error'] %><span class="mc_err"><%= r['error'] %></span><% end %>
+        <% (r['warnings'] || []).each do |w| %><div class="mg_warn"><%= w %></div><% end %>
+        <% if r['ddl'].present? %><details><summary><%= l(:label_db_mig_sql_n, n: r['ddl'].size) %></summary><pre class="mg_sql"><%= r['ddl'].join(";\n\n") %>;</pre></details><% end %>
+      </td>
+    </tr>
+  <% end %>
+  <% m.plan_list.reject { |c| done.include?(c['table']) }.each do |c| %>
+    <tr><td class="name"><b><%= c['table'] %></b></td><td><%= l("label_db_mig_mode_#{c['mode']}") %></td><td><span class="mg_st" data-k="queued"><%= l(:label_db_mig_run_queued) %></span></td><td></td><td></td><td></td></tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<% if @results.any? { |r| r['backup'] } && !m.backup_removed %><p class="db_hintbox"><%= l(:text_db_mig_restore) %></p><% end %>
+<% if m.busy? %><%= javascript_tag do %>setTimeout(function() { location.reload(); }, 3000);<% end %><% end %>
+<% html_title "##{m.id} - #{l(:label_db_migrate)}" %>
