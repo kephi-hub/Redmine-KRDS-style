@@ -2,6 +2,7 @@
 
 /* 접속정보 줄 [▶ 접속] */
 .vk_ssh{display:inline-flex;align-items:center;gap:4px;margin-right:4px;vertical-align:middle;}
+#keys_table td.vk_acts .vk_acts_in{align-items:center;vertical-align:middle;}
 #content a.vk_go{display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 12px;border:1px solid var(--pri_50,#256ef4);border-radius:var(--radius_s,4px);background:var(--pri_50,#256ef4);font-size:0.8125rem;font-weight:700;white-space:nowrap;text-decoration:none;color:#fff;}
 #content a.vk_go:hover{border-color:var(--pri_60,#0b50d0);background:var(--pri_60,#0b50d0);color:#fff;}
 #content a.vk_go svg.icon-svg{width:16px;height:16px;stroke:#fff;}
@@ -11,6 +12,7 @@
 
 /* SSH 설정 · 접속 모달 */
 .sp_form{display:flex;flex-direction:column;gap:14px;}
+.sp_form [hidden]{display:none !important;}
 .sp_help{margin:0;padding:10px 12px;border-radius:var(--radius_m,6px);background:var(--sec_5,#eef2f7);font-size:0.8125rem;color:var(--gray_70,#464c53);}
 .sp_help.sp_warn{background:var(--dan_5,#fdefec);color:var(--dan_60,#bd2c0f);}
 .sp_row{display:flex;flex-direction:column;gap:6px;}
