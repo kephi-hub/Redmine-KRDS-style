@@ -96,8 +96,9 @@ module OpsKit
       raise I18n.t(:error_oa_no_address) if host.blank?
       c = peer_cert(host, port)
       san = c.extensions.find { |e| e.oid == 'subjectAltName' }&.value.to_s.scan(/DNS:([^,\s]+)/).flatten
+      names = san.empty? ? [cn(c.subject)] : san # 대체 이름(SAN)이 없으면 CN 으로
       info = { host: host, port: port, subject: cn(c.subject), issuer: cn(c.issuer), not_before: c.not_before.to_date.to_s,
-               not_after: c.not_after.to_date.to_s, san: san.first(20), match: san.any? { |n| n == host || (n.start_with?('*.') && host.end_with?(n[1..]) && host.count('.') == n.count('.')) } }
+               not_after: c.not_after.to_date.to_s, san: san.first(20), match: names.any? { |n| n == host || (n.start_with?('*.') && host.end_with?(n[1..]) && host.count('.') == n.count('.')) } }
       attrs = { cert_info: info.to_json, cert_at: Time.current, cert_error: nil }
       attrs[:expires_on] = c.not_after.to_date if asset.kind == 'cert'
       asset.update_columns(attrs)
