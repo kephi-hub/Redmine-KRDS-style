@@ -27,7 +27,7 @@ module PmKit
           name
         end
         pc = caps[[m.id, 'pc']]
-        [i + 1, m.site_label, m.screen_id, m.path(index, site: false), m.url, MenuTree::Sheet::TYPE_LABELS[m.screen_type], m.in_menu? ? 'Y' : 'N',
+        [i + 1, m.site_label, m.screen_id, m.path(index, site: false), m.url, MenuScreenType.labels(m.project_id)[m.screen_type], m.in_menu? ? 'Y' : 'N',
          pc&.captured_at&.strftime('%Y-%m-%d %H:%M'), names.join("\n").presence || '캡처 없음']
       end
       list = KrdsUi::Xlsx.build([{ name: '화면 목록', header: %w(번호 사이트 화면\ ID 메뉴\ 경로 URL 화면\ 유형 메뉴\ 노출 캡처\ 일시 파일), rows: rows,
