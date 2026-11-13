@@ -63,7 +63,7 @@
     <span class="sp_lbl"><%= l(:label_ssh_hops) %></span>
     <div class="sp_hops" data-max="<%= VaultSshProfile::MAX_HOPS %>">
       <% hops.each_with_index { |h, i| hop_row.call(i, h) } %>
-      <button type="button" class="sp_add" <%= 'hidden' if hops.size >= VaultSshProfile::MAX_HOPS %>>+ <%= l(:label_ssh_hop_add) %></button>
+      <button type="button" class="sp_add" <%= 'hidden' if hops.size >= VaultSshProfile::MAX_HOPS %>><%= l(:label_ssh_hop_add) %></button>
       <template id="sp_hop_tpl"><% hop_row.call('__I__', {}) %></template>
     </div>
   </div>
