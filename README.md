@@ -123,7 +123,7 @@ Redmine 6.1.6 + Vault(접속정보) 플러그인을 **KRDS(대한민국 정부 �
 | 접속정보 (Vault) | 한국어 화면, 검색·선택 삭제, 비밀번호 가림·복사, 관리자가 정하는 유형 목록(관리 → 접속정보(Vault) → 유형 관리) |
 | Jenkins 배포 | 프로젝트 "배포" 탭에서 실행(Jenkins 매개변수 선택, 운영 배포 식별자 확인), 진행 중 스피너·진행바, 이력(커밋 수·리비전) |
 | 용어사전 | 프로젝트 "용어사전" 탭(프로젝트 용어 + 전사 공통 용어), 관리 → 공통 용어사전, 용어·영문명·약어·분류 검색, CSV 가져오기·내보내기(엑셀 호환), 위키·일감 본문 `{{term(용어)}}` |
-| DB 관리 | 관리 → DB 서버(개발/운영 구분, MariaDB·MySQL, PostgreSQL, MS SQL Server, Oracle, 비밀번호 암호화, SSH 터널, 저장 전 연결 시험), 프로젝트 "DB" 탭: 종류별 탭(테이블·뷰·함수·프로시저·트리거·DB 잡·시퀀스 — DB 종류마다 다름)·정의 SQL·숫자 요약, 테이블 정의서(엑셀), ERD(Mermaid — .md/.mmd/SVG/PNG), 개발/운영 비교(객체 포함), **이관**(MariaDB·MySQL — 테이블마다 구조만/구조+데이터, 미리보기 SQL, 실행 전 대상 백업), 용어사전 점검, 개인정보 컬럼(분류·암호화·경고), 위키·일감 본문 ```mermaid 그림 |
+| DB 관리 | 관리 → DB 서버(개발/운영 구분, MariaDB·MySQL, PostgreSQL, MS SQL Server, Oracle, 비밀번호 암호화, SSH 터널, 저장 전 연결 시험), 프로젝트 "DB" 탭: 종류별 탭(테이블·뷰·함수·프로시저·트리거·DB 잡·시퀀스 — DB 종류마다 다름)·정의 SQL·숫자 요약, 테이블 정의서(엑셀), ERD(Mermaid — .md/.mmd/SVG/PNG), 개발/운영 비교(객체 포함), **이관**(MariaDB·MySQL·PostgreSQL·MS SQL·Oracle 같은 종류끼리 — 테이블마다 구조만/구조+데이터, 미리보기 SQL, 실행 전 대상 백업), 용어사전 점검, 개인정보 컬럼(분류·암호화·경고), 위키·일감 본문 ```mermaid 그림 |
 | 메뉴 구조도 | **사이트별 관리**(사용자·관리자 페이지 등), **화면 캡처**(서버가 로그인해 운영 화면 자동 캡처 → 화면 설계서), 엑셀형 표(뎁스 칸 자동·칸 바로 편집·Tab 들여쓰기·끌어서 옮기기), 추가 칼럼, 메뉴 ↔ 일감 여러 개 연결·메뉴별 일감 일괄 생성, 엑셀 가져오기·내보내기, 구조도(Mermaid)·현황, 일감 화면 메뉴 선택·일감 목록 메뉴 열/검색조건 |
 | 시스템 권한 | 개발 대상 시스템의 권한 등급(예: 일반회원·운영자·관리자), 메뉴 × 권한 매트릭스(조회 R · 편집 CRU · 전체 CRUD), 엑셀 내보내기 |
 | 요구사항 · 테스트 | 공공 표준 분류(SFR·PER·SIR…) 요구사항, 메뉴·일감 연결, **추적표**(요구사항 → 메뉴 → 화면 캡처 → 프로그램 → 일감 → 테스트 → 결함)·위험 표시·변경 이력, 테스트 케이스·회차별 결과 입력, 불합격 → 결함 일감·재테스트 표시, 요구사항 정의서·추적표·테스트 시나리오·결과서 엑셀 |
@@ -295,6 +295,11 @@ docker compose exec redmine sh -c 'bundle exec rails runner setup/apply_settings
 - 위키·일감·문서 본문의 ` ```mermaid ` 블록은 그림으로 보입니다 (Mermaid 11.4.1 을 플러그인에 포함 — 인터넷 연결 불필요, MIT 라이선스).
 - 원격 DB 에는 읽기 전용 세션으로 접속해 테이블·컬럼 정보(메타데이터)만 읽습니다. 데이터 조회·변경 SQL 은 실행하지 않습니다.
 - **개인정보 컬럼** (프로젝트 → DB → [개인정보]): 컬럼마다 분류(고유식별정보·비밀번호·바이오정보·계좌·카드·민감정보·일반 개인정보·개인정보 아님)와 암호화(양방향·단방향·미적용·미확인)를 기록. 컬럼 이름·설명·용어사전으로 **자동 후보**를 찾고 사람이 확정한 것만 저장, **경고**(암호화 필수인데 미적용, 비밀번호가 단방향 아님, 미확인, 표시한 컬럼이 DB 에서 사라짐), 테이블 상세에 배지, 엑셀(개인정보 컬럼 · 분류별 요약). 보기는 DB 보기 권한, 확정·수정은 DB 연결 관리 권한
+- **이관**(1.11 MariaDB·MySQL, 1.12 PostgreSQL·MS SQL Server·Oracle — 같은 종류끼리, `DbManage::Migrator` + DB 별 엔진 `Migrate*`)
+   - PostgreSQL: pg_catalog 로 구조, 데이터는 원본 `COPY TO` → 대상 임시 테이블 `COPY FROM` → 한 트랜잭션에서 반영(replace 는 원본에 없는 행 삭제 + `ON CONFLICT DO UPDATE`), IDENTITY·serial 시퀀스 값 맞춤, 슈퍼유저면 `session_replication_role = replica`
+   - MS SQL Server: sys 카탈로그로 구조, 데이터는 칼럼마다 문자열 변환(날짜 126·float 3·money 2·바이너리 0x)으로 읽어 1000행씩 INSERT/MERGE, `IDENTITY_INSERT`, 관련 외래키 NOCHECK 후 다시 CHECK(검증 없이), 계산 칼럼·rowversion 제외
+   - Oracle: all_* 딕셔너리로 구조(시스템 이름 제약은 이름 없이, 함수 기반 인덱스·LONG·XMLTYPE 은 알림), 데이터는 TO_CHAR/RAWTOHEX 로 읽어 배열 바인드(LOB 있으면 행 단위) INSERT/MERGE, IDENTITY ALWAYS 는 잠시 BY DEFAULT 후 `START WITH LIMIT VALUE`, 관련 외래키 DISABLE 후 ENABLE NOVALIDATE
+   - 고른 테이블은 외래키 기준으로 참조되는 테이블부터. 백업 스크립트는 복원하는 때 이 테이블을 참조하는 외래키를 찾아 저장·삭제 후 다시 만듦
 - **이관**(1.11, MariaDB·MySQL ↔ 같은 종류, `DbManage::Migrator`): [이관] 탭 → 원본·대상 → 테이블마다 건너뜀/구조만/구조+데이터(전체 교체·추가·갱신·없는 것만) → 미리보기(SQL) → 실행(ActiveJob, `db_migrations` 기록)
    - 구조: 원본 `SHOW CREATE TABLE` 기준 CREATE(AUTO_INCREMENT 값 뺌) / ALTER(칼럼 ADD·MODIFY, 인덱스·외래키 추가·변경, 설명). 대상에만 있는 것은 지우지 않음, 기본키가 다르면 경고만
    - 데이터: 원본 읽기 전용 세션 스트리밍(`cast: false` — 값 문자열 그대로, 바이너리 `X'..'`), 1MB 씩 여러 행 INSERT, 테이블마다 트랜잭션(실패 시 ROLLBACK), 두 세션 `time_zone '+00:00'`, 대상 `FOREIGN_KEY_CHECKS=0`·`NO_AUTO_VALUE_ON_ZERO`, 생성 칼럼 제외
