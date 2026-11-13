@@ -147,6 +147,7 @@ module SshConsole
     def loop_shell(ssh, profile, session, rec)
       out = ''.b
       closed = false
+      ready = false # 셸이 열려야(채널 확인 + pty + shell) 입력·창 크기를 보냄 — 그 전 요청은 큐에 남겨 둠
       started = Time.now
       @bytes_out = 0
       @bytes_in = 0
@@ -156,6 +157,8 @@ module SshConsole
           c2.send_channel_request('shell') do |c3, ok2|
             raise TargetError, I18n.t(:error_ssh_pty) unless ok2
             c3.send_data("#{profile.start_cmd}\n") if profile&.start_cmd.present?
+            ready = true
+            emit(t: 's', s: 'connected', m: session.target)
           end
         end
         c.on_data { |_, d| out << d.b }
@@ -163,9 +166,8 @@ module SshConsole
         c.on_close { closed = true }
         c.on_eof { closed = true }
       end
-      emit(t: 's', s: 'connected', m: session.target)
       ssh.loop(0.03) do
-        until @queue.empty?
+        until !ready || @queue.empty?
           kind, a, b = @queue.pop(true) rescue break
           case kind
           when :i
@@ -184,6 +186,8 @@ module SshConsole
           emit(t: 'o', d: Base64.strict_encode64(out))
           out = ''.b
         end
+        @last_input = Time.now unless ready # 셸이 열리기 전 시간은 유휴로 치지 않음
+        @stop ||= 'failed' if !ready && Time.now - started > Connector::TIMEOUT * 2
         idle = Time.now - @last_input
         if idle > WARN && !@warned
           @warned = true
