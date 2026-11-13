@@ -24,7 +24,7 @@ $(function() {
     live.text(C.moved.replace('%{name}', $.trim($tr.find('td.vk_name a, td.vk_name span').first().text())).replace('%{n}', rows().index($tr) + 1));
   }
 
-  // 끌기
+  // 끌기 (행을 옮기면 포인터 캡처가 풀리므로 이동·놓기는 문서에서 받음)
   var drag = null;
   $tb.on('pointerdown', '.vk_drag', function(e) {
     if (e.button && e.button !== 0) return;
@@ -33,9 +33,8 @@ $(function() {
     drag = { $tr: $tr, moved: false, order: ids().join() };
     $tr.addClass('on');
     $('body').addClass('vk_dragging');
-    this.setPointerCapture && this.setPointerCapture(e.pointerId);
   });
-  $tb.on('pointermove', '.vk_drag', function(e) {
+  $(document).on('pointermove', function(e) {
     if (!drag) return;
     var y = e.clientY, $tr = drag.$tr;
     rows().not($tr).each(function() {
@@ -49,7 +48,7 @@ $(function() {
     // 화면 끝 가까이면 스크롤
     if (y < 60) window.scrollBy(0, -12); else if (y > window.innerHeight - 60) window.scrollBy(0, 12);
   });
-  $tb.on('pointerup pointercancel', '.vk_drag', function() {
+  $(document).on('pointerup pointercancel', function() {
     if (!drag) return;
     var d = drag; drag = null;
     d.$tr.removeClass('on');
