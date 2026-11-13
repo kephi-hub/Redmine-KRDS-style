@@ -41,6 +41,7 @@
       setState(text || d.closed, cls || 'is_off');
       term.write('\r\n\x1b[90m── ' + (text || d.closed) + ' ──\x1b[0m\r\n');
       showAgain();
+      document.dispatchEvent(new Event('ssh:closed'));
       try { ws && ws.close(); } catch (e) {}
     }
 
@@ -67,6 +68,7 @@
             state = 'connected'; started = Date.now(); timer = setInterval(tick, 1000); setState('●', 'is_on');
             if (x.m) $('st_target').textContent = x.m;
             send('resize', { cols: term.cols, rows: term.rows });
+            document.dispatchEvent(new Event('ssh:connected'));
             term.focus();
           }
           else if (x.s === 'failed') { note(x.m, 'is_bad'); finish(x.m, 'is_bad'); }
@@ -81,6 +83,7 @@
     var rt = null;
     term.onResize(function(s) { clearTimeout(rt); rt = setTimeout(function() { send('resize', { cols: s.cols, rows: s.rows }); }, 150); });
     window.addEventListener('resize', function() { try { fit.fit(); } catch (e) {} });
+    document.addEventListener('ssh:layout', function() { setTimeout(function() { try { fit.fit(); } catch (e) {} }, 30); });
     function font(delta) {
       size = Math.max(10, Math.min(28, size + delta)); term.options.fontSize = size;
       try { localStorage.setItem('ssh_font', size); } catch (e) {}

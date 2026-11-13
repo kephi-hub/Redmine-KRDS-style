@@ -51,7 +51,44 @@ module SshConsole
       end
     end
 
-    attr_reader :id, :user_id
+    attr_reader :id, :user_id, :prod
+
+    def ready?
+      @ready == true
+    end
+
+    # 파일 창(SFTP) — 터미널과 별도 연결을 세션 동안 하나만 열어 재사용, 요청끼리는 차례로
+    # 접속 정보(경유 포함, 접속할 때 입력한 비밀번호도)는 세션이 끝날 때까지만 메모리에
+    def with_sftp
+      raise TargetError, I18n.t(:error_ssh_files_closed) unless @chain && ready?
+      @sftp_lock.synchronize do
+        2.times do |try|
+          begin
+            unless @sftp && @sftp_link && !@sftp_link.ssh.closed?
+              close_sftp
+              require 'net/sftp'
+              @sftp_link = Connector.open(@chain)
+              @sftp = Net::SFTP::Session.new(@sftp_link.ssh).connect!
+            end
+            return yield(@sftp)
+          rescue Net::SSH::Disconnect, IOError, Errno::ECONNRESET, Errno::EPIPE
+            close_sftp
+            raise if try == 1
+          end
+        end
+      end
+    end
+
+    def close_sftp
+      begin
+        @sftp&.close_channel
+      rescue StandardError
+        nil
+      end
+      @sftp_link&.close
+      @sftp = nil
+      @sftp_link = nil
+    end
 
     def initialize(session, cols, rows, ask)
       @id = session.id
@@ -63,6 +100,12 @@ module SshConsole
       @stop = nil
       @last_input = Time.now
       @warned = false
+      @sftp_lock = Mutex.new
+      @ready = false
+    end
+
+    def touch
+      @last_input = Time.now
     end
 
     def push(kind, *data)
@@ -97,6 +140,8 @@ module SshConsole
         raise TargetError, I18n.t(:error_ssh_key_gone) unless key
         chain = Target.chain(key, profile, user: session.user, ask: @ask)
         @ask = nil
+        @chain = chain
+        @prod = session.prod?
         emit(t: 's', s: 'connecting', m: Target.describe(chain))
         link = Connector.open(chain)
         remember_fingerprints(profile, chain, link.fingerprints) if profile
@@ -117,6 +162,9 @@ module SshConsole
       ensure
         rec&.close
         link&.close
+        @ready = false
+        @sftp_lock.synchronize { close_sftp } rescue nil
+        @chain = nil
         if session && session.status == 'running'
           session.update_columns(status: 'closed', ended_at: Time.current, end_reason: reason, bytes_out: @bytes_out.to_i, bytes_in: @bytes_in.to_i)
           emit(t: 's', s: 'closed', r: reason, m: I18n.t("label_ssh_end_#{reason}", default: reason))
@@ -158,6 +206,7 @@ module SshConsole
             raise TargetError, I18n.t(:error_ssh_pty) unless ok2
             c3.send_data("#{profile.start_cmd}\n") if profile&.start_cmd.present?
             ready = true
+            @ready = true
             emit(t: 's', s: 'connected', m: session.target)
           end
         end

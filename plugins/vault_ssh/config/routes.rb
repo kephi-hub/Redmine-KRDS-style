@@ -11,3 +11,10 @@ resources :projects, only: [] do
 end
 get 'ssh/t/:ticket', to: 'ssh_sessions#terminal', as: 'ssh_terminal', constraints: { ticket: /[\w-]+/ }
 post 'ssh/t/:ticket/again', to: 'ssh_sessions#again', as: 'ssh_terminal_again', constraints: { ticket: /[\w-]+/ }
+# 터미널 파일 창 (SFTP)
+get 'ssh/t/:ticket/files', to: 'ssh_files#index', as: 'ssh_files', constraints: { ticket: /[\w-]+/ }
+get 'ssh/t/:ticket/files/download', to: 'ssh_files#download', as: 'ssh_files_download', constraints: { ticket: /[\w-]+/ }
+post 'ssh/t/:ticket/files/upload', to: 'ssh_files#upload', as: 'ssh_files_upload', constraints: { ticket: /[\w-]+/ }
+post 'ssh/t/:ticket/files/mkdir', to: 'ssh_files#mkdir', as: 'ssh_files_mkdir', constraints: { ticket: /[\w-]+/ }
+post 'ssh/t/:ticket/files/rename', to: 'ssh_files#rename', as: 'ssh_files_rename', constraints: { ticket: /[\w-]+/ }
+post 'ssh/t/:ticket/files/delete', to: 'ssh_files#delete', as: 'ssh_files_delete', constraints: { ticket: /[\w-]+/ }

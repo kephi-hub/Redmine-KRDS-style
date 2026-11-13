@@ -5,6 +5,7 @@ class SshSession < ApplicationRecord
   belongs_to :project
   belongs_to :user
   belongs_to :key, class_name: 'Vault::Key', optional: true
+  has_many :ssh_file_logs, -> { order(:id) }, dependent: :delete_all
 
   validates :status, inclusion: { in: STATUSES }
 

@@ -30,9 +30,10 @@ RUN set -eux; \
     rm -rf /var/lib/apt/lists/*
 ENV CHROME_PATH=/usr/bin/chromium
 
-# 플러그인 gem(DB 관리: SSH 터널용 net-ssh 등, 메뉴 구조도: 화면 캡처용 ferrum)도 같은 단계에서 설치 — 실행 때는 같은 Gemfile 이 마운트됨
+# 플러그인 gem(DB 관리: SSH 터널용 net-ssh 등, 메뉴 구조도: 화면 캡처용 ferrum, SSH 터미널: 파일 창용 net-sftp)도 같은 단계에서 설치 — 실행 때는 같은 Gemfile 이 마운트됨
 COPY plugins/db_manage/Gemfile plugins/db_manage/Gemfile
 COPY plugins/menu_tree/Gemfile plugins/menu_tree/Gemfile
+COPY plugins/vault_ssh/Gemfile plugins/vault_ssh/Gemfile
 
 # Vault 의존 gem(iconv 등)은 네이티브 빌드가 필요 → 빌드 도구 잠깐 설치 후 제거
 # 공식 이미지와 동일하게 임시 database.yml 로 Gemfile.lock 의 DB 어댑터 구성을 유지

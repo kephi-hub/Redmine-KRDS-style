@@ -30,9 +30,10 @@
       <td><% if (d = s.duration) %><%= format('%d:%02d:%02d', d / 3600, d / 60 % 60, d % 60) %><% end %></td>
       <td><span class="ss_st" data-k="<%= s.status %>"><%= s.live? ? l(:label_ssh_status_running) : l("label_ssh_status_#{s.status}") %></span>
         <% if s.end_reason.present? && !s.live? %><br><span class="mt_dim"><%= l("label_ssh_end_#{s.end_reason}", default: s.end_reason) %></span><% end %>
-        <% if s.error.present? %><br><span class="mc_err"><%= s.error.truncate(80) %></span><% end %></td>
+        <% if s.error.present? %><br><span class="mc_err"><%= s.error.truncate(80) %></span><% end %>
+        <% if (fc = s.ssh_file_logs.size) > 0 %><br><span class="mt_dim"><%= l(:label_ssh_file_logs) %> <%= fc %></span><% end %></td>
       <td><code><%= s.remote_ip %></code></td>
-      <td class="buttons"><% if s.record_file.present? %><%= link_to sprite_icon('krds-terminal', l(:label_ssh_replay)), project_ssh_session_path(@project, s), class: 'icon' %><% end %></td>
+      <td class="buttons"><% if s.record_file.present? || s.ssh_file_logs.size > 0 %><%= link_to sprite_icon('krds-terminal', s.record_file.present? ? l(:label_ssh_replay) : l(:label_ssh_file_logs)), project_ssh_session_path(@project, s), class: 'icon' %><% end %></td>
     </tr>
   <% end %>
   </tbody>

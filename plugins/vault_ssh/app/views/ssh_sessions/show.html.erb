@@ -30,4 +30,16 @@
 <% else %>
   <p class="nodata"><%= l(:label_ssh_no_record) %></p>
 <% end %>
+<% logs = s.ssh_file_logs.to_a %>
+<% if logs.any? %>
+<h3 class="ag_sec"><%= l(:label_ssh_file_logs) %> (<%= logs.size %>)</h3>
+<div class="autoscroll"><table class="list ss_list">
+  <thead><tr><th><%= l(:field_created_on) %></th><th><%= l(:field_type) %></th><th class="name"><%= l(:label_ssh_files_name) %></th><th><%= l(:label_ssh_files_size) %></th><th><%= l(:field_status) %></th></tr></thead>
+  <tbody><% logs.each do |g| %><tr>
+    <td><%= format_time(g.created_at) %></td><td><%= l("label_ssh_fa_#{g.action}") %></td>
+    <td class="name"><code><%= g.path %></code><% if g.target.present? %> → <code><%= g.target %></code><% end %></td>
+    <td><%= number_to_human_size(g.size) if g.size %></td>
+    <td><% if g.ok %><span class="ss_st" data-k="closed">OK</span><% else %><span class="mc_err"><%= g.error %></span><% end %></td></tr><% end %></tbody>
+</table></div>
+<% end %>
 <% html_title "#{s.key_name} - #{l(:label_ssh_sessions)}" %>

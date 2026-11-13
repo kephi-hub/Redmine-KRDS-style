@@ -9,7 +9,7 @@
 <%= csrf_meta_tags %>
 <%= stylesheet_link_tag 'xterm', plugin: 'vault_ssh' %>
 <%= stylesheet_link_tag 'ssh_console', plugin: 'vault_ssh' %>
-<%= javascript_include_tag 'xterm', 'xterm-addon-fit', 'ssh_terminal', plugin: 'vault_ssh' %>
+<%= javascript_include_tag 'xterm', 'xterm-addon-fit', 'ssh_terminal', 'ssh_files', plugin: 'vault_ssh' %>
 </head>
 <body class="st_page<%= ' is_prod' if prod %>">
 <header class="st_bar">
@@ -19,6 +19,7 @@
   <span class="st_state" id="st_state" aria-live="polite"><%= l(:text_ssh_connecting) %></span>
   <span class="st_time" id="st_time">00:00:00</span>
   <span class="st_tools">
+ <button type="button" class="st_btn st_files_btn" id="st_files_btn" aria-expanded="false" aria-controls="st_files" disabled><%= l(:label_ssh_files) %></button>
     <button type="button" class="st_btn" id="st_font_dn" aria-label="<%= l(:label_ssh_font) %> -">A-</button>
     <button type="button" class="st_btn" id="st_font_up" aria-label="<%= l(:label_ssh_font) %> +">A+</button>
     <button type="button" class="st_btn st_close" id="st_close"><%= l(:label_ssh_disconnect) %></button>
@@ -26,9 +27,31 @@
   </span>
 </header>
 <div class="st_note" id="st_note" role="status" hidden></div>
+<div class="st_main">
 <main class="st_term" id="st_term" aria-label="SSH 터미널"
       data-ticket="<%= s.ticket %>" data-usable="<%= @usable ? 1 : 0 %>" data-again="<%= @can_again ? ssh_terminal_again_path(s.ticket) : '' %>"
       data-used="<%= l(:text_ssh_used_ticket) %>" data-closed="<%= l(:text_ssh_closed) %>" data-connecting="<%= l(:text_ssh_connecting) %>"></main>
+<aside class="st_files" id="st_files" aria-label="<%= l(:label_ssh_files) %>" hidden
+       data-list="<%= ssh_files_path(s.ticket) %>" data-download="<%= ssh_files_download_path(s.ticket) %>" data-upload="<%= ssh_files_upload_path(s.ticket) %>"
+       data-mkdir="<%= ssh_files_mkdir_path(s.ticket) %>" data-rename="<%= ssh_files_rename_path(s.ticket) %>" data-delete="<%= ssh_files_delete_path(s.ticket) %>" data-prod="<%= prod ? 1 : 0 %>">
+  <div class="sf_head">
+    <strong><%= l(:label_ssh_files) %></strong>
+    <button type="button" class="sf_x" id="sf_close" aria-label="<%= l(:button_close) %>">&times;</button>
+  </div>
+  <form class="sf_path" id="sf_path_form">
+    <button type="button" class="sf_btn" id="sf_up" title="<%= l(:label_ssh_files_up) %>" aria-label="<%= l(:label_ssh_files_up) %>">↑</button>
+    <input type="text" id="sf_path" aria-label="경로" autocomplete="off" spellcheck="false">
+    <button type="button" class="sf_btn" id="sf_refresh" title="<%= l(:label_ssh_files_refresh) %>" aria-label="<%= l(:label_ssh_files_refresh) %>">⟳</button>
+  </form>
+  <div class="sf_tools">
+    <label class="sf_btn sf_pri"><input type="file" id="sf_file" multiple hidden><%= l(:label_ssh_files_upload) %></label>
+    <button type="button" class="sf_btn" id="sf_mkdir"><%= l(:label_ssh_files_mkdir) %></button>
+    <span class="sf_msg" id="sf_msg" role="status" aria-live="polite"></span>
+  </div>
+  <div class="sf_list" id="sf_list" tabindex="0"></div>
+  <div class="sf_drop" id="sf_drop" hidden><%= l(:label_ssh_files_drop) %></div>
+</aside>
+</div>
 <footer class="st_foot"><%= l(:text_ssh_recorded) %> · <%= User.current.name %> · <%= format_time(s.created_at) %><% if s.reason.present? %> · <%= s.reason %><% end %></footer>
 </body>
 </html>
