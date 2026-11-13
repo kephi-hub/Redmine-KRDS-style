@@ -1,0 +1,42 @@
+<%# 접속정보 목록 한 줄 (KRDS) — Vault 원본 줄 템플릿 9개를 이 하나로 (vault_types 가 화면 경로 맨 앞이라 여기 둠).
+    칸 순서·복사(copy-key + 숨은 입력칸 id)·선택 삭제(ids[], data-project-id)는 원본과 같게 유지
+    locals: key, all(전체 목록 여부), parity %>
+<% orphan = key.project.nil? %>
+<% tname = vault_type_label(key).to_s %>
+<% tk = case tname when /SSH/i then 'ssh' when /데이터|DB/i then 'db' when /웹|WEB/i then 'web' when /API/i then 'api' when /SFTP|FTP/i then 'sftp' when /인증서|키 파일|KEY/i then 'cert' else 'etc' end %>
+<% tags = (key.tags.map(&:name) rescue []) %>
+<% copy = lambda do |kind, value| %>
+  <a href="#" role="button" class="vk_btn copy-key" data-clipboard-target="copy_<%= kind %>_<%= key.id %>" title="<%= t('key.btn.clipboard') %>" aria-label="<%= t('key.btn.clipboard') %>"><%= sprite_icon('copy') %></a>
+  <input class="vk_hide" type="text" id="copy_<%= kind %>_<%= key.id %>" value="<%= value %>" readonly tabindex="-1" aria-hidden="true">
+<% end %>
+<tr class="<%= key.is_a?(Vault::KeyFile) ? 'file' : 'key' %> vk_row <%= 'vk_orphan' if orphan %> <%= parity %>"<% if all %> data-project-id="<%= key.project_id %>" data-key-type="<%= key.type %>"<% end %>>
+  <td class="checkbox hide-when-print"><%= check_box_tag('ids[]', key.id, false, id: nil, 'aria-label': "#{key.name} 선택") %></td>
+  <% if all %>
+  <td class="vk_proj"><% if orphan %><span class="vk_gone"><%= t('key.project_not_exist', id: key.project_id) %></span><% else %><%= link_to key.project.name, project_keys_path(key.project) %><% end %></td>
+  <% end %>
+  <td class="vk_type"><span class="vk_badge" data-k="<%= tk %>"><%= tname %></span></td>
+  <td class="vk_name">
+    <% if orphan %><span class="vk_gone"><%= key.name %></span><% else %><%= link_to key.name, project_key_path(key.project, key), class: 'vk_link' %><% end %>
+    <% if tags.any? %><span class="vk_tags"><% tags.first(4).each do |tg| %><span class="vk_tag">#<%= tg %></span><% end %></span><% end %>
+  </td>
+  <td class="vk_url">
+    <% if key.url.present? %><span class="vk_val">
+      <% if key.url =~ %r{\Ahttps?://}i %><%= link_to key.url, key.url, class: 'vk_code', target: '_blank', rel: 'noopener noreferrer' %><% else %><code class="vk_code"><%= key.url %></code><% end %>
+      <% copy.call('url', key.url) %></span>
+    <% else %><span class="vk_none">-</span><% end %>
+  </td>
+  <td class="vk_login">
+    <% if key.login.present? %><span class="vk_val"><code class="vk_code"><%= key.login %></code><% copy.call('login', key.login) %></span>
+    <% else %><span class="vk_none">-</span><% end %>
+  </td>
+  <td class="vk_secret key-password-column">
+    <span class="vk_val">
+    <% if key.body.present? %><span class="vk_dots" aria-label="<%= t('key.attr.body') %> 숨김">••••••••</span><% copy.call('body', key.body.to_s.dup.force_encoding('UTF-8')) %><% end %>
+    <% if !key.is_a?(Vault::Password) && key.file.present? && !orphan %>
+      <%= link_to "/projects/#{key.project.identifier}/keys/#{key.id}/download", class: 'vk_btn', title: '파일 다운로드', 'aria-label': '파일 다운로드', id: ("keyfile_dl_#{key.id}" if key.is_a?(Vault::KeyFile)) do %><%= sprite_icon('download') %><% end %>
+    <% end %>
+    <% if key.body.blank? && !(key.respond_to?(:file) && key.file.present?) %><span class="vk_none">-</span><% end %>
+    </span>
+  </td>
+  <td class="buttons vk_acts"><%= render partial: 'shared/key_actions', locals: { key: key } %></td>
+</tr>

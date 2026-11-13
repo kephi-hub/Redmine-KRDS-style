@@ -1,0 +1,18 @@
+<%# 접속정보 줄 버튼 (KRDS 아이콘 버튼, vault_ko) — 원본과 같은 권한·주소 %>
+<span class="vk_acts_in">
+<% if key.project.nil? %>
+  <% if User.current.admin? %>
+    <%= link_to edit_orphaned_key_path(key), class: 'vk_btn', title: t('key.btn.move'), 'aria-label': t('key.btn.move') do %><%= sprite_icon('arrow-right') %><% end %>
+    <%= link_to orphaned_key_path(key), class: 'vk_btn vk_del', title: t('button_delete'), 'aria-label': t('button_delete'), data: { confirm: t('confirm.key.delete') }, method: :delete do %><%= sprite_icon('del') %><% end %>
+  <% else %>
+    <span class="vk_btn is_off" title="<%= t('key.project_deleted') %>"><%= sprite_icon('link-break') %></span>
+  <% end %>
+<% else %>
+  <%= link_to project_key_path(key.project, key), class: 'vk_btn', title: t('button_view'), 'aria-label': t('button_view') do %><%= sprite_icon('zoom-in') %><% end %>
+  <% if User.current.allowed_to?(:edit_keys, key.project) %>
+    <%= link_to edit_project_key_path(key.project, key), class: 'vk_btn', title: t('button_edit'), 'aria-label': t('button_edit') do %><%= sprite_icon('edit') %><% end %>
+    <%= link_to project_copy_key_path(key.project, key), class: 'vk_btn', title: t('key.title.copy'), 'aria-label': t('key.title.copy') do %><%= sprite_icon('copy-link') %><% end %>
+    <%= link_to project_key_path(key.project, key), class: 'vk_btn vk_del', title: t('button_delete'), 'aria-label': t('button_delete'), data: { confirm: t('confirm.key.delete') }, method: :delete do %><%= sprite_icon('del') %><% end %>
+  <% end %>
+<% end %>
+</span>
