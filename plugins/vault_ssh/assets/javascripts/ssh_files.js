@@ -105,10 +105,11 @@
         x.send(f);
       });
     }
-    $('sf_file').addEventListener('change', function() { upload(this.files); this.value = ''; });
+    // FileList 는 입력칸을 비우면 같이 비므로 먼저 배열로 복사
+    $('sf_file').addEventListener('change', function() { var list = Array.prototype.slice.call(this.files); this.value = ''; upload(list); });
     var drop = $('sf_drop');
     box.addEventListener('dragover', function(e) { e.preventDefault(); drop.hidden = false; });
     box.addEventListener('dragleave', function(e) { if (!box.contains(e.relatedTarget)) drop.hidden = true; });
-    box.addEventListener('drop', function(e) { e.preventDefault(); drop.hidden = true; upload(e.dataTransfer.files); });
+    box.addEventListener('drop', function(e) { e.preventDefault(); drop.hidden = true; upload(Array.prototype.slice.call(e.dataTransfer.files)); });
   });
 })();
