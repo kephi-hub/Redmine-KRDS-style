@@ -11,15 +11,15 @@
       <% next if list.empty? %>
       <section class="pmod_grp" aria-labelledby="pmod_t_<%= key %>">
         <div class="pmod_head">
-          <h3 class="pmod_tit" id="pmod_t_<%= key %>"><%= l("label_nav_#{key}") %> <span class="pmod_n"></span></h3>
-          <button type="button" class="pmod_all" aria-label="<%= l(:label_pmod_toggle, :group => l("label_nav_#{key}")) %>"><%= l(:label_pmod_all) %></button>
+          <h3 class="pmod_tit" id="pmod_t_<%= key %>"><%= KrdsUi::Labels.group(key) %> <span class="pmod_n"></span></h3>
+          <button type="button" class="pmod_all" aria-label="<%= l(:label_pmod_toggle, :group => KrdsUi::Labels.group(key)) %>"><%= l(:label_pmod_all) %></button>
         </div>
         <ul class="pmod_list">
           <% list.each do |m| %>
             <li>
               <label class="pmod_item" for="project_enabled_module_names_<%= m %>">
                 <%= check_box_tag 'project[enabled_module_names][]', m, @project.module_enabled?(m), :id => "project_enabled_module_names_#{m}" %>
-                <span class="pmod_txt"><strong><%= l_or_humanize(m, :prefix => 'project_module_') %></strong>
+                <span class="pmod_txt"><strong><%= KrdsUi::Labels.module_name(m) %></strong>
                   <% if (d = l("label_pmod_desc_#{m}", :default => '')).present? %><span class="pmod_desc"><%= d %></span><% end %></span>
               </label>
             </li>

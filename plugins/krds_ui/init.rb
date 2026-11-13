@@ -103,6 +103,11 @@ module KrdsUi
 end
 User.prepend(KrdsUi::UserInitialsPatch) unless User.ancestors.include?(KrdsUi::UserInitialsPatch)
 AvatarsHelper.prepend(KrdsUi::AvatarNamePatch) unless AvatarsHelper.ancestors.include?(KrdsUi::AvatarNamePatch)
+# 관리 → 메뉴·모듈 이름: 메뉴 표시 이름 바꾸기
+Redmine::MenuManager::MenuItem.prepend(KrdsUi::Labels::CaptionPatch) unless Redmine::MenuManager::MenuItem.ancestors.include?(KrdsUi::Labels::CaptionPatch)
+Redmine::MenuManager.map :admin_menu do |menu|
+  menu.push :krds_labels, { controller: 'krds_labels', action: 'index' }, caption: :label_krds_labels, after: :settings, html: { class: 'icon icon-list' }, icon: 'list'
+end
 DocumentsController.prepend(KrdsUi::DocumentAttachmentsPatch) unless DocumentsController.ancestors.include?(KrdsUi::DocumentAttachmentsPatch)
 DocumentsController.prepend(KrdsUi::DocumentListPatch) unless DocumentsController.ancestors.include?(KrdsUi::DocumentListPatch)
 NewsController.prepend(KrdsUi::NewsSearchPatch) unless NewsController.ancestors.include?(KrdsUi::NewsSearchPatch)
@@ -112,6 +117,7 @@ require_relative 'lib/krds_ui/xlsx_reader'
 require_relative 'lib/krds_ui/pptx'
 require_relative 'lib/krds_ui/menu_groups'
 require_relative 'lib/krds_ui/manual'
+require_relative 'lib/krds_ui/labels'
 # 메인 메뉴: KRDS 메인 메뉴 2뎁스 형태(PC 펼침 패널 · 모바일 세로 탭), 프로젝트 메뉴는 대분류 아래 2뎁스
 Redmine::MenuManager::MenuHelper.prepend(KrdsUi::MenuHelperPatch) unless Redmine::MenuManager::MenuHelper.ancestors.include?(KrdsUi::MenuHelperPatch)
 

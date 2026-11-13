@@ -99,7 +99,7 @@ module KrdsUi
       groups.each do |key, list|
         entries = krds_entries(list, project, current)
         active = entries.any?(&:last)
-        label = l("label_nav_#{key}")
+        label = KrdsUi::Labels.group(key)
         pid = "gnb_p_#{key}"
         mid = "mnav_#{key}"
         links = safe_join(entries.map { |n, caption, url, sel| content_tag(:li, krds_link(caption, url, sel, 'gnb_link', n.name)) })

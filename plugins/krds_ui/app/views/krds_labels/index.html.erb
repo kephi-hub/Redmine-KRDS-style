@@ -1,0 +1,38 @@
+<%# 관리 > 메뉴·모듈 이름 — 화면에 보이는 이름만 바꿈 %>
+<div class="contextual">
+  <% if @saved.any? %>
+    <%= link_to sprite_icon('reload', l(:button_krds_labels_reset)), krds_labels_reset_path, :method => :post, :class => 'icon icon-reload',
+          :data => { :confirm => l(:text_krds_labels_reset_confirm, :count => @saved.size) } %>
+  <% end %>
+</div>
+<h2><%= l(:label_krds_labels) %></h2>
+<p class="subtitle"><%= l(:text_krds_labels) %></p>
+<%= form_tag krds_labels_path, :id => 'krds_labels_form' do %>
+  <div class="lb_jump" role="navigation" aria-label="<%= l(:label_krds_labels) %>">
+    <% @catalog.each do |kind, title, list| %>
+      <a href="#lb_<%= kind %>"><%= title %> <span><%= list.count { |k, _| @saved["#{kind}:#{k}"] } %>/<%= list.size %></span></a>
+    <% end %>
+  </div>
+  <% @catalog.each do |kind, title, list| %>
+  <fieldset class="box lb_box" id="lb_<%= kind %>">
+    <legend><%= title %></legend>
+    <p class="lb_help"><%= l("text_krds_lb_#{kind}") %></p>
+    <div class="autoscroll">
+    <table class="list lb_table">
+      <thead><tr><th><%= l(:label_krds_lb_default) %></th><th class="lb_new"><%= l(:label_krds_lb_new) %></th></tr></thead>
+      <tbody>
+      <% list.each do |key, default| %>
+        <% rec = @saved["#{kind}:#{key}"] %>
+        <tr class="<%= 'on' if rec %>">
+          <td><label for="lb_<%= kind %>_<%= key %>"><strong><%= default %></strong></label> <code class="lb_key"><%= key %></code></td>
+          <td class="lb_new"><%= text_field_tag "labels[#{kind}][#{key}]", rec&.name, :id => "lb_#{kind}_#{key}", :maxlength => 60, :placeholder => default %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+    </div>
+  </fieldset>
+  <% end %>
+  <p class="buttons lb_save"><%= submit_tag l(:button_save), :class => 'btn_main' %></p>
+<% end %>
+<% html_title l(:label_krds_labels) %>
