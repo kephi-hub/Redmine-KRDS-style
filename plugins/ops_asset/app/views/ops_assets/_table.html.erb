@@ -6,7 +6,13 @@
   <% assets.each do |a| %>
     <tr class="<%= 'qa_del' unless a.active? %>">
       <td class="kind"><%= oa_badge(oa_label('kind', a.kind), a.kind) %></td>
-      <td class="name"><strong><%= a.name %></strong><% if a.spec.present? %><span class="db_dim db_pvsub"><%= a.spec.truncate(60) %></span><% end %></td>
+      <td class="name"><strong><%= a.name %></strong><% if a.spec.present? %><span class="db_dim db_pvsub"><%= a.spec.truncate(60) %></span><% end %>
+        <% if (si = a.server_info_h) %><span class="oa_probe"><%= si['host'] %><% if si['uptime_days'] %> · <%= l(:label_oa_uptime, n: si['uptime_days']) %><% end %>
+          <% (si['disks'] || []).first(4).each do |d| %> · <span class="<%= 'oa_warn' if d['pct'].to_i >= OpsKit::Probe::DISK_WARN %>"><%= d['mount'] %> <%= d['pct'] %>%</span><% end %>
+          <span class="db_dim">(<%= format_date(a.info_at) %>)</span></span>
+        <% elsif a.info_error.present? %><span class="oa_probe oa_warn"><%= l(:label_oa_collect_fail) %>: <%= a.info_error.truncate(80) %></span><% end %>
+        <% if (ci = a.cert_info_h) %><span class="oa_probe"><%= l(:label_oa_cert_info, date: ci['not_after'], subject: ci['subject'], issuer: ci['issuer']) %><% unless ci['match'] %> <span class="oa_warn"><%= l(:label_oa_cert_mismatch) %></span><% end %> <span class="db_dim">(<%= format_date(a.cert_at) %>)</span></span>
+        <% elsif a.cert_error.present? %><span class="oa_probe oa_warn"><%= l(:label_oa_cert_fail) %>: <%= a.cert_error.truncate(80) %></span><% end %></td>
       <td><%= oa_label('env', a.env) %></td>
       <td class="name"><%= a.address %><% if a.vendor.present? %><span class="db_dim db_pvsub"><%= a.vendor %></span><% end %></td>
       <td><%= a.owner %></td>
@@ -19,6 +25,8 @@
         <% if admin %>
           <%= link_to sprite_icon('edit', l(:button_edit)), edit_admin_ops_asset_path(a), :class => 'icon icon-edit' %>
         <% elsif can_edit && !a.shared? %>
+          <% if a.kind == 'server' && a.vault_key_id %><%= link_to sprite_icon('reload', l(:label_oa_collect)), project_ops_asset_collect_path(@project, a), :method => :post, :class => 'icon icon-reload' %><% end %>
+          <% if a.cert_checkable? %><%= link_to sprite_icon('krds-lock', l(:label_oa_cert_check)), project_ops_asset_cert_path(@project, a), :method => :post, :class => 'icon' %><% end %>
           <%= link_to sprite_icon('edit', l(:button_edit)), edit_project_ops_asset_path(@project, a), :class => 'icon icon-edit' %>
         <% elsif can_edit && a.shared? %>
           <%= link_to sprite_icon('link-break', l(:label_oa_unlink)), project_ops_asset_unlink_path(@project, a), :method => :delete, :data => { :confirm => l(:text_oa_unlink) }, :class => 'icon icon-link-break' %>

@@ -3,6 +3,8 @@ resources :projects, only: [] do
   get 'assets/export', to: 'ops_assets#export', as: 'ops_assets_export'
   post 'assets/link', to: 'ops_assets#link', as: 'ops_assets_link'
   delete 'assets/:id/link', to: 'ops_assets#unlink', as: 'ops_asset_unlink', constraints: { id: /\d+/ }
+  post 'assets/:id/collect', to: 'ops_assets#collect', as: 'ops_asset_collect', constraints: { id: /\d+/ }
+  post 'assets/:id/cert', to: 'ops_assets#cert', as: 'ops_asset_cert', constraints: { id: /\d+/ }
   resources :ops_assets, path: 'assets', except: [:show]
   get 'schedules/timeline', to: 'ops_schedules#timeline', as: 'ops_schedules_timeline'
   get 'schedules/export', to: 'ops_schedules#export', as: 'ops_schedules_export'

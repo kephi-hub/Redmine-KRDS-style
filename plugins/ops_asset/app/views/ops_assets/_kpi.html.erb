@@ -6,4 +6,5 @@
   <li class="<%= 'on' if @state == 'soon30' %>"><%= link_to path.call(:state => 'soon30') do %><span><%= l(:label_oa_k_soon30) %></span><strong><%= @kpi[:soon30] %></strong><% end %></li>
   <li><span><%= l(:label_oa_k_server) %></span><strong><%= @kpi[:server] %></strong></li>
   <li><span><%= l(:label_oa_k_cert) %></span><strong><%= @kpi[:cert] %></strong></li>
+  <% if @kpi.key?(:disk) %><li class="<%= 'on' if @state == 'disk' %>"><%= link_to path.call(:state => 'disk') do %><span><%= l(:label_oa_k_disk, n: OpsKit::Probe::DISK_WARN) %></span><strong class="<%= 'qa_fail' if @kpi[:disk].positive? %>"><%= @kpi[:disk] %></strong><% end %></li><% end %>
 </ul>

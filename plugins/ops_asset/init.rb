@@ -10,6 +10,7 @@ require_relative 'lib/ops_kit/report'
 require_relative 'lib/ops_kit/importer'
 require_relative 'lib/ops_kit/notifier'
 require_relative 'lib/ops_kit/diagram'
+require_relative 'lib/ops_kit/probe'
 
 Redmine::Plugin.register :ops_asset do
   name '운영 관리'
@@ -21,7 +22,7 @@ Redmine::Plugin.register :ops_asset do
 
   project_module :ops_assets do
     permission :view_ops_assets, { ops_assets: [:index, :export] }, read: true
-    permission :manage_ops_assets, { ops_assets: [:new, :create, :edit, :update, :destroy, :link, :unlink] }, require: :member
+    permission :manage_ops_assets, { ops_assets: [:new, :create, :edit, :update, :destroy, :link, :unlink, :collect, :cert] }, require: :member
   end
   project_module :ops_schedules do
     permission :view_ops_schedules, { ops_schedules: [:index, :show, :timeline, :export, :preview] }, read: true

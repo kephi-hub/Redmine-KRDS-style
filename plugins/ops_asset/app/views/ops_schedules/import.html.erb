@@ -4,9 +4,25 @@
 <div class="tabs"><ul>
   <li><%= link_to l(:label_oa_imp_crontab), project_ops_schedules_import_path(@project), :class => (@from.nil? || @from == 'crontab' ? 'selected' : nil) %></li>
   <% if @project.module_enabled?(:db_manage) %><li><%= link_to l(:label_oa_imp_db), project_ops_schedules_import_path(@project, :from => 'db'), :class => (@from == 'db' ? 'selected' : nil) %></li><% end %>
+  <% if defined?(SshConsole::Exec) && @project.module_enabled?(:keys) %><li><%= link_to l(:label_oa_imp_ssh), project_ops_schedules_import_path(@project, :from => 'ssh'), :class => (@from == 'ssh' ? 'selected' : nil) %></li><% end %>
   <% if @project.module_enabled?(:jenkins_deploy) %><li><%= link_to l(:label_oa_imp_jenkins), project_ops_schedules_import_path(@project, :from => 'jenkins'), :class => (@from == 'jenkins' ? 'selected' : nil) %></li><% end %>
 </ul></div>
-<% if @from == 'db' || @from == 'jenkins' %>
+<% if @from == 'ssh' %>
+  <p class="db_info"><%= l(:text_oa_imp_ssh) %></p>
+  <% if @ssh_assets.empty? %>
+    <p class="db_hintbox"><%= l(:text_oa_imp_ssh_none) %></p>
+  <% else %>
+  <%= form_tag(project_ops_schedules_import_path(@project)) do %>
+    <%= hidden_field_tag 'from', 'ssh', :id => nil %>
+    <div class="box tabular">
+      <p><label for="oa_ssh_asset"><%= l(:label_oa_server) %></label><%= select_tag 'asset_id', options_for_select(@ssh_assets.map { |a| ["#{a.name}#{" (#{a.address})" if a.address.present?} — #{a.vault_key&.name}", a.id] }), :id => 'oa_ssh_asset' %></p>
+      <p><label for="oa_user_cron"><%= l(:label_oa_imp_user_cron) %></label><%= check_box_tag 'user_cron', '1', true, :id => 'oa_user_cron' %> <em class="info"><code>crontab -l</code></em></p>
+      <p><label for="oa_system_cron"><%= l(:label_oa_imp_system) %></label><%= check_box_tag 'system_cron', '1', false, :id => 'oa_system_cron' %> <em class="info"><code>/etc/crontab</code> · <code>/etc/cron.d/*</code> — <%= l(:text_oa_imp_system) %></em></p>
+    </div>
+    <p class="form_btns"><%= link_to l(:button_cancel), project_ops_schedules_path(@project), :class => 'btn_line' %><%= submit_tag l(:label_oa_imp_ssh_go) %></p>
+  <% end %>
+  <% end %>
+<% elsif @from == 'db' || @from == 'jenkins' %>
   <% jobs = @from == 'db' ? @db_jobs : @jk_jobs %>
   <% errs = @from == 'db' ? @db_errors : @jk_errors %>
   <p class="db_info"><%= l(@from == 'db' ? :text_oa_imp_db : :text_oa_imp_jenkins) %></p>

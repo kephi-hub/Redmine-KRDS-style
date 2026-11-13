@@ -93,6 +93,25 @@ module SshConsole
       list << target
     end
 
+    # 처음 연결 때 본 지문을 접속 설정에 기록 (비어 있는 칸만)
+    def remember(profile, chain, fps)
+      return unless profile&.persisted?
+      changed = false
+      hops = profile.hop_list
+      chain.each_with_index do |_, i|
+        fp = fps[i] or next
+        if i == chain.size - 1
+          (profile.host_key = fp; changed = true) if profile.host_key.blank?
+        elsif hops[i] && hops[i]['fp'].blank?
+          hops[i]['fp'] = fp
+          changed = true
+        end
+      end
+      return unless changed
+      profile.hop_list = hops
+      profile.save(validate: false)
+    end
+
     # 화면용 경로 설명 (비밀값 없음): "deploy@10.0.0.16:2222 · 경유 WEB1"
     def describe(chain)
       t = chain.last

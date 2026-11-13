@@ -83,20 +83,23 @@ class OpsSchedulesController < ApplicationController
 
   # 가져오기: GET 화면(from=db|jenkins 면 그때 접속해 목록), POST from=crontab|db|jenkins
   def import
-    @from = params[:from].presence_in(%w(crontab db jenkins))
+    @from = params[:from].presence_in(%w(crontab db jenkins ssh))
     if request.get?
       @db_jobs, @db_errors = OpsKit::Importer.db_jobs(@project) if @from == 'db'
       @jk_jobs, @jk_errors = OpsKit::Importer.jenkins_jobs(@project) if @from == 'jenkins'
+      @ssh_assets = ssh_assets if @from == 'ssh'
       return
     end
     case @from
     when 'crontab' then import_crontab
     when 'db' then import_db
     when 'jenkins' then import_jenkins
+    when 'ssh' then return unless import_ssh
     else return redirect_to(project_ops_schedules_import_path(@project))
     end
     flash[:notice] = l(:notice_oa_imported, created: @result[:created], updated: @result[:updated])
     flash[:warning] = l(:warning_oa_import_skipped, lines: @result[:errors].first(10).join(', ')) if @result[:errors].any?
+    flash[:warning] = [flash[:warning], l(:warning_oa_ssh_missing, n: @result[:missing])].compact.join(' / ') if @result[:missing].to_i.positive?
     redirect_to project_ops_schedules_path(@project)
   end
 
@@ -139,6 +142,52 @@ class OpsSchedulesController < ApplicationController
       upsert(key, name: it[:name], kind: 'cron', ops_asset_id: asset&.id, expression: it[:expression], command: it[:command], run_as: it[:run_as],
                   source: 'crontab', active: true)
     end
+  end
+
+  # 서버에서 가져오기 (SSH) — 서버 자산에 연결한 SSH 접속정보로 crontab 을 읽어 붙여넣기와 같은 방식으로 등록
+  def ssh_assets
+    return [] unless defined?(SshConsole::Access)
+    OpsAsset.for_project(@project).where(kind: 'server', active: true).where.not(vault_key_id: nil).sorted.to_a.select do |a|
+      (k = a.vault_key) && SshConsole::Access.can_connect?(User.current, k)
+    end
+  end
+
+  def import_ssh
+    @result = { created: 0, updated: 0, errors: [], missing: 0 }
+    asset = ssh_assets.find { |a| a.id == params[:asset_id].to_i }
+    unless asset
+      flash[:error] = l(:error_oa_no_ssh_key)
+      redirect_to(project_ops_schedules_import_path(@project, from: 'ssh'))
+      return false
+    end
+    cmds = {}
+    # crontab -l 이 비면(busybox 처럼 setuid 가 아닌 crontab) 계정 crontab 파일을 직접 읽음
+    cmds['user'] = 'c=$(crontab -l 2>/dev/null); if [ -n "$c" ]; then printf "%s\\n" "$c"; else cat /var/spool/cron/$(id -un) /var/spool/cron/crontabs/$(id -un) /etc/crontabs/$(id -un) 2>/dev/null; fi' if params[:user_cron] == '1'
+    cmds['system'] = 'cat /etc/crontab 2>/dev/null; for f in /etc/cron.d/*; do [ -f "$f" ] && cat "$f"; done 2>/dev/null' if params[:system_cron] == '1'
+    if cmds.empty?
+      flash[:error] = l(:error_oa_ssh_pick)
+      redirect_to(project_ops_schedules_import_path(@project, from: 'ssh'))
+      return false
+    end
+    out = SshConsole::Exec.run(asset.vault_key, cmds, user: User.current)
+    keys = []
+    out.each do |kind, text|
+      items, bad = OpsKit::Importer.parse_crontab(text, system: kind == 'system')
+      @result[:errors] += bad.map { |no, _| "#{kind == 'system' ? '시스템' : '계정'} #{no}행" }
+      items.each do |it|
+        key = OpsKit::Importer.key_for('crontab', asset.id, it[:expression], it[:command])
+        keys << key
+        upsert(key, name: it[:name], kind: 'cron', ops_asset_id: asset.id, expression: it[:expression], command: it[:command], run_as: it[:run_as],
+                    source: 'crontab', active: true)
+      end
+    end
+    # 예전에 이 서버에서 가져왔는데 지금 서버에 없는 작업 — 지우지 않고 알려만 줌
+    @result[:missing] = OpsSchedule.where(project_id: @project.id, ops_asset_id: asset.id, source: 'crontab', active: true).where.not(source_key: keys).count
+    true
+  rescue StandardError => e
+    flash[:error] = l(:error_oa_ssh_import, msg: e.message.to_s.truncate(200))
+    redirect_to(project_ops_schedules_import_path(@project, from: 'ssh'))
+    false
   end
 
   def import_db

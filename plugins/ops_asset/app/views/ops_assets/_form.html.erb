@@ -17,6 +17,10 @@
   <% if defined?(JenkinsServer) && (jk = JenkinsServer.order(:name).to_a).any? %>
     <p><%= f.select :jenkins_server_id, jk.map { |s| [s.name, s.id] }, { :include_blank => true, :label => :label_oa_jenkins } %></p>
   <% end %>
+  <% if !local_assigns[:admin] && respond_to?(:ssh_keys) && ssh_keys.any? %>
+    <p><%= f.select :vault_key_id, ssh_keys.map { |k| ["#{k.name} (#{[k.login.presence, k.url].compact.join('@')})", k.id] }, { :include_blank => true, :label => :label_oa_ssh_key } %>
+      <em class="info"><%= l(:text_oa_ssh_key) %></em></p>
+  <% end %>
   <p><%= f.text_area :note, :rows => 3, :cols => 60, :label => :label_oa_note %>
     <em class="info"><%= l(:text_oa_secret) %></em></p>
   <p><%= f.check_box :active, :label => :field_active %></p>

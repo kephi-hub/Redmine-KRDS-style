@@ -49,6 +49,31 @@ class OpsAsset < ApplicationRecord
     defined?(JenkinsServer) && jenkins_server_id ? JenkinsServer.find_by(id: jenkins_server_id) : nil
   end
 
+  # 서버 정보 수집에 쓰는 SSH 접속정보 (접속정보 vault_ssh 의 "SSH 서버")
+  def vault_key
+    defined?(Vault::Key) && vault_key_id ? Vault::Key.find_by(id: vault_key_id) : nil
+  end
+
+  def server_info_h
+    server_info.present? ? JSON.parse(server_info) : nil
+  rescue JSON::ParserError
+    nil
+  end
+
+  def cert_info_h
+    cert_info.present? ? JSON.parse(cert_info) : nil
+  rescue JSON::ParserError
+    nil
+  end
+
+  def disk_warn?
+    disk_pct.to_i >= OpsKit::Probe::DISK_WARN
+  end
+
+  def cert_checkable?
+    %w(cert domain).include?(kind) && address.present?
+  end
+
   def to_s
     name
   end

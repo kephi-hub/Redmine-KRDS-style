@@ -1,4 +1,8 @@
 ko:
+  error_ssh_not_ssh: "SSH 서버 유형 접속정보가 아닙니다."
+  error_ssh_exec_ask: "'접속할 때 직접 입력' 서버는 자동 수집에 쓸 수 없습니다 (저장된 비밀번호나 개인키 필요)."
+  text_ssh_screen_recorded: "화면 녹화 중"
+  text_ssh_screen_not_recorded: "화면 녹화 안 함"
   label_ssh_files: "파일"
   label_ssh_files_up: "상위 폴더"
   label_ssh_files_refresh: "새로 고침"
@@ -98,7 +102,7 @@ ko:
   label_ssh_no_record: "녹화가 없습니다 (녹화하지 않는 서버이거나 연결에 실패)"
   text_ssh_profile_help: "경유 서버는 다른 \"SSH 서버\" 접속정보를 고르면 계정·비밀번호를 다시 적지 않아도 됩니다. 서버 지문은 처음 연결할 때 기록하고, 이후 바뀌면 접속을 막습니다."
   text_ssh_prod_help: "운영 서버 접속은 사유와 프로젝트 식별자(%{id})를 입력해야 하며, 화면이 녹화됩니다."
-  text_ssh_recorded: "이 세션은 기록됩니다"
+  text_ssh_recorded: "접속 기록이 남습니다"
   text_ssh_idle_warn: "1분 동안 입력이 없으면 연결을 끊습니다."
   text_ssh_used_ticket: "이 접속표는 이미 쓰였거나 만료되었습니다. 아래 [다시 연결] 또는 접속정보 목록에서 다시 접속하세요."
   text_ssh_connecting: "연결하는 중..."

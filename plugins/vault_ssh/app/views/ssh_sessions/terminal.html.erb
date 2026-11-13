@@ -52,6 +52,7 @@
   <div class="sf_drop" id="sf_drop" hidden><%= l(:label_ssh_files_drop) %></div>
 </aside>
 </div>
-<footer class="st_foot"><%= l(:text_ssh_recorded) %> · <%= User.current.name %> · <%= format_time(s.created_at) %><% if s.reason.present? %> · <%= s.reason %><% end %></footer>
+<% recorded = prod || VaultSshProfile.find_by(key_id: s.key_id)&.record %>
+<footer class="st_foot"><%= l(:text_ssh_recorded) %> · <%= recorded ? l(:text_ssh_screen_recorded) : l(:text_ssh_screen_not_recorded) %> · <%= User.current.name %> · <%= format_time(s.created_at) %><% if s.reason.present? %> · <%= s.reason %><% end %></footer>
 </body>
 </html>

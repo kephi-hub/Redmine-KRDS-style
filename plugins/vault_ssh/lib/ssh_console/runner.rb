@@ -144,7 +144,7 @@ module SshConsole
         @prod = session.prod?
         emit(t: 's', s: 'connecting', m: Target.describe(chain))
         link = Connector.open(chain)
-        remember_fingerprints(profile, chain, link.fingerprints) if profile
+        Target.remember(profile, chain, link.fingerprints) if profile
         rec = Recorder.new(session, @cols, @rows) if profile&.record || session.prod?
         session.update_columns(status: 'running', started_at: Time.current, target: Target.describe(chain).truncate(255), record_file: rec&.file)
         # 몇 시간 이어질 수 있으므로 DB 연결은 반납 (끝날 때 다시 빌림)
@@ -173,23 +173,6 @@ module SshConsole
         end
         self.class.unregister(@id)
       end
-    end
-
-    def remember_fingerprints(profile, chain, fps)
-      changed = false
-      hops = profile.hop_list
-      chain.each_with_index do |ep, i|
-        fp = fps[i] or next
-        if i == chain.size - 1
-          (profile.host_key = fp; changed = true) if profile.host_key.blank?
-        elsif hops[i] && hops[i]['fp'].blank?
-          hops[i]['fp'] = fp
-          changed = true
-        end
-      end
-      return unless changed
-      profile.hop_list = hops
-      profile.save(validate: false)
     end
 
     def loop_shell(ssh, profile, session, rec)
