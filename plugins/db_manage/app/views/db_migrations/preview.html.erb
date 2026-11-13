@@ -26,9 +26,9 @@
 </table>
 </div>
 <p><button type="button" class="mg_btn" id="mg_dl"><%= sprite_icon('download', l(:label_db_mig_sql_download)) %></button></p>
-<textarea id="mg_sql_all" hidden><%= @sql %></textarea>
+<textarea id="mg_sql_all" style="display:none" aria-hidden="true"><%= @sql %></textarea>
 
-<%= form_tag project_db_migrations_path(@project), class: 'mg_confirm', id: 'mg_run' do %>
+<%= form_tag project_db_migrations_path(@project), id: 'mg_run' do %><div class="mg_confirm">
   <%= hidden_field_tag :source, @source.id, id: nil %><%= hidden_field_tag :target, @target.id, id: nil %>
   <% @choices.each do |c| %><%= hidden_field_tag "mode[#{c['table']}]", c['mode'], id: nil %><% end %>
   <p class="db_hintbox"><%= l(:text_db_mig_backup_note) %></p>
@@ -45,7 +45,7 @@
     <%= link_to l(:button_cancel), project_db_migrations_path(@project, source: @source.id, target: @target.id), class: 'mg_btn' %>
     <button type="submit" class="mg_btn <%= @target.production? ? 'mg_danger' : 'mg_primary' %>" <%= 'disabled' if errors == @plan.size %>><%= l(:label_db_mig_run) %></button>
   </div>
-<% end %>
+</div><% end %>
 <%= javascript_tag do %>
 $(function() {
   $('#mg_dl').on('click', function() {

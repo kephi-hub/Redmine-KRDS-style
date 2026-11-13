@@ -1113,7 +1113,7 @@ table.list .mg_num{text-align:right;white-space:nowrap;}
 .mg_dir{margin:0 0 12px;font-size:1rem;}
 table.list.mg_plan td{vertical-align:top;}
 table.list.mg_plan tr.mg_bad>td{background:var(--dan_5);}
-.mg_sqlcol{text-align:left;}
+#content table.list td.mg_sqlcol,#content table.list th.mg_sqlcol{text-align:left;}
 .mg_warn{font-size:0.8125rem;color:var(--war_60);}
 .mg_sql{max-height:320px;padding:10px 12px;margin:6px 0 0;overflow:auto;border-radius:var(--radius_s);background:#1e2124;font-size:0.75rem;color:#e6e8ea;white-space:pre-wrap;word-break:break-all;}
 .mg_confirm{padding:16px;margin:16px 0;border:1px solid var(--gray_20);border-radius:var(--radius_m);}
