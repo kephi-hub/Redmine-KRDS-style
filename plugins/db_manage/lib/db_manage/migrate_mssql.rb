@@ -410,7 +410,7 @@ module DbManage
         ["DROP SYNONYM IF EXISTS #{qt(key)}", nil, "CREATE SYNONYM #{qt(key)} FOR #{ren.call(base)}"]
       when 'event'
         # 에이전트 작업은 서버 단위 — 같은 인스턴스면 대상 작업이 곧 원본 작업이라 옮기지 않음
-        raise Error, t(:error_db_mig_job_same_server) if to.instance == instance
+        raise Error, t(:error_db_mig_job_same_server) if !to.equal?(self) && to.instance == instance
         [job_script(key, to.db_name), nil]
       else
         d = rows("SELECT OBJECT_DEFINITION(OBJECT_ID(#{s(qt(key))})) AS d").first['d'] or raise Error, t(:error_db_mig_obj_def)

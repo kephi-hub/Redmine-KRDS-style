@@ -92,7 +92,7 @@ module DbManage
             sm = src.describe(c['table']) or raise Error, I18n.t(:error_db_mig_no_source)
             plan = tgt.plan(c['table'], sm, tgt.describe(c['table']))
             item.merge!(plan.slice(:status, :statements, :warnings))
-            item[:error] = I18n.t(:error_db_mig_no_unique) if c['mode'] == 'upsert' && !plan[:unique]
+            item[:error] = I18n.t(:error_db_mig_no_unique) if %w(upsert insert_new).include?(c['mode']) && !plan[:unique]
             item[:warnings] += [I18n.t(:text_db_mig_big, rows: item[:rows])] if DATA_MODES.include?(c['mode']) && item[:rows].to_i >= BIG_ROWS
           rescue StandardError => e
             item[:error] = msg(e)
@@ -163,7 +163,7 @@ module DbManage
       r['plan'] = plan[:status]
       r['warnings'] = plan[:warnings]
       data = DATA_MODES.include?(mode)
-      raise Error, I18n.t(:error_db_mig_no_unique) if mode == 'upsert' && !plan[:unique]
+      raise Error, I18n.t(:error_db_mig_no_unique) if %w(upsert insert_new).include?(mode) && !plan[:unique]
       if tm && (plan[:statements].any? || data)
         FileUtils.mkdir_p(dir)
         file = dir.join("#{name.gsub(/[^\w.-]/, '_')}.sql.gz")
