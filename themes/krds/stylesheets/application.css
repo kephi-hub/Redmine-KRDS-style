@@ -794,7 +794,8 @@ ul.cal li.week-number{padding:8px 12px;border-top:1px solid var(--gray_20);backg
 ul.cal li.week-number:nth-child(9){border-top:0;}
 ul.cal li.calbody{padding:10px 12px;border-top:1px solid var(--gray_10);background:var(--gray_0);}
 ul.cal li.calbody.other-month{display:none;}
-ul.cal li.calbody.today{background:var(--pri_5);}
+ul.cal li.calbody.nwday:not(.other-month){background:var(--gray_5);}
+ul.cal li.calbody.today,ul.cal li.calbody.today.nwday:not(.other-month){background:var(--pri_5);}
 ul.cal p.day-num{display:flex;align-items:center;gap:4px;margin:0;font-size:0.875rem;font-weight:700;color:var(--gray_80);}
 ul.cal p.day-num .abbr-day{font-weight:400;color:var(--gray_60);}
 ul.cal>li:nth-child(8n+2) p.day-num,ul.cal>li.calhead:nth-child(2){color:var(--dan_60);}
@@ -838,6 +839,10 @@ p.legend.cal svg{width:16px;height:16px;}
 /* ===== 일감 상세 하위 일감·연결된 일감 표 ===== */
 #issue_tree table.list.issues,#relations table.list.issues{margin:0;border-top:1px solid var(--gray_20);border-bottom:1px solid var(--gray_20);}
 #issue_tree table.list.issues td.subject,#relations table.list.issues td.subject{text-align:left;}
+#issue_tree table.list.issues td,#relations table.list.issues td{overflow:visible;max-width:none;white-space:normal;text-overflow:clip;}
+#issue_tree table.list.issues td.start_date,#issue_tree table.list.issues td.due_date,#relations table.list.issues td.start_date,#relations table.list.issues td.due_date{white-space:nowrap;}
+div.issue .next-prev-links{float:none;margin:0 0 10px;text-align:right;}
+#history .journal h4.journal-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 8px;}
 
 /* ===== 뉴스 목록 (KRDS 게시판 목록) ===== */
 #content>h2+article.news-article,#content>.list_bar+article.news-article{clear:both;border-top:2px solid var(--gray_90);}
@@ -1850,6 +1855,7 @@ a.vk_code:hover{text-decoration:underline;}
 .kd_toast{position:fixed;bottom:24px;left:50%;z-index:2000;padding:10px 18px;border-radius:var(--radius_m);background:var(--gray_90);font-size:0.875rem;color:var(--gray_0);transform:translateX(-50%);opacity:0;transition:opacity 0.2s;pointer-events:none;}
 .kd_toast.on{opacity:1;}
 @media (min-width:900px){
+div.issue .next-prev-links{float:right;margin:0;}
 ul.cal li.calhead{display:block;padding:10px 0;border-bottom:1px solid var(--gray_20);background:var(--gray_5);text-align:center;font-size:0.8125rem;font-weight:700;color:var(--gray_70);}
 ul.cal li.week-number{padding:8px 0;border-top:1px solid var(--gray_10);background:var(--gray_5);text-align:center;font-size:0.75rem;font-weight:500;color:var(--gray_50);}
 ul.cal li.week-number:nth-child(9){border-top:0;}
