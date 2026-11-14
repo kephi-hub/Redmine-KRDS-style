@@ -166,10 +166,6 @@ table.progress td.todo{background:var(--gray_10);}
 .badge-status-closed{border-color:var(--gray_50);color:var(--gray_60);}
 .badge-count{background:var(--pri_50);color:var(--gray_0);}
 
-/* ===== 달력 ===== */
-.cal .calbody.nwday:not(.other-month){background-color:var(--gray_5);}
-.cal .calbody.today,.cal .calbody.today.nwday:not(.other-month){background:var(--pri_5);}
-.cal .calbody.today p.day-num{color:var(--pri_60);}
 
 /* ===== 간트 (프로젝트·버전 마커 제외) ===== */
 .task_done:not(.project):not(.version){border-color:var(--pri_50);background:var(--pri_50);}
@@ -789,12 +785,59 @@ body.controller-issues.action-show #content>div.contextual>a.icon-edit .icon-svg
 /* 제목 줄 높이를 버튼(36px)에 맞춰 아래 상자와 겹치지 않게 */
 #content>div.contextual+h2{line-height:36px;}
 
-/* ===== 달력 일감 (KRDS 일정 칩: 옅은 배경 + 왼쪽 색 막대) — 일감 상세용 div.issue 규칙이 번지지 않게 ===== */
-ul.cal div.issue{padding:6px 8px;margin:4px 0;border:0;border-left:3px solid var(--pri_50);border-radius:var(--radius_s);background:var(--pri_5);font-size:0.8125rem;line-height:1.5;}
+/* ===== 달력 (KRDS 일정) — 모바일: 날짜별 목록(다른 달 날짜 숨김), 900px 이상: 7칸 격자
+   요일 색은 주 시작이 일요일인 기준(li 8개 묶음: 주 번호 + 일~토). 일감 칩은 옅은 배경 + 왼쪽 상태색 막대 ===== */
+ul.cal{overflow:hidden;border:1px solid var(--gray_20);border-radius:var(--radius_m);background:var(--gray_0);}
+ul.cal>li{border:0;}
+ul.cal li.calhead{display:none;}
+ul.cal li.week-number{padding:8px 12px;border-top:1px solid var(--gray_20);background:var(--sec_5);font-size:0.8125rem;font-weight:700;color:var(--sec_70);}
+ul.cal li.week-number:nth-child(9){border-top:0;}
+ul.cal li.calbody{padding:10px 12px;border-top:1px solid var(--gray_10);background:var(--gray_0);}
+ul.cal li.calbody.other-month{display:none;}
+ul.cal li.calbody.today{background:var(--pri_5);}
+ul.cal p.day-num{display:flex;align-items:center;gap:4px;margin:0;font-size:0.875rem;font-weight:700;color:var(--gray_80);}
+ul.cal p.day-num .abbr-day{font-weight:400;color:var(--gray_60);}
+ul.cal>li:nth-child(8n+2) p.day-num,ul.cal>li.calhead:nth-child(2){color:var(--dan_60);}
+ul.cal>li:nth-child(8n) p.day-num,ul.cal>li.calhead:nth-child(8){color:var(--pri_60);}
+ul.cal li.calbody.today p.day-num{color:var(--pri_70);}
+ul.cal li.calbody.today p.day-num::after{content:"오늘";display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:9px;background:var(--pri_50);font-size:0.6875rem;font-weight:700;color:var(--gray_0);}
+ul.cal div.issue{display:block;padding:5px 8px;margin:6px 0 0;border:0;border-left:3px solid var(--pri_50);border-radius:var(--radius_s);background:var(--pri_5);font-size:0.8125rem;line-height:1.45;color:var(--gray_80);word-break:keep-all;overflow-wrap:anywhere;}
+ul.cal div.issue:hover{box-shadow:0 1px 4px rgba(0,0,0,0.12);}
+ul.cal div.issue>svg{width:14px;height:14px;margin:0 2px 0 0;vertical-align:-2px;}
+ul.cal div.issue a.issue{font-weight:700;}
 ul.cal div.issue.status-2{border-left-color:var(--war_60);background:var(--war_5);}
 ul.cal div.issue.status-3{border-left-color:var(--suc_60);background:var(--suc_5);}
-ul.cal div.issue.status-5,ul.cal div.issue.status-6{border-left-color:var(--gray_30);background:var(--gray_5);}
-ul.cal div.issue a.issue{font-weight:500;}
+ul.cal div.issue.status-4{border-left-color:var(--sec_70);background:var(--sec_5);}
+ul.cal div.issue.status-5,ul.cal div.issue.status-6,ul.cal div.issue.status-7{border-left-color:var(--gray_30);background:var(--gray_5);color:var(--gray_60);}
+ul.cal div.issue.status-5 a.issue,ul.cal div.issue.status-6 a.issue{color:var(--gray_60);}
+ul.cal div.issue.status-7{border-left-color:var(--gray_50);}
+ul.cal div.tooltip span.tip{padding:12px 14px;border:1px solid var(--gray_20);border-radius:var(--radius_m);background:var(--gray_0);box-shadow:0 6px 18px rgba(0,0,0,0.12);font-size:0.8125rem;font-weight:400;line-height:1.6;color:var(--gray_80);}
+p.legend.cal{display:flex;flex-wrap:wrap;gap:8px 16px;margin:12px 0 0;font-size:0.8125rem;color:var(--gray_60);}
+p.legend.cal>span{display:inline-flex;align-items:center;gap:4px;}
+p.legend.cal svg{width:16px;height:16px;}
+
+/* ===== 일감 상세 이력 — 왼쪽 세로선 타임라인 + 아바타 원, 댓글은 카드, 변경 내역은 점 목록 ===== */
+#history .journal{position:relative;padding:0 0 0 44px;}
+#history .journal::before{content:"";position:absolute;top:0;bottom:0;left:15px;width:2px;background:var(--gray_10);}
+#history .journal:first-of-type::before{top:28px;}
+#history .journal:last-of-type::before{bottom:auto;height:28px;}
+#history .journal h4.journal-header{position:relative;padding:18px 0 6px;border-top:0;background:none;}
+#history .journal h4.journal-header .journal-info .avatar{position:absolute;top:13px;left:-44px;z-index:1;box-sizing:border-box;width:32px;height:32px;margin:0;border:2px solid var(--gray_0);border-radius:50%;font-size:0.6875rem;line-height:28px;}
+#history .journal h4.journal-header .journal-link{display:inline-flex;align-items:center;height:20px;padding:0 6px;border-radius:10px;background:var(--gray_10);font-size:0.75rem;font-weight:500;color:var(--gray_60);text-decoration:none;}
+#history .journal div:target h4.journal-header,#history .journal:target h4.journal-header{background:none;}
+#history .journal:target .journal-note,#history .journal div:target .journal-note{border-color:var(--pri_50);box-shadow:0 0 0 2px var(--pri_10);}
+#history .journal .journal-content{padding:0 0 18px;}
+#history ul.journal-details{padding:0;margin:0;list-style:none;font-size:0.8125rem;color:var(--gray_60);}
+#history ul.journal-details li{position:relative;padding:2px 0 2px 12px;}
+#history ul.journal-details li::before{content:"";position:absolute;top:11px;left:2px;width:4px;height:4px;border-radius:50%;background:var(--gray_40);}
+#history ul.journal-details strong{font-weight:500;color:var(--gray_80);}
+#history ul.journal-details i{font-style:normal;color:var(--gray_80);}
+#history .journal-note{padding:12px 16px;margin:8px 0 0;border:1px solid var(--gray_20);border-radius:var(--radius_m);background:var(--gray_0);}
+#history .journal-note>p:last-child{margin-bottom:0;}
+
+/* ===== 일감 상세 하위 일감·연결된 일감 표 ===== */
+#issue_tree table.list.issues,#relations table.list.issues{margin:0;border-top:1px solid var(--gray_20);border-bottom:1px solid var(--gray_20);}
+#issue_tree table.list.issues td.subject,#relations table.list.issues td.subject{text-align:left;}
 
 /* ===== 뉴스 목록 (KRDS 게시판 목록) ===== */
 #content>h2+article.news-article,#content>.list_bar+article.news-article{clear:both;border-top:2px solid var(--gray_90);}
@@ -1807,6 +1850,19 @@ a.vk_code:hover{text-decoration:underline;}
 .kd_toast{position:fixed;bottom:24px;left:50%;z-index:2000;padding:10px 18px;border-radius:var(--radius_m);background:var(--gray_90);font-size:0.875rem;color:var(--gray_0);transform:translateX(-50%);opacity:0;transition:opacity 0.2s;pointer-events:none;}
 .kd_toast.on{opacity:1;}
 @media (min-width:900px){
+ul.cal li.calhead{display:block;padding:10px 0;border-bottom:1px solid var(--gray_20);background:var(--gray_5);text-align:center;font-size:0.8125rem;font-weight:700;color:var(--gray_70);}
+ul.cal li.week-number{padding:8px 0;border-top:1px solid var(--gray_10);background:var(--gray_5);text-align:center;font-size:0.75rem;font-weight:500;color:var(--gray_50);}
+ul.cal li.week-number:nth-child(9){border-top:0;}
+ul.cal li.week-number .label-week{display:none;}
+ul.cal li.calbody{min-height:120px;padding:6px 6px 10px;border-top:1px solid var(--gray_10);border-left:1px solid var(--gray_10);}
+ul.cal li.calbody.other-month{display:block;background:var(--gray_5);}
+ul.cal li.calbody.other-month p.day-num{color:var(--gray_40);}
+ul.cal p.day-num{margin:0 0 2px;font-size:0.8125rem;}
+ul.cal p.day-num .abbr-day{display:none;}
+ul.cal div.issue{padding:4px 6px;margin:4px 0 0;font-size:0.75rem;}
+#history .journal{padding-left:52px;}
+#history .journal::before{left:17px;}
+#history .journal h4.journal-header .journal-info .avatar{left:-52px;width:36px;height:36px;font-size:0.75rem;line-height:32px;}
 .mg_help{grid-template-columns:auto 1fr;}
 .mg_help dd{margin:0;}
 #content #keys_table tr.vk_row>td.vk_acts{display:table-cell;margin:0;padding:10px 8px;border-top:1px solid var(--gray_10);}
