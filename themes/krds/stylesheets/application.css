@@ -215,9 +215,15 @@ div.flash.warning,.conflict,.nodata,.warning{border-color:var(--war_10);backgrou
 div.flash.warning svg.icon-svg,.conflict svg.icon-svg{stroke:var(--war_60);}
 
 /* ===== 페이지네이션 ===== */
-.pagination ul.pages li{border-color:var(--gray_20);}
-.pagination ul.pages li.current{border-color:var(--pri_50);background-color:var(--pri_50);color:var(--gray_0);}
+.pagination ul.pages li{margin:0;border:0;border-radius:var(--radius_s);line-height:36px;}
+.pagination ul.pages li a,.pagination ul.pages li span{display:block;padding:0 13px;border-radius:var(--radius_s);font-weight:500;color:var(--gray_80);}
+.pagination ul.pages li.current{border:0;background-color:var(--pri_50);}
+.pagination ul.pages li.current span{font-weight:700;color:var(--gray_0);}
+.pagination ul.pages li.previous span,.pagination ul.pages li.next span{color:var(--gray_40);}
 .pagination ul.pages li.page:hover{background-color:var(--pri_5);}
+.pagination ul.pages li.page a:hover{color:var(--pri_60);}
+.pagination .per-page a,.pagination .per-page span.selected{display:inline-block;padding:0 6px;border-radius:var(--radius_s);line-height:24px;}
+.pagination .per-page span.selected{background:var(--pri_5);font-weight:700;color:var(--pri_60);}
 
 /* ===== 로그인 ===== */
 #login-form{margin:6em auto 2em;padding:32px 28px;border:1px solid var(--gray_20);border-radius:var(--radius_l);background:var(--gray_0);box-shadow:0 8px 24px rgba(0,0,0,0.06);}
@@ -616,7 +622,7 @@ table.list.messages tr.message>td.reply-count,table.list.messages tr.message>td.
 #query_form_with_buttons>.contextual ul.pages{margin:0;}
 
 /* ===== 일감 목록 (KRDS 목록: 흰 행 + 구분선, 제목 강조, 상태 점 표시) ===== */
-table.list.issues:not(.odd-even) tbody tr:nth-child(even):not(:hover):not(.context-menu-selection){background-color:var(--gray_0);}
+table.list.issues tbody tr.issue:not(:hover):not(.context-menu-selection){background-color:var(--gray_0);}
 table.list.issues td.id a{color:var(--gray_60);}
 table.list.issues td.subject a{font-weight:500;color:var(--gray_90);}
 table.list.issues td.subject a:hover{color:var(--pri_60);text-decoration:underline;}
@@ -630,6 +636,42 @@ table.list.issues tr.status-5 td.status::before,table.list.issues tr.status-6 td
 table.list.issues tr.status-2 td.status{color:var(--war_60);}
 table.list.issues tr.status-3 td.status{color:var(--suc_60);}
 #content>span.pagination{display:flex;flex-direction:column;align-items:center;gap:8px;margin:24px 0 8px;}
+#content>span.pagination ul.pages{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin:0;}
+table.list.issues th{white-space:nowrap;}
+table.list.issues th.subject{text-align:left;}
+table.list.issues th a.sort,table.list.issues th a.sort .icon-svg{color:var(--pri_60);}
+table.list.issues td.id{white-space:nowrap;}
+table.list.issues td.id a::before{content:"#";}
+table.list.issues td.tracker{white-space:nowrap;color:var(--gray_70);}
+table.list.issues tr.closed td.status::before{background:var(--gray_30);}
+table.list.issues tr.closed td.subject a{font-weight:400;}
+table.list.issues td.done_ratio{white-space:nowrap;}
+table.list.issues td.done_ratio table.progress{display:inline-table;float:none;width:80px;margin:0 6px 0 0;border-collapse:separate;border-spacing:0;border-radius:4px;overflow:hidden;vertical-align:middle;}
+table.list.issues td.done_ratio table.progress tbody{display:table-row-group;}
+table.list.issues td.done_ratio table.progress td{height:8px;padding:0;border:0;}
+table.list.issues td.done_ratio p.percent{display:inline-block;margin:0;font-size:0.75rem;color:var(--gray_60);vertical-align:middle;}
+table.progress-0+p.percent::before{content:"0%";}
+table.progress-10+p.percent::before{content:"10%";}
+table.progress-20+p.percent::before{content:"20%";}
+table.progress-30+p.percent::before{content:"30%";}
+table.progress-40+p.percent::before{content:"40%";}
+table.progress-50+p.percent::before{content:"50%";}
+table.progress-60+p.percent::before{content:"60%";}
+table.progress-70+p.percent::before{content:"70%";}
+table.progress-80+p.percent::before{content:"80%";}
+table.progress-90+p.percent::before{content:"90%";}
+table.progress-100+p.percent::before{content:"100%";color:var(--suc_60);}
+table.list.issues tr.group{display:block;}
+table.list.issues tr.group td{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:12px 8px;border-top:1px solid var(--gray_20);border-bottom:1px solid var(--gray_20);background:var(--gray_5);text-align:left;}
+table.list.issues tr.group span.expander{display:inline-flex;color:var(--gray_60);}
+table.list.issues tr.group span.name{font-weight:700;color:var(--gray_90);}
+table.list.issues tr.group span.count{top:0;}
+table.list.issues tr.group span.totals{font-size:0.8125rem;color:var(--gray_60);}
+table.list.issues tr.group span.totals .value{font-weight:700;color:var(--gray_80);}
+table.list.issues tr.group a.toggle-all{display:inline;float:none;margin:0 0 0 auto;font-size:0.8125rem;color:var(--pri_60);}
+body.controller-issues #content p.query-totals{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;margin:0 0 8px;text-align:right;font-size:0.8125rem;}
+body.controller-issues #content p.query-totals>span{margin:0;padding:4px 10px;border-radius:var(--radius_s);background:var(--pri_5);color:var(--gray_70);}
+body.controller-issues #content p.query-totals .value{color:var(--pri_60);}
 #content>span.pagination .items{font-size:0.8125rem;color:var(--gray_60);}
 #content>p.other-formats{display:flex;justify-content:flex-end;align-items:center;gap:6px;margin:0 0 16px;font-size:0.8125rem;color:var(--gray_60);}
 #content>p.other-formats span+span::before{content:none;}
@@ -956,11 +998,12 @@ body.controller-enumerations table.enumerations td.name a{font-weight:500;color:
 table.list.issues thead{display:none;}
 table.list.issues,table.list.issues tbody{display:block;}
 table.list.issues tr.issue{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:14px 4px;border-top:1px solid var(--gray_10);}
-table.list.issues tr.issue>td{display:block;order:3;padding:0;border:0;}
+table.list.issues tr.issue>td{display:block;order:3;padding:0;border:0;font-size:0.8125rem;}
+table.list.issues tr.issue>td.id{width:auto;}
+table.list.issues tr.issue>td.tracker{padding:0 8px;border:1px solid var(--gray_20);border-radius:var(--radius_s);font-size:0.75rem;line-height:20px;}
 table.list.issues tr.issue>td.checkbox,table.list.issues tr.issue>td.id,table.list.issues tr.issue>td.tracker,table.list.issues tr.issue>td.status,table.list.issues tr.issue>td.buttons{order:1;}
 table.list.issues tr.issue>td.buttons{margin-left:auto;}
 table.list.issues tr.issue>td.subject{flex:1 0 100%;order:2;font-size:0.9375rem;}
-table.list.issues tr.issue>td.priority,table.list.issues tr.issue>td.assigned_to,table.list.issues tr.issue>td.updated_on{font-size:0.8125rem;}
 
 .keys_search{width:100%;max-width:none;}
 
@@ -1949,7 +1992,16 @@ table.list.issues tbody{display:table-row-group;}
 table.list.issues tr.issue{display:table-row;padding:0;border:0;}
 table.list.issues tr.issue>td{display:table-cell;padding:12px 10px 12px 0;border-top:1px solid var(--gray_10);}
 table.list.issues tr.issue>td.checkbox{padding:12px 0;}
-table.list.issues tr.issue>td.subject,table.list.issues tr.issue>td.priority,table.list.issues tr.issue>td.assigned_to,table.list.issues tr.issue>td.updated_on{font-size:inherit;}
+table.list.issues tr.issue>td{font-size:inherit;}
+table.list.issues tr.issue>td.id{width:1%;}
+table.list.issues tr.issue>td.tracker{padding:12px 10px 12px 0;border:0;border-top:1px solid var(--gray_10);border-radius:0;font-size:0.875rem;line-height:inherit;}
+table.list.issues tr.issue>td.subject{text-align:left;font-size:inherit;}
+table.list.issues tr.group{display:table-row;}
+table.list.issues tr.group td{display:table-cell;}
+table.list.issues tr.group td>*{vertical-align:middle;}
+table.list.issues tr.group span.name,table.list.issues tr.group span.count{margin-right:6px;}
+table.list.issues tr.group a.toggle-all{display:none;float:right;}
+table.list.issues tr.group:hover a.toggle-all{display:inline;}
 .keys_search{max-width:420px;}
 #issue-form .tabular label:not(.inline):not(.block):not(.floating){margin-bottom:0;}
 div#activity dt.grouped{padding-left:5em;}
