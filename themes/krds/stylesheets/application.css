@@ -167,13 +167,48 @@ table.progress td.todo{background:var(--gray_10);}
 .badge-count{background:var(--pri_50);color:var(--gray_0);}
 
 
-/* ===== 간트 (프로젝트·버전 마커 제외) ===== */
+/* ===== 간트 차트 (위치·높이는 Redmine 인라인 스타일 → 색·모양만, 인라인 배경은 !important 로 덮음) ===== */
+table.gantt-table{border-top:2px solid var(--gray_80);border-bottom:1px solid var(--gray_20);}
+.gantt_hdr{border-color:var(--gray_20);}
+#gantt_area .gantt_hdr{border-right-color:var(--gray_10);}
+.gantt_subjects_container:not(.draw_selected_columns) .gantt_hdr,.last_gantt_selected_column .gantt_hdr,.gantt_subjects_column .gantt_hdr{border-right-color:var(--gray_30);}
+.gantt_hdr[style*="#eee"]{background:var(--gray_5) !important;}
+#gantt_area>.gantt_hdr{font-size:0.8125rem;font-weight:700;color:var(--gray_80);}
+#gantt_area>.gantt_hdr a{color:var(--gray_80);}
+#gantt_area>.gantt_hdr a:hover{color:var(--pri_60);}
+.gantt_hdr.nwday{background-color:var(--gray_5);color:var(--gray_40);}
+.gantt_hdr_selected_column_name{margin:0;font-size:0.8125rem;font-weight:700;text-align:center;color:var(--gray_80);}
+.gantt_selected_column_content>div{color:var(--gray_70);}
+.gantt_subjects div.project-name a,.gantt_subjects div.version-name a{font-weight:700;color:var(--gray_90);}
+.gantt_subjects div.issue-subject a{color:var(--pri_60);}
+.gantt_subjects div.issue-subject span.issue-closed a{color:var(--gray_50);}
+.gantt_subjects div.issue-subject:hover{background-color:var(--pri_5);}
+.gantt_subjects .icon-svg{color:var(--gray_60);}
+.task{color:var(--gray_60);}
+.task.label{font-size:0.75rem;}
+.task.label.project,.task.label.version{color:var(--gray_80);}
+.task.leaf{border-radius:3px;}
 .task_done:not(.project):not(.version){border-color:var(--pri_50);background:var(--pri_50);}
 .task_late:not(.project):not(.version){border-color:var(--dan_40);background:var(--dan_40);}
 .task_todo:not(.project):not(.version){border-color:var(--gray_20);background:var(--gray_20);}
 .task_todo.parent:not(.project):not(.version){border-color:var(--gray_60);background:var(--gray_60);}
-.gantt_hdr.nwday{background-color:var(--gray_5);color:var(--gray_40);}
-.gantt_subjects div.issue-subject:hover{background-color:var(--pri_5);}
+.task.parent.marker{border:0;background:none;}
+.task.parent.marker::before{content:"";position:absolute;top:0;left:0;border:4px solid transparent;border-top:8px solid var(--gray_60);border-bottom:0;}
+.task.version:not(.marker),.task.project:not(.marker){border-radius:2px;}
+.task.version.task_todo,.task.project.task_todo{border-color:var(--gray_20);background:var(--gray_20);}
+.task.version.task_late,.task.project.task_late{border-color:var(--dan_40);background:var(--dan_40);}
+.task.version.task_done,.task.project.task_done{border-color:var(--suc_60);background:var(--suc_60);}
+.task.version.marker,.task.project.marker{background:none;}
+.task.version.marker::before,.task.project.marker::before{content:"";position:absolute;top:1px;left:2px;width:8px;height:8px;border-radius:1px;background:var(--pri_60);transform:rotate(45deg);}
+.task.project.marker::before{background:var(--gray_80);}
+#today_line{border-left:2px solid var(--dan_50) !important;}
+#gantt_area div.tooltip span.tip{padding:12px 14px;border:1px solid var(--gray_20);border-radius:var(--radius_m);background:var(--gray_0);box-shadow:0 6px 18px rgba(0,0,0,0.12);font-size:0.8125rem;font-weight:400;line-height:1.6;color:var(--gray_80);}
+body.controller-gantts #query_form_with_buttons>p.buttons #months{max-width:72px;}
+body.controller-gantts #query_form_with_buttons>p.contextual{float:none;}
+body.controller-gantts #query_form_with_buttons>p.contextual>span{display:inline-flex;align-items:center;gap:4px;font-size:0;}
+body.controller-gantts #query_form_with_buttons>p.contextual a{display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 10px;border:1px solid var(--gray_30);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.8125rem;font-weight:500;color:var(--gray_80);text-decoration:none;}
+body.controller-gantts #query_form_with_buttons>p.contextual a:hover{background:var(--pri_5);color:var(--pri_60);}
+body.controller-gantts #query_form_with_buttons>p.contextual a .icon-svg{width:16px;height:16px;}
 
 /* ===== 콘텐츠 탭 ===== */
 #content .tabs{height:44px;}
@@ -1898,6 +1933,7 @@ a.vk_code:hover{text-decoration:underline;}
 .kd_toast{position:fixed;bottom:24px;left:50%;z-index:2000;padding:10px 18px;border-radius:var(--radius_m);background:var(--gray_90);font-size:0.875rem;color:var(--gray_0);transform:translateX(-50%);opacity:0;transition:opacity 0.2s;pointer-events:none;}
 .kd_toast.on{opacity:1;}
 @media (min-width:900px){
+body.controller-gantts #query_form_with_buttons>p.contextual{float:right;}
 div.issue .next-prev-links{float:right;margin:0;}
 ul.cal li.calhead{display:block;padding:10px 0;border-bottom:1px solid var(--gray_20);background:var(--gray_5);text-align:center;font-size:0.8125rem;font-weight:700;color:var(--gray_70);}
 ul.cal li.week-number{padding:8px 0;border-top:1px solid var(--gray_10);background:var(--gray_5);text-align:center;font-size:0.75rem;font-weight:500;color:var(--gray_50);}
