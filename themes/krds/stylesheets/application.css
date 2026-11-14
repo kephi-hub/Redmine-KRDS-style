@@ -192,7 +192,7 @@ table.gantt-table{border-top:2px solid var(--gray_80);border-bottom:1px solid va
 .task_late:not(.project):not(.version){border-color:var(--dan_40);background:var(--dan_40);}
 .task_todo:not(.project):not(.version){border-color:var(--gray_20);background:var(--gray_20);}
 .task_todo.parent:not(.project):not(.version){border-color:var(--gray_60);background:var(--gray_60);}
-.task.parent.marker{border:0;background:none;}
+.task.parent.marker.starting,.task.parent.marker.ending{border:0;background:none;}
 .task.parent.marker::before{content:"";position:absolute;top:0;left:0;border:4px solid transparent;border-top:8px solid var(--gray_60);border-bottom:0;}
 .task.version:not(.marker),.task.project:not(.marker){border-radius:2px;}
 .task.version.task_todo,.task.project.task_todo{border-color:var(--gray_20);background:var(--gray_20);}
