@@ -16,7 +16,9 @@ module SshConsole
     module_function
 
     MIN_FREE = 1024**3 # 남은 디스크가 1GB 보다 적으면 시작하지 않음 (받는 도중에도 이보다 적어지면 멈춤)
-    CHUNK = 256 * 1024
+    BATCH = 16                # 폴더 백업: 동시에 받는 파일 수
+    REQUESTS = 8              # 파일 하나당 겹쳐 보내는 읽기 요청 수
+    READ_SIZE = 64 * 1024     # 요청 하나가 읽는 크기 (OpenSSH 최대 근처)
     DISK_CHECK = 64 * 1024**2 # 받는 도중 64MB 마다 남은 디스크 확인
     SUDO_S = /\bsudo\s+(?:-\S+\s+(?:'[^']*'\s+)?)*-[A-Za-z]*S\b/ # sudo 바로 뒤 옵션에 -S (mariadb-dump -S 소켓은 제외)
     PROGRESS_EVERY = 2       # 진행 중 받은 양·파일 수를 실행 기록에 남기는 간격(초) — 화면이 실시간으로 보여 줌
@@ -212,6 +214,7 @@ module SshConsole
       st = { bytes: 0, files_total: 0, files_new: 0, files_linked: 0 }
       patterns = job.exclude_list
       report = progress(run)
+      queue = []
       Exec.sftp(key) do |sftp|
         job.path_list.each do |base|
           base = base.chomp('/')
@@ -229,27 +232,30 @@ module SshConsole
               File.link(src, dest)
               st[:files_linked] += 1
             else
-              left = size
-              File.open(dest, 'wb') do |out|
-                sftp.file.open(File.join(base, rel), 'r') do |f|
-                  while left.positive?
-                    data = f.read([CHUNK, left].min)
-                    break if data.nil? || data.empty?
-                    out.write(data)
-                    left -= data.bytesize
-                  end
-                end
-              end
-              File.utime(mtime, mtime, dest) if mtime.positive?
-              st[:bytes] += size
-              st[:files_new] += 1
+              queue << [File.join(base, rel), dest, size, mtime]
+              fetch_batch(sftp, queue, st) if queue.size >= BATCH
             end
             report.call(st.slice(:bytes, :files_total, :files_new, :files_linked))
           end
         end
+        fetch_batch(sftp, queue, st)
+        report.call(st.slice(:bytes, :files_total, :files_new, :files_linked))
       end
       Zlib::GzipWriter.open(dir.join('manifest.json.gz').to_s) { |gz| gz.write(man.to_json) }
       st
+    end
+
+    # 새로 받을 파일 여러 개를 동시에 — 파일마다 요청 REQUESTS 개를 겹쳐 보내 왕복 지연(경유·인터넷)을 줄임
+    def fetch_batch(sftp, queue, st)
+      return if queue.empty?
+      ops = queue.map { |remote, dest, _size, _mtime| sftp.download(remote, dest.to_s, read_size: READ_SIZE, requests: REQUESTS) }
+      sftp.loop { ops.any?(&:active?) }
+      queue.each do |_remote, dest, size, mtime|
+        File.utime(mtime, mtime, dest) if mtime.positive? && File.exist?(dest)
+        st[:bytes] += size
+        st[:files_new] += 1
+      end
+      queue.clear
     end
 
     # 폴더를 돌며 파일마다 (상대 경로, 속성) — 심볼릭 링크는 따라가지 않음
