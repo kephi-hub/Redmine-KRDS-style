@@ -19,6 +19,7 @@ module SshConsole
     CHUNK = 256 * 1024
     DISK_CHECK = 64 * 1024**2 # 받는 도중 64MB 마다 남은 디스크 확인
     SUDO_S = /\bsudo\s+(?:-\S+\s+(?:'[^']*'\s+)?)*-[A-Za-z]*S\b/ # sudo 바로 뒤 옵션에 -S (mariadb-dump -S 소켓은 제외)
+    PROGRESS_EVERY = 2       # 진행 중 받은 양·파일 수를 실행 기록에 남기는 간격(초) — 화면이 실시간으로 보여 줌
     ERR_KEEP = 8000           # 오류 출력은 마지막 8000 바이트만 (오류는 보통 끝에 나옴)
 
     def root
@@ -56,7 +57,7 @@ module SshConsole
       FileUtils.mkdir_p(root.join(dir))
       run.update_columns(dir: dir)
       ActiveRecord::Base.connection_pool.release_connection
-      stats = job.db? ? dump_db(job, root.join(dir)) : mirror(job, run, root.join(dir))
+      stats = job.db? ? dump_db(job, root.join(dir), run) : mirror(job, run, root.join(dir))
       run.update!(stats.merge(status: 'done', finished_at: Time.current, total_bytes: used(root.join(dir))))
       prune(job)
     rescue StandardError => e
@@ -133,13 +134,28 @@ module SshConsole
       SH
     end
 
+    # 진행 상황 기록 — PROGRESS_EVERY 초마다 한 번만 (백그라운드 작업이라 연결은 쓰고 바로 반납)
+    def progress(run)
+      return ->(_h) {} unless run
+      last = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      lambda do |h|
+        now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        next if now - last < PROGRESS_EVERY
+        last = now
+        ActiveRecord::Base.connection_pool.with_connection { run.update_columns(h) }
+      rescue StandardError
+        nil
+      end
+    end
+
     # DB 덤프 → db_<이름>.sql.gz
-    def dump_db(job, dir)
+    def dump_db(job, dir, run = nil)
       key = job.ssh_key or raise I18n.t(:error_sb_no_ssh)
       file = dir.join("db_#{(job.db_name.presence || job.name).gsub(/[^\w.-]/, '_')}.#{job.dump_ext}.gz")
       secret = job.db_kind == 'custom' ? sudo_secret(job, key) : Target.secret(job.db_key || raise(I18n.t(:error_sb_no_dbkey)))
       bytes = 0
       checked = 0
+      report = progress(run)
       err = +''
       status = nil
       Zlib::GzipWriter.open(file.to_s) do |gz|
@@ -147,6 +163,7 @@ module SshConsole
           if kind == :out
             gz.write(data)
             bytes += data.bytesize
+            report.call(bytes: bytes)
             if bytes - checked >= DISK_CHECK
               checked = bytes
               free = disk[:free]
@@ -194,6 +211,7 @@ module SshConsole
       man = {}
       st = { bytes: 0, files_total: 0, files_new: 0, files_linked: 0 }
       patterns = job.exclude_list
+      report = progress(run)
       Exec.sftp(key) do |sftp|
         job.path_list.each do |base|
           base = base.chomp('/')
@@ -226,6 +244,7 @@ module SshConsole
               st[:bytes] += size
               st[:files_new] += 1
             end
+            report.call(st.slice(:bytes, :files_total, :files_new, :files_linked))
           end
         end
       end

@@ -74,6 +74,13 @@ class SysBackupsController < ApplicationController
     send_file file, filename: SshConsole::Backup.download_name(@run), type: 'application/gzip'
   end
 
+  # 진행 중 실행의 현재 값 (실행 기록 표가 2초마다 조용히 읽음) — ids 중 이 프로젝트 것만
+  def status
+    ids = params[:ids].to_s.split(',').map(&:to_i).first(50)
+    runs = SysBackupRun.where(project_id: @project.id, id: ids).includes(:sys_backup_job)
+    render json: runs.map { |r| SshConsole::BackupView.live(r) }
+  end
+
   def destroy_run
     job = @run.sys_backup_job
     @run.destroy unless @run.busy?

@@ -30,5 +30,4 @@
 <% if @runs.empty? %><p class="nodata"><%= l(:label_sb_never) %></p><% else %>
 <%= render partial: 'sys_backups/runs', locals: { runs: @runs, show_job: false } %>
 <% end %>
-<% if @busy %><%= javascript_tag do %>setTimeout(function() { location.reload(); }, 5000);<% end %><% end %>
 <% html_title "#{j.name} - #{l(:label_sb)}" %>

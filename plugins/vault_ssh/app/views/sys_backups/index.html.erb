@@ -38,5 +38,4 @@
 <h3 class="ag_sec"><%= l(:label_sb_recent) %></h3>
 <%= render partial: 'sys_backups/runs', locals: { runs: @runs, show_job: true } %>
 <% end %>
-<% if @busy %><%= javascript_tag do %>setTimeout(function() { location.reload(); }, 5000);<% end %><% end %>
 <% html_title l(:label_sb) %>
