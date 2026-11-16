@@ -30,6 +30,7 @@ class SysBackupsController < ApplicationController
     assign
     if save_job
       flash[:notice] = l(:notice_successful_create)
+      start_run(@job) if params[:run_now].present?
       redirect_to project_sys_backup_path(@project, @job)
     else
       load_options
@@ -45,6 +46,7 @@ class SysBackupsController < ApplicationController
     assign
     if save_job
       flash[:notice] = l(:notice_successful_update)
+      start_run(@job) if params[:run_now].present?
       redirect_to project_sys_backup_path(@project, @job)
     else
       load_options
@@ -58,18 +60,10 @@ class SysBackupsController < ApplicationController
     redirect_to project_sys_backups_path(@project)
   end
 
-  # [지금 백업] — 백그라운드
+  # [지금 백업] — 백그라운드 (상세 화면 · 목록 카드에서). back=index 면 목록으로 돌아감
   def run
-    if @job.busy?
-      flash[:warning] = l(:notice_sb_busy)
-    elsif !(key = @job.ssh_key) || !SshConsole::Access.can_connect?(User.current, key)
-      flash[:error] = l(:error_sb_no_ssh)
-    else
-      r = SysBackupRun.create!(sys_backup_job: @job, project: @project, user: User.current, status: 'queued', trigger: 'manual')
-      SshConsole::BackupJob.perform_later(r.id)
-      flash[:notice] = l(:notice_sb_started)
-    end
-    redirect_to project_sys_backup_path(@project, @job)
+    start_run(@job)
+    redirect_to params[:back] == 'index' ? project_sys_backups_path(@project) : project_sys_backup_path(@project, @job)
   end
 
   # DB 덤프 받기 (.sql.gz / Oracle .dmp.gz / SQL Server .bak.gz)
@@ -88,6 +82,19 @@ class SysBackupsController < ApplicationController
   end
 
   private
+
+  # 지금 백업 시작 — 이미 도는 중이거나 SSH 서버 접속 권한이 없으면 안내만
+  def start_run(job)
+    if job.busy?
+      flash[:warning] = l(:notice_sb_busy)
+    elsif !(key = job.ssh_key) || !SshConsole::Access.can_connect?(User.current, key)
+      flash[:error] = l(:error_sb_no_ssh)
+    else
+      r = SysBackupRun.create!(sys_backup_job: job, project: @project, user: User.current, status: 'queued', trigger: 'manual')
+      SshConsole::BackupJob.perform_later(r.id)
+      flash[:notice] = [flash[:notice], l(:notice_sb_started)].compact.join(' ')
+    end
+  end
 
   def find_job
     @job = SysBackupJob.find_by!(id: params[:id], project_id: @project.id)

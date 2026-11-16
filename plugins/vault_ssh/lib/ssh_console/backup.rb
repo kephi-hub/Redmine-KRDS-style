@@ -73,9 +73,9 @@ module SshConsole
       port = job.port_or_default.to_i
       case job.db_kind
       when 'mysql'
-        # mariadb-dump 만 있는 서버도 있어 둘 중 있는 것. --no-tablespaces: MySQL 8 에서 PROCESS 권한 없는 계정도 덤프되게
+        # mariadb-dump 만 있는 서버도 있어 둘 중 있는 것. --no-tablespaces: MySQL 8 에서 PROCESS 권한 없는 계정도 덤프되게, --hex-blob: 바이너리 칸을 16진수로(문자셋 변환에 깨지지 않게)
         "IFS= read -r P; export MYSQL_PWD=\"$P\"; D=$(command -v mysqldump || command -v mariadb-dump); " \
-          "exec $D --single-transaction --quick --routines --triggers --events --no-tablespaces --default-character-set=utf8mb4 -h #{host} -P #{port} -u #{user} #{name}"
+          "exec $D --single-transaction --quick --routines --triggers --events --no-tablespaces --hex-blob --default-character-set=utf8mb4 -h #{host} -P #{port} -u #{user} #{name}"
       when 'postgresql'
         # --clean --if-exists: 이미 있는 DB 에 그대로 복원해도 겹치지 않게 (지우고 다시 만듦)
         "IFS= read -r P; export PGPASSWORD=\"$P\"; exec pg_dump --no-owner --no-privileges --clean --if-exists -h #{host} -p #{port} -U #{user} #{name}"

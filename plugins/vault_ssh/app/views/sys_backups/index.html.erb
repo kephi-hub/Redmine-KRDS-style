@@ -28,6 +28,7 @@
       </div>
       <p class="sb_what"><%= j.ssh_key&.name %> · <% if j.db? %><%= l("label_sb_db_#{j.db_kind}") %> <code><%= j.db_name %></code><% else %><code><%= j.path_list.first(3).join(', ') %></code><% end %></p>
       <p class="sb_when"><%= SshConsole::BackupView.schedule_text(j) %> · <%= l(:label_sb_keep_n, n: j.keep) %></p>
+      <% if can_edit %><p class="sb_act"><% if j.busy? %><span class="sb_st" data-k="running"><%= l(:label_sb_st_running) %></span><% else %><%= link_to sprite_icon('save', l(:button_sb_run)), project_sys_backup_run_now_path(@project, j, back: 'index'), method: :post, class: 'icon icon-save sb_runbtn', data: { confirm: l(:text_sb_run_confirm) } %><% end %></p><% end %>
       <p class="sb_last"><% if r %><span class="sb_st" data-k="<%= r.status %>"><%= l("label_sb_st_#{r.status}") %></span> <%= format_time(r.started_at || r.created_at) %><% if r.status == 'done' %> · <%= number_to_human_size(r.bytes) %><% end %><% else %><span class="mt_dim"><%= l(:label_sb_never) %></span><% end %></p>
     </li>
   <% end %>
