@@ -19,7 +19,7 @@
         <em class="info"><%= l(:text_sb_db_key) %></em></p>
     </div>
     <div class="sb_dbcustom" <%= 'hidden' unless j.db_kind == 'custom' %>>
-      <p><%= f.text_area :dump_cmd, rows: 3, cols: 70, class: 'oa_mono', label: :label_sb_dump_cmd, placeholder: "sudo -u postgres pg_dump app_db\nmysqldump --defaults-extra-file=~/.my.cnf app_db" %>
+      <p><%= f.text_area :dump_cmd, rows: 3, cols: 70, class: 'oa_mono', label: :label_sb_dump_cmd, placeholder: "sudo -S -p '' mariadb-dump --single-transaction --hex-blob app_db\nsudo -u postgres pg_dump app_db" %>
         <em class="info"><%= l(:text_sb_dump_cmd) %></em></p>
     </div>
   </div>

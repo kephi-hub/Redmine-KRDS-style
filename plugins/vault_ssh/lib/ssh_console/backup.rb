@@ -18,6 +18,7 @@ module SshConsole
     MIN_FREE = 1024**3 # 남은 디스크가 1GB 보다 적으면 시작하지 않음 (받는 도중에도 이보다 적어지면 멈춤)
     CHUNK = 256 * 1024
     DISK_CHECK = 64 * 1024**2 # 받는 도중 64MB 마다 남은 디스크 확인
+    SUDO_S = /\bsudo\s+(?:-\S+\s+(?:'[^']*'\s+)?)*-[A-Za-z]*S\b/ # sudo 바로 뒤 옵션에 -S (mariadb-dump -S 소켓은 제외)
     ERR_KEEP = 8000           # 오류 출력은 마지막 8000 바이트만 (오류는 보통 끝에 나옴)
 
     def root
@@ -136,7 +137,7 @@ module SshConsole
     def dump_db(job, dir)
       key = job.ssh_key or raise I18n.t(:error_sb_no_ssh)
       file = dir.join("db_#{(job.db_name.presence || job.name).gsub(/[^\w.-]/, '_')}.#{job.dump_ext}.gz")
-      secret = job.db_kind == 'custom' ? nil : Target.secret(job.db_key || raise(I18n.t(:error_sb_no_dbkey)))
+      secret = job.db_kind == 'custom' ? sudo_secret(job, key) : Target.secret(job.db_key || raise(I18n.t(:error_sb_no_dbkey)))
       bytes = 0
       checked = 0
       err = +''
@@ -162,6 +163,12 @@ module SshConsole
       raise I18n.t(:error_sb_dump, code: status, msg: err_tail(err)) unless status.to_i.zero?
       raise I18n.t(:error_sb_empty) if bytes.zero?
       { bytes: bytes, files_total: 1, files_new: 1 }
+    end
+
+    # 직접 명령에 `sudo -S` 가 있으면 SSH 서버 접속정보의 비밀번호를 표준입력으로 sudo 에 넘김 (명령줄·화면에 안 드러남)
+    def sudo_secret(job, key)
+      return nil unless job.dump_cmd.to_s.match?(SUDO_S)
+      Target.secret(key) || raise(I18n.t(:error_sb_sudo_pw))
     end
 
     # 오류 출력의 마지막 3줄(빈 줄 제외)을 400자 안으로 — 실제 오류는 보통 끝에 있으므로 길면 앞을 자름

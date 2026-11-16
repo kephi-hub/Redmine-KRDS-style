@@ -119,6 +119,7 @@ summary: 자산 대장, 스케줄러(배치), 점검·장애, 연계 인터페�
 
 1. 오른쪽 위 **[DB 백업]** 또는 **[폴더 백업]**
 2. **DB 백업**: SSH 서버 · DB 종류(MySQL·MariaDB / PostgreSQL / **Oracle** / **SQL Server** / 직접 명령) · DB 주소(SSH 서버에서 본 주소, 같은 서버면 127.0.0.1) · 포트 · DB 이름(Oracle 은 서비스 이름) · **DB 계정**(접속정보에서 선택). 운영 서버에 `mysqldump`/`pg_dump`/`expdp`/`sqlcmd` 가 있어야 합니다
+   - **직접 명령**에서 sudo 비밀번호가 필요하면 `sudo -S -p '' mariadb-dump …` 처럼 씁니다 — SSH 서버 접속정보의 비밀번호를 표준입력으로 넘깁니다
    - **Oracle·SQL Server** 는 DB 서버에 백업 파일을 만든 뒤 받아 오고 지웁니다. 그래서 **SSH 서버가 DB 서버**여야 하고 SSH 계정이 그 파일을 읽고 지울 수 있어야 합니다 — Oracle: `oracle` 계정 또는 `oinstall` 그룹 + DB 계정에 `GRANT READ, WRITE ON DIRECTORY DATA_PUMP_DIR` (DB 계정의 스키마를 Data Pump 로 받음) / SQL Server(Linux): `mssql` 그룹 또는 root + DB 계정에 `db_backupoperator` (COPY_ONLY 라 기존 백업 일정에 영향 없음)
 3. **폴더 백업**: 백업할 폴더(절대 경로, 한 줄에 하나) · 제외(`*.tmp`, `cache/` 등). 두 번째부터는 **바뀐 파일만** 받습니다
 4. **일정**: 수동 / 매일 / 매주(요일) + 시각 — 운영 부하가 적은 새벽 권장. **보관**: 최근 몇 번을 남길지
