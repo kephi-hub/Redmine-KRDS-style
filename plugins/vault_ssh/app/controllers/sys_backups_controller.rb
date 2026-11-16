@@ -16,8 +16,7 @@ class SysBackupsController < ApplicationController
   end
 
   def show
-    @runs = @job.sys_backup_runs.includes(:user).to_a
-    @busy = @runs.any?(&:busy?)
+    load_runs
   end
 
   def new
@@ -31,7 +30,7 @@ class SysBackupsController < ApplicationController
     if save_job
       flash[:notice] = l(:notice_successful_create)
       start_run(@job) if params[:run_now].present?
-      redirect_to project_sys_backup_path(@project, @job)
+      redirect_to job_home(@job)
     else
       load_options
       render :new
@@ -40,6 +39,7 @@ class SysBackupsController < ApplicationController
 
   def edit
     load_options
+    load_runs
   end
 
   def update
@@ -47,9 +47,10 @@ class SysBackupsController < ApplicationController
     if save_job
       flash[:notice] = l(:notice_successful_update)
       start_run(@job) if params[:run_now].present?
-      redirect_to project_sys_backup_path(@project, @job)
+      redirect_to job_home(@job)
     else
       load_options
+      load_runs
       render :edit
     end
   end
@@ -63,7 +64,7 @@ class SysBackupsController < ApplicationController
   # [지금 백업] — 백그라운드 (상세 화면 · 목록 카드에서). back=index 면 목록으로 돌아감
   def run
     start_run(@job)
-    redirect_to params[:back] == 'index' ? project_sys_backups_path(@project) : project_sys_backup_path(@project, @job)
+    redirect_to params[:back] == 'index' ? project_sys_backups_path(@project) : job_home(@job)
   end
 
   # DB 덤프 받기 (.sql.gz / Oracle .dmp.gz / SQL Server .bak.gz)
@@ -85,10 +86,21 @@ class SysBackupsController < ApplicationController
     job = @run.sys_backup_job
     @run.destroy unless @run.busy?
     flash[:notice] = l(:notice_successful_delete)
-    redirect_to project_sys_backup_path(@project, job)
+    redirect_to job_home(job)
   end
 
   private
+
+  # 작업의 기본 화면 — 관리 권한이 있으면 편집(아래 실행 기록), 보기 권한만 있으면 상세
+  def job_home(job)
+    User.current.allowed_to?(:manage_sys_backups, @project) ? edit_project_sys_backup_path(@project, job) : project_sys_backup_path(@project, job)
+  end
+  helper_method :job_home
+
+  def load_runs
+    @runs = @job.sys_backup_runs.includes(:user).to_a
+    @busy = @runs.any?(&:busy?)
+  end
 
   # 지금 백업 시작 — 이미 도는 중이거나 SSH 서버 접속 권한이 없으면 안내만
   def start_run(job)

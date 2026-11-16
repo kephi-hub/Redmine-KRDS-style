@@ -9,7 +9,7 @@
     <% lv = r.busy? ? SshConsole::BackupView.live(r) : nil %>
     <tr class="sb_row<%= ' on' if lv %>"<% if lv %> data-run="<%= r.id %>" data-start="<%= lv[:start] %>"<% end %>>
       <td><%= format_time(r.started_at || r.created_at) %></td>
-      <% if show_job %><td class="name"><%= link_to r.sys_backup_job.name, project_sys_backup_path(@project, r.sys_backup_job) %></td><% end %>
+      <% if show_job %><td class="name"><%= link_to r.sys_backup_job.name, job_home(r.sys_backup_job) %></td><% end %>
       <td><span class="sb_st" data-k="<%= r.status %>"><% if lv %><i class="sb_spin" aria-hidden="true"></i><% end %><span class="sb_stt"><%= l("label_sb_st_#{r.status}") %></span></span><% if lv %><span class="sb_prog<%= ' wait' unless lv[:pct] %>" role="progressbar" aria-valuemin="0" aria-valuemax="100"<% if lv[:pct] %> aria-valuenow="<%= lv[:pct] %>"<% end %> aria-label="<%= l(:label_sb_st_running) %>"><i<% if lv[:pct] %> style="width:<%= lv[:pct] %>%"<% end %>></i></span><% end %><% if r.error.present? %><br><span class="mc_err"><%= r.error.truncate(160) %></span><% end %></td>
       <td><% if lv %><span class="sb_vb"><%= number_to_human_size(r.bytes) if r.bytes.to_i.positive? %></span><% elsif r.status == 'done' %><%= number_to_human_size(r.bytes) %><% if r.total_bytes > r.bytes %><span class="mt_dim db_pvsub"><%= l(:label_sb_total, size: number_to_human_size(r.total_bytes)) %></span><% end %><% end %></td>
       <td><% if lv && r.sys_backup_job.files? %><span class="sb_vf"><%= l(:label_sb_files_n, total: r.files_total, new: r.files_new, linked: r.files_linked) if r.files_total.to_i.positive? %></span><% elsif r.status == 'done' && r.sys_backup_job.files? %><%= l(:label_sb_files_n, total: r.files_total, new: r.files_new, linked: r.files_linked) %><% end %></td>
@@ -29,7 +29,9 @@
 // 진행 중 실행: 경과 시간 1초마다, 받은 양·파일 수·진행 막대는 2초마다 조용히 갱신, 끝나면 한 번 새로 고침
 $(function() {
   var url = '<%= j project_sys_backups_status_path(@project) %>', tpl = '<%= j l(:label_sb_files_n, total: '%T', new: '%N', linked: '%L') %>';
-  var st = <%= raw({ 'queued' => l(:label_sb_st_queued), 'running' => l(:label_sb_st_running) }.to_json) %>;
+  var st = <%= raw(%w(queued running done failed).to_h { |k| [k, l("label_sb_st_#{k}")] }.to_json) %>;
+  // 편집 화면에서 입력을 바꾸는 중이면 끝나도 새로 고치지 않음 (고치던 값이 날아가지 않게)
+  var dirty = false; $(document).on('input change', '#sb_form :input', function() { dirty = true; });
   function hs(b) { var u = ['Bytes', 'KB', 'MB', 'GB', 'TB'], i = 0; while (b >= 1024 && i < u.length - 1) { b /= 1024; i++; } return (i ? b.toFixed(b < 10 ? 1 : 0) : b) + ' ' + u[i]; }
   function mmss(s) { return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
   function nf(n) { return Number(n).toLocaleString('ko-KR'); }
@@ -43,7 +45,11 @@ $(function() {
       var finished = false;
       $.each(list, function(_, d) {
         var $tr = $('tr.sb_row.on[data-run=' + d.id + ']');
-        if (!d.active) { finished = true; return; }
+        if (!d.active) {
+          finished = true;
+          if (dirty) { $tr.removeClass('on').find('.sb_spin, .sb_prog').remove(); $tr.find('.sb_st').attr('data-k', d.status).find('.sb_stt').text(st[d.status] || d.status); }
+          return;
+        }
         if (d.start) $tr.attr('data-start', d.start).data('start', d.start);
         $tr.find('.sb_st').attr('data-k', d.status).find('.sb_stt').text(st[d.status] || d.status);
         if (d.bytes > 0) $tr.find('.sb_vb').text(hs(d.bytes));
@@ -51,7 +57,7 @@ $(function() {
         var $p = $tr.find('.sb_prog');
         if (d.pct !== null && d.pct !== undefined) { $p.removeClass('wait').attr('aria-valuenow', d.pct).find('i').css('width', d.pct + '%'); }
       });
-      if (finished) { clearInterval(poll); clearInterval(tick); location.reload(); }
+      if (finished && !dirty) { clearInterval(poll); clearInterval(tick); location.reload(); }
     });
   }, 2000);
 });

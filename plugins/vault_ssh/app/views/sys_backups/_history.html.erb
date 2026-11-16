@@ -1,0 +1,10 @@
+<%# 복원 방법 · 실행 기록 (상세 · 편집 화면 공통, locals: job) %>
+<% if (done = @runs.find { |r| r.status == 'done' }) %>
+  <h3 class="ag_sec"><%= l(:label_sb_restore) %></h3>
+  <p class="db_hintbox"><%= l(job.db? ? :text_sb_restore_db : :text_sb_restore_files) %></p>
+  <pre class="sb_cmd"><code><%= SshConsole::Backup.restore_hint(job, done) %></code></pre>
+<% end %>
+<h3 class="ag_sec"><%= l(:label_sb_history) %></h3>
+<% if @runs.empty? %><p class="nodata"><%= l(:label_sb_never) %></p><% else %>
+<%= render partial: 'sys_backups/runs', locals: { runs: @runs, show_job: false } %>
+<% end %>

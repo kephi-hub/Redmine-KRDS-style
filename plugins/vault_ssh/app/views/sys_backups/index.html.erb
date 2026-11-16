@@ -23,7 +23,7 @@
     <li class="sb_card<%= ' is_off' unless j.active %>">
       <div class="sb_top">
         <span class="sb_kind" data-k="<%= j.kind %>"><%= l("label_sb_kind_#{j.kind}") %></span>
-        <%= link_to j.name, project_sys_backup_path(@project, j), class: 'sb_name' %>
+        <%= link_to j.name, job_home(j), class: 'sb_name' %>
         <% unless j.active %><span class="mt_dim"><%= l(:label_sb_paused) %></span><% end %>
       </div>
       <p class="sb_what"><%= j.ssh_key&.name %> · <% if j.db? %><%= l("label_sb_db_#{j.db_kind}") %> <code><%= j.db_name %></code><% else %><code><%= j.path_list.first(3).join(', ') %></code><% end %></p>

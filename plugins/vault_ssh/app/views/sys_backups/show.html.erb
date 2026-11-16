@@ -21,13 +21,5 @@
   <li><span><%= l(:label_sb_schedule) %></span> <%= SshConsole::BackupView.schedule_text(j) %></li>
   <li><span><%= l(:label_sb_keep) %></span> <%= l(:label_sb_keep_n, n: j.keep) %></li>
 </ul>
-<% if (done = @runs.find { |r| r.status == 'done' }) %>
-  <h3 class="ag_sec"><%= l(:label_sb_restore) %></h3>
-  <p class="db_hintbox"><%= l(j.db? ? :text_sb_restore_db : :text_sb_restore_files) %></p>
-  <pre class="sb_cmd"><code><%= SshConsole::Backup.restore_hint(j, done) %></code></pre>
-<% end %>
-<h3 class="ag_sec"><%= l(:label_sb_history) %></h3>
-<% if @runs.empty? %><p class="nodata"><%= l(:label_sb_never) %></p><% else %>
-<%= render partial: 'sys_backups/runs', locals: { runs: @runs, show_job: false } %>
-<% end %>
+<%= render partial: 'sys_backups/history', locals: { job: j } %>
 <% html_title "#{j.name} - #{l(:label_sb)}" %>
