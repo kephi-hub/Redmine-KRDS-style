@@ -72,9 +72,9 @@ class SysBackupsController < ApplicationController
     redirect_to project_sys_backup_path(@project, @job)
   end
 
-  # DB 덤프 받기 (.sql.gz)
+  # DB 덤프 받기 (.sql.gz / Oracle .dmp.gz / SQL Server .bak.gz)
   def download
-    file = @run.path && Dir[@run.path.join('*.sql.gz').to_s].first
+    file = SshConsole::Backup.dump_file(@run)
     return render_404 unless file && @run.status == 'done'
     Rails.logger.info("[sys_backup] download run #{@run.id} by #{User.current.login}")
     send_file file, filename: SshConsole::Backup.download_name(@run), type: 'application/gzip'

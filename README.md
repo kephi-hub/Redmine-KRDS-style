@@ -108,7 +108,7 @@ Redmine 6.1.6 + Vault(접속정보) 플러그인을 **KRDS(대한민국 정부 �
 | 메뉴 | 대분류 7개(개요·일감·설계·개발·운영·산출물·협업) + 2뎁스, KRDS 메인 메뉴형 펼침 패널(아이콘), 모바일 전체 화면 메뉴, 모듈 설정 대분류 카드 |
 | 초기화면 · 매뉴얼 | 안내문 + 바로 가기 카드 + 새소식 + **탭 사용 매뉴얼**(시작하기 · 일감·일정 · 설계 · 개발 · 운영 · 산출물·관리 · 자주 묻는 질문, 탭마다 목차·표·알림 상자, 주소 `#man-dev` 로 바로 열기). 내용은 `plugins/krds_ui/manual/*.md` 를 고치면 재시작 없이 반영 |
 | SSH 터미널 | 접속정보 **SSH 서버**에서 **[▶ 접속]** → 새 탭 브라우저 터미널(xterm.js, 설치 없음), **터미널 옆 파일 창**(받기·올리기·새 폴더·이름 바꾸기·삭제, 작업 기록), **[⚙ 접속 설정]** 모달(포트 · 개발/운영 · 인증: 비밀번호/개인키/접속할 때 입력 · **경유 서버 최대 3대** · 시작 명령 · 녹화(기본 해제, 운영은 항상) · 서버 지문, [접속 시험]), 운영 서버는 사유 + 식별자 + 2단계 인증, **접속 기록 · 화면 녹화 재생 · 엑셀** (`plugins/vault_ssh`) |
-| 시스템 백업 | 프로젝트 **운영 › 시스템 백업**: 운영 서버 **DB 덤프**(MySQL·MariaDB / PostgreSQL / 직접 명령, 비밀번호는 표준입력) · **폴더 백업**(SFTP, 바뀐 파일만 받고 나머지는 하드링크, 제외 패턴), 매일·매주 일정 + [지금 백업], 보관 횟수, 덤프 받기 · 복원 안내 (`plugins/vault_ssh`) |
+| 시스템 백업 | 프로젝트 **운영 › 시스템 백업**: 운영 서버 **DB 덤프**(MySQL·MariaDB / PostgreSQL / Oracle Data Pump / SQL Server / 직접 명령, 비밀번호는 표준입력) · **폴더 백업**(SFTP, 바뀐 파일만 받고 나머지는 하드링크, 제외 패턴), 매일·매주 일정 + [지금 백업], 보관 횟수, 덤프 받기 · 복원 안내 (`plugins/vault_ssh`) |
 | 화면 유형 · 접속정보 순서 | 메뉴 구조도 **[화면 유형]** 모달 — 프로젝트별 화면 유형 추가·삭제·이름·메뉴 노출 기본값(`menu_screen_types`, 없으면 기본 6가지), 펼치기/접기 영역 오른쪽 정렬 · 접속정보 목록 **드래그 정렬**(⋮⋮ 손잡이, 키보드 ↑↓, `keys.position`, `vault_types`) |
 | 메뉴 · 모듈 이름 | 관리 → **메뉴 · 모듈 이름**: 상단 메뉴 · 프로젝트 대분류 · 프로젝트 메뉴 · 모듈(설정 › 모듈)에 **보이는 이름만** 바꾸기 (비우면 기본 이름, 페이지 제목·다른 문구는 그대로, 저장 즉시 반영) |
 | 웹 접근성 | KWCAG 2.2 자동 점검(axe) 기준으로 PMS 화면 위반 정리 — 명도 대비(링크·보조 글자 색), 문장 속 링크 밑줄, 글자 아바타 대체 텍스트, 이름 없는 버튼·입력칸 레이블, 누르기 영역 24px, 모바일 메뉴 ARIA |
@@ -394,9 +394,10 @@ Jenkins 쪽은 플러그인 설치 없이 **배포 전용 계정 + API 토큰**�
 ![시스템 백업](docs/screenshots/41_sys_backups.png)
 
 - **작업**(`sys_backup_jobs`): SSH 서버 접속정보(접속 설정의 경유·지문 그대로, "접속할 때 입력" 서버는 불가) + 종류
-  - **DB**: MySQL·MariaDB(`mysqldump`/`mariadb-dump --single-transaction`) · PostgreSQL(`pg_dump`) · 직접 명령. DB 계정은 접속정보에서 고르고 비밀번호는 원격 명령 **표준입력**으로 넘김(`ps` 에 안 보임). 출력은 PMS 쪽에서 gzip → `db_<DB>.sql.gz`, 종료 코드·빈 출력 검사
+  - **DB**: MySQL·MariaDB(`mysqldump`/`mariadb-dump --single-transaction --no-tablespaces`) · PostgreSQL(`pg_dump --clean --if-exists`) · **Oracle**(`expdp` 스키마 → `DATA_PUMP_DIR` 파일을 `cat` 후 삭제, `sqlplus /nolog` 로 경로 조회) · **SQL Server**(Linux, `BACKUP DATABASE … WITH COPY_ONLY, CHECKSUM` → 기본 백업 폴더 파일 `cat` 후 삭제, `SQLCMDPASSWORD`) · 직접 명령. DB 계정은 접속정보에서 고르고 비밀번호는 원격 명령 **표준입력**으로 넘김(`ps` 에 안 보임). 출력은 PMS 쪽에서 gzip → `db_<DB>.sql.gz` / `.dmp.gz` / `.bak.gz`, 종료 코드·빈 출력 검사, 오류는 출력 끝 3줄
+  - Oracle·SQL Server 는 **SSH 서버 = DB 서버**, SSH 계정이 백업 파일을 읽고 지울 수 있어야 함(Oracle `oracle`/`oinstall`, SQL Server `mssql` 그룹). Oracle 비밀번호에 `"` 불가. 2026-11-16 Oracle 23 Free·SQL Server 2022 컨테이너에서 백업 → `impdp`/`RESTORE` 복원까지 확인
   - **폴더**: SFTP 로 하위 전체(심볼릭 링크 제외), 제외 패턴(`*.tmp`, `cache/`, `thumbs/**`). 지난 완료본과 크기·수정 시각이 같으면 **하드링크**, 바뀐 파일만 받음. `manifest.json.gz`
-- **보관**: 호스트 `backup/sys/<프로젝트 id>/<작업 id>/<YYYYmmdd_HHMMSS>/` (컨테이너 `/usr/src/redmine/sys_backups`, `SYS_BACKUP_DIR`), 작업별 보관 횟수만큼(완료본), 실패 기록은 60일. 남은 디스크 1GB 미만이면 시작 안 함
+- **보관**: 호스트 `backup/sys/<프로젝트 id>/<작업 id>/<YYYYmmdd_HHMMSS>/` (컨테이너 `/usr/src/redmine/sys_backups`, `SYS_BACKUP_DIR`), 작업별 보관 횟수만큼(완료본), 실패 기록은 60일(실패 시 받던 파일은 바로 지움). 남은 디스크 1GB 미만이면 시작 안 함·받는 도중(64MB 마다 확인)에도 멈춤. 프로젝트 삭제 시 작업·기록·보관 폴더 함께 삭제
 - **실행**: [지금 백업](ActiveJob, 화면 5초마다 새로 고침) · 일정(매일/매주 + 시각, 서울 시간) — cron 이 매시 `rake redmine:sys_backup:run` (`setup/cron.example`), 작업은 하나씩 차례로
 - **복원**은 자동으로 하지 않음 — 상세 화면에 복원 명령 안내(DB: [덤프 받기] 파일 기준, 폴더: `backup/sys/…/files/` 에서 되돌리기)
 - **권한**: 시스템 백업 보기·덤프 받기 / 관리·실행 — 기본 PM/PL (`setup/seed.yml`). 실행에는 그 SSH 서버 터미널 접속 권한도 필요

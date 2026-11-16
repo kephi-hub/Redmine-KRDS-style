@@ -13,7 +13,7 @@
   <li><span><%= l(:label_sb_kind) %></span> <%= l("label_sb_kind_#{j.kind}") %></li>
   <li><span><%= l(:label_sb_ssh) %></span> <%= j.ssh_key&.name %></li>
   <% if j.db? %>
-    <li><span>DB</span> <%= l("label_sb_db_#{j.db_kind}") %><% unless j.db_kind == 'custom' %> <code><%= j.db_host.presence || '127.0.0.1' %>:<%= j.db_port || (j.db_kind == 'mysql' ? 3306 : 5432) %>/<%= j.db_name %></code> · <%= j.db_key&.name %><% end %></li>
+    <li><span>DB</span> <%= l("label_sb_db_#{j.db_kind}") %><% unless j.db_kind == 'custom' %> <code><%= j.db_host.presence || '127.0.0.1' %>:<%= j.port_or_default %>/<%= j.db_name %></code> · <%= j.db_key&.name %><% end %></li>
   <% else %>
     <li><span><%= l(:label_sb_paths) %></span> <code><%= j.path_list.join(', ') %></code></li>
     <% if j.exclude_list.any? %><li><span><%= l(:label_sb_excludes) %></span> <code><%= j.exclude_list.join(', ') %></code></li><% end %>

@@ -12,8 +12,9 @@
       <% SysBackupJob::DB_KINDS.each do |k| %><label class="inline"><%= f.radio_button :db_kind, k, class: 'sb_dbkind_pick' %> <%= l("label_sb_db_#{k}") %></label><% end %></p>
     <div class="sb_dbstd" <%= 'hidden' if j.db_kind == 'custom' %>>
       <p><%= f.text_field :db_host, size: 30, maxlength: 255, placeholder: '127.0.0.1', label: :label_sb_db_host %><em class="info"><%= l(:text_sb_db_host) %></em></p>
-      <p><%= f.number_field :db_port, min: 1, max: 65535, placeholder: '3306 / 5432', label: :label_sb_db_port %></p>
-      <p><%= f.text_field :db_name, size: 30, maxlength: 120, label: :label_sb_db_name %></p>
+      <p><%= f.number_field :db_port, min: 1, max: 65535, placeholder: '3306 / 5432 / 1521 / 1433', label: :label_sb_db_port %></p>
+      <p><%= f.text_field :db_name, size: 30, maxlength: 120, label: :label_sb_db_name %><em class="info"><%= l(:text_sb_db_name) %></em></p>
+      <p class="sb_dbfile" <%= 'hidden' unless %w(oracle mssql).include?(j.db_kind) %>><span class="db_hintbox"><%= l(:text_sb_db_file) %></span></p>
       <p><%= f.select :db_key_id, @db_keys.map { |k| ["#{k.name}#{" (#{k.login})" if k.login.present?}", k.id] }, { include_blank: true, label: :label_sb_db_key } %>
         <em class="info"><%= l(:text_sb_db_key) %></em></p>
     </div>
@@ -41,6 +42,7 @@ $(function() {
     var k = $('.sb_kind_pick:checked').val(), d = $('.sb_dbkind_pick:checked').val();
     $('.sb_db').prop('hidden', k !== 'db'); $('.sb_files').prop('hidden', k !== 'files');
     $('.sb_dbstd').prop('hidden', d === 'custom'); $('.sb_dbcustom').prop('hidden', d !== 'custom');
+    $('.sb_dbfile').prop('hidden', d !== 'oracle' && d !== 'mssql');
     $('.sb_weekday').prop('hidden', $('.sb_sch_pick').val() !== 'weekly');
   }
   $(document).on('change', '.sb_kind_pick, .sb_dbkind_pick, .sb_sch_pick', sync); sync();
