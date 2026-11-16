@@ -14,7 +14,7 @@
       <p><%= f.text_field :db_host, size: 30, maxlength: 255, placeholder: '127.0.0.1', label: :label_sb_db_host %><em class="info"><%= l(:text_sb_db_host) %></em></p>
       <p><%= f.number_field :db_port, min: 1, max: 65535, placeholder: '3306 / 5432 / 1521 / 1433', label: :label_sb_db_port %></p>
       <p><%= f.text_field :db_name, size: 30, maxlength: 120, label: :label_sb_db_name %><em class="info"><%= l(:text_sb_db_name) %></em></p>
-      <p class="sb_dbfile" <%= 'hidden' unless %w(oracle mssql).include?(j.db_kind) %>><span class="db_hintbox"><%= l(:text_sb_db_file) %></span></p>
+      <p class="sb_dbfile" <%= 'hidden' unless %w(oracle mssql).include?(j.db_kind) %>><em class="info sb_warn"><%= l(:text_sb_db_file) %></em></p>
       <p><%= f.select :db_key_id, @db_keys.map { |k| ["#{k.name}#{" (#{k.login})" if k.login.present?}", k.id] }, { include_blank: true, label: :label_sb_db_key } %>
         <em class="info"><%= l(:text_sb_db_key) %></em></p>
     </div>
