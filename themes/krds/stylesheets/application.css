@@ -1312,8 +1312,13 @@ table.list.mt_types td.mt_ck{white-space:nowrap;}
 #content table.mt_grid td.mt_ed{cursor:text;}
 #content table.mt_grid td.mt_ed:hover{box-shadow:inset 0 0 0 1px var(--pri_20);}
 #content table.mt_grid td.mt_ed:focus{outline:none;box-shadow:inset 0 0 0 2px var(--pri_50);}
-#content table.mt_grid td.mt_editing{padding:2px;box-shadow:inset 0 0 0 2px var(--pri_50);}
-.mt_input{width:100%;height:30px;padding:0 6px;border:0;background:var(--gray_0);font-size:0.8125rem;}
+#content table.mt_grid td.mt_editing{box-shadow:inset 0 0 0 2px var(--pri_50);}
+.mt_input{width:100%;height:30px;padding:0;border:0;background:var(--gray_0);font-size:0.8125rem;}
+#content table.mt_grid td.mt_editing .mt_leaf+.mt_input{width:calc(100% - 26px);}
+/* 입력 중 열 너비 고정(menu_grid.js 가 .on 을 붙임): 넘치는 글자는 말줄임, 입력을 마치면 풀려서 한 번 정렬 */
+#content table.mt_grid.on{table-layout:fixed;}
+#content table.mt_grid.on th{box-sizing:border-box;}
+#content table.mt_grid.on td{overflow:hidden;text-overflow:ellipsis;}
 #content table.mt_grid td.mt_name{max-width:none;}
 .mt_tog{width:22px;height:22px;padding:0;margin:0 4px 0 0;border:0;background:none;font-size:0.75rem;color:var(--gray_60);cursor:pointer;}
 .mt_tog:hover{color:var(--pri_60);}

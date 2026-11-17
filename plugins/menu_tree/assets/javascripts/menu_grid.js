@@ -1,10 +1,12 @@
 /* 메뉴 구조도 엑셀형 표 — 메뉴 구조도 플러그인
    - 서버 JSON(rows, max_depth)으로 표를 그림: 1뎁스…N뎁스 칸(가장 깊은 메뉴에 맞춰 자동), 화면 ID·URL·유형·채널·대상 권한·사용·추가 칼럼·일감·진행률·비고
    - 칸을 눌러 바로 고침(Enter 저장·아래로, Tab 다음 칸, Esc 취소). 메뉴명 칸에서 Tab 들여쓰기 / Shift+Tab 내어쓰기
-   - 행 ⋯ 메뉴(아래·하위 추가, 들여·내어쓰기, 위·아래, 일감, 삭제), 끌어서 옮기기, 접기·펼치기, 검색, 고른 메뉴로 일감 만들기 */
+   - 행 ⋯ 메뉴(아래·하위 추가, 들여·내어쓰기, 위·아래, 일감, 삭제), 끌어서 옮기기, 접기·펼치기, 검색, 고른 메뉴로 일감 만들기
+   - 입력하는 동안은 열 너비를 고정(표가 출렁이지 않게), 입력을 마치고 표 밖으로 나가면 그때 한 번 내용에 맞춰 정렬 */
 (function($) {
   'use strict';
   var C, rows = [], maxDepth = 1, byId = {}, collapsed = {}, selected = {}, editing = null, focusDone = false;
+  var frozen = null, pending = 0, thawTimer = null;   // 입력 중 열 너비 고정 { 칸 key: 너비 }, 저장 중인 요청 수
   var KEY = 'mt_collapsed_' + location.pathname;
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -23,6 +25,32 @@
   }
   function saveCollapsed() { try { sessionStorage.setItem(KEY, JSON.stringify(Object.keys(collapsed))); } catch (e) {} }
   try { (JSON.parse(sessionStorage.getItem(KEY) || '[]') || []).forEach(function(id) { collapsed[id] = true; }); } catch (e) {}
+
+  // ---- 입력 중 열 너비 고정 ----
+  // 칸을 누르거나 저장해 표를 다시 그려도 지금 너비 그대로 → 입력을 마치면(thaw) 한 번만 내용에 맞춰 정렬
+  function freeze() {
+    clearTimeout(thawTimer);
+    if (frozen) return;
+    var $t = $('#mt_grid');
+    frozen = { _w: $t.outerWidth() };
+    $t.find('thead th').each(function() { frozen[$(this).data('key')] = this.getBoundingClientRect().width; });
+    applyFrozen();
+  }
+  function applyFrozen() {
+    if (!frozen) return;
+    var $t = $('#mt_grid').addClass('on').css('width', frozen._w);
+    $t.find('thead th').each(function() { var w = frozen[$(this).data('key')]; if (w) this.style.width = w + 'px'; });
+  }
+  function thaw() {
+    clearTimeout(thawTimer);
+    thawTimer = setTimeout(function() {
+      // 편집 중·저장 중이거나 표 안에 머물러 있으면 계속 고정
+      if (!frozen || editing || pending || $(document.activeElement).closest('#mt_grid').length) return;
+      frozen = null;
+      var $t = $('#mt_grid').removeClass('on').css('width', '');
+      $t.find('thead th').css('width', '');
+    }, 400);
+  }
 
   function load(then) {
     return $.getJSON(C.urls.data).done(function(d) {
@@ -128,9 +156,10 @@
     editing = null;
     var cols = columns(), list = visible();
     var head = '<tr>' + cols.map(function(c) {
-      if (c.key === 'sel') return '<th class="mt_sel"><input type="checkbox" id="mt_all" aria-label="' + esc(t('select_all')) + '"></th>';
-      if (c.key === 'drag' || c.key === 'act') return '<th class="mt_' + c.key + '"></th>';
-      return '<th class="' + (c.depth !== undefined ? 'mt_dh' : 'mt_h_' + c.key.replace(/^x\d+$/, 'x')) + '">' + esc(c.label) + '</th>';
+      var dk = ' data-key="' + c.key + '"';
+      if (c.key === 'sel') return '<th class="mt_sel"' + dk + '><input type="checkbox" id="mt_all" aria-label="' + esc(t('select_all')) + '"></th>';
+      if (c.key === 'drag' || c.key === 'act') return '<th class="mt_' + c.key + '"' + dk + '></th>';
+      return '<th class="' + (c.depth !== undefined ? 'mt_dh' : 'mt_h_' + c.key.replace(/^x\d+$/, 'x')) + '"' + dk + '>' + esc(c.label) + '</th>';
     }).join('') + '</tr>';
     var body = list.length ? list.map(function(r) {
       var out = [], skip = false;
@@ -144,6 +173,7 @@
     }).join('') : '<tr><td class="mt_empty" colspan="' + cols.length + '">' + esc(t('no_rows')) + '</td></tr>';
     $('#mt_grid thead').html(head);
     $('#mt_grid tbody').html(body);
+    applyFrozen();
     selCount();
   }
 
@@ -180,7 +210,8 @@
     if (!C.canEdit || editing) return;
     var id = $td.closest('tr').data('id'), key = $td.data('key'), r = byId[id], c = key === 'name' ? { edit: 'text' } : colDef(key);
     if (!r || !c || !c.edit) return;
-    if (c.edit === 'bool') { save(id, key, value(r, key) ? '0' : '1'); return; }
+    freeze();
+    if (c.edit === 'bool') { save(id, key, value(r, key) ? '0' : '1', function() { cellAt(id, key).trigger('focus'); }); return; }   // 누른 칸에 그대로 머묾
     var v = key === 'name' ? r.name : value(r, key), $in;
     if (c.edit === 'select') {
       $in = $('<select class="mt_input"><option value=""></option></select>');
@@ -191,7 +222,9 @@
       if (key === 'name') $in.attr('maxlength', 150);
     }
     editing = { id: id, key: key, $td: $td, old: v || '' };
-    $td.addClass('mt_editing').data('html', $td.html()).empty().append($in);
+    $td.addClass('mt_editing').data('html', $td.html()).empty();
+    if (key === 'name') $td.append('<span class="mt_leaf"></span>');   // 접기 버튼 자리를 남겨 글자가 옆으로 밀리지 않게
+    $td.append($in);
     $in.trigger('focus'); if ($in.is('input[type=text]')) $in[0].select();
     $in.on('keydown', function(e) {
       if (e.key === 'Escape') { e.preventDefault(); cancel(); return; }
@@ -222,14 +255,15 @@
   }
 
   function save(id, key, v, then) {
-    api('PATCH', url('item', id), { field: key, value: v }).done(function() {
+    pending++;
+    api('PATCH', url('item', id), { field: key, value: v }).always(function() { pending--; }).done(function() {
       var r = byId[id];
       if (key.charAt(0) === 'x' && /^x\d+$/.test(key)) { r.extra = r.extra || {}; if (v === '' || v === '0') delete r.extra[key.slice(1)]; else r.extra[key.slice(1)] = v; }
       else if (key === 'active') r.active = v === '1';
       else r[key] = v;
       // 목록·체크 칸 값은 서버 정리 결과를 다시 받음
-      load(then);
-    }).fail(function() { load(); });
+      load(function() { if (then) then(); thaw(); });
+    }).fail(function() { load(thaw); });
   }
 
   function cellAt(id, key) { return $('#mt_grid tr[data-id="' + id + '"] td[data-key="' + key + '"]'); }
@@ -254,7 +288,7 @@
   function add(data) {
     api('POST', C.urls.create, $.extend({ name: t('new_name') }, data)).done(function(res) {
       if (data.parent_id) { delete collapsed[data.parent_id]; saveCollapsed(); }
-      load(function() { var $td = cellAt(res.id, 'name'); $td[0] && $td[0].scrollIntoView({ block: 'center' }); startEdit($td); });
+      load(function() { var $td = cellAt(res.id, 'name'); $td[0] && $td[0].scrollIntoView({ block: 'nearest' }); startEdit($td); });   // 화면이 크게 튀지 않게 nearest
     });
   }
   function remove(id) {
@@ -317,6 +351,9 @@
         $tr.find('td[data-key="' + key + '"]').trigger('focus');
       }
     });
+    // 표 밖으로 나가면(입력 마침) 열 너비 고정을 풀고 한 번 정렬, 창 크기를 바꾸면 바로 풂
+    $g.on('focusout', thaw);
+    $(window).on('resize', function() { if (frozen && !editing) { frozen = null; $g.removeClass('on').css('width', '').find('thead th').css('width', ''); } });
     $g.on('click', '.mt_tog', function() {
       var id = $(this).closest('tr').data('id');
       if (collapsed[id]) delete collapsed[id]; else collapsed[id] = true;
