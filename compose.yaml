@@ -30,13 +30,16 @@ services:
       REDMINE_SECRET_KEY_BASE: ${REDMINE_SECRET_KEY_BASE}
       REDMINE_CIPHER_KEY: ${REDMINE_CIPHER_KEY:?REDMINE_CIPHER_KEY 를 .env 에 넣으세요}   # config/configuration.yml 이 읽음
       REDMINE_PLUGINS_MIGRATE: "1"
-      REDMINE_HOST_NAME: ${REDMINE_HOST_NAME:-}        # 메일 링크 등에 쓰는 주소 (예: 서버IP:3000)
+      REDMINE_HOST_NAME: ${REDMINE_HOST_NAME:-}        # 메일 링크 등에 쓰는 주소 (예: 서버IP:3000, 하위 경로면 www.nanwe.co.kr/pms)
+      REDMINE_PROTOCOL: ${REDMINE_PROTOCOL:-http}      # 메일 링크 프로토콜 (외부 HTTPS 프록시 뒤면 https)
+      RAILS_RELATIVE_URL_ROOT: ${REDMINE_RELATIVE_URL_ROOT:-}   # 하위 경로 서비스 (예: /pms) — 비우면 / 에서 서비스
       REDMINE_SYS_API_KEY: ${REDMINE_SYS_API_KEY:-}    # 저장소 커밋 가져오기 API 키 (cron 과 같은 값)
     volumes:
       - files:/usr/src/redmine/files     # 첨부파일
       - keys:/usr/src/redmine/keys       # Vault 키 파일
       - ./backup/ctl:/usr/src/redmine/backup_ctl:z   # PMS 백업 상태(관리 > 백업 화면) — 백업 파일 자체는 마운트하지 않음
       - ./backup/sys:/usr/src/redmine/sys_backups:z   # 프로젝트 시스템 백업(운영 서버 DB 덤프·폴더) 보관
+      - ./config/config.ru:/usr/src/redmine/config.ru:z   # 하위 경로(RAILS_RELATIVE_URL_ROOT) 서비스 + / 로 오면 하위 경로로 이동
       - ./config/configuration.yml:/usr/src/redmine/config/configuration.yml:z   # z: SELinux 라벨 (ro 금지: 엔트리포인트가 config/ 를 chown 함)
       - ./themes:/usr/src/redmine/themes:z   # 사용자 테마 (krds)
       - ./plugins/vault_ko:/usr/src/redmine/plugins/vault_ko:z   # Vault 한국어화 (번역+화면 문구)

@@ -153,6 +153,7 @@ Redmine 6.1.6 + Vault(접속정보) 플러그인을 **KRDS(대한민국 정부 �
 | `plugins/vault_ko/` | Vault 한국어 번역 + 화면 개선 규칙(`build.rb`). 이미지 빌드 때 원본 화면에 적용 (검색창, 선택 삭제, 비밀번호 가림, http 복사, 유형 선택칸·유형 표시·유형 관리 카드 연결) |
 | `setup/` | 기준 설정(`seed.yml` — 역할 권한·일감 유형·사용자 정의 항목 등), 초기화면 안내문(`welcome.md`), 적용 스크립트, 백업·복원 스크립트(`backup.sh`·`restore.sh`), cron 예시 |
 | `config/configuration.yml` | 암호화 키를 `.env` 에서 읽음 (파일에 비밀값 없음) |
+| `config/config.ru` | `.env` 의 `REDMINE_RELATIVE_URL_ROOT`(예: `/pms`) 아래에서 서비스, `/` 로 들어오면 하위 경로로 이동 |
 
 ## 설치 (Rocky Linux 9 기준)
 ### 1. Docker 설치 (서버당 1회)
@@ -192,6 +193,10 @@ docker compose exec redmine sh -c 'bundle exec rails runner setup/apply_settings
 
 ### 7. 접속
 `http://<서버IP>:3000` — 초기 계정 **admin / admin** (로그인 후 즉시 변경)
+
+### 8. 외부 접속 — 하위 경로 (선택)
+외부 nginx 의 `https://www.nanwe.co.kr/pms` 처럼 하위 경로로 열 때 `.env` 에 `REDMINE_RELATIVE_URL_ROOT=/pms`, `REDMINE_HOST_NAME=www.nanwe.co.kr/pms`, `REDMINE_PROTOCOL=https` 를 넣고 `docker compose up -d --force-recreate redmine` → `apply_settings.rb` 실행. 사내 주소는 `http://<서버IP>:3000/pms/` (예전 주소는 자동 이동).
+nginx 는 경로를 그대로 넘김 (`location /pms/ { proxy_pass http://<서버IP>:3000; }`, 웹소켓 헤더 포함).
 
 ## 수정 · 배포
 수정 → 커밋 → push 후 서버에서 **`cd /root/redmine && ./deploy.sh`** 한 줄이면 됩니다. 바뀐 파일을 보고 알아서 처리합니다.

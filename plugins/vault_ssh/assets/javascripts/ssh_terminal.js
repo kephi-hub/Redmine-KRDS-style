@@ -52,7 +52,7 @@
       state = 'connecting';
       setState(d.connecting);
       ident = JSON.stringify({ channel: 'SshConsole::TerminalChannel', ticket: d.ticket, cols: term.cols, rows: term.rows });
-      ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/cable');
+      ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + (d.cable || '/cable'));
       ws.onmessage = function(ev) {
         var m = JSON.parse(ev.data);
         if (m.type === 'ping') return;

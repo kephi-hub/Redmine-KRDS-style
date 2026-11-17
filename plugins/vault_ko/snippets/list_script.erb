@@ -54,7 +54,7 @@ $(function() {
     var fail = [];
     items.reduce(function(p, it) {
       return p.then(function() {
-        return fetch('/projects/' + encodeURIComponent(it.project) + '/keys/' + encodeURIComponent(it.id), {
+        return fetch(<%= raw Redmine::Utils.relative_url_root.to_json %> + '/projects/' + encodeURIComponent(it.project) + '/keys/' + encodeURIComponent(it.id), {
           method: 'POST', credentials: 'same-origin',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': token },
           body: '_method=delete&authenticity_token=' + encodeURIComponent(token)

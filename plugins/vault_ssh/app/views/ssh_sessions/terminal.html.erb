@@ -29,7 +29,7 @@
 <div class="st_note" id="st_note" role="status" hidden></div>
 <div class="st_main">
 <main class="st_term" id="st_term" aria-label="SSH 터미널"
-      data-ticket="<%= s.ticket %>" data-usable="<%= @usable ? 1 : 0 %>" data-again="<%= @can_again ? ssh_terminal_again_path(s.ticket) : '' %>"
+      data-ticket="<%= s.ticket %>" data-cable="<%= Redmine::Utils.relative_url_root %>/cable" data-usable="<%= @usable ? 1 : 0 %>" data-again="<%= @can_again ? ssh_terminal_again_path(s.ticket) : '' %>"
       data-used="<%= l(:text_ssh_used_ticket) %>" data-closed="<%= l(:text_ssh_closed) %>" data-connecting="<%= l(:text_ssh_connecting) %>"></main>
 <aside class="st_files" id="st_files" aria-label="<%= l(:label_ssh_files) %>" hidden
        data-list="<%= ssh_files_path(s.ticket) %>" data-download="<%= ssh_files_download_path(s.ticket) %>" data-upload="<%= ssh_files_upload_path(s.ticket) %>"

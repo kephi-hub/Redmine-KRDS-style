@@ -27,7 +27,7 @@ else
 fi
 
 printf '[대기] '
-i=0; until [ "$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:${REDMINE_PORT:-3000}/login")" = 200 ]; do
+i=0; until [ "$(curl -sL -o /dev/null -w '%{http_code}' "http://localhost:${REDMINE_PORT:-3000}/login")" = 200 ]; do
   i=$((i+1)); [ $i -gt 60 ] && { echo '시간 초과 — docker compose logs redmine 확인'; exit 1; }; printf '.'; sleep 3
 done; echo ' 정상'
 

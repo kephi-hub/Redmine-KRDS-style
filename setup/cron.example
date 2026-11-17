@@ -1,6 +1,7 @@
 # SVN/Git 커밋을 5분마다 가져와 일감에 연결 (refs/fixes/closes, @시간)
 # 설치: KEY 를 .env 의 REDMINE_SYS_API_KEY 값으로 바꿔 /etc/cron.d/redmine_fetch 로 저장 후 chmod 600
-*/5 * * * * root curl -s -m 240 -o /dev/null "http://localhost:3000/sys/fetch_changesets?key=KEY"
+# 하위 경로(.env 의 REDMINE_RELATIVE_URL_ROOT=/pms)로 서비스하면 -L 이 / → /pms 이동을 따라감
+*/5 * * * * root curl -sL -m 240 -o /dev/null "http://localhost:3000/sys/fetch_changesets?key=KEY"
 
 # PMS 백업: 매일 03:00 DB·첨부파일·Vault 키 (setup/backup.sh), 관리 > 백업 화면의 [지금 백업] 요청은 1분마다 확인
 # 설치: /etc/cron.d/redmine_backup 로 저장 후 chmod 600 (경로는 서버의 Redmine 폴더로)

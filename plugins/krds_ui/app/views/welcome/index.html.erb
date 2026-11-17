@@ -8,7 +8,7 @@
     <li><%= link_to my_page_path do %><%= sprite_icon('user') %><strong><%= l(:label_my_page) %></strong><span><%= l(:text_krds_q_mypage) %></span><% end %></li>
     <li><%= link_to projects_path do %><%= sprite_icon('projects') %><strong><%= l(:label_project_plural) %></strong><span><%= l(:text_krds_q_projects) %></span><% end %></li>
     <% if Redmine::Plugin.installed?(:pm_docs) %>
-    <li><%= link_to '/pmo' do %><%= sprite_icon('stats') %><strong><%= l(:label_pm_portfolio) %></strong><span><%= l(:text_krds_q_pmo) %></span><% end %></li>
+    <li><%= link_to pm_portfolio_path do %><%= sprite_icon('stats') %><strong><%= l(:label_pm_portfolio) %></strong><span><%= l(:text_krds_q_pmo) %></span><% end %></li>
     <% end %>
     <li><%= link_to '#manual' do %><%= sprite_icon('help') %><strong><%= l(:label_krds_manual) %></strong><span><%= l(:text_krds_q_manual) %></span><% end %></li>
   </ul>

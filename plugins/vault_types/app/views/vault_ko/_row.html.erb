@@ -34,7 +34,7 @@
     <span class="vk_val">
     <% if key.body.present? %><span class="vk_dots" aria-label="<%= t('key.attr.body') %> 숨김">••••••••</span><% copy.call('body', key.body.to_s.dup.force_encoding('UTF-8')) %><% end %>
     <% if !key.is_a?(Vault::Password) && key.file.present? && !orphan %>
-      <%= link_to "/projects/#{key.project.identifier}/keys/#{key.id}/download", class: 'vk_btn', title: '파일 다운로드', 'aria-label': '파일 다운로드', id: ("keyfile_dl_#{key.id}" if key.is_a?(Vault::KeyFile)) do %><%= sprite_icon('download') %><% end %>
+      <%= link_to "#{Redmine::Utils.relative_url_root}/projects/#{key.project.identifier}/keys/#{key.id}/download", class: 'vk_btn', title: '파일 다운로드', 'aria-label': '파일 다운로드', id: ("keyfile_dl_#{key.id}" if key.is_a?(Vault::KeyFile)) do %><%= sprite_icon('download') %><% end %>
     <% end %>
     <% if key.body.blank? && !(key.respond_to?(:file) && key.file.present?) %><span class="vk_none">-</span><% end %>
     </span>
