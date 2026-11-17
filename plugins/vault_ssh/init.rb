@@ -34,7 +34,7 @@ Redmine::Plugin.register :vault_ssh do
 
   # 프로젝트 시스템 백업 (운영 DB 덤프 · 첨부파일 폴더) — 덤프에 실데이터가 들어 있어 보기 권한도 따로
   project_module :sys_backups do
-    permission :view_sys_backups, { sys_backups: [:index, :show, :download, :status] }, read: true
+    permission :view_sys_backups, { sys_backups: [:index, :show, :download, :status], sys_backup_zips: [:show] }, read: true
     permission :manage_sys_backups, { sys_backups: [:new, :create, :edit, :update, :destroy, :run, :destroy_run] }, require: :member
   end
   menu :project_menu, :sys_backups, { controller: 'sys_backups', action: 'index' }, caption: :label_sb, param: :project_id

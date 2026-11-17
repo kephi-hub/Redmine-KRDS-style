@@ -10,6 +10,7 @@ require 'zlib'
 require 'json'
 require 'shellwords'
 require 'fileutils'
+require 'open3'
 
 module SshConsole
   module Backup
@@ -298,6 +299,57 @@ module SshConsole
       run.path && Dir[run.path.join('db_*.gz').to_s].first
     end
 
+    # ---- 폴더 백업본 [zip 받기] ----
+    # 보관 폴더(files/ 아래 원래 경로)를 bsdtar 로 zip 을 만들면서 바로 내려보냄 → 임시 파일·대기 없음
+    # zip64(4GB·65,535개 넘어도), 한글 파일 이름 UTF-8 표시, 압축 없이 묶기만 — 첨부파일은 대부분 이미 압축된 형식(이미지·PDF·hwp·docx)이라
+    # 크기 차이는 작고 속도는 약 2배(실측 26 → 48MB/s), 서버 CPU 도 덜 씀
+    ZIP_MAX = 2              # 동시에 받는 zip 수 (받는 동안 웹 처리 스레드 하나를 씀)
+    ZIP_CHUNK = 256 * 1024
+    ZIP_LOCK = Mutex.new
+    @zip_active = 0
+
+    def zip_ready?
+      @zip_ready = system('command -v bsdtar >/dev/null 2>&1') if @zip_ready.nil?
+      @zip_ready
+    end
+
+    def zip_dir(run)
+      run.path && (d = run.path.join('files')).directory? ? d : nil
+    end
+
+    # <프로젝트>_<날짜>_<작업 이름>.zip
+    def zip_name(run)
+      "#{run.sys_backup_job.project.identifier}_#{File.basename(run.dir)}_#{run.sys_backup_job.name.to_s.gsub(%r{[\\/:*?"<>|\s]+}, '_')}.zip"
+    end
+
+    def zip_busy?
+      ZIP_LOCK.synchronize { @zip_active >= ZIP_MAX }
+    end
+
+    # zip 을 만들면서 조각마다 yield (SysBackupZipsController 가 ActionController::Live 로 바로 내려보냄)
+    # 받는 사람이 끊으면 yield 에서 오류 → bsdtar 를 멈추고 정리
+    def zip_each(run)
+      dir = zip_dir(run)
+      ZIP_LOCK.synchronize { @zip_active += 1 }
+      tops = Dir.children(dir).sort
+      cmd = ['bsdtar', '--format', 'zip', '--options', 'zip:compression=store,zip:hdrcharset=UTF-8', '-cf', '-', '--', *tops]
+      Open3.popen2(*cmd, chdir: dir.to_s, err: File::NULL) do |stdin, stdout, wait|
+        stdin.close
+        begin
+          while (chunk = stdout.read(ZIP_CHUNK))
+            yield chunk
+          end
+        ensure
+          stdout.close unless stdout.closed?
+          Process.kill('TERM', wait.pid) if wait.alive? rescue nil
+          st = wait.value
+          Rails.logger.warn("[sys_backup] zip run #{run.id}: bsdtar #{st}") unless st.success?
+        end
+      end
+    ensure
+      ZIP_LOCK.synchronize { @zip_active -= 1 }
+    end
+
     # 복원 안내 명령 (화면 표시용, 비밀번호 없음)
     def restore_hint(job, run)
       return nil unless run.path
@@ -319,7 +371,10 @@ module SshConsole
         else "gunzip -c #{rel}"
         end
       else
-        "rsync -a backup/sys/#{run.dir}/files/ <운영 서버>:/   # 예) 폴더 하나만: backup/sys/#{run.dir}/files#{job.path_list.first}/"
+        "# PMS 서버에서 바로: 보관 폴더 → 운영 서버\n" \
+          "rsync -a backup/sys/#{run.dir}/files/ <운영 서버>:/   # 예) 폴더 하나만: backup/sys/#{run.dir}/files#{job.path_list.first}/\n" \
+          "# 또는 실행 기록의 [zip 받기] 파일을 운영 서버에 올려서 (zip 안 경로 = 원래 경로에서 맨 앞 / 를 뺀 것)\n" \
+          "unzip -o #{zip_name(run)} -d /"
       end
     end
   end

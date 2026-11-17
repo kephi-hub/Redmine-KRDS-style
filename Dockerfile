@@ -60,3 +60,10 @@ RUN set -eux; \
 COPY plugins/vault_ko/build.rb /tmp/vault_ko/build.rb
 COPY plugins/vault_ko/snippets /tmp/vault_ko/snippets
 RUN ruby /tmp/vault_ko/build.rb plugins/vault && rm -rf /tmp/vault_ko && chown -R redmine:redmine plugins/vault
+
+# 시스템 백업 폴더 백업본 [zip 받기]: bsdtar 로 만들면서 바로 내려보냄 (zip64 — 4GB·65,535개 넘어도, 한글 파일 이름 UTF-8 표시, 무압축)
+# 앞 단계 캐시를 그대로 쓰도록 맨 끝에 둠
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends libarchive-tools; \
+    rm -rf /var/lib/apt/lists/*

@@ -12,6 +12,7 @@ resources :projects, only: [] do
   post 'sys_backups/:id/run', to: 'sys_backups#run', as: 'sys_backup_run_now', constraints: { id: /\d+/ }
   get 'sys_backups/status', to: 'sys_backups#status', as: 'sys_backups_status'
   get 'sys_backups/runs/:run_id/download', to: 'sys_backups#download', as: 'sys_backup_download', constraints: { run_id: /\d+/ }
+  get 'sys_backups/runs/:run_id/zip', to: 'sys_backup_zips#show', as: 'sys_backup_zip', constraints: { run_id: /\d+/ }
   delete 'sys_backups/runs/:run_id', to: 'sys_backups#destroy_run', as: 'sys_backup_run', constraints: { run_id: /\d+/ }
   resources :sys_backups, path: 'sys_backups'
 end

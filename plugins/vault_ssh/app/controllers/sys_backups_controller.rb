@@ -1,4 +1,4 @@
-# 프로젝트 > 운영 > 시스템 백업 — 백업 작업(DB 덤프 / 폴더) 등록 · [지금 백업] · 기록 · 덤프 받기 · 복원 안내
+# 프로젝트 > 운영 > 시스템 백업 — 백업 작업(DB 덤프 / 폴더) 등록 · [지금 백업] · 기록 · 덤프 받기 · 폴더 zip 받기 · 복원 안내
 class SysBackupsController < ApplicationController
   menu_item :sys_backups
 
