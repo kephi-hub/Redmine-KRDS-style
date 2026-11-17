@@ -1,6 +1,8 @@
 <%# [▶ 접속] [⚙ 접속 설정] — 접속정보 목록 줄·상세 화면 공용 (ssh_console.js 가 누름 처리) %>
 <% prof = VaultSshProfile.find_by(key_id: key.id) %>
-<% if SshConsole::Access.can_connect?(User.current, key, prof) %>
+<% if prof&.relay_only %>
+  <span class="vk_relay" title="<%= l(:text_ssh_relay_only) %>"><%= l(:label_ssh_relay_badge) %></span>
+<% elsif SshConsole::Access.can_connect?(User.current, key, prof) %>
   <a href="#" role="button" class="vk_go<%= ' is_prod' if prof&.prod? %>" data-ssh-connect="<%= project_key_ssh_path(key.project, key) %>"
      data-env="<%= prof&.env || 'dev' %>" data-auth="<%= prof&.auth || 'password' %>" data-name="<%= key.name %>" data-login="<%= key.login %>"
      data-project="<%= key.project.identifier %>" title="<%= l(:label_ssh_connect) %> — <%= key.name %>"><%= sprite_icon('krds-terminal', l(:label_ssh_connect)) %></a>

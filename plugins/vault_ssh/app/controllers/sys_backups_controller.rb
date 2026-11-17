@@ -130,7 +130,8 @@ class SysBackupsController < ApplicationController
   # 고를 수 있는 접속정보 — SSH 서버(접속 권한 있는 것), 데이터베이스(볼 수 있는 비밀번호 유형, DB 이름 유형 먼저)
   def load_options
     keys = SshConsole::Access.visible_keys(User.current, @project)
-    @ssh_keys = keys.select { |k| SshConsole::Target.ssh_key?(k) && SshConsole::Access.can_connect?(User.current, k) }
+    relay = VaultSshProfile.where(key_id: keys.map(&:id), relay_only: true).pluck(:key_id)
+    @ssh_keys = keys.select { |k| SshConsole::Target.ssh_key?(k) && !relay.include?(k.id) && SshConsole::Access.can_connect?(User.current, k) }
     @db_keys = keys.select { |k| k.is_a?(Vault::Password) && !SshConsole::Target.ssh_key?(k) }
                    .sort_by { |k| [k.vault_type&.name.to_s.match?(/데이터|DB/i) ? 0 : 1, k.name] }
   end

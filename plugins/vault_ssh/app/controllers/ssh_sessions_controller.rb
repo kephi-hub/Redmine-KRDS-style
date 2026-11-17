@@ -9,6 +9,7 @@ class SshSessionsController < ApplicationController
   # 접속 정보 확인 → 접속 기록(pending) + 접속표 → 터미널 탭 주소 (JSON)
   def create
     profile = VaultSshProfile.find_by(key_id: @key.id)
+    return fail_json(l(:error_ssh_relay_only), 403) if profile&.relay_only
     return fail_json(l(:error_ssh_not_allowed), 403) unless SshConsole::Access.can_connect?(User.current, @key, profile)
     reason = params[:reason].to_s.strip.truncate(255, omission: '')
     if profile&.prod?
