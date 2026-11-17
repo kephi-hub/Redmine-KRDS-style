@@ -14,6 +14,7 @@ require_relative 'lib/site_tools/repo_export'
 require_relative 'lib/site_tools/hooks'
 require_relative 'lib/site_tools/backup'
 require_relative 'lib/site_tools/ext_access'
+require_relative 'lib/site_tools/repo_title'
 
 Redmine::Plugin.register :site_tools do
   name '관리 도구'
@@ -41,6 +42,8 @@ end
 
 User.prepend(SiteTools::UserPatch) unless User.ancestors.include?(SiteTools::UserPatch)
 # 외부 접속 허용 IP — 모든 화면·API 의 user_setup 뒤(로그인 검사 전)에 확인 (메서드 덮어쓰기라 이미 읽힌 하위 컨트롤러에도 적용)
+# 저장소 화면 브라우저 제목 앞의 "/" 정리
+ApplicationHelper.prepend(SiteTools::RepoTitle) unless ApplicationHelper.ancestors.include?(SiteTools::RepoTitle)
 ApplicationController.prepend(SiteTools::ExtAccess::Guard) unless ApplicationController.ancestors.include?(SiteTools::ExtAccess::Guard)
 # 시작할 때 저장된 SMTP 설정 적용 (DB 준비 전이면 건너뜀)
 begin
