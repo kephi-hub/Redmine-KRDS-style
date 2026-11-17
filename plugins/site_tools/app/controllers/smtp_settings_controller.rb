@@ -18,7 +18,8 @@ class SmtpSettingsController < ApplicationController
       flash[:error] = error
       return redirect_to(smtp_settings_path)
     end
-    Setting.plugin_site_tools = cfg
+    old = Setting.plugin_site_tools
+    Setting.plugin_site_tools = (old.is_a?(Hash) ? old.stringify_keys : {}).merge(cfg)   # 같은 칸의 외부 접속 허용 IP 값 유지
     Setting.mail_from = params[:mail_from].to_s.strip if params[:mail_from].present?
     SiteTools::Smtp.apply!
     flash[:notice] = l(cfg['enabled'] == '1' ? :notice_smtp_saved_on : :notice_smtp_saved_off)

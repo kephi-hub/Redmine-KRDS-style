@@ -101,3 +101,22 @@ ko:
   label_repo_export_who: 받은 사람
   label_repo_export_path: 경로
   label_repo_export_size: 크기
+  # 외부 접속 허용 IP
+  label_ext_access: 외부 접속 허용 IP
+  text_ext_access: "외부 주소(https://www.nanwe.co.kr/pms)로 들어오는 접속을 허용한 IP 에서만 받습니다. 사내에서 PMS 서버로 바로 접속하는 것은 제한하지 않습니다."
+  label_ext_ip_state_on: 외부 접속 제한 사용 중
+  label_ext_ip_state_off: 외부 접속 제한 꺼짐 (모든 IP 허용)
+  text_ext_ip_you_external: "지금 외부 주소로 접속 중입니다. 접속 IP: %{ip}"
+  text_ext_ip_you_internal: "지금 사내에서 직접 접속 중입니다 (%{ip}). 이 접속은 제한되지 않습니다."
+  label_ext_ip_enabled: 외부 접속 제한
+  text_ext_ip_enabled: 켜면 아래 목록에 없는 IP 의 외부 접속을 막습니다. 2단계 인증과 함께 쓰세요.
+  label_ext_ip_list: 허용 IP
+  text_ext_ip_list: "한 줄에 하나씩 IP(211.234.10.25) 또는 대역(175.200.0.0/24). # 뒤는 메모입니다."
+  label_ext_ip_private: 사설 IP 허용
+  text_ext_ip_private: "10.x · 172.16~31.x · 192.168.x 로 보이는 외부 접속을 허용합니다. 사내에서 외부 주소로 접속하면 공유기 IP(192.168.10.1)로 보입니다."
+  label_ext_proxy_list: 외부 프록시 서버
+  text_ext_proxy_list: 외부 접속을 넘겨주는 nginx 서버 IP. 이 서버를 거친 요청만 검사합니다. 바꿀 일은 거의 없습니다.
+  error_ext_ip_invalid: "IP 형식이 잘못된 줄이 있습니다: %{lines}"
+  error_ext_ip_self: "지금 접속 IP(%{ip})가 허용 목록에 없어 저장하지 않았습니다. 저장하면 바로 접속이 끊깁니다. 목록에 추가하거나 사내에서 저장하세요."
+  notice_ext_ip_saved_on: 저장했습니다. 허용 목록에 없는 IP 의 외부 접속을 막습니다.
+  notice_ext_ip_saved_off: 저장했습니다. 외부 접속 제한이 꺼져 있습니다.

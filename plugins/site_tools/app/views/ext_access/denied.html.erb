@@ -1,0 +1,28 @@
+<%# 외부 접속 허용 IP 에 없는 곳에서 접속 — 로그인 전 단계라 Redmine 머리글 없이 단독 화면 %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>접속이 허용되지 않은 위치 — <%= Setting.app_title %></title>
+<style>
+body{margin:0;background:#f4f5f6;font-family:"Pretendard GOV",-apple-system,"Malgun Gothic",sans-serif;color:#1e2124;}
+.deny_box{max-width:480px;padding:32px 24px;margin:15vh auto 0;border:1px solid #d6e0eb;border-radius:12px;background:#fff;}
+.deny_tit{margin:0 0 12px;font-size:1.25rem;font-weight:700;}
+.deny_txt{margin:0 0 8px;font-size:0.9375rem;line-height:1.6;color:#464c53;}
+.deny_ip{display:inline-block;padding:2px 8px;border-radius:6px;background:#eef2f7;font-family:monospace;font-size:0.875rem;}
+@media (min-width:600px){
+.deny_box{padding:40px 36px;}
+}
+</style>
+</head>
+<body>
+<main class="deny_box">
+  <h1 class="deny_tit">접속이 허용되지 않은 위치입니다</h1>
+  <p class="deny_txt">이 PMS 는 허용된 IP 에서만 외부 접속할 수 있습니다.</p>
+  <p class="deny_txt">지금 접속 IP: <span class="deny_ip"><%= client %></span></p>
+  <p class="deny_txt">접속이 필요하면 PMS 관리자에게 위 IP 를 알려 허용을 요청하세요.</p>
+</main>
+</body>
+</html>

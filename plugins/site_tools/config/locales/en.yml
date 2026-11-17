@@ -32,3 +32,21 @@ en:
   label_committer_maps: Repository committers
   permission_export_repository: Download source code
   label_repo_export: Download source
+  label_ext_access: External access IPs
+  text_ext_access: "Only allow access through the external address (https://www.nanwe.co.kr/pms) from listed IPs. Direct internal access is not restricted."
+  label_ext_ip_state_on: External access restricted
+  label_ext_ip_state_off: External access unrestricted (all IPs)
+  text_ext_ip_you_external: "You are connected through the external address. Your IP: %{ip}"
+  text_ext_ip_you_internal: "You are connected directly from the internal network (%{ip}). This access is not restricted."
+  label_ext_ip_enabled: Restrict external access
+  text_ext_ip_enabled: Block external access from IPs not in the list below. Use with two-factor authentication.
+  label_ext_ip_list: Allowed IPs
+  text_ext_ip_list: "One IP (211.234.10.25) or range (175.200.0.0/24) per line. Text after # is a note."
+  label_ext_ip_private: Allow private IPs
+  text_ext_ip_private: "Allow external requests that appear as 10.x, 172.16-31.x or 192.168.x (internal users via the external address appear as the router IP)."
+  label_ext_proxy_list: External proxy servers
+  text_ext_proxy_list: IP of the nginx server that forwards external access. Only requests through it are checked.
+  error_ext_ip_invalid: "Invalid IP lines: %{lines}"
+  error_ext_ip_self: "Not saved: your current IP (%{ip}) is not in the list and you would be locked out. Add it or save from the internal network."
+  notice_ext_ip_saved_on: Saved. External access from unlisted IPs is blocked.
+  notice_ext_ip_saved_off: Saved. External access restriction is off.

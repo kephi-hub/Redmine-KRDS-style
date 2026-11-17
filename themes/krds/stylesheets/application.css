@@ -973,6 +973,7 @@ body.controller-news.action-show #content>h3{padding-top:20px;margin-top:28px;bo
 #admin-index #admin-menu a.smtp-settings::after{content:"알림 메일 서버 · 시험 메일";}
 #admin-index #admin-menu a.committer-maps::after{content:"저장소 커미터 ↔ 사용자 연결";}
 #admin-index #admin-menu a.pms-backups::after{content:"PMS 백업 상태 · 지금 백업";}
+#admin-index #admin-menu a.ext-access::after{content:"외부(nanwe.co.kr/pms) 접속 허용 IP";}
 #admin-index #admin-menu a.krds-labels::after{content:"메뉴 · 모듈에 보이는 이름 바꾸기";}
 #admin-index #admin-menu a.admin-ops-assets::after{content:"여러 프로젝트 공용 자산 · 만료 관리";}
 /* Vault 메뉴: 플러그인 배경 아이콘 대신 krds-lock 아이콘(KrdsUi::ADMIN_ICONS) */
@@ -1182,6 +1183,7 @@ table.list.db_cols td.name code{font-size:0.9375rem;color:var(--gray_95);}
 .db_hist_save{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 16px;}
 #content table.db_hist td{text-align:left;}
 #content table.db_hist tr.on td.comment{font-weight:500;}
+#content .ip_list{width:100%;max-width:520px;font-family:Consolas,"D2Coding",monospace;font-size:0.875rem;}
 .db_qform textarea{width:100%;padding:10px 12px;border:1px solid var(--gray_30);border-radius:var(--radius_m);font-family:Consolas,"D2Coding",monospace;font-size:0.875rem;line-height:1.5;}
 .db_qbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0 16px;}
 #content .db_qbar .btn_line{display:inline-flex;align-items:center;height:36px;padding:0 14px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.875rem;font-weight:500;color:var(--pri_60);cursor:pointer;}

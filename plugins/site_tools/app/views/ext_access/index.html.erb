@@ -1,0 +1,19 @@
+<%# 관리 > 외부 접속 허용 IP %>
+<h2><%= l(:label_ext_access) %></h2>
+<p class="subtitle"><%= l(:text_ext_access) %></p>
+<p class="st_state <%= 'on' if @cfg['ext_ip_enabled'] == '1' %>"><%= l(@cfg['ext_ip_enabled'] == '1' ? :label_ext_ip_state_on : :label_ext_ip_state_off) %></p>
+<p class="db_hintbox"><%= @client ? l(:text_ext_ip_you_external, ip: @client) : l(:text_ext_ip_you_internal, ip: request.remote_ip) %></p>
+<%= form_tag(ext_access_path, :id => 'ext_ip_form') do %>
+<div class="box tabular">
+  <p><label for="ext_ip_enabled"><%= l(:label_ext_ip_enabled) %></label><%= check_box_tag 'ext_ip_enabled', '1', @cfg['ext_ip_enabled'] == '1', :id => 'ext_ip_enabled' %>
+    <em class="info"><%= l(:text_ext_ip_enabled) %></em></p>
+  <p><label for="ext_ip_list"><%= l(:label_ext_ip_list) %></label><%= text_area_tag 'ext_ip_list', @cfg['ext_ip_list'], :id => 'ext_ip_list', :rows => 8, :class => 'ip_list', :placeholder => "211.234.10.25   # 본사 회의실\n175.200.0.0/24  # 협력사" %>
+    <em class="info"><%= l(:text_ext_ip_list) %></em></p>
+  <p><label for="ext_ip_private"><%= l(:label_ext_ip_private) %></label><%= check_box_tag 'ext_ip_private', '1', @cfg['ext_ip_private'] == '1', :id => 'ext_ip_private' %>
+    <em class="info"><%= l(:text_ext_ip_private) %></em></p>
+  <p><label for="ext_proxy_list"><%= l(:label_ext_proxy_list) %></label><%= text_area_tag 'ext_proxy_list', @cfg['ext_proxy_list'], :id => 'ext_proxy_list', :rows => 2, :class => 'ip_list' %>
+    <em class="info"><%= l(:text_ext_proxy_list) %></em></p>
+</div>
+<p class="form_btns"><%= submit_tag l(:button_save) %></p>
+<% end %>
+<% html_title l(:label_ext_access) %>
