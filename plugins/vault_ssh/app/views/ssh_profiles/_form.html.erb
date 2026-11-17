@@ -72,10 +72,6 @@
     <input type="text" id="sp_start" name="ssh[start_cmd]" value="<%= p.start_cmd %>" maxlength="255" placeholder="cd /app && sudo -iu tomcat" class="sp_wide">
   </div>
   <div class="sp_row">
-    <span class="sp_lbl"><%= l(:label_ssh_relay) %></span>
-    <label class="sp_chk"><input type="checkbox" name="ssh[relay_only]" value="1" <%= 'checked' if p.relay_only %>> <%= l(:label_ssh_relay_on) %></label>
-  </div>
-  <div class="sp_row">
     <span class="sp_lbl"><%= l(:label_ssh_record) %></span>
     <label class="sp_chk"><input type="checkbox" name="ssh[record]" value="1" <%= 'checked' if (p.persisted? && p.record) || p.prod? %> <%= 'disabled' if p.prod? %>> <%= l(:label_ssh_record_on) %></label>
   </div>

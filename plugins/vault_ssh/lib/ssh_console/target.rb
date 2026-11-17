@@ -37,10 +37,17 @@ module SshConsole
       nil
     end
 
+    # SSH 로 접속할 수 있는 접속정보 — 유형 이름에 SSH 가 있거나 경유 서버
     def ssh_key?(key)
       return false unless key.is_a?(Vault::Password)
       name = key.respond_to?(:vault_type) ? key.vault_type&.name.to_s : ''
-      name.match?(/SSH/i)
+      name.match?(/SSH/i) || name.include?('경유')
+    end
+
+    # 경유 서버 (VPN 점프 VM 등) — 다른 서버의 경유로만 씀. 터미널 접속·시스템 백업 대상 아님 (접속 설정·연결 시험은 됨)
+    def relay_key?(key)
+      return false unless key.is_a?(Vault::Password)
+      (key.respond_to?(:vault_type) ? key.vault_type&.name.to_s : '').include?('경유')
     end
 
     # 접속정보 하나 → 단계 하나 (ask: 접속할 때 입력한 { user:, password: })

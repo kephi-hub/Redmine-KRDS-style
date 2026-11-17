@@ -8,6 +8,7 @@ module SshConsole
 
     def open_link(key, user: nil)
       raise TargetError, I18n.t(:error_ssh_not_ssh) unless key && Target.ssh_key?(key)
+      raise TargetError, I18n.t(:error_ssh_relay_only) if Target.relay_key?(key)
       profile = VaultSshProfile.find_by(key_id: key.id)
       raise TargetError, I18n.t(:error_ssh_exec_ask) if profile&.auth == 'ask'
       user ||= User.active.where(admin: true).first

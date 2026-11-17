@@ -22,7 +22,7 @@ Redmine::Plugin.register :vault_ssh do
   name 'SSH 터미널'
   author 'kephi-hub'
   description '접속정보(Vault) SSH 서버에 브라우저 터미널로 접속 — 경유 서버, 접속 기록·녹화'
-  version '1.4.0'
+  version '1.5.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
   requires_redmine_plugin :vault, version_or_higher: '0.10.5'

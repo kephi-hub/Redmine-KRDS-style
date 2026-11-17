@@ -61,7 +61,6 @@ class SshProfilesController < ApplicationController
     profile.env = p[:env].to_s.presence_in(VaultSshProfile::ENVS) || 'dev'
     profile.record = profile.env == 'prod' || p[:record] == '1'
     profile.start_cmd = p[:start_cmd].to_s.strip.truncate(255, omission: '').presence
-    profile.relay_only = p[:relay_only] == '1'
     old = profile.hop_list
     reset = p[:reset_fp] == '1'
     learned = Array(p[:learned_fp])

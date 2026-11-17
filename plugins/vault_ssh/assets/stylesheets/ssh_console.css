@@ -2,7 +2,6 @@
 
 /* 접속정보 줄 [▶ 접속] */
 .vk_ssh{display:inline-flex;align-items:center;gap:4px;margin-right:4px;vertical-align:middle;}
-.vk_relay{display:inline-flex;align-items:center;height:24px;padding:0 8px;border:1px solid var(--gray_20,#cdd1d5);border-radius:var(--radius_s,4px);background:var(--gray_5,#f4f5f6);font-size:0.75rem;font-weight:500;color:var(--gray_70,#464c53);white-space:nowrap;cursor:help;}
 #keys_table td.vk_acts .vk_acts_in{align-items:center;vertical-align:middle;}
 #content a.vk_go{display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 12px;border:1px solid var(--pri_50,#256ef4);border-radius:var(--radius_s,4px);background:var(--pri_50,#256ef4);font-size:0.8125rem;font-weight:700;white-space:nowrap;text-decoration:none;color:#fff;}
 #content a.vk_go:hover{border-color:var(--pri_60,#0b50d0);background:var(--pri_60,#0b50d0);color:#fff;}

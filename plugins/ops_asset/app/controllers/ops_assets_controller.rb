@@ -118,7 +118,7 @@ class OpsAssetsController < ApplicationController
   # 이 프로젝트에서 그 사용자가 볼 수 있는 "SSH 서버" 접속정보
   def ssh_keys
     return [] unless defined?(SshConsole::Access) && @project.module_enabled?(:keys)
-    @ssh_keys ||= SshConsole::Access.visible_keys(User.current, @project).select { |k| SshConsole::Target.ssh_key?(k) }
+    @ssh_keys ||= SshConsole::Access.visible_keys(User.current, @project).select { |k| SshConsole::Target.ssh_key?(k) && !SshConsole::Target.relay_key?(k) }
   end
   helper_method :ssh_keys
 
