@@ -25,3 +25,7 @@ post 'ssh/t/:ticket/files/upload', to: 'ssh_files#upload', as: 'ssh_files_upload
 post 'ssh/t/:ticket/files/mkdir', to: 'ssh_files#mkdir', as: 'ssh_files_mkdir', constraints: { ticket: /[\w-]+/ }
 post 'ssh/t/:ticket/files/rename', to: 'ssh_files#rename', as: 'ssh_files_rename', constraints: { ticket: /[\w-]+/ }
 post 'ssh/t/:ticket/files/delete', to: 'ssh_files#delete', as: 'ssh_files_delete', constraints: { ticket: /[\w-]+/ }
+
+# 관리 > SSH 접속 기록 (전체 프로젝트)
+get 'admin/ssh_sessions', to: 'admin_ssh_sessions#index', as: 'admin_ssh_sessions'
+get 'admin/ssh_sessions/export', to: 'admin_ssh_sessions#export', as: 'admin_ssh_sessions_export'

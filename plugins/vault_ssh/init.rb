@@ -22,7 +22,7 @@ Redmine::Plugin.register :vault_ssh do
   name 'SSH 터미널'
   author 'kephi-hub'
   description '접속정보(Vault) SSH 서버에 브라우저 터미널로 접속 — 경유 서버, 접속 기록·녹화'
-  version '1.5.0'
+  version '1.6.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
   requires_redmine_plugin :vault, version_or_higher: '0.10.5'
@@ -47,6 +47,12 @@ ActionCable.server.config.cable = { 'adapter' => 'async' } if ActionCable.server
 ActionCable.server.config.disable_request_forgery_protection = true
 ActionCable.server.config.connection_class = -> { SshConsole::Cable::Connection }
 ActionCable.server.config.logger = Rails.logger
+
+# 관리 > SSH 접속 기록 — Redmine 기본 아이콘을 쓰려고 플러그인 밖에서 등록
+Redmine::MenuManager.map :admin_menu do |menu|
+  menu.push :admin_ssh_sessions, { controller: 'admin_ssh_sessions', action: 'index' },
+            caption: :label_ssh_admin_sessions, after: :plugins, html: { class: 'icon icon-history' }, icon: 'history'
+end
 
 # 프로젝트 삭제 시 시스템 백업 작업도 함께 (작업 → 실행 기록 → PMS 서버 보관 폴더까지 지움)
 Project.has_many :sys_backup_jobs, dependent: :destroy unless Project.reflect_on_association(:sys_backup_jobs)
