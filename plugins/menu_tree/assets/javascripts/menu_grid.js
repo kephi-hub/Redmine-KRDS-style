@@ -2,7 +2,8 @@
    - 서버 JSON(rows, max_depth)으로 표를 그림: 1뎁스…N뎁스 칸(가장 깊은 메뉴에 맞춰 자동), 화면 ID·URL·유형·채널·대상 권한·사용·추가 칼럼·일감·진행률·비고
    - 칸을 눌러 바로 고침(Enter 저장·아래로, Tab 다음 칸, Esc 취소). 메뉴명 칸에서 Tab 들여쓰기 / Shift+Tab 내어쓰기
    - 행 ⋯ 메뉴(아래·하위 추가, 들여·내어쓰기, 위·아래, 일감, 삭제), 끌어서 옮기기, 접기·펼치기, 검색, 고른 메뉴로 일감 만들기
-   - 입력하는 동안은 열 너비를 고정(표가 출렁이지 않게), 입력을 마치고 표 밖으로 나가면 그때 한 번 내용에 맞춰 정렬 */
+   - 입력하는 동안은 열 너비를 고정(표가 출렁이지 않게), 입력을 마치고 표 밖으로 나가면 그때 한 번 내용에 맞춰 정렬
+   - 페이지를 내리면 열 제목 줄이 화면 맨 위에 따라붙음(표가 가로 스크롤 상자 안이라 CSS sticky 대신 translateY) */
 (function($) {
   'use strict';
   var C, rows = [], maxDepth = 1, byId = {}, collapsed = {}, selected = {}, editing = null, focusDone = false;
@@ -51,6 +52,19 @@
       $t.find('thead th').css('width', '');
     }, 400);
   }
+
+  // ---- 열 제목 줄 따라오기 ----
+  // 표 윗변이 화면 위로 지나가면 그만큼 thead 를 내려 화면 맨 위에 붙임, 표 끝에서는 마지막 행을 가리지 않게 멈춤
+  var stickReq = 0;
+  function stickHead() {
+    stickReq = 0;
+    var tb = document.getElementById('mt_grid'), h = tb && tb.tHead;
+    if (!h) return;
+    var r = tb.getBoundingClientRect(), y = Math.min(Math.max(0, -r.top), Math.max(0, r.height - h.offsetHeight * 2));
+    h.style.transform = y ? 'translateY(' + y + 'px)' : '';
+    h.classList.toggle('on', y > 0);
+  }
+  function stickSoon() { if (!stickReq) stickReq = requestAnimationFrame(stickHead); }
 
   function load(then) {
     return $.getJSON(C.urls.data).done(function(d) {
@@ -175,6 +189,7 @@
     $('#mt_grid tbody').html(body);
     applyFrozen();
     selCount();
+    stickHead();
   }
 
   function kpi() {
@@ -353,6 +368,7 @@
     });
     // 표 밖으로 나가면(입력 마침) 열 너비 고정을 풀고 한 번 정렬, 창 크기를 바꾸면 바로 풂
     $g.on('focusout', thaw);
+    $(window).on('scroll resize', stickSoon);
     $(window).on('resize', function() { if (frozen && !editing) { frozen = null; $g.removeClass('on').css('width', '').find('thead th').css('width', ''); } });
     $g.on('click', '.mt_tog', function() {
       var id = $(this).closest('tr').data('id');

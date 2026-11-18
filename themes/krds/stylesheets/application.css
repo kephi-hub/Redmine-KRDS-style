@@ -1320,10 +1320,12 @@ table.list.mt_types td.mt_ck{white-space:nowrap;}
 #content .mt_btn.mt_primary{background:var(--pri_50);color:var(--gray_0);}
 #content .mt_btn .icon-svg{width:16px;height:16px;}
 .mt_help{margin:0 0 10px;font-size:0.8125rem;color:var(--gray_60);}
-/* 표 머리글(1단계·2단계… 열 제목) 고정: 가로 스크롤 상자(autoscroll) 안에서는 화면 기준 sticky 가 안 먹으므로 상자 자체를 화면 높이로 제한해 그 안에서 스크롤 */
-.mt_wrap{max-height:max(360px,calc(100vh - 160px));overflow:auto;border:1px solid var(--gray_20);border-radius:var(--radius_m);}
+.mt_wrap{border:1px solid var(--gray_20);border-radius:var(--radius_m);}
 #content table.mt_grid{margin:0;border-top:0;font-size:0.8125rem;}
-#content table.mt_grid thead th{position:sticky;top:0;z-index:2;border-bottom:0;box-shadow:inset 0 -1px 0 var(--gray_30);}
+/* 열 제목 줄 따라오기(menu_grid.js 가 화면 위로 지나간 만큼 내리고 .on): 행 위에 그리고, 붙어 있는 동안 아래 그림자. 칸으로 이동할 때 제목 줄에 가리지 않게 여백 */
+#content table.mt_grid thead{position:relative;z-index:3;}
+#content table.mt_grid thead.on th{box-shadow:0 4px 6px -4px rgba(0,0,0,0.25);}
+#content table.mt_grid td{scroll-margin-top:48px;}
 #content table.mt_grid th{padding:8px 6px;white-space:nowrap;text-align:left;}
 #content table.mt_grid th.mt_dh{background:var(--pri_5);color:var(--pri_70);}
 #content table.mt_grid td{padding:0 6px;height:36px;border-top:1px solid var(--gray_10);white-space:nowrap;text-align:left;vertical-align:middle;}
