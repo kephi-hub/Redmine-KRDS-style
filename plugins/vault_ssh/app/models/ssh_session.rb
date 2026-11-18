@@ -9,6 +9,14 @@ class SshSession < ApplicationRecord
 
   validates :status, inclusion: { in: STATUSES }
 
+  # 기록을 지우면 녹화 파일도 지움 (1년 정리 작업·프로젝트 삭제 때) — 녹화 폴더 밖은 건드리지 않음
+  after_destroy do
+    path = record_path
+    File.delete(path) if path && path.to_s.start_with?(self.class.root.to_s) && File.file?(path)
+  rescue SystemCallError
+    nil
+  end
+
   scope :recent, -> { order(created_at: :desc, id: :desc) }
 
   def self.root

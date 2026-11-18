@@ -22,7 +22,7 @@ Redmine::Plugin.register :vault_ssh do
   name 'SSH 터미널'
   author 'kephi-hub'
   description '접속정보(Vault) SSH 서버에 브라우저 터미널로 접속 — 경유 서버, 접속 기록·녹화'
-  version '1.6.0'
+  version '1.6.1'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
   requires_redmine_plugin :vault, version_or_higher: '0.10.5'
@@ -56,3 +56,5 @@ end
 
 # 프로젝트 삭제 시 시스템 백업 작업도 함께 (작업 → 실행 기록 → PMS 서버 보관 폴더까지 지움)
 Project.has_many :sys_backup_jobs, dependent: :destroy unless Project.reflect_on_association(:sys_backup_jobs)
+# 프로젝트 삭제 시 SSH 접속 기록·파일 기록·녹화 파일도 함께
+Project.has_many :ssh_sessions, dependent: :destroy unless Project.reflect_on_association(:ssh_sessions)
