@@ -4,12 +4,13 @@
 # - Vault 화면 연결(유형 선택칸·유형 표시·관리 카드)은 vault_ko/build.rb 가 이미지 빌드 때 넣음
 require_relative 'lib/vault_types/keys_controller_patch'
 require_relative 'lib/vault_types/hooks'
+require_relative 'lib/vault_types/file_crypto_patch'
 
 Redmine::Plugin.register :vault_types do
   name '접속정보 유형'
   author 'kephi-hub'
   description '접속정보(Vault) 유형 목록 관리'
-  version '1.0.0'
+  version '1.1.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
   requires_redmine_plugin :vault, version_or_higher: '0.10.5'
@@ -19,4 +20,7 @@ end
 Vault::Key.belongs_to :vault_type, class_name: 'VaultKeyType', optional: true unless Vault::Key.reflect_on_association(:vault_type)
 KeysController.prepend(VaultTypes::KeysControllerPatch) unless KeysController.ancestors.include?(VaultTypes::KeysControllerPatch)
 KeysController.helper(VaultTypesHelper)
+# 키 파일 암호화 보정 — 이중 암호화 방지 · 여러 겹 복호화 · 다운로드 복호화
+Vault::Key.prepend(VaultTypes::FileCryptoPatch::KeyModel) unless Vault::Key.ancestors.include?(VaultTypes::FileCryptoPatch::KeyModel)
+KeyFilesController.prepend(VaultTypes::FileCryptoPatch::Download) unless KeyFilesController.ancestors.include?(VaultTypes::FileCryptoPatch::Download)
 VaultSettingsController.helper(VaultTypesHelper)
