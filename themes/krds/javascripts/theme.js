@@ -22,7 +22,7 @@ $(function() {
 /* 하단 버튼: 폼 끝의 저장·취소 묶음을 오른쪽 정렬(.form_btns)
  * - 취소 같은 링크는 파란 테두리 버튼(.btn_line)으로 바꿔 저장 앞에 둠 (Enter 키는 그대로 첫 저장 버튼)
  * - 두 번째 이후 저장 버튼(저장 후 계속하기 등)도 테두리 버튼
- * - 검색줄·검색조건·표 안의 폼·접속정보 화면은 제외, 화면에서 직접 .form_btns 를 쓴 폼도 그대로 둠 */
+ * - 검색줄(.list_search·.qa_filter)·검색조건·표 안의 폼·접속정보 화면은 제외, 화면에서 직접 .form_btns 를 쓴 폼도 그대로 둠 */
 $(function() {
   function isBtn(n) { return n.nodeType === 1 && $(n).is('input[type=submit], button[type=submit]'); }
   function isLink(n) { return n.nodeType === 1 && n.tagName === 'A'; }
@@ -45,7 +45,7 @@ $(function() {
     $(box).children('a').addClass('btn_line').insertBefore(first);
     $(box).children('input[type=submit], button[type=submit]').slice(1).addClass('btn_line');
   }
-  $('#content form').not('.list_search, #query_form').each(function() {
+  $('#content form').not('.list_search, #query_form, .qa_filter').each(function() {
     if ($(this).find('.form_btns').length || $(this).closest('td, .pwd-form').length) return;
     var last = $(this).children().not('script, input[type=hidden]').last()[0];
     var g = last && last.tagName === 'P' ? tailGroup(last) : null;

@@ -1478,7 +1478,10 @@ html.kd_open,html.kd_open body{overflow:hidden;}
 
 /* 요구사항 · 테스트 (qa_trace 플러그인) — 필터, 배지(data-k 로 색), 추적표, 상세, 결과 입력 */
 .qa_filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 16px;}
-.qa_filter select,.qa_filter input[type=search]{flex:1 1 100%;}
+.qa_filter label{flex:none;font-size:0.875rem;font-weight:500;color:var(--gray_70);}
+.qa_filter label:has(input[type=checkbox]){display:inline-flex;align-items:center;gap:6px;font-weight:400;}
+.qa_filter select,.qa_filter input[type=search],.qa_filter input[type=text],.qa_filter input[type=date],.qa_filter input[type=month]{flex:1 1 100%;}
+.qa_filter input[type=submit],.qa_filter button[type=submit]{flex:none;margin:0;}
 .qa_clear{font-size:0.875rem;}
 .qa_chk{display:inline-flex;align-items:center;gap:4px;font-size:0.875rem;}
 .qa_badge{display:inline-flex;align-items:center;height:20px;padding:0 7px;margin:1px 0;border-radius:10px;background:var(--gray_10);font-size:0.6875rem;font-weight:700;white-space:nowrap;color:var(--gray_70);}
@@ -1792,8 +1795,8 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 /* ===== 태블릿 (600px 이상) ===== */
 @media (min-width:600px){
 .pmod_grid{grid-template-columns:repeat(2,1fr);}
-.qa_filter select,.qa_filter input[type=search]{flex:0 1 auto;}
-.qa_filter input[type=search]{flex-basis:240px;}
+.qa_filter select,.qa_filter input[type=date],.qa_filter input[type=month]{flex:0 0 auto;}
+.qa_filter input[type=search],.qa_filter input[type=text]{flex:0 1 240px;}
 .mt_tools .list_field{flex:0 1 300px;}
 .ag_tools .list_field{flex:0 1 320px;}
 #admin-index #admin-menu ul{grid-template-columns:repeat(2,1fr);}
