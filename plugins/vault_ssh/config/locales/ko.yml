@@ -87,6 +87,7 @@ ko:
   label_sb_when_daily: "매일 %{at}"
   label_sb_when_weekly: "매주 %{day}요일 %{at}"
   text_sb_schedule: "서울 시간. 서버 cron 이 매시간 확인해 실행합니다 (운영 부하가 적은 새벽 권장)."
+  text_sb_schedule_off: "수동 — 자동으로 실행하지 않고 [지금 백업] 으로만 실행합니다. 매일·매주를 고르면 시각을 정할 수 있습니다."
   text_sb_keep: "최근 이만큼만 남기고 오래된 백업본부터 지웁니다."
   error_sb_dir: "백업 보관 폴더(backup/sys)를 쓸 수 없습니다. 서버 설정을 확인하세요."
   error_sb_disk: "PMS 서버 디스크가 1GB 보다 적게 남아 백업을 하지 않았거나 멈췄습니다 (받던 파일은 지웠습니다)."
