@@ -1,7 +1,7 @@
 <%# 프로젝트 > 접속정보 > 접속 기록 — 누가·언제·어느 서버·사유·시간·종료, 녹화 재생, 엑셀 %>
 <div class="contextual">
   <%= link_to sprite_icon('download', l(:label_export_to) + ' Excel'), project_ssh_sessions_export_path(@project, env: @env, q: @q.presence), class: 'icon icon-download' %>
-  <%= link_to sprite_icon('krds-lock', l(:label_module_plural)), project_keys_path(@project), class: 'icon' %>
+  <%= link_to sprite_icon('key', l(:label_ssh_back_keys)), project_keys_path(@project), class: 'icon icon-key' %>
 </div>
 <h2><%= l(:label_ssh_sessions) %></h2>
 <% unless @all %><p class="db_hintbox"><%= l(:label_ssh_mine_only) %></p><% end %>
