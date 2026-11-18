@@ -1482,6 +1482,7 @@ html.kd_open,html.kd_open body{overflow:hidden;}
 .qa_filter label:has(input[type=checkbox]){display:inline-flex;align-items:center;gap:6px;font-weight:400;}
 .qa_filter select,.qa_filter input[type=search],.qa_filter input[type=text],.qa_filter input[type=date],.qa_filter input[type=month]{flex:1 1 100%;}
 .qa_filter input[type=submit],.qa_filter button[type=submit]{flex:none;margin:0;}
+.qa_filter select{padding-right:32px;}
 .qa_clear{font-size:0.875rem;}
 .qa_chk{display:inline-flex;align-items:center;gap:4px;font-size:0.875rem;}
 .qa_badge{display:inline-flex;align-items:center;height:20px;padding:0 7px;margin:1px 0;border-radius:10px;background:var(--gray_10);font-size:0.6875rem;font-weight:700;white-space:nowrap;color:var(--gray_70);}
