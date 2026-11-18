@@ -305,10 +305,10 @@ $(function() {
   };
   $(function() {
     // 본문보다 넓은 표는 가로 스크롤 상자로 감쌈 — 오른쪽 사이드바 밑으로 들어가거나 모바일에서 잘리지 않게
+    var main = document.getElementById('content'), mainRight = main ? main.getBoundingClientRect().right : innerWidth;
     $('#content table.list').each(function() {
-      var par = this.parentElement;
-      if (!par || $(this).closest('.autoscroll').length) return;
-      if (this.getBoundingClientRect().width > par.clientWidth + 2) $(this).wrap('<div class="autoscroll"></div>');
+      if ($(this).closest('.autoscroll').length) return;
+      if (this.getBoundingClientRect().right > mainRight + 2) $(this).wrap('<div class="autoscroll"></div>');
     });
     // 모바일 카드에서 머리글이 숨으면 짧은 값 칸(✓·숫자 등) 앞에 그 칸 머리글을 붙임 (일감·파일·게시판·접속정보 카드는 이미 설계됨)
     $('#content table.list').not('.issues, .files, .messages, #keys_table').each(function() {
@@ -318,7 +318,8 @@ $(function() {
       $(this).children('tbody').children('tr').each(function() {
         $(this).children('td').each(function(i) {
           if ($(this).is('.name, .buttons, .checkbox, .subject, .id') || !names[i]) return;
-          if ($.trim($(this).text()).length <= 14) $(this).attr('data-label', names[i]);
+          var txt = $.trim($(this).text());
+          if ((txt || $(this).find('svg, img, .icon').length) && txt.length <= 14) $(this).attr('data-label', names[i]);
         });
       });
       $(this).addClass('krds_labels');
