@@ -119,7 +119,12 @@ html.flyout-is-active #wrapper .flyout-menu{right:0;}
 
 /* ===== 폼 ===== */
 input,select,textarea,button{border:1px solid var(--gray_30);border-radius:var(--radius_s);font-family:var(--fonts-main);color:var(--gray_90);}
-input[type="text"],input[type="password"],input[type="email"],input[type="url"],input[type="number"],input[type="date"],input[type="search"],select{height:32px;}
+input[type="text"],input[type="password"],input[type="email"],input[type="url"],input[type="number"],input[type="date"],input[type="datetime-local"],input[type="time"],input[type="month"],input[type="search"],select{height:32px;}
+/* 선택칸: 글자가 펼침 화살표와 겹치지 않게 / 입력 폼의 선택칸은 폭을 맞춤(빈 선택칸이 화살표만 남지 않게) */
+select:not([multiple]):not([size]){padding-right:28px;}
+.tabular p>select:not([multiple]):not([size]){width:100%;max-width:320px;}
+/* 한글은 단어 단위로 줄바꿈 (긴 영문·코드는 넘칠 때만 끊음) */
+#content{word-break:keep-all;overflow-wrap:break-word;}
 input[type="checkbox"],input[type="radio"]{border:0;}
 textarea{padding:8px 10px;line-height:1.6;}
 input[type="text"]:focus,input[type="password"]:focus,input[type="date"]:focus,input[type="number"]:focus,select:focus,textarea:focus{border:1px solid var(--pri_50);outline:none;box-shadow:0 0 0 3px var(--pri_10);}
@@ -129,6 +134,7 @@ input[type="button"]:hover{background:var(--gray_5);}
 input[type="file"]::file-selector-button{height:32px;padding:0 12px;margin-right:8px;border:1px solid var(--gray_40);border-radius:var(--radius_s);background:var(--gray_0);font-family:var(--fonts-main);font-weight:500;color:var(--gray_80);cursor:pointer;}
 input[type="file"]::file-selector-button:hover{background:var(--gray_5);}
 .jstElements button,.tabs-buttons button{border-radius:var(--radius_s);}
+.jstElements{display:flex;flex-wrap:wrap;align-items:center;gap:2px;height:auto;}
 input[type="submit"],button[type="submit"]{height:32px;padding:0 16px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--pri_50);font-weight:500;color:var(--gray_0);}
 input[type="submit"]:hover,button[type="submit"]:hover{border-color:var(--pri_60);background:var(--pri_60);}
 input[type="submit"]:active,button[type="submit"]:active{border-color:var(--pri_70);background:var(--pri_70);}
@@ -653,7 +659,7 @@ table.list.messages tr.message>td.reply-count,table.list.messages tr.message>td.
 #list-definition .buttons button:hover{border-color:var(--gray_50);background:var(--gray_10);}
 #list-definition label.inline{display:inline-flex;align-items:center;gap:4px;margin-right:16px;}
 #query_form_with_buttons>p.buttons{display:flex;align-items:center;gap:8px;padding-top:16px;margin:16px 0 0;border-top:1px solid var(--gray_20);font-size:0.875rem;}
-#query_form_with_buttons>p.buttons a.icon{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 16px;margin:0;border:1px solid var(--gray_40);border-radius:var(--radius_s);background:var(--gray_0);font-weight:500;color:var(--gray_80);}
+#query_form_with_buttons>p.buttons a.icon{display:inline-flex;align-items:center;gap:4px;box-sizing:border-box;height:36px;padding:0 16px;margin:0;border:1px solid var(--gray_40);border-radius:var(--radius_s);background:var(--gray_0);font-weight:500;color:var(--gray_80);}
 #query_form_with_buttons>p.buttons a.icon:hover{background:var(--gray_10);text-decoration:none;}
 #query_form_with_buttons>p.buttons a.icon-checked{border-color:var(--pri_50);background:var(--pri_50);color:var(--gray_0);}
 #query_form_with_buttons>p.buttons a.icon-checked:hover{border-color:var(--pri_60);background:var(--pri_60);}
@@ -661,7 +667,7 @@ table.list.messages tr.message>td.reply-count,table.list.messages tr.message>td.
 #query_form_with_buttons>p.buttons a.icon-save{margin-left:auto;border-color:transparent;background:none;color:var(--pri_60);}
 #query_form_with_buttons>p.buttons a.icon-save:hover{background:var(--pri_5);}
 #query_form_with_buttons>p.contextual,#query_form_with_buttons>span.contextual{display:flex;align-items:center;gap:8px;height:36px;margin:33px 0 0 16px;font-size:0.8125rem;}
-#query_form_with_buttons>p.buttons input,#query_form_with_buttons>p.buttons select{margin:0;}
+#query_form_with_buttons>p.buttons input,#query_form_with_buttons>p.buttons select{height:36px;margin:0;}
 #query_form_with_buttons>.contextual ul.pages{margin:0;}
 
 /* ===== 일감 목록 (KRDS 목록: 흰 행 + 구분선, 제목 강조, 상태 점 표시) ===== */
@@ -693,17 +699,17 @@ table.list.issues td.done_ratio table.progress{display:inline-table;float:none;w
 table.list.issues td.done_ratio table.progress tbody{display:table-row-group;}
 table.list.issues td.done_ratio table.progress td{height:8px;padding:0;border:0;}
 table.list.issues td.done_ratio p.percent{display:inline-block;margin:0;font-size:0.75rem;color:var(--gray_60);vertical-align:middle;}
-table.progress-0+p.percent::before{content:"0%";}
-table.progress-10+p.percent::before{content:"10%";}
-table.progress-20+p.percent::before{content:"20%";}
-table.progress-30+p.percent::before{content:"30%";}
-table.progress-40+p.percent::before{content:"40%";}
-table.progress-50+p.percent::before{content:"50%";}
-table.progress-60+p.percent::before{content:"60%";}
-table.progress-70+p.percent::before{content:"70%";}
-table.progress-80+p.percent::before{content:"80%";}
-table.progress-90+p.percent::before{content:"90%";}
-table.progress-100+p.percent::before{content:"100%";color:var(--suc_60);}
+table.list.issues td.done_ratio table.progress-0+p.percent::before{content:"0%";}
+table.list.issues td.done_ratio table.progress-10+p.percent::before{content:"10%";}
+table.list.issues td.done_ratio table.progress-20+p.percent::before{content:"20%";}
+table.list.issues td.done_ratio table.progress-30+p.percent::before{content:"30%";}
+table.list.issues td.done_ratio table.progress-40+p.percent::before{content:"40%";}
+table.list.issues td.done_ratio table.progress-50+p.percent::before{content:"50%";}
+table.list.issues td.done_ratio table.progress-60+p.percent::before{content:"60%";}
+table.list.issues td.done_ratio table.progress-70+p.percent::before{content:"70%";}
+table.list.issues td.done_ratio table.progress-80+p.percent::before{content:"80%";}
+table.list.issues td.done_ratio table.progress-90+p.percent::before{content:"90%";}
+table.list.issues td.done_ratio table.progress-100+p.percent::before{content:"100%";color:var(--suc_60);}
 table.list.issues tr.group{display:block;}
 table.list.issues tr.group td{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:12px 8px;border-top:1px solid var(--gray_20);border-bottom:1px solid var(--gray_20);background:var(--gray_5);text-align:left;}
 table.list.issues tr.group span.expander{display:inline-flex;color:var(--gray_60);}
@@ -1259,7 +1265,7 @@ table.list.mg_plan tr.mg_bad>td{background:var(--dan_5);}
 .mg_input{width:100%;max-width:480px;}
 .mg_meta{display:flex;flex-wrap:wrap;gap:6px 20px;padding:12px 14px;margin:0 0 16px;border-radius:var(--radius_m);background:var(--gray_5);list-style:none;}
 .mg_meta li>span:first-child{margin-right:6px;font-size:0.8125rem;color:var(--gray_60);}
-.db_stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:0;margin:0 0 20px;list-style:none;}
+.db_stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;padding:0;margin:0 0 20px;list-style:none;}
 .db_stats li{display:flex;flex-direction:column;gap:4px;padding:12px 16px;border:1px solid var(--gray_20);border-radius:var(--radius_m);background:var(--gray_0);font-size:0.8125rem;color:var(--gray_60);}
 .db_stats li a{display:flex;flex-direction:column;gap:4px;color:inherit;text-decoration:none;}
 .db_stats li strong{font-size:1.375rem;color:var(--gray_95);}
@@ -1631,6 +1637,7 @@ a.pf_name{font-weight:700;}
 .pm_bl_form{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 12px;margin:0 0 16px;padding:12px;border:1px solid var(--gray_10);border-radius:var(--radius_m);background:var(--gray_5);}
 .pm_bl_fld{display:flex;flex-direction:column;gap:4px;width:100%;}
 .pm_bl_fld input[type=text]{width:100%;}
+.pm_bl_form input[type=submit]{height:32px;margin:0;}
 .pm_list tr.on td{background:var(--pri_5);}
 .pm_list tr.pm_total th{background:var(--gray_5);text-align:left;}
 .pm_mm .pf_bar{width:100%;max-width:160px;}
@@ -1791,7 +1798,7 @@ table.list.files tr.file>td.buttons{margin-left:auto;}
 /* 일감 등록·편집 폼: 항목 이름을 입력칸 위에 */
 #issue-form .tabular p{padding-top:6px;padding-bottom:6px;}
 #issue-form .tabular label:not(.inline):not(.block):not(.floating){margin-bottom:6px;text-align:left;font-weight:500;color:var(--gray_80);}
-#issue-form .jstElements{overflow-x:auto;white-space:nowrap;}
+#issue-form .jstElements{white-space:normal;}
 
 /* ===== 태블릿 (600px 이상) ===== */
 @media (min-width:600px){
@@ -2115,7 +2122,7 @@ table.list.db_list tr.db_row,table.list.db_cols tr.db_col{display:table-row;padd
 table.list.db_list tr.db_row>td,table.list.db_cols tr.db_col>td,table.list.db_list tr.db_row>td:empty,table.list.db_cols tr.db_col>td:empty,table.list.db_list tr.db_row>td.name,table.list.db_cols tr.db_col>td.name,table.list.db_list tr.db_row>td.comment,table.list.db_cols tr.db_col>td.comment,table.list.db_cols tr.db_col>td.pos{display:table-cell;padding:9px 10px 9px 4px;border-top:1px solid var(--gray_10);font-size:0.875rem;vertical-align:middle;}
 table.list.db_list tr.db_row>td.count::before,table.list.db_list tr.db_row>td.rows::before,table.list.db_list tr.db_row>td.match::before,table.list.db_cols tr.db_col>td.null::before,table.list.db_cols tr.db_col>td.default::before{content:none;}
 table.list.db_list tr.db_row>td.name,table.list.db_cols tr.db_col>td.name{white-space:nowrap;}
-.db_stats{grid-template-columns:repeat(4,1fr);}
+.db_stats{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));}
 #admin-index #admin-menu ul{grid-template-columns:repeat(3,1fr);}
 }
 
