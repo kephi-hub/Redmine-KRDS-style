@@ -47,6 +47,6 @@ class DeployTargetsController < ApplicationController
   end
 
   def target_params
-    params.require(:deploy_target).permit(:name, :jenkins_server_id, :job_path, :production, :default_params)
+    params.require(:deploy_target).permit(:name, :jenkins_server_id, :job_path, :production, :default_params, :window_enabled, :window_start, :window_end, day_list: [])
   end
 end

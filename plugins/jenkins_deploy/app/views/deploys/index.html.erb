@@ -15,6 +15,8 @@
       <% if target.production? %><span class="dep_prod"><%= l(:label_deploy_production) %></span><% end %>
     </div>
     <p class="dep_job"><%= target.jenkins_server %> · <%= target.job_path %></p>
+    <% open = target.deploy_open?; can_force = User.current.allowed_to?(:manage_deploy_targets, @project) %>
+    <% if target.window_enabled? %><p class="dep_win_txt<%= ' is_off' unless open %>"><%= l(:label_deploy_window, :window => target.window_text) %></p><% end %>
     <p class="dep_last">
       <% if last %>
         <%= deploy_status_tag(last[:status]) %>
@@ -33,12 +35,18 @@
       <% elsif active %>
         <span class="dep_hint"><%= l(:label_deploy_running_wait) %></span>
         <button type="button" class="dep_btn" disabled><%= l(:label_deploy_run) %></button>
+      <% elsif !open && !can_force %>
+        <span class="dep_hint"><%= l(:label_deploy_closed, :next => (n = target.next_open_at) ? format_time(n) : '-') %></span>
+        <button type="button" class="dep_btn" disabled><%= l(:label_deploy_run) %></button>
+      <% elsif !open %>
+        <span class="dep_hint"><%= l(:label_deploy_closed, :next => (n = target.next_open_at) ? format_time(n) : '-') %></span>
+        <button type="button" class="dep_btn dep_force" data-dialog="dep_dlg_<%= target.id %>"><%= l(:label_deploy_emergency_btn) %></button>
       <% else %>
         <button type="button" class="dep_btn" data-dialog="dep_dlg_<%= target.id %>"><%= l(:label_deploy_run) %></button>
       <% end %>
     </div>
 
-    <% if target.runnable_by?(User.current) && !active %>
+    <% if target.runnable_by?(User.current) && !active && (open || can_force) %>
     <dialog id="dep_dlg_<%= target.id %>" class="dep_dlg" aria-labelledby="dep_dlg_tit_<%= target.id %>">
       <%= form_tag project_deploys_path(@project), :method => :post, :class => 'dep_form' do %>
         <%= hidden_field_tag 'target_id', target.id, :id => nil %>
@@ -86,13 +94,18 @@
           <%= text_field_tag 'confirm', '', :id => "dep_confirm_#{target.id}", :autocomplete => 'off', :data => { :expect => @project.identifier } %>
         </p>
         <% end %>
+        <% unless open %>
+        <p class="dep_emergency">
+          <label class="dep_check"><%= check_box_tag 'emergency', '1', false, :id => "dep_emg_#{target.id}" %> <%= l(:label_deploy_emergency, :window => target.window_text) %></label>
+        </p>
+        <% end %>
         <p>
-          <label for="dep_note_<%= target.id %>"><%= l(:label_deploy_note) %></label>
+          <label for="dep_note_<%= target.id %>"><%= l(open ? :label_deploy_note : :label_deploy_emergency_note) %></label>
           <%= text_field_tag 'note', '', :id => "dep_note_#{target.id}", :maxlength => 255 %>
         </p>
         <p class="form_btns">
           <button type="button" class="btn_line dep_close"><%= l(:button_cancel) %></button>
-          <%= submit_tag l(:label_deploy_run), :name => nil, :disabled => target.production?, :data => { :disable_with => l(:label_deploy_status_queued) } %>
+          <%= submit_tag l(:label_deploy_run), :name => nil, :disabled => (target.production? || !open), :data => { :disable_with => l(:label_deploy_status_queued) } %>
         </p>
       <% end %>
     </dialog>
@@ -149,9 +162,15 @@ $(function() {
     if (d && d.showModal) d.showModal();
   });
   $(document).on('click', '.dep_close', function() { this.closest('dialog').close(); });
-  $(document).on('input', '.dep_form input[name=confirm]', function() {
-    $(this).closest('form').find('input[type=submit]').prop('disabled', $.trim($(this).val()) !== String($(this).data('expect')));
-  });
+  // [실행] 켜기: 운영이면 프로젝트 식별자 일치, 시간 외면 긴급 체크 + 사유
+  function depCheck(form) {
+    var $f = $(form), ok = true, $c = $f.find('input[name=confirm]'), $e = $f.find('input[name=emergency]');
+    if ($c.length) ok = ok && $.trim($c.val()) === String($c.data('expect'));
+    if ($e.length) ok = ok && $e.prop('checked') && $.trim($f.find('input[name=note]').val()) !== '';
+    $f.find('input[type=submit]').prop('disabled', !ok);
+  }
+  $(document).on('input change', '.dep_form input', function() { depCheck(this.form); });
+  $('.dep_form').each(function() { depCheck(this); });
   // 진행 중 행: 경과 시간과 진행바를 1초마다 갱신 (예상 시간 기준, 끝나기 전에는 99% 에서 멈춤)
   function fmt(s) { return s < 60 ? s + '초' : Math.floor(s / 60) + '분 ' + ('0' + (s % 60)).slice(-2) + '초'; }
   if ($('.dep_live').length) setInterval(function() {

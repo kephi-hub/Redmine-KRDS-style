@@ -13,7 +13,7 @@ Redmine::Plugin.register :jenkins_deploy do
   name 'Jenkins 배포'
   author 'kephi-hub'
   description 'Redmine 프로젝트에서 Jenkins 배포 작업 실행과 이력 확인'
-  version '1.3.0'
+  version '1.4.0'
   url 'https://github.com/kephi-hub/Redmine-KRDS-style'
   requires_redmine version_or_higher: '6.0'
 

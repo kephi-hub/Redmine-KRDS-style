@@ -27,6 +27,13 @@ class DeploysController < ApplicationController
     return render_404 unless target
     return deny(l(:error_deploy_not_allowed)) unless target.runnable_by?(User.current)
     return deny(l(:error_deploy_confirm)) if target.production? && params[:confirm].to_s.strip != @project.identifier
+    emergency = false
+    unless target.deploy_open?
+      # 배포 가능 시간 밖 — 배포 대상 관리 권한자가 "시간 외 긴급 배포" + 사유를 넣었을 때만
+      return deny(l(:error_deploy_window, window: target.window_text)) unless params[:emergency] == '1' && User.current.allowed_to?(:manage_deploy_targets, @project)
+      return deny(l(:error_deploy_emergency_note)) if params[:note].to_s.strip.blank?
+      emergency = true
+    end
     run = target.active_run
     run&.refresh!
     return deny(l(:error_deploy_running)) if run&.reload&.active?
@@ -44,7 +51,7 @@ class DeploysController < ApplicationController
 
     run = @project.deploy_runs.create!(
       deploy_target: target, user: User.current, target_name: target.name, job_path: target.job_path,
-      production: target.production?, note: params[:note].to_s.strip.truncate(255).presence, status: 'queued'
+      production: target.production?, note: "#{'[시간 외 긴급] ' if emergency}#{params[:note].to_s.strip}".strip.truncate(255).presence, status: 'queued'
     )
     begin
       raise jenkins_error if jenkins_error

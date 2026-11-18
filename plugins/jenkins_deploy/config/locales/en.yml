@@ -63,6 +63,25 @@ en:
   error_jenkins_no_queue: Jenkins did not return a queue item.
   error_jenkins_server_in_use: This server is used by deploy targets.
   error_deploy_not_allowed: You are not allowed to deploy this target.
+  field_window_enabled: 배포 가능 시간
+  field_window_days: 배포 요일
+  field_window_time: 배포 시각
+  field_window_start: 시작 시각
+  field_window_end: 끝 시각
+  text_deploy_window_info: 켜면 아래 요일·시각(서울 시간)에만 배포할 수 있습니다. 실수로 바로 배포하는 것을 막습니다.
+  text_deploy_window_time: 끝이 시작보다 이르면 다음 날까지 (예 22:00 ~ 06:00)
+  label_deploy_weekdays: 월,화,수,목,금,토,일
+  label_deploy_days_weekday: 평일
+  label_deploy_days_weekend: 주말
+  label_deploy_days_every: 매일
+  label_deploy_next_day: 익일
+  label_deploy_window: "배포 가능: %{window}"
+  label_deploy_closed: "지금은 배포 시간이 아닙니다 (다음 가능 %{next})"
+  label_deploy_emergency_btn: 시간 외 긴급 배포
+  label_deploy_emergency: "배포 가능 시간(%{window})이 아닙니다 — 시간 외 긴급 배포로 진행 (기록에 남음)"
+  label_deploy_emergency_note: 긴급 배포 사유 (필수)
+  error_deploy_window: "배포 가능 시간(%{window})이 아니라 배포하지 않았습니다."
+  error_deploy_emergency_note: 시간 외 긴급 배포는 사유를 입력해야 합니다.
   error_deploy_confirm: The project identifier did not match. Nothing was deployed.
   error_deploy_running: A deploy is already running.
   error_deploy_failed: "Could not start the deploy: %{message}"

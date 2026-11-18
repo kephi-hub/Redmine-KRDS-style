@@ -6,9 +6,26 @@
     <em class="info"><%= l(:text_job_path_info) %></em></p>
   <p><%= f.check_box :production %>
     <em class="info"><%= l(:text_production_info) %></em></p>
+  <p><%= f.check_box :window_enabled, :class => 'dep_win_pick' %>
+    <em class="info"><%= l(:text_deploy_window_info) %></em></p>
+  <div class="dep_win" <%= 'hidden' unless @target.window_enabled? %>>
+    <p><label><%= l(:field_window_days) %></label>
+      <span class="dep_days">
+      <% l(:label_deploy_weekdays).split(',').each_with_index do |n, i| %>
+        <label class="inline"><%= check_box_tag 'deploy_target[day_list][]', i + 1, @target.day_list.include?(i + 1), :id => "dep_day_#{i + 1}" %> <%= n %></label>
+      <% end %>
+      <%= hidden_field_tag 'deploy_target[day_list][]', '', :id => nil %>
+      </span></p>
+    <p><label for="deploy_target_window_start"><%= l(:field_window_time) %></label>
+      <%= f.time_field :window_start, :no_label => true, :step => 600 %> ~ <%= f.time_field :window_end, :no_label => true, :step => 600 %>
+      <em class="info"><%= l(:text_deploy_window_time) %></em></p>
+  </div>
   <p><%= f.text_area :default_params, :rows => 4, :cols => 60, :placeholder => "BRANCH=develop" %>
     <em class="info"><%= l(:text_default_params_info) %></em></p>
 </div>
+<%= javascript_tag do %>
+$(function() { $(document).on('change', '.dep_win_pick', function() { $('.dep_win').prop('hidden', !this.checked); }); });
+<% end %>
 <p class="form_btns">
   <%= link_to l(:button_cancel), settings_project_path(@project, :tab => 'deploys'), :class => 'btn_line' %>
   <%= submit_tag l(@target.new_record? ? :button_create : :button_save) %>
