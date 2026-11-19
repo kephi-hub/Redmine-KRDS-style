@@ -355,8 +355,9 @@ module SshConsole
       return nil unless run.path
       if job.db?
         rel = download_name(run)
+        return nil unless rel # 보관 파일이 없으면(정리됨) 안내하지 않음
         h = job.db_host.presence || '127.0.0.1'
-        u = job.db_key&.login
+        u = job.db_key&.login.presence || '<DB 계정>'
         case job.db_kind
         when 'mysql' then "gunzip -c #{rel} | mysql -h #{h} -P #{job.port_or_default} -u #{u} -p #{job.db_name}"
         when 'postgresql' then "gunzip -c #{rel} | psql -h #{h} -p #{job.port_or_default} -U #{u} #{job.db_name}"
