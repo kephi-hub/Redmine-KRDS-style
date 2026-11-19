@@ -9,7 +9,7 @@ class OpsSchedulesController < ApplicationController
   before_action :find_schedule, only: [:show, :edit, :update, :destroy]
 
   def index
-    all = OpsSchedule.where(project_id: @project.id).includes(:ops_asset).sorted.to_a
+    all = OpsSchedule.by_time(OpsSchedule.where(project_id: @project.id).includes(:ops_asset).to_a)
     today = Date.current
     @today_runs = all.select(&:active?).sum { |s| s.cron&.runs_on(today)&.size.to_i }
     @kpi = { all: all.size, active: all.count(&:active?), servers: all.map(&:ops_asset_id).compact.uniq.size,
@@ -29,7 +29,7 @@ class OpsSchedulesController < ApplicationController
   # 24시간 타임라인: 시간대별 실행 수, 같은 서버에서 실행 시간이 겹치는 작업
   def timeline
     @date = (Date.parse(params[:date].to_s) rescue Date.current)
-    list = OpsSchedule.where(project_id: @project.id, active: true).includes(:ops_asset).sorted.to_a
+    list = OpsSchedule.by_time(OpsSchedule.where(project_id: @project.id, active: true).includes(:ops_asset).to_a)
     @rows = list.map { |s| [s, s.cron&.valid? ? s.cron.runs_on(@date) : nil] }
     @hours = Array.new(24, 0)
     @rows.each { |_, runs| runs&.each { |t| @hours[t.hour] += 1 } }
@@ -104,7 +104,7 @@ class OpsSchedulesController < ApplicationController
   end
 
   def export
-    send_data OpsKit::Sheet.schedules(OpsSchedule.where(project_id: @project.id).includes(:ops_asset).sorted.to_a),
+    send_data OpsKit::Sheet.schedules(OpsSchedule.by_time(OpsSchedule.where(project_id: @project.id).includes(:ops_asset).to_a)),
               filename: "배치정의서_#{@project.identifier}_#{User.current.today.strftime('%Y%m%d')}.xlsx", type: OpsKit::Sheet::XLSX
   end
 

@@ -82,6 +82,11 @@ module OpsKit
     end
 
     # 그날 실행 시각 (최대 limit 개)
+    # 하루 중 처음 도는 시각(0시부터 분) — 스케줄 목록을 시간 순으로 정렬할 때 씀
+    def first_minute
+      valid? ? @hour.min * 60 + @min.min : nil
+    end
+
     def runs_on(date, limit = 1500)
       return [] unless valid? && day?(date)
       z = self.class.zone

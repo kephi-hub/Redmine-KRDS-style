@@ -20,6 +20,11 @@ class OpsSchedule < ApplicationRecord
 
   scope :sorted, -> { order(:name, :id) }
 
+  # 목록·타임라인·배치 정의서 순서: 하루 중 처음 도는 시각 → 작업명. 시각을 계산할 수 없는 작업(글로 적은 일정 등)은 맨 뒤
+  def self.by_time(list)
+    list.sort_by { |s| [s.cron&.first_minute || 24 * 60, s.name, s.id] }
+  end
+
   def asset_visible
     return unless ops_asset_id
     errors.add(:ops_asset_id, :invalid) unless OpsAsset.for_project(project).exists?(id: ops_asset_id)
