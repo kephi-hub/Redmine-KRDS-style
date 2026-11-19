@@ -1778,7 +1778,7 @@ table.list.pm_list tr.pm_late td.next{font-weight:700;color:var(--dan_60);}
 .pm_rounds li>a strong{font-size:0.9375rem;color:var(--gray_90);}
 .pm_rounds li>a:hover{border-color:var(--sec_70);background:var(--sec_5);text-decoration:none;}
 .pm_rounds li.on>a{border:2px solid var(--sec_70);background:var(--sec_5);}
-.pm_redit{position:absolute;top:10px;right:10px;}
+#content .pm_rounds .pm_redit{display:inline-flex;position:absolute;top:10px;right:10px;align-items:center;justify-content:center;width:32px;height:32px;padding:0;}
 .pm_bulk{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;margin:0 0 12px;border:1px solid var(--gray_20);border-radius:var(--radius_m);background:var(--gray_5);}
 #content table.pm_list tr.pm_off td{color:var(--gray_60);}
 .pm_acc{white-space:pre-line;font-size:0.8125rem;}

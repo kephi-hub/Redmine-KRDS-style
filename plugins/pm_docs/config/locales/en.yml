@@ -136,6 +136,7 @@ en:
   label_pm_rk_week: "Rk week"
   label_pm_round: "Round"
   label_pm_round_all: "Round all"
+  label_pm_round_n: "%{count} rounds"
   label_pm_round_count: "%{total} findings · %{done} verified"
   label_pm_round_new: "Round new"
   label_pm_rs_done: "Rs done"

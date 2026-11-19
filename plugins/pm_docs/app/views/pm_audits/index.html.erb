@@ -10,7 +10,9 @@
 <p class="subtitle"><%= l(:text_pm_audits) %></p>
 <% if @rounds.any? %>
 <ul class="pm_rounds">
-  <li class="<%= 'on' unless @round %>"><%= link_to l(:label_pm_round_all), project_pm_audits_path(@project, :status => @status) %></li>
+  <% la = @by_round.values.flatten %>
+  <li class="<%= 'on' unless @round %>"><%= link_to project_pm_audits_path(@project, :status => @status) do %><strong><%= l(:label_pm_round_all) %></strong>
+    <span><%= l(:label_pm_round_n, :count => @rounds.size) %></span><span><%= l(:label_pm_round_count, :total => la.size, :done => la.count { |a| a.status == 'verified' }) %></span><% end %></li>
   <% @rounds.each do |r| %>
     <% l2 = @by_round[r.id] || [] %>
     <li class="<%= 'on' if @round == r %>"><%= link_to project_pm_audits_path(@project, :round => r.id, :status => @status) do %><strong><%= r.name %></strong>

@@ -2,7 +2,7 @@
 <% if (done = @runs.find { |r| r.status == 'done' }) %>
   <h3 class="ag_sec"><%= l(:label_sb_restore) %></h3>
   <p class="db_hintbox"><%= l(job.db? ? :text_sb_restore_db : :text_sb_restore_files) %></p>
-  <pre class="sb_cmd"><code><%= SshConsole::Backup.restore_hint(job, done) %></code></pre>
+  <% if (hint = SshConsole::Backup.restore_hint(job, done)).present? %><pre class="sb_cmd"><code><%= hint %></code></pre><% end %>
 <% end %>
 <h3 class="ag_sec"><%= l(:label_sb_history) %></h3>
 <% if @runs.empty? %><p class="nodata"><%= l(:label_sb_never) %></p><% else %>

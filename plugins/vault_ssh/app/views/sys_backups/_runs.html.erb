@@ -16,7 +16,7 @@
       <td><% s = r.seconds %><% if lv %><span class="sb_vt"><%= format('%d:%02d', s.to_i / 60, s.to_i % 60) %></span><% if lv[:est] %><span class="mt_dim sb_est"> / <%= l(:label_sb_est, t: format('%d:%02d', lv[:est] / 60, lv[:est] % 60)) %></span><% end %><% elsif s %><%= format('%d:%02d', s / 60, s % 60) %><% end %></td>
       <td><%= r.trigger == 'schedule' ? l(:label_sb_by_schedule) : r.user&.name %></td>
       <td class="buttons">
-        <% if r.status == 'done' && r.sys_backup_job.db? %><%= link_to sprite_icon('download', l(:label_sb_download)), project_sys_backup_download_path(@project, r.id), class: 'icon icon-download' %><% end %>
+        <% if r.status == 'done' && r.sys_backup_job.db? && r.dir.present? %><%= link_to sprite_icon('download', l(:label_sb_download)), project_sys_backup_download_path(@project, r.id), class: 'icon icon-download' %><% end %>
         <% if r.status == 'done' && r.sys_backup_job.files? && r.dir.present? %><%= link_to sprite_icon('download', l(:label_sb_zip)), project_sys_backup_zip_path(@project, r.id), class: 'icon icon-download', data: { confirm: l(:text_sb_zip_confirm, size: number_to_human_size(r.total_bytes), count: number_with_delimiter(r.files_total.to_i)) } %><% end %>
         <% if can_edit && !r.busy? %><%= link_to sprite_icon('del', l(:button_delete)), project_sys_backup_run_path(@project, r.id), method: :delete, data: { confirm: l(:text_sb_delete_run) }, class: 'icon icon-del' %><% end %>
       </td>

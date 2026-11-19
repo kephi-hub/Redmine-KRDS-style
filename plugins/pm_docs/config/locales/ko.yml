@@ -136,6 +136,7 @@ ko:
   label_pm_rk_week: "이번 주"
   label_pm_round: "감리 회차"
   label_pm_round_all: "전체 회차"
+  label_pm_round_n: "감리 회차 %{count}"
   label_pm_round_count: "지적 %{total} · 확인 %{done}"
   label_pm_round_new: "새 감리 회차"
   label_pm_rs_done: "기간 실적 (완료 · 진행)"

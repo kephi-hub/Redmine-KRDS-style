@@ -13,7 +13,7 @@ class AdminSshSessionsController < ApplicationController
     @pages = Paginator.new(@count, 50, params[:page])
     @sessions = scope.order(id: :desc).offset(@pages.offset).limit(@pages.per_page).to_a
     @projects = Project.where(id: SshSession.distinct.select(:project_id)).sorted.to_a
-    @recorded_total = SshSession.where.not(record_file: [nil, '']).count
+    @recorded_total = scope.where.not(record_file: [nil, '']).count # 지금 거른 조건 안에서
   end
 
   def export
