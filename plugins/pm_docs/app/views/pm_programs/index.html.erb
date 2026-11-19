@@ -6,14 +6,21 @@
   <%= link_to sprite_icon('download', l(:label_pm_prog_export)), project_pm_programs_export_path(@project), :class => 'icon icon-download' %>
 </div>
 <h2><%= l(:label_pm_programs) %></h2>
-<p class="subtitle"><%= l(:text_pm_programs) %></p>
+<p class="subtitle"><%= l(@view == 'tree' ? :text_pm_tree : :text_pm_programs) %></p>
+<% vp = @view == 'list' ? { :view => 'list' } : {} %>
+<% if defined?(MenuItem) && @project.module_enabled?(:menu_tree) %>
+<div class="tabs"><ul>
+  <li><%= link_to l(:label_pm_view_tree), project_pm_programs_path(@project, :status => @status, :kind => @kind, :developer_id => @dev, :q => @q.presence), :class => ('selected' if @view == 'tree') %></li>
+  <li><%= link_to l(:label_pm_view_list), project_pm_programs_path(@project, :view => 'list', :status => @status, :kind => @kind, :developer_id => @dev, :q => @q.presence), :class => ('selected' if @view == 'list') %></li>
+</ul></div>
+<% end %>
 <% done = @kpi['done'] + @kpi['tested'] %>
 <ul class="db_stats mt_kpi">
-  <li class="<%= 'on' unless @status %>"><%= link_to project_pm_programs_path(@project) do %><span><%= l(:label_pm_k_all) %></span><strong><%= @kpi['all'] %></strong><% end %></li>
+  <li class="<%= 'on' unless @status %>"><%= link_to project_pm_programs_path(@project, vp) do %><span><%= l(:label_pm_k_all) %></span><strong><%= @kpi['all'] %></strong><% end %></li>
   <% %w(todo dev done tested).each do |s| %>
-    <li class="<%= 'on' if @status == s %>"><%= link_to project_pm_programs_path(@project, :status => s) do %><span><%= pm_label('pstatus', s) %></span><strong><%= @kpi[s] %></strong><% end %></li>
+    <li class="<%= 'on' if @status == s %>"><%= link_to project_pm_programs_path(@project, vp.merge(:status => s)) do %><span><%= pm_label('pstatus', s) %></span><strong><%= @kpi[s] %></strong><% end %></li>
   <% end %>
-  <li class="<%= 'on' if @status == 'nopath' %>"><%= link_to project_pm_programs_path(@project, :status => 'nopath') do %><span><%= l(:label_pm_k_nopath) %></span><strong><%= @kpi['nopath'] %></strong><% end %></li>
+  <li class="<%= 'on' if @status == 'nopath' %>"><%= link_to project_pm_programs_path(@project, vp.merge(:status => 'nopath')) do %><span><%= l(:label_pm_k_nopath) %></span><strong><%= @kpi['nopath'] %></strong><% end %></li>
 </ul>
 <p class="db_info"><%= l(:label_pm_progress) %> <%= pm_bar(done, @kpi['all']) %>
   <% if can_edit && defined?(MenuItem) && @project.module_enabled?(:menu_tree) %> · <%= l(:label_pm_from_menus) %>
@@ -23,15 +30,19 @@
     · <%= link_to l(:label_pm_suggest), project_pm_programs_suggest_path(@project) %>
     · <%= link_to l(:label_pm_status_suggest), project_pm_programs_status_suggest_path(@project) %><% end %></p>
 <% if @by_dev.size > 1 %>
-  <ul class="db_tags"><% @by_dev.each do |u, n, d| %><li><%= link_to (u ? u.name : l(:label_pm_no_dev)), project_pm_programs_path(@project, :developer_id => u&.id) %> <span><%= d %>/<%= n %></span></li><% end %></ul>
+  <ul class="db_tags"><% @by_dev.each do |u, n, d| %><li><%= link_to (u ? u.name : l(:label_pm_no_dev)), project_pm_programs_path(@project, vp.merge(:developer_id => u&.id)) %> <span><%= d %>/<%= n %></span></li><% end %></ul>
 <% end %>
 <%= form_tag(project_pm_programs_path(@project), :method => :get, :class => 'qa_filter') do %>
   <%= hidden_field_tag 'status', @status if @status %>
+  <%= hidden_field_tag 'view', 'list', :id => nil if @view == 'list' %>
   <%= select_tag 'kind', options_for_select([[l(:label_pm_kind_all), '']] + pm_options('pkind', PmProgram::KINDS), @kind), :'aria-label' => l(:label_pm_kind) %>
   <%= search_field_tag 'q', @q, :placeholder => l(:label_pm_prog_search), :'aria-label' => l(:label_pm_prog_search) %>
   <%= submit_tag l(:label_pm_filter), :name => nil %>
 <% end %>
-<% if @programs.empty? %>
+<% if @view == 'tree' %>
+  <%= render :partial => 'pm_programs/tree', :locals => { :can_edit => can_edit } %>
+  <% if can_edit && @kpi['all'].zero? %><p class="db_hintbox"><%= l(:text_pm_prog_empty) %></p><% end %>
+<% elsif @programs.empty? %>
   <p class="nodata"><%= l(:label_no_data) %></p>
   <% if can_edit && @kpi['all'].zero? %><p class="db_hintbox"><%= l(:text_pm_prog_empty) %></p><% end %>
 <% else %>

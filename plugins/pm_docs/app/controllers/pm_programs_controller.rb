@@ -29,6 +29,9 @@ class PmProgramsController < ApplicationController
     order = menus_on? ? MenuItem.ordered(@project).each_with_index.to_h { |(m, _), i| [m.id, i] } : {}
     @programs = list.sort_by { |p| [order[p.menu_item_id] || 1_000_000, p.code] }
     @grouped = menus_on? && @programs.any?(&:menu_item_id)
+    # 기본은 메뉴 구조도 트리 (메뉴 구조도 모듈이 켜져 있을 때), ?view=list 는 예전 표
+    @view = menus_on? && params[:view] != 'list' ? 'tree' : 'list'
+    build_tree if @view == 'tree'
   end
 
   def show
@@ -44,9 +47,10 @@ class PmProgramsController < ApplicationController
 
   def create
     @program = PmProgram.new(program_params.merge(project: @project))
+    return quick_create if params[:quick]
     if @program.save
       flash[:notice] = l(:notice_successful_create)
-      redirect_to params[:continue] ? new_project_pm_program_path(@project) : project_pm_program_path(@project, @program)
+      redirect_to params[:continue] ? new_project_pm_program_path(@project, menu_item_id: @program.menu_item_id, back: params[:back]) : after_save_path
     else
       load_form
       render :new
@@ -60,7 +64,7 @@ class PmProgramsController < ApplicationController
   def update
     if @program.update(program_params)
       flash[:notice] = l(:notice_successful_update)
-      redirect_to project_pm_program_path(@project, @program)
+      redirect_to after_save_path
     else
       load_form
       render :edit
@@ -70,7 +74,7 @@ class PmProgramsController < ApplicationController
   def destroy
     @program.destroy
     flash[:notice] = l(:notice_successful_delete)
-    redirect_to project_pm_programs_path(@project)
+    redirect_to tree_path(@program.menu_item_id)
   end
 
   # 메뉴 구조도에서 만들기 — 화면(화면 유형·화면 ID 가 있거나 말단, 사용 중인 것) 기준
@@ -81,6 +85,9 @@ class PmProgramsController < ApplicationController
     return redirect_to(project_pm_programs_path(@project)) unless menus_on?
     ordered = MenuItem.ordered(@project)
     screens = MenuItem.screens(ordered).select(&:active?)
+    # 트리의 메뉴 줄 [기본 기능] — 그 화면 하나만 (말단이 아니어도, 사용 안 함이어도 직접 누른 것이니 만듦)
+    one = params[:menu_item_id].presence && MenuItem.find_by(id: params[:menu_item_id], project_id: @project.id)
+    screens = [one] if one
     index = ordered.to_h { |m, _| [m.id, m] }
     codes = PmProgram.where(project_id: @project.id).pluck(:code).map(&:upcase).to_set
     seq = PmProgram.where(project_id: @project.id).where('code LIKE ?', 'PGM-%').pluck(:code).map { |c| c[/\APGM-(\d+)/, 1].to_i }.max || 0
@@ -113,7 +120,7 @@ class PmProgramsController < ApplicationController
       end
     end
     flash[:notice] = l(:notice_pm_programs_created, count: n)
-    redirect_to project_pm_programs_path(@project)
+    redirect_to one ? tree_path(one.id) : project_pm_programs_path(@project)
   end
 
   # 상태 제안: GET 목록, POST 고른 것 반영 (apply[프로그램 id] = 새 상태)
@@ -168,6 +175,52 @@ class PmProgramsController < ApplicationController
   end
 
   private
+
+  # 트리: [메뉴, 뎁스] 앞순서 + 메뉴별 프로그램 + 하위 합계(전체·완료). 검색 조건이 있으면 맞는 프로그램이 있는 메뉴(와 상위)만
+  def build_tree
+    ordered = MenuItem.ordered(@project)
+    @by_menu = @programs.group_by(&:menu_item_id)
+    @no_menu = @by_menu.delete(nil) || []
+    @by_menu.select! { |id, _| @index[id] }
+    @no_menu += @programs.select { |p| p.menu_item_id && !@index[p.menu_item_id] }
+    by_parent = ordered.map(&:first).group_by(&:parent_id)
+    @sum = {}
+    sum = lambda do |m|
+      own = @by_menu[m.id] || []
+      t = [own.size, own.count { |p| %w(done tested).include?(p.status) }]
+      (by_parent[m.id] || []).each { |c| s = sum.call(c); t = [t[0] + s[0], t[1] + s[1]] }
+      @sum[m.id] = t
+    end
+    (by_parent[nil] || []).each { |m| sum.call(m) }
+    @filtered = @status || @kind || @dev || @q.present?
+    @parents = by_parent.keys.compact.to_set
+    @rows = @filtered ? ordered.select { |m, _| @sum[m.id][0].positive? } : ordered.reject { |m, _| !m.active? && @sum[m.id][0].zero? }
+  end
+
+  # 트리에서 바로 추가: 처리·이름만 받고 ID·유형은 메뉴로 채움. 실패해도 트리로 돌아가 오류 표시
+  def quick_create
+    menu = @program.menu_item
+    act = @program.action_list.first || 'select'
+    @program.code = PmProgram.next_code(@project, menu, act) if @program.code.blank?
+    @program.name = "#{menu&.name} : #{pm_label('paction', act)}" if @program.name.blank?
+    @program.kind = menu&.screen_type == 'popup' ? 'popup' : 'screen' if params.dig(:pm_program, :kind).blank?
+    @program.status = 'todo' if @program.status.blank?
+    if @program.save
+      flash[:notice] = l(:notice_pm_prog_added, code: @program.code)
+    else
+      flash[:error] = @program.errors.full_messages.join(', ')
+    end
+    redirect_to tree_path(@program.menu_item_id)
+  end
+
+  def tree_path(menu_id)
+    project_pm_programs_path(@project, anchor: menu_id ? "pg_m#{menu_id}" : 'pg_none')
+  end
+
+  # 트리에서 연 등록·수정은 트리(그 메뉴 위치)로, 아니면 상세로
+  def after_save_path
+    params[:back] == 'tree' ? tree_path(@program.menu_item_id) : project_pm_program_path(@project, @program)
+  end
 
   def menus_on?
     defined?(MenuItem) && @project.module_enabled?(:menu_tree)

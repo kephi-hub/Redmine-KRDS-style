@@ -215,6 +215,20 @@ en:
   label_pm_no_menu: "No menu"
   label_pm_func_count: "%{count} programs"
   label_pm_func_done: "%{count} done"
+  label_pm_view_tree: Menu tree
+  label_pm_expand: Expand
+  label_pm_collapse: Collapse
+  label_pm_view_list: List
+  label_pm_add_here: Program
+  label_pm_add_funcs: Default functions
+  label_pm_add_go: Add
+  label_pm_add_name_ph: "Name (blank = 'menu : action')"
+  label_pm_add_code_ph: ID (blank = auto)
+  label_pm_no_prog: No programs
+  label_pm_tree_head: Menu · Program
+  notice_pm_prog_added: "Program %{code} added."
+  text_pm_tree: "Programs are shown under each screen in menu tree order. Use [+ Program] on a menu row to add one there (ID is generated from the screen ID and action), or [Default functions] to create the standard functions for the screen type. Edit the menus themselves in the menu tree."
+  text_pm_add_funcs: "Create programs for this screen from its screen type's default functions. Existing IDs are skipped. Continue?"
   label_pm_cases: "Test cases"
   label_pm_last_result: "Last result"
   text_pm_paction: "Only server-side functions (select, insert, update, delete, download, upload, print, approve)."

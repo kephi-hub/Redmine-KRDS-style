@@ -1,0 +1,113 @@
+<%# 프로그램 목록 — 메뉴 구조도 트리 (메뉴 줄 아래 그 화면의 프로그램). 펼침·접기·바로 추가는 아래 스크립트 %>
+<div class="pg_tools">
+  <button type="button" class="btn_line pg_all" data-open="1"><%= l(:label_menu_g_expand) %></button>
+  <button type="button" class="btn_line pg_all" data-open="0"><%= l(:label_menu_g_collapse) %></button>
+  <%= link_to l(:label_menu_tree), project_menu_items_path(@project), :class => 'pg_link' %>
+</div>
+<% if @rows.empty? && @no_menu.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<div class="autoscroll">
+<table class="list pg_tree" id="pg_tree" data-key="pg_tree_<%= @project.id %>">
+  <thead><tr><th class="name"><%= l(:label_pm_tree_head) %></th><th class="pg_wide"><%= l(:label_pm_paction) %></th><th class="pg_wide"><%= l(:label_pm_paths) %></th><th class="pg_wide"><%= l(:label_pm_developer) %></th><th><%= l(:field_status) %></th><th class="pg_wide"><%= l(:label_pm_planned) %></th><th></th></tr></thead>
+  <tbody>
+  <% prog_row = lambda do |p, pid, d, menu| %>
+    <% short = menu && p.name.start_with?("#{menu.name} : ") ? p.name.delete_prefix("#{menu.name} : ") : p.name %>
+    <tr class="pg_prog" data-pid="<%= pid %>" style="--d:<%= d %>">
+      <td class="name"><span class="mt_leaf"></span><%= link_to p.code, project_pm_program_path(@project, p), :class => 'pg_code' %> <span class="pg_pname"><%= short %></span></td>
+      <td class="pg_wide acts"><% p.action_list.each do |a| %><span class="pm_act"><%= pm_label('paction', a) %></span><% end %></td>
+      <td class="pg_wide"><%= p.paths.size.positive? ? p.paths.size : pm_badge(l(:label_pm_none), 'none') %></td>
+      <td class="pg_wide"><%= p.developer %></td>
+      <td><%= pm_badge(pm_label('pstatus', p.status), p.status) %></td>
+      <td class="pg_wide"><%= format_date(p.planned_on) %></td>
+      <td class="buttons"><% if can_edit %>
+        <%= link_to sprite_icon('edit', l(:button_edit)), edit_project_pm_program_path(@project, p, :back => 'tree'), :class => 'icon icon-edit' %>
+        <%= link_to sprite_icon('del', l(:button_delete)), project_pm_program_path(@project, p), :method => :delete, :data => { :confirm => l(:text_are_you_sure) }, :class => 'icon icon-del' %>
+      <% end %></td>
+    </tr>
+  <% end %>
+  <% @rows.each do |m, d| %>
+    <% own = @by_menu[m.id] || []; tot, dn = @sum[m.id]; kids = @parents.include?(m.id) %>
+    <tr class="pg_menu<%= ' d0' if d.zero? %><%= ' pg_off' unless m.active? %>" id="pg_m<%= m.id %>" data-id="<%= m.id %>" data-pid="<%= m.parent_id %>" style="--d:<%= d %>">
+      <td class="name" colspan="6"><% if kids || own.any? %><button type="button" class="mt_tog" aria-expanded="true" aria-label="<%= l(:label_pm_collapse) %>">▾</button><% else %><span class="mt_leaf"></span><% end %><span class="pg_mname"><%= m.pick_label(d) %></span><% if m.screen_id %> <code><%= m.screen_id %></code><% end %>
+        <% if tot.positive? %><span class="pm_gcnt"><%= l(:label_pm_func_count, :count => tot) %> · <%= l(:label_pm_func_done, :count => dn) %></span><% elsif m.screen?(kids) %><span class="pm_gcnt"><%= l(:label_pm_no_prog) %></span><% end %></td>
+      <td class="buttons"><% if can_edit %>
+        <button type="button" class="pg_btn pg_add" data-menu="<%= m.id %>" aria-label="<%= m.name %> <%= l(:label_pm_add_here) %>"><%= sprite_icon('add', l(:label_pm_add_here)) %></button>
+        <% if own.empty? && m.screen?(kids) %><%= link_to l(:label_pm_add_funcs), project_pm_programs_from_menus_path(@project, :mode => 'function', :menu_item_id => m.id), :method => :post, :class => 'pg_btn', :data => { :confirm => l(:text_pm_add_funcs) } %><% end %>
+      <% end %></td>
+    </tr>
+    <% own.each { |p| prog_row.call(p, m.id, d + 1, m) } %>
+  <% end %>
+  <% if @no_menu.any? %>
+    <tr class="pg_menu d0" id="pg_none" data-id="none" data-pid="" style="--d:0">
+      <td class="name" colspan="7"><button type="button" class="mt_tog" aria-expanded="true" aria-label="<%= l(:label_pm_collapse) %>">▾</button><span class="pg_mname"><%= l(:label_pm_no_menu) %></span>
+        <span class="pm_gcnt"><%= l(:label_pm_func_count, :count => @no_menu.size) %></span></td>
+    </tr>
+    <% @no_menu.each { |p| prog_row.call(p, 'none', 1, nil) } %>
+  <% end %>
+  <% if can_edit %>
+    <tr class="pg_addrow" hidden style="--d:1">
+      <td colspan="7">
+        <%= form_tag project_pm_programs_path(@project), :class => 'pg_addform' do %>
+          <%= hidden_field_tag 'quick', '1', :id => nil %>
+          <%= hidden_field_tag 'pm_program[menu_item_id]', '', :id => 'pg_add_menu' %>
+          <%= select_tag 'pm_program[action_list][]', options_for_select(pm_options('paction', PmProgram::ACTIONS), 'select'), :id => 'pg_add_act', :'aria-label' => l(:label_pm_paction) %>
+          <%= text_field_tag 'pm_program[name]', '', :id => 'pg_add_name', :maxlength => 150, :placeholder => l(:label_pm_add_name_ph), :'aria-label' => l(:label_pm_prog_name) %>
+          <%= text_field_tag 'pm_program[code]', '', :id => 'pg_add_code', :maxlength => 60, :placeholder => l(:label_pm_add_code_ph), :'aria-label' => l(:label_pm_prog_code) %>
+          <%= select_tag 'pm_program[developer_id]', content_tag(:option, l(:label_pm_developer), :value => '') + options_for_select(pm_members(@project).map { |u| [u.name, u.id] }), :id => 'pg_add_dev', :'aria-label' => l(:label_pm_developer) %>
+          <button type="button" class="btn_line pg_cancel"><%= l(:button_cancel) %></button>
+          <%= submit_tag l(:label_pm_add_go), :name => nil %>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+<% end %>
+<%= javascript_tag do %>
+$(function() {
+  var $t = $('#pg_tree'); if (!$t.length) return;
+  var key = $t.data('key'), closed = {}, $add = $t.find('tr.pg_addrow');
+  try { closed = JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch (e) { closed = {}; }
+  var kids = {};
+  $t.find('tbody > tr[data-pid]').each(function() { var p = String($(this).data('pid')); (kids[p] = kids[p] || []).push(this); });
+  function setRow(tr, show) {
+    tr.hidden = !show;
+    var id = tr.getAttribute('data-id');
+    if (id && kids[id]) kids[id].forEach(function(c) { setRow(c, show && !closed[id]); });
+  }
+  function paint() {
+    $t.find('tr.pg_menu').each(function() {
+      var id = this.getAttribute('data-id'), $b = $(this).find('.mt_tog');
+      $b.text(closed[id] ? '▸' : '▾').attr('aria-expanded', !closed[id]).attr('aria-label', closed[id] ? <%= raw l(:label_pm_expand).to_json %> : <%= raw l(:label_pm_collapse).to_json %>);
+    });
+    $t.find('tr.pg_menu').filter(function() { var p = this.getAttribute('data-pid'); return !p || !document.getElementById('pg_m' + p); }).each(function() { setRow(this, true); });
+    try { localStorage.setItem(key, JSON.stringify(closed)); } catch (e) {}
+  }
+  // 주소의 #pg_m메뉴 (추가·수정 뒤 돌아옴) — 상위를 펼치고 그 줄 표시
+  var hit = location.hash && document.getElementById(location.hash.slice(1));
+  if (hit && $(hit).is('tr.pg_menu')) {
+    for (var n = hit; n; n = document.getElementById('pg_m' + n.getAttribute('data-pid'))) delete closed[n.getAttribute('data-id')];
+    $(hit).addClass('on');
+  }
+  paint();
+  if (hit) hit.scrollIntoView({ block: 'center' });
+  $t.on('click', '.mt_tog', function() { var id = $(this).closest('tr').attr('data-id'); closed[id] = !closed[id]; if (!closed[id]) delete closed[id]; $add.prop('hidden', true); paint(); });
+  $('.pg_all').on('click', function() {
+    var open = $(this).data('open') == 1; closed = {};
+    if (!open) $t.find('tr.pg_menu').each(function() { if ($(this).find('.mt_tog').length) closed[this.getAttribute('data-id')] = true; });
+    paint();
+  });
+  // [+ 프로그램]: 입력 줄을 그 메뉴 바로 아래로 옮겨 보여 줌
+  $t.on('click', '.pg_add', function() {
+    var $m = $(this).closest('tr'), id = $m.attr('data-id');
+    if (closed[id]) { delete closed[id]; paint(); }
+    $('#pg_add_menu').val(id); $('#pg_add_name, #pg_add_code').val('');
+    $add.css('--d', (+$m.css('--d') || 0) + 1).insertAfter($m).prop('hidden', false);
+    $('#pg_add_act').trigger('focus');
+  });
+  $add.on('click', '.pg_cancel', function() { var id = $('#pg_add_menu').val(); $add.prop('hidden', true); $('#pg_m' + id).find('.pg_add').trigger('focus'); });
+  $add.on('keydown', function(e) { if (e.key === 'Escape') $add.find('.pg_cancel').trigger('click'); });
+});
+<% end %>

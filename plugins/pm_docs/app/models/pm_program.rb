@@ -44,6 +44,19 @@ class PmProgram < ApplicationRecord
     self.actions = (ACTIONS & Array(list).map(&:to_s)).join(',').presence
   end
 
+  # 트리에서 [+ 프로그램] 으로 추가할 때 ID 자동: 화면 ID(없으면 그 화면 프로그램의 PGM-nnn, 그것도 없으면 새 PGM-nnn) + 처리 접미어
+  # 같은 ID 가 있으면 -2, -3 … (예: SCR-010-S, SCR-010-S-2)
+  def self.next_code(project, menu, action)
+    codes = where(project_id: project.id).pluck(:code).map(&:upcase).to_set
+    base = menu&.screen_id.presence
+    base ||= where(project_id: project.id, menu_item_id: menu.id).pluck(:code).map { |c| c[/\A(PGM-\d+)/, 1] }.compact.first if menu
+    base ||= format('PGM-%03d', (where(project_id: project.id).where('code LIKE ?', 'PGM-%').pluck(:code).map { |c| c[/\APGM-(\d+)/, 1].to_i }.max || 0) + 1)
+    code = "#{base}-#{SUFFIX[action] || 'E'}"
+    n = 1
+    code = "#{base}-#{SUFFIX[action] || 'E'}-#{n += 1}" while codes.include?(code.upcase)
+    code
+  end
+
   # 화면 유형별 기본 기능 (유형이 없으면 조회)
   def self.default_funcs(screen_type)
     DEFAULT_FUNCS.fetch(screen_type.to_s, [%w(select 조회)])

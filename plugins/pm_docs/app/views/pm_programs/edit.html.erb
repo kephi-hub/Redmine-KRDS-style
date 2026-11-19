@@ -1,6 +1,7 @@
 <h2><%= link_to l(:label_pm_programs), project_pm_programs_path(@project) %> &#187; <%= link_to @program.code, project_pm_program_path(@project, @program) %> &#187; <%= l(:button_edit) %></h2>
 <%= labelled_form_for @program, :url => project_pm_program_path(@project, @program), :method => :patch do |f| %>
+  <%= hidden_field_tag 'back', params[:back], :id => nil if params[:back] == 'tree' %>
   <%= render :partial => 'pm_programs/form', :locals => { :f => f } %>
-  <p class="form_btns"><%= link_to l(:button_cancel), project_pm_program_path(@project, @program), :class => 'btn_line' %><%= submit_tag l(:button_save) %></p>
+  <p class="form_btns"><%= link_to l(:button_cancel), params[:back] == 'tree' ? project_pm_programs_path(@project, :anchor => "pg_m#{@program.menu_item_id}") : project_pm_program_path(@project, @program), :class => 'btn_line' %><%= submit_tag l(:button_save) %></p>
 <% end %>
 <% html_title @program.code %>
