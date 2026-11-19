@@ -1719,22 +1719,32 @@ a.pm_card.warn .pm_csub span+span{font-weight:700;color:var(--war_60);}
 .pg_tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0 8px;}
 #content .pg_tools button.btn_line{height:32px;padding:0 12px;}
 .pg_link{margin-left:auto;font-size:0.875rem;}
-#content table.pg_tree td,#content table.pg_tree th{vertical-align:middle;}
-#content table.pg_tree td.name{padding-left:calc(8px + var(--d,0) * 20px);text-align:left;}
-#content table.pg_tree tr.pg_menu>td{background:var(--gray_5);}
-#content table.pg_tree tr.pg_menu.d0>td{background:var(--sec_5);}
-#content table.pg_tree tr.pg_menu.on>td{box-shadow:inset 0 2px 0 var(--pri_50);}
+#content table.pg_tree,#content table.pg_tree tbody{display:block;}
+#content table.pg_tree thead{display:none;}
+#content table.pg_tree tr{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:8px 8px 8px calc(8px + var(--d,0) * 14px);border-top:1px solid var(--gray_10);}
+#content table.pg_tree tr[hidden]{display:none;}
+#content table.pg_tree td{display:block;padding:0;border:0;background:none;vertical-align:middle;}
+#content table.pg_tree td.name{flex:1 1 60%;text-align:left;}
+#content table.pg_tree tr.pg_menu{background:var(--gray_5);}
+#content table.pg_tree tr.pg_menu.d0{background:var(--sec_5);}
+#content table.pg_tree tr.pg_menu.d0>td,#content table.pg_tree tr.pg_menu>td{background:none;}
+#content table.pg_tree th.name{text-align:left;}
+#content table.pg_tree td.buttons .icon-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+#content table.pg_tree tr.pg_prog td.buttons a.icon{padding:0 8px;}
+#content table.pg_tree tr.pg_menu.on,#content table.pg_tree tr.pg_menu.on>td{box-shadow:inset 0 2px 0 var(--pri_50);}
 #content table.pg_tree tr.pg_off .pg_mname{text-decoration:line-through;color:var(--gray_60);}
 .pg_mname{font-weight:700;color:var(--gray_90);}
 #content table.pg_tree tr.pg_menu code{margin-left:4px;font-size:0.75rem;}
 .pg_code{margin-right:4px;font-family:var(--font_mono,monospace);font-size:0.8125rem;}
 .pg_pname{color:var(--gray_80);}
 .pg_wide{display:none;}
-#content table.pg_tree td.buttons{white-space:nowrap;text-align:right;}
+#content table.pg_tree td.buttons{margin-left:auto;white-space:nowrap;text-align:right;}
+#content table.pg_tree .pg_code{white-space:nowrap;}
 #content .pg_btn{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 10px;margin-left:4px;border:1px solid var(--pri_50);border-radius:var(--radius_s);background:var(--gray_0);font-size:0.8125rem;font-weight:700;color:var(--pri_60);text-decoration:none;cursor:pointer;}
 #content .pg_btn:hover{background:var(--pri_5);}
 #content .pg_btn svg{width:14px;height:14px;}
-#content table.pg_tree tr.pg_addrow>td{padding:8px 8px 8px calc(8px + var(--d,1) * 20px);background:var(--pri_5);}
+#content table.pg_tree tr.pg_addrow{background:var(--pri_5);}
+#content table.pg_tree tr.pg_addrow>td{flex:1 1 100%;}
 .pg_addform{display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
 #content .pg_addform input[type=text],#content .pg_addform select{height:32px;}
 #content .pg_addform #pg_add_name{flex:1 1 200px;}
@@ -2010,7 +2020,17 @@ a.vk_code:hover{text-decoration:underline;}
 .kd_toast{position:fixed;bottom:24px;left:50%;z-index:2000;padding:10px 18px;border-radius:var(--radius_m);background:var(--gray_90);font-size:0.875rem;color:var(--gray_0);transform:translateX(-50%);opacity:0;transition:opacity 0.2s;pointer-events:none;}
 .kd_toast.on{opacity:1;}
 @media (min-width:900px){
+#content table.pg_tree{display:table;}
+#content table.pg_tree thead{display:table-header-group;}
+#content table.pg_tree tbody{display:table-row-group;}
+#content table.pg_tree tr{display:table-row;padding:0;border:0;}
+#content table.pg_tree tr[hidden]{display:none;}
+#content table.pg_tree td{display:table-cell;padding:6px 8px;border-top:1px solid var(--gray_10);}
+#content table.pg_tree td.name{padding-left:calc(8px + var(--d,0) * 20px);}
+#content table.pg_tree tr.pg_addrow>td{padding:8px 8px 8px calc(8px + var(--d,1) * 20px);}
 #content table.pg_tree .pg_wide{display:table-cell;}
+#content table.pg_tree td.buttons .icon-label{position:static;width:auto;height:auto;overflow:visible;clip:auto;}
+#content table.pg_tree tr.pg_prog td.buttons a.icon{padding:0 12px;}
 table.list.krds_labels td[data-label]::before{content:none;}
 #pm_actions,#pm_decisions{display:table;}
 #pm_actions thead,#pm_decisions thead{display:table-header-group;}
