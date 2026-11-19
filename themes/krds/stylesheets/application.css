@@ -1729,7 +1729,8 @@ a.pm_card.warn .pm_csub span+span{font-weight:700;color:var(--war_60);}
 #content table.pg_tree tr.pg_menu.d0{background:var(--sec_5);}
 #content table.pg_tree tr.pg_menu.d0>td,#content table.pg_tree tr.pg_menu>td{background:none;}
 #content table.pg_tree th.name{text-align:left;}
-#content table.pg_tree td.buttons .icon-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+#content table.pg_tree td.pg_wide{display:none;}
+#content table.pg_tree td.buttons a.icon .icon-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
 #content table.pg_tree tr.pg_prog td.buttons a.icon{padding:0 8px;}
 #content table.pg_tree tr.pg_menu.on,#content table.pg_tree tr.pg_menu.on>td{box-shadow:inset 0 2px 0 var(--pri_50);}
 #content table.pg_tree tr.pg_off .pg_mname{text-decoration:line-through;color:var(--gray_60);}
@@ -2028,8 +2029,8 @@ a.vk_code:hover{text-decoration:underline;}
 #content table.pg_tree td{display:table-cell;padding:6px 8px;border-top:1px solid var(--gray_10);}
 #content table.pg_tree td.name{padding-left:calc(8px + var(--d,0) * 20px);}
 #content table.pg_tree tr.pg_addrow>td{padding:8px 8px 8px calc(8px + var(--d,1) * 20px);}
-#content table.pg_tree .pg_wide{display:table-cell;}
-#content table.pg_tree td.buttons .icon-label{position:static;width:auto;height:auto;overflow:visible;clip:auto;}
+#content table.pg_tree td.pg_wide,#content table.pg_tree th.pg_wide{display:table-cell;}
+#content table.pg_tree td.buttons a.icon .icon-label{position:static;width:auto;height:auto;overflow:visible;clip:auto;}
 #content table.pg_tree tr.pg_prog td.buttons a.icon{padding:0 12px;}
 table.list.krds_labels td[data-label]::before{content:none;}
 #pm_actions,#pm_decisions{display:table;}

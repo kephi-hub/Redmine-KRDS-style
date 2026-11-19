@@ -311,7 +311,7 @@ $(function() {
       if (this.getBoundingClientRect().right > mainRight + 2) $(this).wrap('<div class="autoscroll"></div>');
     });
     // 모바일 카드에서 머리글이 숨으면 짧은 값 칸(✓·숫자 등) 앞에 그 칸 머리글을 붙임 (일감·파일·게시판·접속정보 카드는 이미 설계됨)
-    $('#content table.list').not('.issues, .files, .messages, #keys_table').each(function() {
+    $('#content table.list').not('.issues, .files, .messages, #keys_table, .pg_tree').each(function() {
       var head = $(this).children('thead');
       if (!head.length || head.css('display') !== 'none') return;
       var names = head.find('th').map(function() { return $.trim($(this).text()); }).get();
